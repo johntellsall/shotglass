@@ -24,7 +24,7 @@ linux3:
 
 django:
 	find $(SRCDIR)/python-django-1.7.6/django \
-	| egrep -v '/(contrib|debian|\.pc|tests)/' \
+	| egrep -v '/(contrib|debian|conf/locale|\.pc|tests)/' \
 	> $@.lst
 	ctags --fields=afmikKlnsStz --languages=python -L $@.lst
 	/home/johnm/env/bin/python ./manage.py make_index \
