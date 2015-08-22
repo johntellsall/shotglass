@@ -14,13 +14,13 @@ linux1:
 	/home/johnm/env/bin/python ./manage.py make_index --project=linux1 --prefix=$(SRCDIR)/linux
 
 linux3:
-	find ../../linux-3* -name '*.c' | egrep -v '/(drivers|scripts)/' \
+	find $(SRCDIR)/linux-3* -name '*.c' | egrep -v '/(drivers|scripts)/' \
 	| egrep -v '/net/(appletalk|ax25|decnet|ipv6|irda|sctp)' \
 	| egrep -v '/fs/(ceph|xfs)' | egrep -v /codecs/ \
 	| egrep -v 'kernel/cpu/.+/' > linux3.lst
 	ctags --fields=afmikKlnsStz -L linux3.lst
 	/home/johnm/env/bin/python ./manage.py make_index \
-	--project=linux3 --prefix=../../linux-3*
+	--project=linux3 --prefix=$(SRCDIR)/linux-3*
 
 django:
 	find $(SRCDIR)/python-django-1.7.6/django \
