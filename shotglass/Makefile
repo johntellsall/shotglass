@@ -9,9 +9,9 @@ xv6:
 	/home/johnm/env/bin/python ./manage.py make_index --project=xv6 --prefix=../../xv6
 
 linux1:
-	find ../../linux -name '*.c' | xargs wc -l | tail -1
-	ctags --fields=afmikKlnsStz $$(find ../../linux -name '*.c')
-	/home/johnm/env/bin/python ./manage.py make_index --project=linux1 --prefix=../../linux
+	find $(SRCDIR)/linux -name '*.c' | xargs wc -l | tail -1
+	ctags --fields=afmikKlnsStz $$(find $(SRCDIR)/linux -name '*.c')
+	/home/johnm/env/bin/python ./manage.py make_index --project=linux1 --prefix=$(SRCDIR)/linux
 
 linux3:
 	find ../../linux-3* -name '*.c' | egrep -v '/(drivers|scripts)/' \
