@@ -1,0 +1,9 @@
+<h3>Hello, project {{ project }}</h3>
+
+symbols = {{ symbol_count }}
+
+<h3>{{ functions|length }} functions</h3>
+
+{% for function in functions %}
+<li>{{ function.name }}</li>
+{% endfor %}

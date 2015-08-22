@@ -1,2 +1,4 @@
-# shotglass
-Tools to visualize large code bases in different ways.
+TODO:
+- cyclomatic complexity
+
+https://pypi.python.org/pypi/radon

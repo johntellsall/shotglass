@@ -1,0 +1,7 @@
+Django==1.8.2
+argparse==1.2.1
+django-extensions==1.5.5
+ipython==3.2.0
+python-ctags==1.0.5
+six==1.9.0
+wsgiref==0.1.2

@@ -1,0 +1,35 @@
+<style>
+  body {
+  font-family: monospace;
+  padding: 0 10px;
+}
+
+#some-div {
+  border: 1px solid #ccc;
+  display: none;
+  font-size: 10px;
+  margin-top: 10px;
+  padding: 5px;
+  text-transform: uppercase;
+}
+
+#some-div:hover #some-element {
+  display: block;
+}
+
+
+{% for row in rows %}
+{{ line.bar }} <!-- {{ line.path }}:{{ line.name }} {{ line.length}} -->
+{% endfor %}
+
+</style>
+<h3>{{ project }} overview</h3>
+
+{% for line in overview %}
+{{ line.bar }} <!-- {{ line.path }}:{{ line.name }} {{ line.length}} -->
+{% endfor %}
+
+<hr>
+<span id="some-element">
+  howdy
+</span>
