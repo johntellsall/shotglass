@@ -16,7 +16,7 @@ class Grid(object):
     def draw(self, x, y, pen):
         print 'draw: {}, {}, {}'.format(x, y, pen)
 
-    def render(self):
+    def render(self, *args):
         pass
     
 class ScreenGrid(Grid):
@@ -33,7 +33,7 @@ class ScreenGrid(Grid):
         except IndexError:
             pass
         
-    def render(self):
+    def render(self, *args):
         for row in self.data:
             print ''.join(row)
 
@@ -45,6 +45,9 @@ class ImageGrid(Grid):
 
     def draw(self, x, y, pen):
         self.im_draw.point([x, y], pen)
+
+    def render(self, path):
+        self.im.save(path)
         
 class Cursor(object):
     def __init__(self, grid):
@@ -88,5 +91,6 @@ class Command(BaseCommand):
             if prev_path != symbol.path:
                 if prev_path:
                     cursor.step(ImageColor.getrgb('white'))
+                    print prev_path,
                 prev_path = symbol.path
-        grid.render()
+        grid.render('{}.png'.format(options['project']))
