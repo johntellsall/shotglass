@@ -84,13 +84,17 @@ class Command(BaseCommand):
         grid = ImageGrid(120, 80)
         cursor = Cursor(grid)
         prev_path = None
-        for symbol in symbols:
+        for num,symbol in enumerate(symbols):
             # ScreenGrid: cursor.step(symbol.name[0])
-            pen = ImageColor.getrgb('hsl(0,100%,50%)')
+            first_ascii = ord(symbol.name[0])
+            first_hue = 360 * (first_ascii & 0x1f) / 32.
+            pen = ImageColor.getrgb('hsl({}, 100%, 50%)'.format(int(first_hue)))
             cursor.step(pen)
             if prev_path != symbol.path:
                 if prev_path:
-                    cursor.step(ImageColor.getrgb('white'))
-                    print prev_path,
+                    cursor.step(ImageColor.getrgb('black'))
+                    cursor.step(ImageColor.getrgb('black'))
+                    if not (num % 5):
+                        print prev_path,
                 prev_path = symbol.path
         grid.render('{}.png'.format(options['project']))
