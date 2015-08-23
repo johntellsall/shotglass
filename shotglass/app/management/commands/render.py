@@ -19,11 +19,11 @@ class Grid(object):
     def render(self, *args):
         pass
     
-class ScreenGrid(Grid):
+class TextGrid(Grid):
     def __init__(self, width, height):
         self.blank_row = ['.'] * width
         self.data = []
-        super(ScreenGrid, self).__init__(width, height)
+        super(TextGrid, self).__init__(width, height)
 
     def draw(self, x, y, pen):
         if y >= len(self.data):
@@ -74,27 +74,38 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--project', default='django')
+        parser.add_argument('--grid', default='screen')
         # parser.add_argument('--prefix', default='')
         # parser.add_argument('--verbose', action='store_true')
 
     def handle(self, *args, **options):
         my_symbols = SourceLine.objects.filter(project=options['project'])
         symbols = my_symbols.order_by('path')
-        grid = ScreenGrid(120, 20)
         grid = ImageGrid(120, 80)
+        def symbol_pen(symbol):
+            first_ascii = ord(symbol.name[0])
+            first_hue = 360 * (first_ascii & 0x1f) / 32.
+            return ImageColor.getrgb('hsl({}, 100%, 50%)'.format(int(first_hue)))
+        if options['grid'] == 'text':
+            grid = TextGrid(120, 20)
+            def symbol_pen(symbol):
+                return symbol.name[0]
+                    
         cursor = Cursor(grid)
         prev_path = None
         for num,symbol in enumerate(symbols):
-            # ScreenGrid: cursor.step(symbol.name[0])
-            first_ascii = ord(symbol.name[0])
-            first_hue = 360 * (first_ascii & 0x1f) / 32.
-            pen = ImageColor.getrgb('hsl({}, 100%, 50%)'.format(int(first_hue)))
+            pen = symbol_pen(symbol)
             cursor.step(pen)
             if prev_path != symbol.path:
                 if prev_path:
-                    cursor.step(ImageColor.getrgb('black'))
-                    cursor.step(ImageColor.getrgb('black'))
+                    if isinstance(grid, ImageGrid):
+                        cursor.step(ImageColor.getrgb('black'))
+                        cursor.step(ImageColor.getrgb('black'))
                     if not (num % 5):
                         print prev_path,
                 prev_path = symbol.path
-        grid.render('{}.png'.format(options['project']))
+        if isinstance(grid, ImageGrid):
+            grid.render('{}.png'.format(options['project']))
+        else:
+            grid.render()
+            
