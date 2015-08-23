@@ -1,8 +1,10 @@
+import colorsys
 import sys
 from collections import Counter
 
 import ctags
 from django.core.management.base import BaseCommand, CommandError
+from PIL import Image, ImageColor, ImageDraw
 
 from app.models import SourceLine
 
@@ -20,7 +22,7 @@ class Grid(object):
 class ScreenGrid(Grid):
     def __init__(self, width, height):
         self.blank_row = ['.'] * width
-        self.data = [] # self.blank_rowrow[:] for _ in xrange(height)]
+        self.data = []
         super(ScreenGrid, self).__init__(width, height)
 
     def draw(self, x, y, pen):
@@ -34,7 +36,16 @@ class ScreenGrid(Grid):
     def render(self):
         for row in self.data:
             print ''.join(row)
-            
+
+class ImageGrid(Grid):
+    def __init__(self, width, height):
+        self.im = Image.new('RGB', (width, height))
+        self.im_draw = ImageDraw.Draw(self.im)
+        super(ImageGrid, self).__init__(width, height)
+
+    def draw(self, x, y, pen):
+        self.im_draw.point([x, y], pen)
+        
 class Cursor(object):
     def __init__(self, grid):
         self.x = 0
@@ -67,8 +78,15 @@ class Command(BaseCommand):
         my_symbols = SourceLine.objects.filter(project=options['project'])
         symbols = my_symbols.order_by('path')
         grid = ScreenGrid(120, 20)
+        grid = ImageGrid(120, 80)
         cursor = Cursor(grid)
+        prev_path = None
         for symbol in symbols:
-            # print symbol.name
-            cursor.step(symbol.name[0])
+            # ScreenGrid: cursor.step(symbol.name[0])
+            pen = ImageColor.getrgb('hsl(0,100%,50%)')
+            cursor.step(pen)
+            if prev_path != symbol.path:
+                if prev_path:
+                    cursor.step(ImageColor.getrgb('white'))
+                prev_path = symbol.path
         grid.render()
