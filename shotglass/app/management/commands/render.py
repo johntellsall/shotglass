@@ -1,4 +1,4 @@
-import colorsys
+import math
 import sys
 from collections import Counter
 
@@ -75,19 +75,28 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--project', default='django')
         parser.add_argument('--grid', default='screen')
+        parser.add_argument('--width', type=int)
         # parser.add_argument('--prefix', default='')
         # parser.add_argument('--verbose', action='store_true')
 
     def handle(self, *args, **options):
         my_symbols = SourceLine.objects.filter(project=options['project'])
         symbols = my_symbols.order_by('path')
-        grid = ImageGrid(120, 80)
+
+        # default make square image
+        width = options['width']
+        if not width:
+            # X: do in database
+            symbols_total = sum(symbols.values_list('length', flat=True))
+            width = int(math.sqrt(symbols_total) + 1)
+            
+        grid = ImageGrid(width, width)
         def symbol_pen(symbol):
             first_ascii = ord(symbol.name[0])
             first_hue = 360 * (first_ascii & 0x1f) / 32.
             return ImageColor.getrgb('hsl({}, 100%, 50%)'.format(int(first_hue)))
         if options['grid'] == 'text':
-            grid = TextGrid(120, 20)
+            grid = TextGrid(width, 0)
             def symbol_pen(symbol):
                 return symbol.name[0]
                     
@@ -95,7 +104,7 @@ class Command(BaseCommand):
         prev_path = None
         for num,symbol in enumerate(symbols):
             pen = symbol_pen(symbol)
-            cursor.step(pen)
+            cursor.step(pen, count=symbol.length)
             if prev_path != symbol.path:
                 if prev_path:
                     if isinstance(grid, ImageGrid):
