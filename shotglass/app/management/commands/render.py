@@ -92,9 +92,13 @@ class Command(BaseCommand):
             
         grid = ImageGrid(width, width)
         def symbol_pen(symbol):
+            if symbol.kind == 'class':
+                return ImageColor.getrgb('white')
+            elif symbol.kind == 'variable':
+                return ImageColor.getrgb('hsl(0, 0%, 75%)')
             first_ascii = ord(symbol.name[0])
             first_hue = 360 * (first_ascii & 0x1f) / 32.
-            return ImageColor.getrgb('hsl({}, 100%, 50%)'.format(int(first_hue)))
+            return ImageColor.getrgb('hsl({}, 75%, 50%)'.format(int(first_hue)))
         if options['grid'] == 'text':
             grid = TextGrid(width, 0)
             def symbol_pen(symbol):
@@ -110,8 +114,8 @@ class Command(BaseCommand):
                     if isinstance(grid, ImageGrid):
                         cursor.step(ImageColor.getrgb('black'))
                         cursor.step(ImageColor.getrgb('black'))
-                    if not (num % 5):
-                        print prev_path,
+                    # if not (num % 5):
+                    #     print prev_path,
                 prev_path = symbol.path
         if isinstance(grid, ImageGrid):
             grid.render('{}.png'.format(options['project']))

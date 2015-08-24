@@ -69,6 +69,8 @@ class Command(BaseCommand):
                 prev_path = symbol.path
             if prev_symbol:
                 prev_symbol.length = symbol.line_number - prev_symbol.line_number
+                if prev_symbol.kind in ('variable', 'class'):
+                    prev_symbol.length = 1
                 prev_symbol.save()
             prev_symbol = symbol
         logger.debug('done')
