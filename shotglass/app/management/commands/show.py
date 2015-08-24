@@ -20,12 +20,15 @@ class Command(BaseCommand):
         my_symbols = SourceLine.objects.filter(project=options['project'])
         symbols = my_symbols.order_by('path')
         count_kind = Counter()
+        paths = set()
         for symbol in symbols:
             count_kind[symbol.kind] += 1
+            paths.add(symbol.path)
             if 0:
                 nice = dict((key, value) for key, value in line.__dict__.iteritems() if not key.startswith('_'))
                 print '{name:40} {kind:12} {path}:{line_number}'.format(**nice)
         print 'files:', len(set(my_symbols.values_list('path')))
         print 'total:', sum(count_kind.values())
         print count_kind
+
         
