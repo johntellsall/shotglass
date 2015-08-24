@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import logging
 import sys
 
 import ctags
@@ -7,6 +8,15 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 
 from app.models import SourceLine
+
+
+logging.basicConfig(
+    format="%(asctime)-15s %(levelname)-8s %(message)s",
+    stream=sys.stderr,
+    level=logging.DEBUG)
+# disable db queries
+logging.getLogger('django.db.backends').propagate = False
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -24,31 +34,33 @@ class Command(BaseCommand):
         if not tagFile.find(entry, '', ctags.TAG_PARTIALMATCH):
             sys.exit('no tags?')
             
+        if connection.vendor == 'sqlite':
+            connection.cursor().execute('PRAGMA synchronous=OFF')
+
+        SourceLine.objects.filter(project=options['project']).delete() # XX
+
         prefix = options['prefix']
-        rows = []
+        # rows = []
+        logger.debug('scanning source')
         while True:
             if entry['kind']:
                 path = entry['file']
                 if prefix and path.startswith(prefix):
                     path = path[len(prefix):].lstrip('/')
-                rows.append(SourceLine(name=entry['name'],
-                                       project=options['project'],
-                                       path=path,
-                                       length=0, # XX should be None
-                                       line_number=entry['lineNumber'],
-                                       kind=entry['kind']))
-                if options['verbose']:
-                    print rows[-1].__dict__
+                SourceLine(name=entry['name'],
+                           project=options['project'],
+                           path=path,
+                           length=0, # XX should be None
+                           line_number=entry['lineNumber'],
+                           kind=entry['kind']).save()
             status = tagFile.findNext(entry)
             if not status:
                 break
 
-        SourceLine.objects.filter(project=options['project']).delete() # XX
-        SourceLine.objects.bulk_create(rows)
+        # SourceLine.objects.bulk_create(rows)
         
+        logger.debug('calculating sizes')
         source = SourceLine.objects.filter(project=options['project']).order_by('path', 'line_number')
-        if connection.vendor == 'sqlite':
-            connection.cursor().execute('PRAGMA synchronous=OFF')
         prev_path = None
         prev_symbol = None
         for symbol in source:
@@ -59,3 +71,4 @@ class Command(BaseCommand):
                 prev_symbol.length = symbol.line_number - prev_symbol.line_number
                 prev_symbol.save()
             prev_symbol = symbol
+        logger.debug('done')
