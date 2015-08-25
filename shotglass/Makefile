@@ -3,6 +3,12 @@ VBIN := $(VIRTUAL_ENV)/bin
 CTAGS := ctags --fields=afmikKlnsStz 
 all:
 
+flask:
+	$(CTAGS) -o $@.tags --recurse --exclude=examples --exclude=testsuite $(SRCDIR)/Flask* 
+	$(VBIN)/python ./manage.py make_index \
+	--project=$@ --prefix=$(SRCDIR)/Flask* --tags=$@.tags
+	$(VBIN)/python ./manage.py show --project=$@
+
 postgres:
 	find $(SRCDIR)/postgres*/src -name '*.c' \
 	| egrep -v '/(interfaces|port|test)/' > $@.lst

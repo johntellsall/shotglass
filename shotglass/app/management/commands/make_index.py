@@ -25,10 +25,11 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--project')
         parser.add_argument('--prefix', default='')
+        parser.add_argument('--tags', default='tags')
         parser.add_argument('--verbose', action='store_true')
 
     def handle(self, *args, **options):
-        tagFile = ctags.CTags('tags')
+        tagFile = ctags.CTags(options['tags'])
         entry = ctags.TagEntry()
 
         if not tagFile.find(entry, '', ctags.TAG_PARTIALMATCH):
