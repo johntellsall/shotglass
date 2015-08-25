@@ -16,6 +16,9 @@ class Grid(object):
     def draw(self, x, y, pen):
         print 'draw: {}, {}, {}'.format(x, y, pen)
 
+    def get_symbol_pen(self, symbol):
+        return symbol.name[0]
+    
     def render(self, *args):
         pass
     
@@ -48,6 +51,15 @@ class ImageGrid(Grid):
 
     def render(self, path):
         self.im.save(path)
+
+    def get_symbol_pen(self, symbol):
+        if symbol.kind == 'class':
+            return ImageColor.getrgb('white')
+        elif symbol.kind == 'variable':
+            return ImageColor.getrgb('hsl(0, 0%, 75%)')
+        first_ascii = ord(symbol.name[0])
+        first_hue = 360 * (first_ascii & 0x1f) / 32.
+        return ImageColor.getrgb('hsl({}, 75%, 50%)'.format(int(first_hue)))
         
 class Cursor(object):
     def __init__(self, grid):
@@ -91,31 +103,19 @@ class Command(BaseCommand):
             width = int(math.sqrt(symbols_total) + 1)
             
         grid = ImageGrid(width, width)
-        def symbol_pen(symbol):
-            if symbol.kind == 'class':
-                return ImageColor.getrgb('white')
-            elif symbol.kind == 'variable':
-                return ImageColor.getrgb('hsl(0, 0%, 75%)')
-            first_ascii = ord(symbol.name[0])
-            first_hue = 360 * (first_ascii & 0x1f) / 32.
-            return ImageColor.getrgb('hsl({}, 75%, 50%)'.format(int(first_hue)))
         if options['grid'] == 'text':
             grid = TextGrid(width, 0)
-            def symbol_pen(symbol):
-                return symbol.name[0]
                     
         cursor = Cursor(grid)
         prev_path = None
         for num,symbol in enumerate(symbols):
-            pen = symbol_pen(symbol)
+            pen = grid.get_symbol_pen(symbol)
             cursor.step(pen, count=symbol.length)
             if prev_path != symbol.path:
                 if prev_path:
                     if isinstance(grid, ImageGrid):
                         cursor.step(ImageColor.getrgb('black'))
                         cursor.step(ImageColor.getrgb('black'))
-                    # if not (num % 5):
-                    #     print prev_path,
                 prev_path = symbol.path
         if isinstance(grid, ImageGrid):
             grid.render('{}.png'.format(options['project']))

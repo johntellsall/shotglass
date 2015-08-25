@@ -28,7 +28,9 @@ class Command(BaseCommand):
                 nice = dict((key, value) for key, value in line.__dict__.iteritems() if not key.startswith('_'))
                 print '{name:40} {kind:12} {path}:{line_number}'.format(**nice)
         print 'files:', len(set(my_symbols.values_list('path')))
-        print 'total:', sum(count_kind.values())
-        print count_kind
-
+        print 'symbols:'
+        for name, value in sorted(count_kind.iteritems()):
+            print '\t{} {}'.format(name, value)
+        print '\ttotal:', sum(count_kind.values())
+        
         
