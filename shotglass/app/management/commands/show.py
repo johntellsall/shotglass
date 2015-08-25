@@ -12,11 +12,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--project', default='django')
-        # parser.add_argument('--prefix', default='')
-        # parser.add_argument('--verbose', action='store_true')
 
     def handle(self, *args, **options):
-        # , kind__in=('function', 'member')
         my_symbols = SourceLine.objects.filter(project=options['project'])
         symbols = my_symbols.order_by('path')
         count_kind = Counter()
@@ -24,9 +21,8 @@ class Command(BaseCommand):
         for symbol in symbols:
             count_kind[symbol.kind] += 1
             paths.add(symbol.path)
-            if 0:
-                nice = dict((key, value) for key, value in line.__dict__.iteritems() if not key.startswith('_'))
-                print '{name:40} {kind:12} {path}:{line_number}'.format(**nice)
+
+        # TODO: calc in database
         print 'files:', len(set(my_symbols.values_list('path')))
         print 'symbols:'
         for name, value in sorted(count_kind.iteritems()):

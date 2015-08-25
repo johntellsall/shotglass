@@ -1,25 +1,40 @@
 SRCDIR := ../../test-projects
 VBIN := $(VIRTUAL_ENV)/bin
-
+CTAGS := ctags --fields=afmikKlnsStz 
 all:
+
+postgres:
+	find $(SRCDIR)/postgres*/src -name '*.c' \
+	| egrep -v '/(interfaces|port|test)/' > $@.lst
+	$(CTAGS)  -L $@.lst
+	$(VBIN)/python ./manage.py make_index --project=$@ --prefix=$(SRCDIR)/postgres*
+	$(VBIN)/python ./manage.py show --project=$@
+
+redis:
+	find $(SRCDIR)/redis* -name '*.c' \
+	| egrep -v '(tests|utils)' > $@.lst
+	$(CTAGS) -L $@.lst
+	$(VBIN)/python ./manage.py make_index --project=$@ --prefix=$(SRCDIR)/redis*
+	$(VBIN)/python ./manage.py show --project=$@
 
 xv6:
 	ctags --fields=afmikKlnsStz $(SRCDIR)/xv6/*.c
 	$(VBIN)/python ./manage.py make_index --project=xv6 --prefix=$(SRCDIR)/xv6
 
 linux1:
-	find $(SRCDIR)/linux -name '*.c' | xargs wc -l | tail -1
-	ctags --fields=afmikKlnsStz $$(find $(SRCDIR)/linux -name '*.c')
+	$(CTAGS) `$$(find $(SRCDIR)/linux -name '*.c')`
 	$(VBIN)/python ./manage.py make_index --project=linux1 --prefix=$(SRCDIR)/linux
+	$(VBIN)/python .manage show --project=$@
 
 linux3:
 	find $(SRCDIR)/linux-3* -name '*.c' | egrep -v '/(drivers|scripts)/' \
 	| egrep -v '/net/(appletalk|ax25|decnet|ipv6|irda|sctp)' \
 	| egrep -v '/fs/(ceph|xfs)' | egrep -v /codecs/ \
-	| egrep -v 'kernel/cpu/.+/' > linux3.lst
-	ctags --fields=afmikKlnsStz -L linux3.lst
+	| egrep -v 'kernel/cpu/.+/' > $@.lst
+	$(CTAGS) -L $@.lst
 	$(VBIN)/python ./manage.py make_index \
-	--project=linux3 --prefix=$(SRCDIR)/linux-3*
+	--project=$@ --prefix=$(SRCDIR)/linux-3*
+	$(VBIN)/python .manage show --project=$@
 
 django:
 	find $(SRCDIR)/python-django-1.7.6/django \
