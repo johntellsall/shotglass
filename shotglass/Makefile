@@ -1,6 +1,6 @@
 SRCDIR := ../../test-projects
 VBIN := $(VIRTUAL_ENV)/bin
-CTAGS := ctags --fields=afmikKlnsStz 
+CTAGS := ctags --fields=afmikKlnsStz --totals
 all:
 
 flask:
@@ -8,6 +8,14 @@ flask:
 	$(VBIN)/python ./manage.py make_index \
 	--project=$@ --prefix=$(SRCDIR)/Flask* --tags=$@.tags
 	$(VBIN)/python ./manage.py show --project=$@
+
+mysql:
+	$(CTAGS) -o $@.tags --recurse $(SRCDIR)/mysql*
+	wc -l $@.tags
+	$(VBIN)/python ./manage.py make_index \
+	--project=$@ --prefix=$(SRCDIR)/mysql* --tags=$@.tags
+	$(VBIN)/python ./manage.py show --project=$@
+
 
 postgres:
 	find $(SRCDIR)/postgres*/src -name '*.c' \

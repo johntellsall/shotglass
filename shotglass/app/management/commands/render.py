@@ -52,14 +52,18 @@ class ImageGrid(Grid):
     def render(self, path):
         self.im.save(path)
 
-    def get_symbol_pen(self, symbol):
-        if symbol.kind == 'class':
+    def make_pen(self, args):
+        return ImageColor.getrgb('hsl({0}, {1}%, {2}%)'.format(
+            int(args[0]), args[1], args[2]))
+    
+    def get_symbol_hsl(self, symbol):
+        if 0: # symbol.kind == 'class':
             return ImageColor.getrgb('white')
         elif symbol.kind == 'variable':
-            return ImageColor.getrgb('hsl(0, 0%, 75%)')
+            return (0, 0, 75)# ImageColor.getrgb('hsl(0, 0%, 75%)')
         first_ascii = ord(symbol.name[0])
         first_hue = 360 * (first_ascii & 0x1f) / 32.
-        return ImageColor.getrgb('hsl({}, 75%, 50%)'.format(int(first_hue)))
+        return (first_hue, 50, 25)
         
 class Cursor(object):
     def __init__(self, grid):
@@ -102,18 +106,21 @@ class Command(BaseCommand):
             symbols_total = sum(symbols.values_list('length', flat=True))
             width = int(math.sqrt(symbols_total) + 1)
             
-        grid = ImageGrid(width, width)
-        if options['grid'] == 'text':
-            grid = TextGrid(width, 0)
+        text_mode = options['grid'] == 'text'
+        grid = TextGrid(width, 0) if text_mode else ImageGrid(width, width)
                     
         cursor = Cursor(grid)
         prev_path = None
         for num,symbol in enumerate(symbols):
-            pen = grid.get_symbol_pen(symbol)
+            color = grid.get_symbol_hsl(symbol)
+            if not text_mode and symbol.path.endswith('fs.c'):
+                hue,sat,light = color
+                color = (hue, 75, 75)
+            pen = grid.make_pen(color)
             cursor.step(pen, count=symbol.length)
             if prev_path != symbol.path:
                 if prev_path:
-                    if isinstance(grid, ImageGrid):
+                    if not text_mode:
                         cursor.step(ImageColor.getrgb('black'))
                         cursor.step(ImageColor.getrgb('black'))
                 prev_path = symbol.path

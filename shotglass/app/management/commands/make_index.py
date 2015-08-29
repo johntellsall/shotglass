@@ -48,12 +48,15 @@ class Command(BaseCommand):
                 path = entry['file']
                 if prefix and path.startswith(prefix):
                     path = path[len(prefix):].lstrip('/')
-                SourceLine(name=entry['name'],
-                           project=options['project'],
-                           path=path,
-                           length=0, # XX should be None
-                           line_number=entry['lineNumber'],
-                           kind=entry['kind']).save()
+                try:
+                    SourceLine(name=entry['name'],
+                               project=options['project'],
+                               path=path,
+                               length=0, # XX should be None
+                               line_number=entry['lineNumber'],
+                               kind=entry['kind']).save()
+                except django.db.utils.ProgrammingError:
+                    logger.error('%s: uhoh', entry['name'])
             status = tagFile.findNext(entry)
             if not status:
                 break
