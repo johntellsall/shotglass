@@ -4,6 +4,7 @@ from collections import Counter
 
 import ctags
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Avg, Max, Sum
 from PIL import Image, ImageColor, ImageDraw
 
 from app.models import SourceLine
@@ -85,6 +86,36 @@ class Cursor(object):
                 self.y += 1
                 self.dx *= -1
         
+def render_project(project, text_mode, width):
+    my_symbols = SourceLine.objects.filter(project=project)
+    symbols = my_symbols.order_by('path', 'line_number')
+
+    grid = TextGrid(width, 0) if text_mode else ImageGrid(width, width)
+
+    cursor = Cursor(grid)
+    prev_path = None
+
+    for symbol in symbols:
+        highlight = not text_mode and symbol.path=='fs.c' # XX
+        color = grid.get_symbol_hsl(symbol)
+        if highlight:
+            color = (color[0], 75, 75)
+        pen = grid.make_pen(color)
+        cursor.step(pen, count=symbol.length)
+        if prev_path != symbol.path:
+            if prev_path:
+                if not text_mode:
+                    cursor.step(ImageColor.getrgb('black'))
+                    cursor.step(ImageColor.getrgb('black'))
+            prev_path = symbol.path
+    if not text_mode:
+        name = '{}.png'.format(project)
+        grid.render(name)
+        print name
+    else:
+        grid.render()
+            
+    
 class Command(BaseCommand):
     help = 'beer'
 
@@ -107,41 +138,21 @@ class Command(BaseCommand):
 
         for project in projects:
             print project, 
-            my_symbols = SourceLine.objects.filter(project=project)
-            symbols = my_symbols.order_by('path', 'line_number')
 
             # default make square image
             width = options['width']
             if not width:
                 # X: do in database
-                symbols_total = sum(symbols.values_list('length', flat=True))
-                width = int(math.sqrt(symbols_total) + 1)
+                symbols = SourceLine.objects.filter(project=project)
+                if 0:
+                    lines_total = sum(symbols.values_list('length', flat=True))
+                else:
+                    lines_total = SourceLine.objects.filter(
+                        project=project).aggregate(Sum('length'))['length__sum']
+
+                width = int(math.sqrt(lines_total) + 1)
 
             text_mode = options['grid'] == 'text'
-            grid = TextGrid(width, 0) if text_mode else ImageGrid(width, width)
-
-            cursor = Cursor(grid)
-            prev_path = None
-            for num,symbol in enumerate(symbols):
-                highlight = not text_mode and symbol.path=='fs.c'
-                # print '{}{:20} {}'.format(a
-                #     '*' if highlight else '.',
-                #     symbol.path, symbol.name)
-                color = grid.get_symbol_hsl(symbol)
-                if highlight:
-                    color = (color[0], 75, 75)
-                pen = grid.make_pen(color)
-                cursor.step(pen, count=symbol.length)
-                if prev_path != symbol.path:
-                    if prev_path:
-                        if not text_mode:
-                            cursor.step(ImageColor.getrgb('black'))
-                            cursor.step(ImageColor.getrgb('black'))
-                    prev_path = symbol.path
-            if isinstance(grid, ImageGrid):
-                name = '{}.png'.format(project)
-                grid.render(name)
-                print name
-            else:
-                grid.render()
+            render_project(project, text_mode, width)
+            
             
