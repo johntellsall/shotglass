@@ -89,46 +89,59 @@ class Command(BaseCommand):
     help = 'beer'
 
     def add_arguments(self, parser):
-        parser.add_argument('--project', default='django')
+        parser.add_argument('projects', nargs='+', default=['django'])
         parser.add_argument('--grid', default='screen')
         parser.add_argument('--width', type=int)
         # parser.add_argument('--prefix', default='')
         # parser.add_argument('--verbose', action='store_true')
 
+    def get_projects(self, projects):
+        if projects != ['all']:
+            return projects
+        projects = SourceLine.objects.values('project').distinct(
+        ).values_list('project', flat=True)
+        return sorted(filter(None, projects))
+    
     def handle(self, *args, **options):
-        my_symbols = SourceLine.objects.filter(project=options['project'])
-        symbols = my_symbols.order_by('path', 'line_number')
+        projects = self.get_projects(options['projects'])
 
-        # default make square image
-        width = options['width']
-        if not width:
-            # X: do in database
-            symbols_total = sum(symbols.values_list('length', flat=True))
-            width = int(math.sqrt(symbols_total) + 1)
-            
-        text_mode = options['grid'] == 'text'
-        grid = TextGrid(width, 0) if text_mode else ImageGrid(width, width)
-                    
-        cursor = Cursor(grid)
-        prev_path = None
-        for num,symbol in enumerate(symbols):
-            highlight = not text_mode and symbol.path=='fs.c'
-            print '{}{:20} {}'.format(
-                '*' if highlight else '.',
-                symbol.path, symbol.name)
-            color = grid.get_symbol_hsl(symbol)
-            if highlight:
-                color = (color[0], 75, 75)
-            pen = grid.make_pen(color)
-            cursor.step(pen, count=symbol.length)
-            if prev_path != symbol.path:
-                if prev_path:
-                    if not text_mode:
-                        cursor.step(ImageColor.getrgb('black'))
-                        cursor.step(ImageColor.getrgb('black'))
-                prev_path = symbol.path
-        if isinstance(grid, ImageGrid):
-            grid.render('{}.png'.format(options['project']))
-        else:
-            grid.render()
+        for project in projects:
+            print project, 
+            my_symbols = SourceLine.objects.filter(project=project)
+            symbols = my_symbols.order_by('path', 'line_number')
+
+            # default make square image
+            width = options['width']
+            if not width:
+                # X: do in database
+                symbols_total = sum(symbols.values_list('length', flat=True))
+                width = int(math.sqrt(symbols_total) + 1)
+
+            text_mode = options['grid'] == 'text'
+            grid = TextGrid(width, 0) if text_mode else ImageGrid(width, width)
+
+            cursor = Cursor(grid)
+            prev_path = None
+            for num,symbol in enumerate(symbols):
+                highlight = not text_mode and symbol.path=='fs.c'
+                # print '{}{:20} {}'.format(a
+                #     '*' if highlight else '.',
+                #     symbol.path, symbol.name)
+                color = grid.get_symbol_hsl(symbol)
+                if highlight:
+                    color = (color[0], 75, 75)
+                pen = grid.make_pen(color)
+                cursor.step(pen, count=symbol.length)
+                if prev_path != symbol.path:
+                    if prev_path:
+                        if not text_mode:
+                            cursor.step(ImageColor.getrgb('black'))
+                            cursor.step(ImageColor.getrgb('black'))
+                    prev_path = symbol.path
+            if isinstance(grid, ImageGrid):
+                name = '{}.png'.format(project)
+                grid.render(name)
+                print name
+            else:
+                grid.render()
             
