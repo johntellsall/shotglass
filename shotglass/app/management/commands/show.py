@@ -31,12 +31,21 @@ class Command(BaseCommand):
         print '\ttotal:', sum(count_kind.values())
         
 
-    HEADER = ''
+    HEADER = '{:12} {:>6} {:>5} {:>4} {:>6}'.format(
+        'project', 'syms', 'max', 'avg', 'total')
     FORMAT = '{project:12} {num_symbols:6} {max_length:5} {avg_length:4} {total_length:6}'
+
+    def get_projects(self, projects):
+        if projects != ['all']:
+            return projects
+        projects = SourceLine.objects.values('project').distinct(
+        ).values_list('project', flat=True)
+        return sorted(filter(None, projects))
+    
     def handle(self, *args, **options):
-        projects = options['projects']
-        # if projects == ['all']:
-        #     projects = 
+        projects = self.get_projects(options['projects'])
+
+        print self.HEADER
         for project in projects:
             symbols = SourceLine.objects.filter(project=project)
             num_symbols = symbols.count()

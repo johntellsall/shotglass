@@ -19,10 +19,10 @@ mysql:
 
 postgres:
 	find $(SRCDIR)/postgres*/src -name '*.c' \
-	| egrep -v '/(interfaces|port|test)/' > $@.lst
+	| egrep -v '/(interfaces|port|tcl|test|tools|tutorial)/' > $@.lst
 	$(CTAGS)  -L $@.lst
 	$(VBIN)/python ./manage.py make_index --project=$@ --prefix=$(SRCDIR)/postgres*
-	$(VBIN)/python ./manage.py show --project=$@
+	$(VBIN)/python ./manage.py show $@
 
 python2:
 	find $(SRCDIR)/Python-2* -name '*.c' | egrep '/(Objects|Python)/'  > $@.lst
