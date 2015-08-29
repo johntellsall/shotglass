@@ -24,6 +24,18 @@ postgres:
 	$(VBIN)/python ./manage.py make_index --project=$@ --prefix=$(SRCDIR)/postgres*
 	$(VBIN)/python ./manage.py show --project=$@
 
+python2:
+	find $(SRCDIR)/Python-2* -name '*.c' | egrep '/(Objects|Python)/'  > $@.lst
+	$(CTAGS)  -L $@.lst
+	$(VBIN)/python ./manage.py make_index --project=$@ --prefix=$(SRCDIR)/Python-2*
+	$(VBIN)/python ./manage.py show --project=$@
+
+python3:
+	find $(SRCDIR)/Python-3* -name '*.c' | egrep '/(Objects|Python)/'  > $@.lst
+	$(CTAGS)  -L $@.lst
+	$(VBIN)/python ./manage.py make_index --project=$@ --prefix=$(SRCDIR)/Python-3*
+	$(VBIN)/python ./manage.py show --project=$@
+
 redis:
 	find $(SRCDIR)/redis* -name '*.c' \
 	| egrep -v '(tests|utils)' > $@.lst
@@ -32,7 +44,8 @@ redis:
 	$(VBIN)/python ./manage.py show --project=$@
 
 xv6:
-	ctags --fields=afmikKlnsStz $(SRCDIR)/xv6/*.c
+	/bin/ls -1 $(SRCDIR)/xv6/*.c | egrep -v usertests.c \
+	| ctags -L - --fields=afmikKlnsStz 
 	$(VBIN)/python ./manage.py make_index --project=xv6 --prefix=$(SRCDIR)/xv6
 
 linux1:

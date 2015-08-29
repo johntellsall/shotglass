@@ -97,7 +97,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         my_symbols = SourceLine.objects.filter(project=options['project'])
-        symbols = my_symbols.order_by('path')
+        symbols = my_symbols.order_by('path', 'line_number')
 
         # default make square image
         width = options['width']
@@ -112,10 +112,13 @@ class Command(BaseCommand):
         cursor = Cursor(grid)
         prev_path = None
         for num,symbol in enumerate(symbols):
+            highlight = not text_mode and symbol.path=='fs.c'
+            print '{}{:20} {}'.format(
+                '*' if highlight else '.',
+                symbol.path, symbol.name)
             color = grid.get_symbol_hsl(symbol)
-            if not text_mode and symbol.path.endswith('fs.c'):
-                hue,sat,light = color
-                color = (hue, 75, 75)
+            if highlight:
+                color = (color[0], 75, 75)
             pen = grid.make_pen(color)
             cursor.step(pen, count=symbol.length)
             if prev_path != symbol.path:
