@@ -51,9 +51,9 @@ xv6:
 linux1:
 	$(CTAGS) `$$(find $(SRCDIR)/linux -name '*.c')`
 	$(VBIN)/python ./manage.py make_index --project=linux1 --prefix=$(SRCDIR)/linux
-	$(VBIN)/python .manage show --project=$@
+	$(VBIN)/python ./manage.py show --project=$@
 
-linux3:
+linux3-most:
 	find $(SRCDIR)/linux-3* -name '*.c' | egrep -v '/(drivers|scripts)/' \
 	| egrep -v '/net/(appletalk|ax25|decnet|ipv6|irda|sctp)' \
 	| egrep -v '/fs/(ceph|xfs)' | egrep -v /codecs/ \
@@ -61,7 +61,15 @@ linux3:
 	$(CTAGS) -L $@.lst
 	$(VBIN)/python ./manage.py make_index \
 	--project=$@ --prefix=$(SRCDIR)/linux-3*
-	$(VBIN)/python .manage show --project=$@
+	$(VBIN)/python ./manage.py show --project=$@
+
+linux3:
+	find $(SRCDIR)/linux-3*/kernel -name '*.c' \
+	| egrep -v 'kernel/cpu/.+/' > $@.lst
+	$(CTAGS) -L $@.lst
+	$(VBIN)/python ./manage.py make_index \
+	--project=$@ --prefix=$(SRCDIR)/linux-3*
+	$(VBIN)/python ./manage show --project=$@
 
 django:
 	find $(SRCDIR)/python-django-1.7.6/django \

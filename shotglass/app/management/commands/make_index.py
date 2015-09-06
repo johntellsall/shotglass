@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import logging
 import sys
 
@@ -23,6 +24,7 @@ class Command(BaseCommand):
     help = 'beer'
 
     def add_arguments(self, parser):
+        # parser.add_argument('--paths', type=argparse.FileType('w'))
         parser.add_argument('--project')
         parser.add_argument('--prefix', default='')
         parser.add_argument('--tags', default='tags')
@@ -41,7 +43,6 @@ class Command(BaseCommand):
         SourceLine.objects.filter(project=options['project']).delete() # XX
 
         prefix = options['prefix']
-        # rows = []
         logger.debug('scanning source')
         while True:
             if entry['kind']:
