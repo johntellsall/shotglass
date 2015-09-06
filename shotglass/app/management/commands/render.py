@@ -149,7 +149,7 @@ class Command(BaseCommand):
         return sorted(filter(None, projects))
     
     def handle(self, *args, **options):
-        width = options['width'] or calc_width(project)
+        width = options['width'] or calc_width(options['projects'][0])
         do_hilbert(options['projects'], width)
         return
         projects = self.get_projects(options['projects'])
