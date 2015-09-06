@@ -86,6 +86,21 @@ class Cursor(object):
                 self.y += 1
                 self.dx *= -1
         
+def calc_width(project):
+    if 0:     # X: do in database
+        symbols = SourceLine.objects.filter(project=project)
+        lines_total = sum(symbols.values_list('length', flat=True))
+    else:
+        lines_total = SourceLine.objects.filter(
+            project=project).aggregate(Sum('length'))['length__sum']
+
+    return int(math.sqrt(lines_total) + 1)
+
+def do_hilbert(project, width):
+    from .hilbert import int_to_Hilbert
+    for i in range(10):
+        print int_to_Hilbert(i)
+
 def render_project(project, text_mode, width):
     my_symbols = SourceLine.objects.filter(project=project)
     symbols = my_symbols.order_by('path', 'line_number')
@@ -120,7 +135,7 @@ class Command(BaseCommand):
     help = 'beer'
 
     def add_arguments(self, parser):
-        parser.add_argument('projects', nargs='+', default=['django'])
+        parser.add_argument('projects', nargs='+', default=['flask'])
         parser.add_argument('--grid', default='screen')
         parser.add_argument('--width', type=int)
         # parser.add_argument('--prefix', default='')
@@ -134,23 +149,16 @@ class Command(BaseCommand):
         return sorted(filter(None, projects))
     
     def handle(self, *args, **options):
+        width = options['width'] or calc_width(project)
+        do_hilbert(options['projects'], width)
+        return
         projects = self.get_projects(options['projects'])
 
         for project in projects:
             print project, 
 
             # default make square image
-            width = options['width']
-            if not width:
-                # X: do in database
-                symbols = SourceLine.objects.filter(project=project)
-                if 0:
-                    lines_total = sum(symbols.values_list('length', flat=True))
-                else:
-                    lines_total = SourceLine.objects.filter(
-                        project=project).aggregate(Sum('length'))['length__sum']
-
-                width = int(math.sqrt(lines_total) + 1)
+            width = options['width'] or calc_width(project)
 
             text_mode = options['grid'] == 'text'
             render_project(project, text_mode, width)
