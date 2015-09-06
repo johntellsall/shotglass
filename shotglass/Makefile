@@ -4,17 +4,19 @@ CTAGS := ctags --fields=afmikKlnsStz --totals
 all:
 
 flask:
-	$(CTAGS) -o $@.tags --recurse --exclude=examples --exclude=testsuite $(SRCDIR)/Flask* 
+	find $(SRCDIR)/Flask*/flask -name '*.py' \
+	| egrep -v '(examples|testsuite|themes)' \
+	| $(CTAGS) -L - -o $@.tags
 	$(VBIN)/python ./manage.py make_index \
-	--project=$@ --prefix=$(SRCDIR)/Flask* --tags=$@.tags
-	$(VBIN)/python ./manage.py show --project=$@
+	--project=$@ --prefix=`echo $(SRCDIR)/Flask*` --tags=$@.tags
+	$(VBIN)/python ./manage.py show $@
 
 mysql:
 	$(CTAGS) -o $@.tags --recurse $(SRCDIR)/mysql*
 	wc -l $@.tags
 	$(VBIN)/python ./manage.py make_index \
 	--project=$@ --prefix=$(SRCDIR)/mysql* --tags=$@.tags
-	$(VBIN)/python ./manage.py show --project=$@
+	$(VBIN)/python ./manage.py show $@
 
 
 postgres:

@@ -96,11 +96,29 @@ def calc_width(project):
 
     return int(math.sqrt(lines_total) + 1)
 
-def do_hilbert(project, width):
+def text_hilbert(project, width):
     from .hilbert import int_to_Hilbert
-    for i in range(10):
-        print int_to_Hilbert(i)
-
+    symbols = SourceLine.objects.filter(project=project
+    ).order_by('path', 'line_number')
+    dimensions = 2
+    index_ = 0
+    import ipdb ; ipdb.set_trace()
+    for symbol in symbols[:10]:
+        print '{:5}'.format(int_to_Hilbert(index_, dimensions)),
+        print symbol.path, symbol.name, symbol.length
+        index_ += symbol.length
+        
+def do_hilbert(project, width):
+    symbols = SourceLine.objects.filter(project=project
+    ).order_by('path', 'line_number')
+    index_ = 0
+    dimensions = 3
+    for symbol in symbols:
+        print int_to_Hilbert(index_, dimensions)
+        print '{}\t{} {} {}'.format(index_, symbol.path, symbol.name,
+                                    symbol.length)
+        index += symbol.length
+        
 def render_project(project, text_mode, width):
     my_symbols = SourceLine.objects.filter(project=project)
     symbols = my_symbols.order_by('path', 'line_number')
@@ -138,8 +156,6 @@ class Command(BaseCommand):
         parser.add_argument('projects', nargs='+', default=['flask'])
         parser.add_argument('--grid', default='screen')
         parser.add_argument('--width', type=int)
-        # parser.add_argument('--prefix', default='')
-        # parser.add_argument('--verbose', action='store_true')
 
     def get_projects(self, projects):
         if projects != ['all']:
@@ -150,7 +166,9 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         width = options['width'] or calc_width(options['projects'][0])
-        do_hilbert(options['projects'], width)
+        # import ipdb ; ipdb.set_trace()
+        text_hilbert(options['projects'][0], width)
+# do_hilbert(options['projects'], width)
         return
         projects = self.get_projects(options['projects'])
 
