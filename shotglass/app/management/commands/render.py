@@ -55,7 +55,7 @@ class ImageGrid(Grid):
 
     def drawto(self, xy, pen):
         if self.last:
-            self.im_draw.line([self.last, xy], pen)
+            self.im_draw.line((self.last, xy), pen)
         self.last = xy
 
     def render(self, path):
@@ -111,22 +111,22 @@ def grid_hilbert(project, width):
     symbols = SourceLine.objects.filter(project=project
     ).order_by('path', 'line_number')
     index_ = 0
-    point = [0, 0]
+    point = (0, 0)
     grid = ImageGrid(width, width)
     # import ipdb ; ipdb.set_trace()
     first_spot = ImageColor.getrgb('hsl(0, 0%, 75%)') # light gray
     for symbol in symbols: #[:1000]:
         pen = theme.get_symbol_hsl(symbol)
-        print '{:6} {:8} {:10}'.format(index_, point, pen),
+        print '{:6} {:8} {:11}'.format(index_, point, pen),
         print symbol.path, symbol.name, symbol.length
-        grid.draw(point[0], point[1], first_spot)
+        grid.drawto(point, first_spot)
         index_ += 1
         if symbol.length <= 1:
             continue
         # pen = (pen[0], pen[1], pen[2] / 2)             # darker
         for _ in xrange(symbol.length-1):
-            point = int_to_Hilbert(index_)
-            grid.draw(point[0], point[1], pen)
+            point = tuple(int_to_Hilbert(index_))
+            grid.drawto(point, pen)
             index_ += 1
     grid.render('{}.png'.format(project))
         
