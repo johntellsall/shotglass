@@ -63,7 +63,7 @@ class Theme(object):
     def get_symbol_hsl(self, symbol):
         first_ascii = ord(symbol.name[0])
         first_hue = 360 * (first_ascii & 0x1f) / 32.
-        return (int(first_hue), 50, 25)
+        return (int(first_hue), 30, 15)
         
 class Cursor(object):
     def __init__(self, grid):
@@ -105,7 +105,7 @@ def grid_hilbert(project, width):
     grid = ImageGrid(width, width)
     # import ipdb ; ipdb.set_trace()
     first_spot = ImageColor.getrgb('hsl(0, 0%, 75%)') # light gray
-    for symbol in symbols[:100]:
+    for symbol in symbols[:1000]:
         pen = theme.get_symbol_hsl(symbol)
         print '{:5} {:7} {:8}'.format(index_, point, pen),
         print symbol.path, symbol.name, symbol.length
