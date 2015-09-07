@@ -1,3 +1,4 @@
+import logging
 import math
 import sys
 from collections import Counter
@@ -48,6 +49,7 @@ class ImageGrid(Grid):
         super(ImageGrid, self).__init__(width, height)
 
     def draw(self, x, y, pen):
+        # print x,y,pen
         self.im_draw.point([x, y], pen)
 
     def render(self, path):
@@ -64,7 +66,7 @@ class ImageGrid(Grid):
             return (0, 0, 75)# ImageColor.getrgb('hsl(0, 0%, 75%)')
         first_ascii = ord(symbol.name[0])
         first_hue = 360 * (first_ascii & 0x1f) / 32.
-        return (first_hue, 50, 25)
+        return (int(first_hue), 50, 25)
         
 class Cursor(object):
     def __init__(self, grid):
@@ -96,28 +98,27 @@ def calc_width(project):
 
     return int(math.sqrt(lines_total) + 1)
 
-def text_hilbert(project, width):
+def grid_hilbert(project, width):
     from .hilbert import int_to_Hilbert
     symbols = SourceLine.objects.filter(project=project
     ).order_by('path', 'line_number')
-    dimensions = 2
     index_ = 0
-    import ipdb ; ipdb.set_trace()
-    for symbol in symbols[:10]:
-        print '{:5}'.format(int_to_Hilbert(index_, dimensions)),
+    point = [0, 0]
+    grid = ImageGrid(width, width)
+    # import ipdb ; ipdb.set_trace()
+    for symbol in symbols[:100]:
+        print '{:5} {:7}'.format(index_, point),
         print symbol.path, symbol.name, symbol.length
-        index_ += symbol.length
-        
-def do_hilbert(project, width):
-    symbols = SourceLine.objects.filter(project=project
-    ).order_by('path', 'line_number')
-    index_ = 0
-    dimensions = 3
-    for symbol in symbols:
-        print int_to_Hilbert(index_, dimensions)
-        print '{}\t{} {} {}'.format(index_, symbol.path, symbol.name,
-                                    symbol.length)
-        index += symbol.length
+        grid.draw(point[0], point[1], ImageColor.getrgb('white'))
+        index_ += 1
+        if symbol.length <= 1:
+            continue
+        pen = grid.get_symbol_hsl(symbol)
+        for _ in xrange(symbol.length-1):
+            point = int_to_Hilbert(index_)
+            grid.draw(point[0], point[1], pen)
+            index_ += 1
+    grid.render('{}.png'.format(project))
         
 def render_project(project, text_mode, width):
     my_symbols = SourceLine.objects.filter(project=project)
@@ -167,7 +168,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         width = options['width'] or calc_width(options['projects'][0])
         # import ipdb ; ipdb.set_trace()
-        text_hilbert(options['projects'][0], width)
+        grid_hilbert(options['projects'][0], width)
 # do_hilbert(options['projects'], width)
         return
         projects = self.get_projects(options['projects'])
