@@ -58,12 +58,9 @@ class ImageGrid(Grid):
     def make_pen(self, args):
         return ImageColor.getrgb('hsl({0}, {1}%, {2}%)'.format(
             int(args[0]), args[1], args[2]))
-    
+
+class Theme(object):
     def get_symbol_hsl(self, symbol):
-        if 0: # symbol.kind == 'class':
-            return ImageColor.getrgb('white')
-        elif symbol.kind == 'variable':
-            return (0, 0, 75)# ImageColor.getrgb('hsl(0, 0%, 75%)')
         first_ascii = ord(symbol.name[0])
         first_hue = 360 * (first_ascii & 0x1f) / 32.
         return (int(first_hue), 50, 25)
@@ -100,20 +97,23 @@ def calc_width(project):
 
 def grid_hilbert(project, width):
     from .hilbert import int_to_Hilbert
+    theme = Theme()
     symbols = SourceLine.objects.filter(project=project
     ).order_by('path', 'line_number')
     index_ = 0
     point = [0, 0]
     grid = ImageGrid(width, width)
     # import ipdb ; ipdb.set_trace()
+    first_spot = ImageColor.getrgb('hsl(0, 0%, 75%)') # light gray
     for symbol in symbols[:100]:
-        print '{:5} {:7}'.format(index_, point),
+        pen = theme.get_symbol_hsl(symbol)
+        print '{:5} {:7} {:8}'.format(index_, point, pen),
         print symbol.path, symbol.name, symbol.length
-        grid.draw(point[0], point[1], ImageColor.getrgb('white'))
+        grid.draw(point[0], point[1], first_spot)
         index_ += 1
         if symbol.length <= 1:
             continue
-        pen = grid.get_symbol_hsl(symbol)
+        # pen = (pen[0], pen[1], pen[2] / 2)             # darker
         for _ in xrange(symbol.length-1):
             point = int_to_Hilbert(index_)
             grid.draw(point[0], point[1], pen)
