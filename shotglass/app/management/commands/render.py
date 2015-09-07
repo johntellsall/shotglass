@@ -1,5 +1,6 @@
 import logging
 import math
+import random
 import sys
 from collections import Counter
 
@@ -46,11 +47,16 @@ class ImageGrid(Grid):
     def __init__(self, width, height):
         self.im = Image.new('RGB', (width, height))
         self.im_draw = ImageDraw.Draw(self.im)
+        self.last = (0, 0)
         super(ImageGrid, self).__init__(width, height)
 
     def draw(self, x, y, pen):
-        # print x,y,pen
         self.im_draw.point([x, y], pen)
+
+    def drawto(self, xy, pen):
+        if self.last:
+            self.im_draw.line([self.last, xy], pen)
+        self.last = xy
 
     def render(self, path):
         self.im.save(path)
@@ -60,11 +66,15 @@ class ImageGrid(Grid):
             int(args[0]), args[1], args[2]))
 
 class Theme(object):
+    # X: always reddish
     def get_symbol_hsl(self, symbol):
         first_ascii = ord(symbol.name[0])
         first_hue = 360 * (first_ascii & 0x1f) / 32.
         return (int(first_hue), 30, 15)
-        
+    def get_symbol_hsl(self, symbol):
+        hue = random.randint(0, 360)
+        return (hue, 30, 15)
+    
 class Cursor(object):
     def __init__(self, grid):
         self.x = 0
@@ -105,9 +115,9 @@ def grid_hilbert(project, width):
     grid = ImageGrid(width, width)
     # import ipdb ; ipdb.set_trace()
     first_spot = ImageColor.getrgb('hsl(0, 0%, 75%)') # light gray
-    for symbol in symbols[:1000]:
+    for symbol in symbols: #[:1000]:
         pen = theme.get_symbol_hsl(symbol)
-        print '{:5} {:7} {:8}'.format(index_, point, pen),
+        print '{:6} {:8} {:10}'.format(index_, point, pen),
         print symbol.path, symbol.name, symbol.length
         grid.draw(point[0], point[1], first_spot)
         index_ += 1
