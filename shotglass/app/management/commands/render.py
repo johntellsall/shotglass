@@ -72,8 +72,8 @@ class ImageGrid(Grid):
 class Theme(object):
     def get_symbol_hsl(self, symbol):
         if symbol.kind not in ('function', 'member'):
-            print symbol.__dict__
-            return (0, 100, 50)
+            # print symbol.__dict__
+            return (0, 25, 25)
         hue = random.randint(0, 360)
         return (hue, 75, 25)
     
@@ -114,7 +114,7 @@ def grid_hilbert(project, width):
     ).order_by('path', 'line_number')
     index_ = 0
     point = (0, 0)
-    width *= 2
+    width *= 4
     grid = ImageGrid(width, width)
     first_spot = color_hsl(0, 0, 75) # light gray
 
@@ -123,7 +123,13 @@ def grid_hilbert(project, width):
             yield tuple(int_to_Hilbert(index_))
     
     thispoint = thispoint_iter()
+    prev_path = None
     for num,symbol in enumerate(symbols):
+        if prev_path != symbol.path:
+            if prev_path:
+                _ = thispoint.next()
+                _ = thispoint.next()                
+            prev_path = symbol.path
         pen_hsl = theme.get_symbol_hsl(symbol)
         pen = color_hsl(*pen_hsl)
         if 0:
@@ -135,7 +141,8 @@ def grid_hilbert(project, width):
         grid.moveto(thispoint.next())
         for _ in xrange(symbol.length-1):
             grid.drawto(thispoint.next(), pen)
-
+        # _ = thispoint.next()
+        
     grid.render('{}.png'.format(project))
         
 def render_project(project, text_mode, width):
@@ -185,9 +192,9 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         width = options['width'] or calc_width(options['projects'][0])
-        # import ipdb ; ipdb.set_trace()
-        grid_hilbert(options['projects'][0], width)
-# do_hilbert(options['projects'], width)
+        for project in options['projects']:
+            print project
+            grid_hilbert(project, width)
         return
         projects = self.get_projects(options['projects'])
 
