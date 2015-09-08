@@ -50,10 +50,14 @@ class ImageGrid(Grid):
         self.last = (0, 0)
         super(ImageGrid, self).__init__(width, height)
 
-    def draw(self, x, y, pen):
-        self.im_draw.point([x, y], pen)
+    def moveto(self, xy):
+        self.last = (xy[0]*2, xy[1]*2)
+        
+    def draw(self, xy, pen):
+        self.im_draw.point((xy[0]*2, xy[1]*2), pen)
 
     def drawto(self, xy, pen):
+        xy = (xy[0]*2, xy[1]*2)
         if self.last:
             self.im_draw.line((self.last, xy), pen)
         self.last = xy
@@ -67,13 +71,13 @@ class ImageGrid(Grid):
 
 class Theme(object):
     # X: always reddish
-    def get_symbol_hsl(self, symbol):
-        first_ascii = ord(symbol.name[0])
-        first_hue = 360 * (first_ascii & 0x1f) / 32.
-        return (int(first_hue), 30, 15)
+    # def get_symbol_hsl(self, symbol):
+    #     first_ascii = ord(symbol.name[0])
+    #     first_hue = 360 * (first_ascii & 0x1f) / 32.
+    #     return (int(first_hue), 30, 15)
     def get_symbol_hsl(self, symbol):
         hue = random.randint(0, 360)
-        return (hue, 30, 15)
+        return (hue, 100, 50)
     
 class Cursor(object):
     def __init__(self, grid):
@@ -96,14 +100,14 @@ class Cursor(object):
                 self.dx *= -1
         
 def calc_width(project):
-    if 0:     # X: do in database
-        symbols = SourceLine.objects.filter(project=project)
-        lines_total = sum(symbols.values_list('length', flat=True))
-    else:
-        lines_total = SourceLine.objects.filter(
-            project=project).aggregate(Sum('length'))['length__sum']
+    lines_total = SourceLine.objects.filter(
+        project=project).aggregate(Sum('length'))['length__sum']
 
     return int(math.sqrt(lines_total) + 1)
+
+def color_hsl(hue, saturation, lightness):
+    return ImageColor.getrgb('hsl({}, {}%, {}%)'.format(
+        hue, saturation, lightness))
 
 def grid_hilbert(project, width):
     from .hilbert import int_to_Hilbert
@@ -112,18 +116,23 @@ def grid_hilbert(project, width):
     ).order_by('path', 'line_number')
     index_ = 0
     point = (0, 0)
+    width *= 2
     grid = ImageGrid(width, width)
-    # import ipdb ; ipdb.set_trace()
-    first_spot = ImageColor.getrgb('hsl(0, 0%, 75%)') # light gray
-    for symbol in symbols: #[:1000]:
-        pen = theme.get_symbol_hsl(symbol)
-        print '{:6} {:8} {:11}'.format(index_, point, pen),
-        print symbol.path, symbol.name, symbol.length
-        grid.drawto(point, first_spot)
+    first_spot = color_hsl(0, 0, 75) # light gray
+
+    for num,symbol in enumerate(symbols):
+        pen_hsl = theme.get_symbol_hsl(symbol)
+        pen = color_hsl(*pen_hsl)
+        # pen = color_hsl(random.randint(0, 360), 100, 50)
+        if 1:
+            print '{:6} {:9} {:8}'.format(index_, point, pen),
+            print symbol.path, symbol.name, symbol.length
+        grid.draw(point, first_spot)
         index_ += 1
         if symbol.length <= 1:
             continue
-        # pen = (pen[0], pen[1], pen[2] / 2)             # darker
+        point = tuple(int_to_Hilbert(index_))
+        grid.moveto(point)
         for _ in xrange(symbol.length-1):
             point = tuple(int_to_Hilbert(index_))
             grid.drawto(point, pen)
