@@ -70,14 +70,12 @@ class ImageGrid(Grid):
             int(args[0]), args[1], args[2]))
 
 class Theme(object):
-    # X: always reddish
-    # def get_symbol_hsl(self, symbol):
-    #     first_ascii = ord(symbol.name[0])
-    #     first_hue = 360 * (first_ascii & 0x1f) / 32.
-    #     return (int(first_hue), 30, 15)
     def get_symbol_hsl(self, symbol):
+        if symbol.kind not in ('function', 'member'):
+            print symbol.__dict__
+            return (0, 100, 50)
         hue = random.randint(0, 360)
-        return (hue, 100, 50)
+        return (hue, 75, 25)
     
 class Cursor(object):
     def __init__(self, grid):
@@ -120,23 +118,24 @@ def grid_hilbert(project, width):
     grid = ImageGrid(width, width)
     first_spot = color_hsl(0, 0, 75) # light gray
 
+    def thispoint_iter():
+        for index_ in xrange(100000):
+            yield tuple(int_to_Hilbert(index_))
+    
+    thispoint = thispoint_iter()
     for num,symbol in enumerate(symbols):
         pen_hsl = theme.get_symbol_hsl(symbol)
         pen = color_hsl(*pen_hsl)
-        # pen = color_hsl(random.randint(0, 360), 100, 50)
-        if 1:
+        if 0:
             print '{:6} {:9} {:8}'.format(index_, point, pen),
             print symbol.path, symbol.name, symbol.length
-        grid.draw(point, first_spot)
-        index_ += 1
+        grid.draw(thispoint.next(), first_spot)
         if symbol.length <= 1:
             continue
-        point = tuple(int_to_Hilbert(index_))
-        grid.moveto(point)
+        grid.moveto(thispoint.next())
         for _ in xrange(symbol.length-1):
-            point = tuple(int_to_Hilbert(index_))
-            grid.drawto(point, pen)
-            index_ += 1
+            grid.drawto(thispoint.next(), pen)
+
     grid.render('{}.png'.format(project))
         
 def render_project(project, text_mode, width):
