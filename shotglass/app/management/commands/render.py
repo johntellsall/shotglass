@@ -107,14 +107,14 @@ def color_hsl(hue, saturation, lightness):
     return ImageColor.getrgb('hsl({}, {}%, {}%)'.format(
         hue, saturation, lightness))
 
-def grid_hilbert(project, width):
+def grid_hilbert_symbol(project, width):
     from .hilbert import int_to_Hilbert
     theme = Theme()
     symbols = SourceLine.objects.filter(project=project
     ).order_by('path', 'line_number')
     index_ = 0
     point = (0, 0)
-    width *= 4
+    width *= 4                  # XX?
     grid = ImageGrid(width, width)
     first_spot = color_hsl(0, 0, 75) # light gray
 
@@ -141,10 +141,50 @@ def grid_hilbert(project, width):
         grid.moveto(thispoint.next())
         for _ in xrange(symbol.length-1):
             grid.drawto(thispoint.next(), pen)
-        # _ = thispoint.next()
         
     grid.render('{}.png'.format(project))
+
+def thispoint_iter():
+    from .hilbert import int_to_Hilbert
+    for index_ in xrange(100000):
+        yield tuple(int_to_Hilbert(index_))
+
+def grid_hilbert_arg(project, width, argname='path'):
+    theme = Theme()
+    symbols = SourceLine.objects.filter(project=project
+    ).order_by(argname, 'line_number')
+    point = (0, 0)
+    width *= 4                  # XX?
+    grid = ImageGrid(width, width)
+    first_spot = color_hsl(0, 0, 75) # light gray
+
+    prev_arg = None
+    thispoint = thispoint_iter()
+    highlight = False
+    for num,symbol in enumerate(symbols):
+        arg = getattr(symbol, argname)
+        if prev_arg != arg:
+            if prev_arg:
+                print arg
+                _ = thispoint.next()
+                _ = thispoint.next()              
+            prev_arg = arg
+            highlight = not highlight
+        pen_hsl = (0, 50 if num%2 else 25, 40 if highlight else 60)
+        pen = color_hsl(*pen_hsl)
+        grid.draw(thispoint.next(), pen)
+        if symbol.length <= 1:
+            continue
+        grid.moveto(thispoint.next())
+        for _ in xrange(symbol.length-1):
+            grid.drawto(thispoint.next(), pen)
         
+    grid.render('{}_{}.png'.format(project, argname))
+
+grid_hilbert = grid_hilbert_arg
+def grid_hilbert(project, width):
+    return grid_hilbert_arg(project, width, argname='tags_json')
+
 def render_project(project, text_mode, width):
     my_symbols = SourceLine.objects.filter(project=project)
     symbols = my_symbols.order_by('path', 'line_number')

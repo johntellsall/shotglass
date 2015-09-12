@@ -2,11 +2,13 @@
 
 import argparse
 import logging
+import json
 import sys
 
 import ctags
+import django.db
 from django.core.management.base import BaseCommand, CommandError
-from django.db import connection
+# from django.db import connection
 
 from app.models import SourceLine
 
@@ -37,8 +39,8 @@ class Command(BaseCommand):
         if not tagFile.find(entry, '', ctags.TAG_PARTIALMATCH):
             sys.exit('no tags?')
             
-        if connection.vendor == 'sqlite':
-            connection.cursor().execute('PRAGMA synchronous=OFF')
+        if django.db.connection.vendor == 'sqlite':
+            django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
 
         SourceLine.objects.filter(project=options['project']).delete() # XX
 
@@ -49,13 +51,16 @@ class Command(BaseCommand):
                 path = entry['file']
                 if prefix and path.startswith(prefix):
                     path = path[len(prefix):].lstrip('/')
+                tags = path.split('/')[:-1]
+                tags_json = json.dumps(tags) if tags else None
                 try:
                     SourceLine(name=entry['name'],
                                project=options['project'],
                                path=path,
                                length=0, # XX should be None
                                line_number=entry['lineNumber'],
-                               kind=entry['kind']).save()
+                               kind=entry['kind'],
+                               tags_json=tags_json).save()
                 except django.db.utils.ProgrammingError:
                     logger.error('%s: uhoh', entry['name'])
             status = tagFile.findNext(entry)
