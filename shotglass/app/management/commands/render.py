@@ -175,7 +175,7 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
     highlight = 40
     hue,saturation = 0, 0
     hue_iter = make_step_iter(50, 360)
-    saturation_iter = itertools.cycle([25, 50])
+    saturation_iter = itertools.cycle([25, 70])
     highlight_iter = itertools.cycle([40, 60])
     thispoint = thispoint_iter()
 
@@ -190,7 +190,7 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
     for symbol,arg in arg_iter():
         if symbol.path != prev_path:
             if prev_path:
-                print '\t', prev_path
+                # print '\t', prev_path
                 for _ in xrange(3):
                     thispoint.next()
             prev_path = symbol.path
