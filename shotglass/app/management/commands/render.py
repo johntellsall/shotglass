@@ -1,3 +1,6 @@
+# pylint: disable=no-member
+
+import itertools
 import logging
 import json
 import math
@@ -65,7 +68,7 @@ class ImageGrid(Grid):
 
     def render(self, path):
         self.im.save(path)
-
+        
     def make_pen(self, args):
         return ImageColor.getrgb('hsl({0}, {1}%, {2}%)'.format(
             int(args[0]), args[1], args[2]))
@@ -108,47 +111,55 @@ def color_hsl(hue, saturation, lightness):
     return ImageColor.getrgb('hsl({}, {}%, {}%)'.format(
         hue, saturation, lightness))
 
-def grid_hilbert_symbol(project, width):
-    from .hilbert import int_to_Hilbert
-    theme = Theme()
-    symbols = SourceLine.objects.filter(project=project
-    ).order_by('path', 'line_number')
-    index_ = 0
-    point = (0, 0)
-    width *= 4                  # XX?
-    grid = ImageGrid(width, width)
-    first_spot = color_hsl(0, 0, 75) # light gray
+# def grid_hilbert_symbol(project, width):
+#     from .hilbert import int_to_Hilbert
+#     theme = Theme()
+#     symbols = SourceLine.objects.filter(project=project
+#     ).order_by('path', 'line_number')
+#     index_ = 0
+#     point = (0, 0)
+#     width *= 4                  # XX?
+#     grid = ImageGrid(width, width)
+#     first_spot = color_hsl(0, 0, 75) # light gray
 
-    def thispoint_iter():
-        for index_ in xrange(100000):
-            yield tuple(int_to_Hilbert(index_))
+#     def thispoint_iter():
+#         for index_ in xrange(100000):
+#             yield tuple(int_to_Hilbert(index_))
     
-    thispoint = thispoint_iter()
-    prev_path = None
-    for num,symbol in enumerate(symbols):
-        if prev_path != symbol.path:
-            if prev_path:
-                _ = thispoint.next()
-                _ = thispoint.next()                
-            prev_path = symbol.path
-        pen_hsl = theme.get_symbol_hsl(symbol)
-        pen = color_hsl(*pen_hsl)
-        if 0:
-            print '{:6} {:9} {:8}'.format(index_, point, pen),
-            print symbol.path, symbol.name, symbol.length
-        grid.draw(thispoint.next(), first_spot)
-        if symbol.length <= 1:
-            continue
-        grid.moveto(thispoint.next())
-        for _ in xrange(symbol.length-1):
-            grid.drawto(thispoint.next(), pen)
+#     thispoint = thispoint_iter()
+#     prev_path = None
+#     for num,symbol in enumerate(symbols):
+#         if prev_path != symbol.path:
+#             if prev_path:
+#                 _ = thispoint.next()
+#                 _ = thispoint.next()                
+#             prev_path = symbol.path
+#         pen_hsl = theme.get_symbol_hsl(symbol)
+#         pen = color_hsl(*pen_hsl)
+#         if 0:
+#             print '{:6} {:9} {:8}'.format(index_, point, pen),
+#             print symbol.path, symbol.name, symbol.length
+#         grid.draw(thispoint.next(), first_spot)
+#         if symbol.length <= 1:
+#             continue
+#         grid.moveto(thispoint.next())
+#         for _ in xrange(symbol.length-1):
+#             grid.drawto(thispoint.next(), pen)
         
-    grid.render('{}.png'.format(project))
+#     path='{}.png'.format(project)
+#     import ipdb ; ipdb.set_trace()
+#     grid.render(path)
+#     print path
 
 def thispoint_iter():
     from .hilbert import int_to_Hilbert
     for index_ in xrange(100000):
         yield tuple(int_to_Hilbert(index_))
+
+def make_step_iter(step, max_):
+    for num in xrange(0, 100000, step):
+        yield num % max_
+
 
 def grid_hilbert_arg(project, width, argname='path', depth=None):
     theme = Theme()
@@ -160,24 +171,32 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
     first_spot = color_hsl(0, 0, 75) # light gray
 
     prev_arg = None
+    highlight = 40
+    hue,saturation = 0, 0
+    hue_iter = make_step_iter(50, 360)
+    saturation_iter = itertools.cycle([25, 50])
+    highlight_iter = itertools.cycle([40, 60])
     thispoint = thispoint_iter()
-    highlight = False
-    hue = 0
-    for num,symbol in enumerate(symbols):
-        arg = getattr(symbol, argname)
-        # import ipdb;ipdb.set_trace()
-        if depth and arg and argname=='tags_json':
-            arg = json.loads(arg)[:depth]
+
+    def arg_iter():
+        for symbol in symbols:
+            arg = getattr(symbol, argname)
+            if depth and arg and argname.endswith('_json'):
+                yield (symbol, json.loads(arg)[:depth])
+            else:
+                yield (symbol, arg)
+            
+    for symbol,arg in arg_iter():
         if prev_arg != arg:
-            hue = (hue + 50) % 360
+            hue = hue_iter.next()
             if prev_arg:
                 print arg
                 _ = thispoint.next()
                 _ = thispoint.next()              
             prev_arg = arg
-            highlight = not highlight # alternate args
-        saturation = 50 if num%2 else 25 # alternate symbols
-        pen_hsl = (hue, saturation, 40 if highlight else 60)
+            highlight = highlight_iter.next() # alternate args
+        saturation = saturation_iter.next() # alternate symbols
+        pen_hsl = (hue, saturation, highlight)
         pen = color_hsl(*pen_hsl)
         grid.draw(thispoint.next(), pen)
         if symbol.length <= 1:
@@ -189,43 +208,11 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
     detail = ''
     if depth:
         detail = '_{}'.format(depth)
-    grid.render('{}_{}{}.png'.format(project, argname, detail))
+    argname = argname.split('_')[0]
+    path = '{}_{}{}.png'.format(project, argname, detail)
+    grid.render(path)
+    print path
 
-# if 1:
-#     grid_hilbert = grid_hilbert_arg
-# else:
-#     def grid_hilbert(project, width, :
-#         return grid_hilbert_arg(project, width, argname='tags_json')
-
-def render_project(project, text_mode, width):
-    my_symbols = SourceLine.objects.filter(project=project)
-    symbols = my_symbols.order_by('path', 'line_number')
-
-    grid = TextGrid(width, 0) if text_mode else ImageGrid(width, width)
-
-    cursor = Cursor(grid)
-    prev_path = None
-
-    for symbol in symbols:
-        highlight = not text_mode and symbol.path=='fs.c' # XX
-        color = grid.get_symbol_hsl(symbol)
-        if highlight:
-            color = (color[0], 75, 75)
-        pen = grid.make_pen(color)
-        cursor.step(pen, count=symbol.length)
-        if prev_path != symbol.path:
-            if prev_path:
-                if not text_mode:
-                    cursor.step(ImageColor.getrgb('black'))
-                    cursor.step(ImageColor.getrgb('black'))
-            prev_path = symbol.path
-    if not text_mode:
-        name = '{}.png'.format(project)
-        grid.render(name)
-        print name
-    else:
-        grid.render()
-            
     
 class Command(BaseCommand):
     help = 'beer'
@@ -252,16 +239,5 @@ class Command(BaseCommand):
         for project in options['projects']:
             print project
             grid_hilbert_arg(project, width, options['arg'], options['depth'])
-        return
-        projects = self.get_projects(options['projects'])
-
-        for project in projects:
-            print project, 
-
-            # default make square image
-            width = options['width'] or calc_width(project)
-
-            text_mode = options['grid'] == 'text'
-            render_project(project, text_mode, width)
             
             
