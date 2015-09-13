@@ -164,13 +164,14 @@ def make_step_iter(step, max_):
 def grid_hilbert_arg(project, width, argname='path', depth=None):
     theme = Theme()
     symbols = SourceLine.objects.filter(project=project
-    ).order_by(argname, 'line_number')
+    ).order_by('tags_json', 'path', 'line_number')
     point = (0, 0)
     width *= 4                  # XX?
     grid = ImageGrid(width, width)
     first_spot = color_hsl(0, 0, 75) # light gray
 
     prev_arg = None
+    prev_path = None
     highlight = 40
     hue,saturation = 0, 0
     hue_iter = make_step_iter(50, 360)
@@ -187,12 +188,15 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
                 yield (symbol, arg)
             
     for symbol,arg in arg_iter():
+        if symbol.path != prev_path:
+            if prev_path:
+                print '\t', prev_path
+                for _ in xrange(3):
+                    thispoint.next()
+            prev_path = symbol.path
         if prev_arg != arg:
             hue = hue_iter.next()
-            if prev_arg:
-                print arg
-                _ = thispoint.next()
-                _ = thispoint.next()              
+            print arg
             prev_arg = arg
             highlight = highlight_iter.next() # alternate args
         saturation = saturation_iter.next() # alternate symbols
