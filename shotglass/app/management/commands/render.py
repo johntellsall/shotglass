@@ -1,4 +1,5 @@
 import logging
+import json
 import math
 import random
 import sys
@@ -149,7 +150,7 @@ def thispoint_iter():
     for index_ in xrange(100000):
         yield tuple(int_to_Hilbert(index_))
 
-def grid_hilbert_arg(project, width, argname='path'):
+def grid_hilbert_arg(project, width, argname='path', depth=None):
     theme = Theme()
     symbols = SourceLine.objects.filter(project=project
     ).order_by(argname, 'line_number')
@@ -161,16 +162,22 @@ def grid_hilbert_arg(project, width, argname='path'):
     prev_arg = None
     thispoint = thispoint_iter()
     highlight = False
+    hue = 0
     for num,symbol in enumerate(symbols):
         arg = getattr(symbol, argname)
+        # import ipdb;ipdb.set_trace()
+        if depth and arg and argname=='tags_json':
+            arg = json.loads(arg)[:depth]
         if prev_arg != arg:
+            hue = (hue + 50) % 360
             if prev_arg:
                 print arg
                 _ = thispoint.next()
                 _ = thispoint.next()              
             prev_arg = arg
-            highlight = not highlight
-        pen_hsl = (0, 50 if num%2 else 25, 40 if highlight else 60)
+            highlight = not highlight # alternate args
+        saturation = 50 if num%2 else 25 # alternate symbols
+        pen_hsl = (hue, saturation, 40 if highlight else 60)
         pen = color_hsl(*pen_hsl)
         grid.draw(thispoint.next(), pen)
         if symbol.length <= 1:
@@ -179,11 +186,16 @@ def grid_hilbert_arg(project, width, argname='path'):
         for _ in xrange(symbol.length-1):
             grid.drawto(thispoint.next(), pen)
         
-    grid.render('{}_{}.png'.format(project, argname))
+    detail = ''
+    if depth:
+        detail = '_{}'.format(depth)
+    grid.render('{}_{}{}.png'.format(project, argname, detail))
 
-grid_hilbert = grid_hilbert_arg
-def grid_hilbert(project, width):
-    return grid_hilbert_arg(project, width, argname='tags_json')
+# if 1:
+#     grid_hilbert = grid_hilbert_arg
+# else:
+#     def grid_hilbert(project, width, :
+#         return grid_hilbert_arg(project, width, argname='tags_json')
 
 def render_project(project, text_mode, width):
     my_symbols = SourceLine.objects.filter(project=project)
@@ -222,7 +234,10 @@ class Command(BaseCommand):
         parser.add_argument('projects', nargs='+', default=['flask'])
         parser.add_argument('--grid', default='screen')
         parser.add_argument('--width', type=int)
-
+        parser.add_argument('--arg', choices=('path', 'tags'),
+                            default='path')
+        parser.add_argument('--depth', type=int, default=0)
+        
     def get_projects(self, projects):
         if projects != ['all']:
             return projects
@@ -231,10 +246,12 @@ class Command(BaseCommand):
         return sorted(filter(None, projects))
     
     def handle(self, *args, **options):
+        if options['arg'] == 'tags':
+            options['arg'] = 'tags_json'
         width = options['width'] or calc_width(options['projects'][0])
         for project in options['projects']:
             print project
-            grid_hilbert(project, width)
+            grid_hilbert_arg(project, width, options['arg'], options['depth'])
         return
         projects = self.get_projects(options['projects'])
 
