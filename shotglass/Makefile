@@ -51,9 +51,10 @@ xv6:
 	$(VBIN)/python ./manage.py make_index --project=xv6 --prefix=$(SRCDIR)/xv6
 
 linux1:
-	$(CTAGS) `$$(find $(SRCDIR)/linux -name '*.c')`
-	$(VBIN)/python ./manage.py make_index --project=linux1 --prefix=$(SRCDIR)/linux
-	$(VBIN)/python ./manage.py show --project=$@
+	$(CTAGS) -o $@.tags `find $(SRCDIR)/linux -name '*.c'`
+	$(VBIN)/python ./manage.py make_index \
+	--project=linux1 --prefix=$(SRCDIR)/linux --tags=$@.tags
+	$(VBIN)/python ./manage.py show $@
 
 linux3-most:
 	find $(SRCDIR)/linux-3* -name '*.c' | egrep -v '/(drivers|scripts)/' \

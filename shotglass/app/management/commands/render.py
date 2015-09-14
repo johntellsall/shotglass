@@ -104,61 +104,27 @@ class Cursor(object):
 def calc_width(project):
     lines_total = SourceLine.objects.filter(
         project=project).aggregate(Sum('length'))['length__sum']
-
+    if not lines_total:
+        print 'WARNING: {} is empty'.format(project)
+        return 0
     return int(math.sqrt(lines_total) + 1)
 
 def color_hsl(hue, saturation, lightness):
     return ImageColor.getrgb('hsl({}, {}%, {}%)'.format(
         hue, saturation, lightness))
 
-# def grid_hilbert_symbol(project, width):
-#     from .hilbert import int_to_Hilbert
-#     theme = Theme()
-#     symbols = SourceLine.objects.filter(project=project
-#     ).order_by('path', 'line_number')
-#     index_ = 0
-#     point = (0, 0)
-#     width *= 4                  # XX?
-#     grid = ImageGrid(width, width)
-#     first_spot = color_hsl(0, 0, 75) # light gray
-
-#     def thispoint_iter():
-#         for index_ in xrange(100000):
-#             yield tuple(int_to_Hilbert(index_))
-    
-#     thispoint = thispoint_iter()
-#     prev_path = None
-#     for num,symbol in enumerate(symbols):
-#         if prev_path != symbol.path:
-#             if prev_path:
-#                 _ = thispoint.next()
-#                 _ = thispoint.next()                
-#             prev_path = symbol.path
-#         pen_hsl = theme.get_symbol_hsl(symbol)
-#         pen = color_hsl(*pen_hsl)
-#         if 0:
-#             print '{:6} {:9} {:8}'.format(index_, point, pen),
-#             print symbol.path, symbol.name, symbol.length
-#         grid.draw(thispoint.next(), first_spot)
-#         if symbol.length <= 1:
-#             continue
-#         grid.moveto(thispoint.next())
-#         for _ in xrange(symbol.length-1):
-#             grid.drawto(thispoint.next(), pen)
-        
-#     path='{}.png'.format(project)
-#     import ipdb ; ipdb.set_trace()
-#     grid.render(path)
-#     print path
-
 def thispoint_iter():
     from .hilbert import int_to_Hilbert
-    for index_ in xrange(100000):
+    index_ = 0
+    while True:
         yield tuple(int_to_Hilbert(index_))
+        index_ += 1
 
 def make_step_iter(step, max_):
-    for num in xrange(0, 100000, step):
-        yield num % max_
+    num = 0
+    while True:
+        yield num
+        num = (num + step) % max_
 
 
 def grid_hilbert_arg(project, width, argname='path', depth=None):
@@ -239,9 +205,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options['arg'] == 'tags':
             options['arg'] = 'tags_json'
-        width = options['width'] or calc_width(options['projects'][0])
-        for project in options['projects']:
-            print project
+        for project in self.get_projects(options['projects']):
+            print '***', project
+            width = options['width'] or calc_width(project)
+            if not width:
+                continue
             grid_hilbert_arg(project, width, options['arg'], options['depth'])
             
             
