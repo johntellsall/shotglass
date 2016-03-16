@@ -23,8 +23,7 @@ def total_lines(path_format):
     
 package_dir = os.path.join(os.environ['VIRTUAL_ENV'], 'lib/python*/site-packages')
 for libdir in filter(is_interesting, glob.glob('{}/*'.format(package_dir))):
-    print libdir
-    print total_lines('{0}/*.py {0}/*/*.py'.format(libdir))
-    blam
+    total = total_lines('{0}/*.py {0}/*/*.py'.format(libdir))
+    print '{:8d}\t{}'.format(total, libdir)
     
     
