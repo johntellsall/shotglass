@@ -3,8 +3,10 @@ VBIN := $(VIRTUAL_ENV)/bin
 CTAGS := ctags --fields=afmikKlnsStz --totals
 all:
 
+# apt-get source postgresql-9.3 python3.4 python3-flask mysql-common
+# apt-get source python2.7 python-django redis
 flask:
-	find $(SRCDIR)/Flask*/flask -name '*.py' \
+	find $(SRCDIR)/flask*/flask -name '*.py' \
 	| egrep -v '(examples|testsuite|themes)' \
 	| $(CTAGS) -L - -o $@.tags
 	$(VBIN)/python ./manage.py make_index \
@@ -27,16 +29,20 @@ postgres:
 	$(VBIN)/python ./manage.py show $@
 
 python2:
-	find $(SRCDIR)/Python-2* -name '*.c' | egrep '/(Objects|Python)/'  > $@.lst
+	find $(SRCDIR)/python2* -name '*.c' \
+	| egrep '/(Objects|Python)/'  > $@.lst
 	$(CTAGS)  -L $@.lst
-	$(VBIN)/python ./manage.py make_index --project=$@ --prefix=$(SRCDIR)/Python-2*
-	$(VBIN)/python ./manage.py show --project=$@
+	$(VBIN)/python ./manage.py make_index --project=$@ \
+	--prefix=$(SRCDIR)/python2*
+	$(VBIN)/python ./manage.py show $@
 
 python3:
-	find $(SRCDIR)/Python-3* -name '*.c' | egrep '/(Objects|Python)/'  > $@.lst
+	find $(SRCDIR)/python3* -name '*.c' \
+	| egrep '/(Objects|Python)/'  > $@.lst
 	$(CTAGS)  -L $@.lst
-	$(VBIN)/python ./manage.py make_index --project=$@ --prefix=$(SRCDIR)/Python-3*
-	$(VBIN)/python ./manage.py show --project=$@
+	$(VBIN)/python ./manage.py make_index --project=$@ \
+	--prefix=$(SRCDIR)/python3*
+	$(VBIN)/python ./manage.py show $@
 
 redis:
 	find $(SRCDIR)/redis* -name '*.c' \
@@ -47,7 +53,7 @@ redis:
 
 xv6:
 	/bin/ls -1 $(SRCDIR)/xv6/*.c | egrep -v usertests.c \
-	| ctags -L - --fields=afmikKlnsStz 
+	| ctags -L - --fields=afmikKlnsStz
 	$(VBIN)/python ./manage.py make_index --project=xv6 --prefix=$(SRCDIR)/xv6
 
 linux1:
@@ -75,11 +81,11 @@ linux3:
 	$(VBIN)/python ./manage show --project=$@
 
 django:
-	find $(SRCDIR)/python-django-1.7.6/django \
+	find $(SRCDIR)/python-django-*/django \
 	| egrep -v '/(contrib|debian|conf/locale|\.pc|tests)/' \
 	> $@.lst
 	ctags --fields=afmikKlnsStz --languages=python -L $@.lst
 	$(VBIN)/python ./manage.py make_index \
-	--project=django --prefix=$(SRCDIR)/python-django-1.7.6/django
+	--project=django --prefix=$(SRCDIR)/python-django-*/django
 
 allprojects: django xv6 linux1
