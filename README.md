@@ -20,4 +20,4 @@
     $ ./manage.py render flask
     $ firefox flask_path.png
 
-!(images/flask_path.png)
+![Flask](images/flask_path.png)
