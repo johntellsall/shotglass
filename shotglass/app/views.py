@@ -10,7 +10,7 @@ def index(request):
     if 0:
         projects = SourceLine.objects.distinct('project')
     else:
-        projects = ('linux1', 'linux3', 'xv6')
+        projects = ('flask',)
     return render(request, 'index.html', {'projects': projects})
 
 
@@ -34,7 +34,7 @@ def overview(request, project):
 # def overview2(request, project):
 #     WIDTH = 1000
 #     Block = namedtuple('Block', 'width css_class')
-    
+
 #     proj_source = SourceLine.objects.filter(project=project)
 #     prev = None
 #     for source in proj_source.order_by('path', 'line_number'):
@@ -43,10 +43,10 @@ def overview(request, project):
 #             continue
 #         info = dict(prev.__dict__)
 #         info['length'] = source
-        
+
 #     x = 0
 #     css_class = 'light'
-        
+
 #         block = Block(line['
 #     def calc_overview():
 #         prev_lineno = 0
@@ -65,33 +65,16 @@ def overview(request, project):
 #             x += info['length']
 #             if x > WIDTH:
 #                 x = 0
-            
+
 #     return render(request, 'overview2.html', {
 #         'rows': rows,
 #     })
-            
-    
-def list_functions1(request, project):
-    proj_lines = SourceLine.objects.filter(project=project)
-    symbol_count = proj_lines.count()
-    if 0:
-        functions = defaultdict(list)
-        for function in proj_lines.filter(kind='function'):
-            functions[function.name].append(function)
-    else:
-        functions = proj_lines.filter(kind='function').order_by('name')
 
-    return render(request, 'list_functions.html', {
-        'functions': functions,
-        'project': project, 
-        'symbol_count': symbol_count})
 
-def list_functions2(request, project):
+def list_functions(request, project):
     proj_lines = SourceLine.objects.filter(project=project)
     functions = proj_lines.filter(kind='function').order_by('path', 'name')
 
     return render(request, 'list_functions2.html', {
         'functions': functions,
         'project': project})
-
-list_functions = list_functions2
