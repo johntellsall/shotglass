@@ -1,4 +1,4 @@
-INSTALL
+# INSTALL
 
     sudo apt install python-dev python-virtualenv
     virtualenv ./venv
@@ -7,7 +7,8 @@ INSTALL
     ./manage.py migrate
 
 
-DEMO
+# DEMO
+
     $ apt source python-flask
     $ ./manage.py make_index --project=flask \
     --prefix=`echo ../../test-projects/Flask*` --tags=flask.tags
@@ -19,4 +20,4 @@ DEMO
     $ ./manage.py render flask
     $ firefox flask_path.png
 
-!(images/flask_path.png
+!(images/flask_path.png)
