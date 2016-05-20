@@ -1,6 +1,6 @@
 # INSTALL
 
-    sudo apt install python-dev python-virtualenv
+    sudo apt install -y exuberant-ctags python-dev python-virtualenv
     virtualenv ./venv
     . ./venv/bin/activate
     pip install -r ./requirements.txt
@@ -21,3 +21,9 @@
     $ firefox flask_path.png
 
 ![Flask](images/flask_path.png)
+
+# MORE DEMOS
+
+![Flask](images/flask_path_1.png)
+
+![Flask](images/flask_path_tags.png)
