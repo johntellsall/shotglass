@@ -24,4 +24,9 @@
 
 # MORE DEMOS
 
+# Tags mode
+
+In "tags mode", a source tree is colored per tag, or directory.  Since
+Flask has only one directory, it's not that interesting:
+
 ![Flask](images/flask_tags.png)
