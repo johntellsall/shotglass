@@ -24,6 +24,4 @@
 
 # MORE DEMOS
 
-![Flask](images/flask_path_1.png)
-
-![Flask](images/flask_path_tags.png)
+![Flask](images/flask_tags.png)
