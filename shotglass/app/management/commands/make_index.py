@@ -30,12 +30,14 @@ class Command(BaseCommand):
     help = 'beer'
 
     def add_arguments(self, parser):
-        # parser.add_argument('--paths', type=argparse.FileType('w'))
-        parser.add_argument('--index', type=str) # XX
-        parser.add_argument('--project')
-        parser.add_argument('--prefix', default='')
-        parser.add_argument('--tags', default='tags')
+        parser.add_argument('project', metavar='FILE')
+        # parser.add_argument('', type=str) # XX
+        # parser.add_argument('--project')
+        # parser.add_argument('--prefix', default='')
+        parser.add_argument('--tags')
         parser.add_argument('--verbose', action='store_true')
+        # internal
+        parser.add_argument('--list_path')
 
         # $ find ./python-django-*/django
         # | egrep -v '/(contrib|debian|conf/locale|\.pc|tests)/' > django.lst
@@ -52,20 +54,35 @@ class Command(BaseCommand):
             for path in (os.path.join(root, name) for name in names):
                 yield path
 
-    def handle(self, *args, **options):
-        # find source code in tree, write to list file
-        paths = self.find_source_paths(options['index'])
-        index_name = os.path.basename(options['index'])
-        list_path = '{}.lst'.format(index_name)
-        with open(list_path, 'w') as sourcef:
-            sourcef.write('\n'.join(paths))
-            sourcef.write('\n')
+    def find_source(self, project):
+        """
+        find source code in tree, write to list file
+        """
+        paths = self.find_source_paths(top=project)
+        list_path = '{}.lst'.format(project)
+        with open(list_path, 'w') as listf:
+            listf.write('\n'.join(paths))
+        return list_path
 
-        # from selected source, find symbols
+    def find_tags(self, project, list_path):
+        """
+        from selected source, find symbols
+        """
         cmd = 'ctags --fields=afmikKlnsStz -L {} -o {}'
-        tags_path = '{}.tags'.format(options['index'])
+        tags_path = '{}.tags'.format(project)
         subprocess.check_call(
             cmd.format(list_path, tags_path), shell=True)
+        return tags_path
+
+    def handle(self, *args, **options):
+        project = os.path.dirname(options['project'])
+        assert os.path.isdir(project)
+
+        if not options['list_path']:
+            options['list_path'] = self.find_source(project)
+        if not options['tags']:
+            options['tags'] = self.find_tags(project, options['list_path'])
+
         sys.exit(0)
         tagFile = ctags.CTags(options['tags'])
         entry = ctags.TagEntry()
