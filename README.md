@@ -19,7 +19,6 @@ Overall workflow:
 - use "ctags" to find symbols and other info about listed files
 - store symbols in database index for quick processing
 
-    # get source
     $ apt source python-flask
     $ ./manage.py make_index --project=flask \
     --prefix=`echo ../../test-projects/Flask*` --tags=flask.tags

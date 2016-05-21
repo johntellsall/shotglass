@@ -3,12 +3,12 @@
 import argparse
 import logging
 import json
+import os
 import sys
 
 import ctags
 import django.db
 from django.core.management.base import BaseCommand, CommandError
-# from django.db import connection
 
 from app.models import SourceLine
 
@@ -27,18 +27,30 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         # parser.add_argument('--paths', type=argparse.FileType('w'))
+        parser.add_argument('--index', type=str, default=False) # XX
         parser.add_argument('--project')
         parser.add_argument('--prefix', default='')
         parser.add_argument('--tags', default='tags')
         parser.add_argument('--verbose', action='store_true')
 
+        # $ find ./python-django-*/django
+        # | egrep -v '/(contrib|debian|conf/locale|\.pc|tests)/' > django.lst
+
+        # $ ctags --fields=afmikKlnsStz --languages=python -L django.lst -o django.tags
+    def find_source(self, top):
+        for root, dirs, files in os.walk(top):
+            print root,dirs,files
+
     def handle(self, *args, **options):
+        self.find_source(options['index'])
+        sys.exit(1)
+
         tagFile = ctags.CTags(options['tags'])
         entry = ctags.TagEntry()
 
         if not tagFile.find(entry, '', ctags.TAG_PARTIALMATCH):
             sys.exit('no tags?')
-            
+
         if django.db.connection.vendor == 'sqlite':
             django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
 
@@ -68,7 +80,7 @@ class Command(BaseCommand):
                 break
 
         # SourceLine.objects.bulk_create(rows)
-        
+
         logger.debug('calculating sizes')
         source = SourceLine.objects.filter(project=options['project']).order_by('path', 'line_number')
         prev_path = None
