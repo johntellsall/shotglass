@@ -31,9 +31,10 @@ class Command(BaseCommand):
         print '\ttotal:', sum(count_kind.values())
 
 
-    HEADER = '{:12} {:>6} {:>5} {:>4} {:>6}'.format(
-        'project', 'syms', 'max', 'avg', 'total')
-    FORMAT = '{project:12} {num_symbols:6} {max_length:5} {avg_length:4} {total_length:6}'
+    HEADER = '{:20} {:>7} {:>5} {:>4} {:>8}'.format(
+        'project', 'symbols', 'max', 'avg', 'total')
+    FORMAT = ('{project:20} {num_symbols:7,} {max_length:5}'
+              ' {avg_length:4} {total_length:8,}')
 
     def get_all_projects(self):
         projects = SourceLine.objects.values('project').distinct(
@@ -44,6 +45,7 @@ class Command(BaseCommand):
         if not options['projects']:
             all_projects = self.get_all_projects()
             print('PROJECTS: {}'.format(', '.join(all_projects)))
+            print('or "all"')
             return
         projects = options['projects']
         if projects == ['all']:
