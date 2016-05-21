@@ -12,7 +12,7 @@ class Command(BaseCommand):
     help = 'beer'
 
     def add_arguments(self, parser):
-        parser.add_argument('projects', nargs='+', default=['django'])
+        parser.add_argument('projects', nargs='*')
 
     def old_handle(self, *args, **options):
         my_symbols = SourceLine.objects.filter(project=options['project'])
@@ -35,15 +35,19 @@ class Command(BaseCommand):
         'project', 'syms', 'max', 'avg', 'total')
     FORMAT = '{project:12} {num_symbols:6} {max_length:5} {avg_length:4} {total_length:6}'
 
-    def get_projects(self, projects):
-        if projects != ['all']:
-            return projects
+    def get_all_projects(self):
         projects = SourceLine.objects.values('project').distinct(
         ).values_list('project', flat=True)
         return sorted(filter(None, projects))
 
     def handle(self, *args, **options):
-        projects = self.get_projects(options['projects'])
+        if not options['projects']:
+            all_projects = self.get_all_projects()
+            print('PROJECTS: {}'.format(', '.join(all_projects)))
+            return
+        projects = options['projects']
+        if projects == ['all']:
+            projects = self.get_all_projects()
 
         print self.HEADER
         for project in projects:
