@@ -47,13 +47,18 @@ class Command(BaseCommand):
         for root, dirs, names in os.walk(top):
             if bad_dir_pat.search(root):
                 continue
-            # names = (name for name in names if name.endswith('.py'))
+            names = (name for name in names if name.endswith(('.c', '.py')))
             for path in (os.path.join(root, name) for name in names):
                 yield path
 
     def handle(self, *args, **options):
-        pprint.pprint(list(self.find_source_paths(options['index'])))
-        sys.exit(1)
+        paths = self.find_source_paths(options['index'])
+        index_name = os.path.basename(options['index'])
+        list_path = '{}.lst'.format(index_name)
+        with open(list_path, 'w') as sourcef:
+            sourcef.write('\n'.join(paths))
+            sourcef.write('\n')
+        sys.exit(0)
 
         tagFile = ctags.CTags(options['tags'])
         entry = ctags.TagEntry()
