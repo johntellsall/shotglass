@@ -110,8 +110,9 @@ class Command(BaseCommand):
                 break
 
     def handle(self, *args, **options):
-        project = os.path.dirname(options['project'])
-        assert os.path.isdir(project)
+        project = options['project']
+        if not os.path.isdir(project):
+            sys.exit('{}: project must be directory'.format(project))
 
         if not options['list_path']:
             logger.debug('finding source')

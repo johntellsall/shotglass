@@ -10,22 +10,23 @@
 
 # DEMO: Flask, a small project
 
-Shotglass displays information about all source files in a large project. For each file, it renders a single dot per line of code. If code has a symbol definition, ...
+Shotglass displays information about all source files in a large
+project. For each file, it renders a single dot per line of code. If
+code has a symbol definition, ...
 
 Overall workflow:
 
-- get source
-- find interesting source files, put in a list
-- use "ctags" to find symbols and other info about listed files
+- get source tree
+- rename raw source directory to a short project name
 - store symbols in database index for quick processing
 
     $ apt source python-flask
-    $ ./manage.py make_index --project=flask \
-    --prefix=`echo ../../test-projects/Flask*` --tags=flask.tags
+    $ mv flask-0.10.1 flask
+    $ ./manage.py make_index flask
 
     $ ./manage.py show flask
-    project        syms   max  avg  total
-    flask           402   196   10   4121
+    project              symbols   max  avg    total
+    flask                    463   196    9    4,208
 
     $ ./manage.py render flask
     $ firefox flask_path.png
@@ -36,14 +37,17 @@ Overall workflow:
 # DEMO: Django, a bit larger
 
     $ apt source python-django
-    $ find ./python-django-*/django \
-    | egrep -v '/(contrib|debian|conf/locale|\.pc|tests)/' > django.lst
-    $ ctags --fields=afmikKlnsStz --languages=python -L django.lst -o django.tags
-    $ ./manage.py make_index --project=django --prefix=$PWD/python-django* --tags=django.tags
+
+    $ ./manage.py make_index django
+    2016-05-21 19:01:46,708 DEBUG    finding source
+    2016-05-21 19:01:46,791 DEBUG    finding tags
+    2016-05-21 19:01:49,622 INFO     django: 6,049 tags
+    2016-05-21 19:01:49,622 DEBUG    calculating file sizes
+    2016-05-21 19:01:53,366 DEBUG    done
 
     $ ./manage.py show django
-    project        syms   max  avg  total
-    django         6664   335    8  53511
+    project              symbols   max  avg    total
+    django                 6,049   335    7   48,326
 
     $ ./manage.py render django
 
