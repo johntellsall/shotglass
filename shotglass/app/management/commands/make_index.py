@@ -7,6 +7,7 @@ import json
 import os
 import pprint
 import re
+import subprocess
 import sys
 
 import ctags
@@ -52,14 +53,20 @@ class Command(BaseCommand):
                 yield path
 
     def handle(self, *args, **options):
+        # find source code in tree, write to list file
         paths = self.find_source_paths(options['index'])
         index_name = os.path.basename(options['index'])
         list_path = '{}.lst'.format(index_name)
         with open(list_path, 'w') as sourcef:
             sourcef.write('\n'.join(paths))
             sourcef.write('\n')
-        sys.exit(0)
 
+        # from selected source, find symbols
+        cmd = 'ctags --fields=afmikKlnsStz -L {} -o {}'
+        tags_path = '{}.tags'.format(options['index'])
+        subprocess.check_call(
+            cmd.format(list_path, tags_path), shell=True)
+        sys.exit(0)
         tagFile = ctags.CTags(options['tags'])
         entry = ctags.TagEntry()
 
