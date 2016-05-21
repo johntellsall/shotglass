@@ -4,6 +4,7 @@
     virtualenv ./venv
     . ./venv/bin/activate
     pip install -r ./requirements.txt
+    cd ./shotglass
     ./manage.py migrate
 
 
@@ -21,6 +22,10 @@
     $ firefox flask_path.png
 
 ![Flask](images/flask_path.png)
+
+# demo -- Django
+
+    $ apt source python-django
 
 # MORE DEMOS
 

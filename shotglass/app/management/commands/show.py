@@ -29,7 +29,7 @@ class Command(BaseCommand):
         for name, value in sorted(count_kind.iteritems()):
             print '\t{} {}'.format(name, value)
         print '\ttotal:', sum(count_kind.values())
-        
+
 
     HEADER = '{:12} {:>6} {:>5} {:>4} {:>6}'.format(
         'project', 'syms', 'max', 'avg', 'total')
@@ -41,7 +41,7 @@ class Command(BaseCommand):
         projects = SourceLine.objects.values('project').distinct(
         ).values_list('project', flat=True)
         return sorted(filter(None, projects))
-    
+
     def handle(self, *args, **options):
         projects = self.get_projects(options['projects'])
 
@@ -51,7 +51,10 @@ class Command(BaseCommand):
             num_symbols = symbols.count()
             num_functions = symbols.filter(kind__in=('function', 'member')).count()
             # TODO: optimize
-            max_length = symbols.aggregate(Max('length')).values()[0]
-            avg_length = int(symbols.aggregate(Avg('length')).values()[0])
-            total_length = symbols.aggregate(Sum('length')).values()[0]
+            if not num_symbols:
+                max_length = avg_length = total_length = 0
+            else:
+                max_length = symbols.aggregate(Max('length')).values()[0]
+                avg_length = int(symbols.aggregate(Avg('length')).values()[0])
+                total_length = symbols.aggregate(Sum('length')).values()[0]
             print self.FORMAT.format(**locals())

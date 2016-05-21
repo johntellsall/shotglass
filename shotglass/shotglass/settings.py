@@ -27,7 +27,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'app',
-    'source',
+    # 'source',
     'django_extensions',
 )
 
