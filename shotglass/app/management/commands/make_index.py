@@ -31,8 +31,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('project', metavar='FILE')
-        # parser.add_argument('', type=str) # XX
-        # parser.add_argument('--project')
         # parser.add_argument('--prefix', default='')
         parser.add_argument('--tags')
         parser.add_argument('--verbose', action='store_true')
@@ -42,7 +40,6 @@ class Command(BaseCommand):
         # $ find ./python-django-*/django
         # | egrep -v '/(contrib|debian|conf/locale|\.pc|tests)/' > django.lst
 
-        # $ ctags --fields=afmikKlnsStz --languages=python -L django.lst -o django.tags
     def find_source_paths(self, top):
         # XX
         bad_dir_pat = re.compile(
