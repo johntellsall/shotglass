@@ -74,17 +74,8 @@ class Command(BaseCommand):
             cmd.format(list_path, tags_path), shell=True)
         return tags_path
 
-    def handle(self, *args, **options):
-        project = os.path.dirname(options['project'])
-        assert os.path.isdir(project)
-
-        if not options['list_path']:
-            options['list_path'] = self.find_source(project)
-        if not options['tags']:
-            options['tags'] = self.find_tags(project, options['list_path'])
-
-        sys.exit(0)
-        tagFile = ctags.CTags(options['tags'])
+    def make_index(self, project, tags_path):
+        tagFile = ctags.CTags(tags_path)
         entry = ctags.TagEntry()
 
         if not tagFile.find(entry, '', ctags.TAG_PARTIALMATCH):
@@ -93,10 +84,10 @@ class Command(BaseCommand):
         if django.db.connection.vendor == 'sqlite':
             django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
 
-        SourceLine.objects.filter(project=options['project']).delete() # XX
+        # XX: delete project's index
+        SourceLine.objects.filter(project=project).delete()
 
-        prefix = options['prefix']
-        logger.debug('scanning source')
+        prefix = None # options['prefix']
         while True:
             if entry['kind']:
                 path = entry['file']
@@ -106,7 +97,7 @@ class Command(BaseCommand):
                 tags_json = json.dumps(tags) if tags else None
                 try:
                     SourceLine(name=entry['name'],
-                               project=options['project'],
+                               project=project,
                                path=path,
                                length=0, # XX should be None
                                line_number=entry['lineNumber'],
@@ -118,10 +109,24 @@ class Command(BaseCommand):
             if not status:
                 break
 
-        # SourceLine.objects.bulk_create(rows)
+    def handle(self, *args, **options):
+        project = os.path.dirname(options['project'])
+        assert os.path.isdir(project)
 
-        logger.debug('calculating sizes')
-        source = SourceLine.objects.filter(project=options['project']).order_by('path', 'line_number')
+        if not options['list_path']:
+            logger.debug('finding source')
+            options['list_path'] = self.find_source(project)
+        if not options['tags']:
+            logger.debug('finding tags')
+            options['tags'] = self.find_tags(project, options['list_path'])
+
+        self.make_index(project, options['tags'])
+        project_source = SourceLine.objects.filter(project=project)
+        logger.info('%s: %s tags', project,
+                    '{:,}'.format(project_source.count()))
+
+        logger.debug('calculating file sizes')
+        source = project_source.order_by('path', 'line_number')
         prev_path = None
         prev_symbol = None
         for symbol in source:
@@ -134,4 +139,5 @@ class Command(BaseCommand):
                     prev_symbol.length = 1
                 prev_symbol.save()
             prev_symbol = symbol
+
         logger.debug('done')
