@@ -17,11 +17,14 @@ from django.core.management.base import BaseCommand, CommandError
 from app.models import SourceLine
 
 
+INDEX_SUFFIXES = ('.c', '.py')
+
 logging.basicConfig(
     format="%(asctime)-15s %(levelname)-8s %(message)s",
     stream=sys.stderr,
     level=logging.DEBUG)
-# disable db queries
+
+# disable db query logs
 logging.getLogger('django.db.backends').propagate = False
 logger = logging.getLogger(__name__)
 
@@ -30,10 +33,10 @@ class Command(BaseCommand):
     help = 'beer'
 
     def add_arguments(self, parser):
-        parser.add_argument('project', metavar='FILE')
-        # parser.add_argument('--prefix', default='')
+        parser.add_argument('project_dir', metavar='FILE')
+        parser.add_argument('--project')
         parser.add_argument('--tags')
-        parser.add_argument('--verbose', action='store_true')
+        # parser.add_argument('--verbose', action='store_true')
         # internal
         parser.add_argument('--list_path')
 
@@ -47,15 +50,15 @@ class Command(BaseCommand):
         for root, dirs, names in os.walk(top):
             if bad_dir_pat.search(root):
                 continue
-            names = (name for name in names if name.endswith(('.c', '.py')))
+            names = (name for name in names if name.endswith(INDEX_SUFFIXES))
             for path in (os.path.join(root, name) for name in names):
                 yield path
 
-    def find_source(self, project):
+    def find_source(self, project_dir, project):
         """
         find source code in tree, write to list file
         """
-        paths = self.find_source_paths(top=project)
+        paths = self.find_source_paths(top=project_dir)
         list_path = '{}.lst'.format(project)
         with open(list_path, 'w') as listf:
             listf.write('\n'.join(paths))
@@ -106,23 +109,31 @@ class Command(BaseCommand):
             if not status:
                 break
 
+    def format_project_name(self, project_dir):
+        return project_dir.lstrip('./').rstrip('/')
+
     def handle(self, *args, **options):
-        project = options['project']
-        if not os.path.isdir(project):
-            sys.exit('{}: project must be directory'.format(project))
+        project_dir = options['project_dir']
+        if not os.path.isdir(project_dir):
+            sys.exit('{}: project must be directory'.format(project_dir))
+        project_name = options.get(
+            'project', self.format_project_name(project_dir))
 
         if not options['list_path']:
             logger.debug('finding source')
-            options['list_path'] = self.find_source(project)
+            options['list_path'] = self.find_source(
+                project_dir=project_dir, project=project_name)
         if not options['tags']:
             logger.debug('finding tags')
-            options['tags'] = self.find_tags(project, options['list_path'])
+            options['tags'] = self.find_tags(
+                project_name, options['list_path'])
 
-        self.make_index(project, options['tags'])
-        project_source = SourceLine.objects.filter(project=project)
-        logger.info('%s: %s tags', project,
+        self.make_index(project_name, options['tags'])
+        project_source = SourceLine.objects.filter(project=project_name)
+        logger.info('%s: %s tags', project_name,
                     '{:,}'.format(project_source.count()))
 
+        sys.exit(0)
         logger.debug('calculating file sizes')
         source = project_source.order_by('path', 'line_number')
         prev_path = None
