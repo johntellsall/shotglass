@@ -119,12 +119,13 @@ class Command(BaseCommand):
         project_name = options.get(
             'project', self.format_project_name(project_dir))
 
+        logger.info('%s: start', project_name)
         if not options['list_path']:
-            logger.debug('finding source')
+            logger.debug('%s: finding source', project_name)
             options['list_path'] = self.find_source(
                 project_dir=project_dir, project=project_name)
         if not options['tags']:
-            logger.debug('finding tags')
+            logger.debug('%s: finding tags', project_name)
             options['tags'] = self.find_tags(
                 project_name, options['list_path'])
 
@@ -133,8 +134,7 @@ class Command(BaseCommand):
         logger.info('%s: %s tags', project_name,
                     '{:,}'.format(project_source.count()))
 
-        sys.exit(0)
-        logger.debug('calculating file sizes')
+        logger.debug('%s: calculating file sizes', project_name)
         source = project_source.order_by('path', 'line_number')
         prev_path = None
         prev_symbol = None
@@ -149,4 +149,4 @@ class Command(BaseCommand):
                 prev_symbol.save()
             prev_symbol = symbol
 
-        logger.debug('done')
+        logger.debug('%s: done', project_name)
