@@ -11,30 +11,13 @@ from app.models import SourceLine
 class Command(BaseCommand):
     help = 'beer'
 
-    def add_arguments(self, parser):
-        parser.add_argument('projects', nargs='*')
-
-    def old_handle(self, *args, **options):
-        my_symbols = SourceLine.objects.filter(project=options['project'])
-        symbols = my_symbols.order_by('path')
-        count_kind = Counter()
-        paths = set()
-        for symbol in symbols:
-            count_kind[symbol.kind] += 1
-            paths.add(symbol.path)
-
-        # TODO: calc in database
-        print 'files:', len(set(my_symbols.values_list('path')))
-        print 'symbols:'
-        for name, value in sorted(count_kind.iteritems()):
-            print '\t{} {}'.format(name, value)
-        print '\ttotal:', sum(count_kind.values())
-
-
     HEADER = '{:20} {:>7} {:>5} {:>4} {:>8}'.format(
         'project', 'symbols', 'max', 'avg', 'total')
     FORMAT = ('{project:20} {num_symbols:7,} {max_length:5}'
               ' {avg_length:4} {total_length:8,}')
+
+    def add_arguments(self, parser):
+        parser.add_argument('projects', nargs='*')
 
     def get_all_projects(self):
         projects = SourceLine.objects.values('project').distinct(
