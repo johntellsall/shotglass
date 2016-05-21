@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
 import argparse
+import fnmatch
 import logging
 import json
 import os
+import pprint
+import re
 import sys
 
 import ctags
@@ -27,7 +30,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         # parser.add_argument('--paths', type=argparse.FileType('w'))
-        parser.add_argument('--index', type=str, default=False) # XX
+        parser.add_argument('--index', type=str) # XX
         parser.add_argument('--project')
         parser.add_argument('--prefix', default='')
         parser.add_argument('--tags', default='tags')
@@ -37,12 +40,19 @@ class Command(BaseCommand):
         # | egrep -v '/(contrib|debian|conf/locale|\.pc|tests)/' > django.lst
 
         # $ ctags --fields=afmikKlnsStz --languages=python -L django.lst -o django.tags
-    def find_source(self, top):
-        for root, dirs, files in os.walk(top):
-            print root,dirs,files
+    def find_source_paths(self, top):
+        # XX
+        bad_dir_pat = re.compile(
+            r'(contrib|debian|conf/locale|\.pc|pl|tests)')
+        for root, dirs, names in os.walk(top):
+            if bad_dir_pat.search(root):
+                continue
+            # names = (name for name in names if name.endswith('.py'))
+            for path in (os.path.join(root, name) for name in names):
+                yield path
 
     def handle(self, *args, **options):
-        self.find_source(options['index'])
+        pprint.pprint(list(self.find_source_paths(options['index'])))
         sys.exit(1)
 
         tagFile = ctags.CTags(options['tags'])
