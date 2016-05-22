@@ -1,13 +1,13 @@
 from collections import defaultdict, namedtuple
 from django.http import HttpResponse
-from django.shortcuts import render
+from django import shortcuts
 
 from app.models import SourceLine
 
 
 def index(request):
     projects = SourceLine.projects()
-    return render(request, 'index.html', {'projects': projects})
+    return shortcuts.render(request, 'index.html', {'projects': projects})
 
 
 def overview(request, project):
@@ -23,7 +23,7 @@ def overview(request, project):
             info['bar'] = info['name'][0] * info['length']
             yield info
 
-    return render(request, 'overview.html', {
+    return shortcuts.render(request, 'overview.html', {
         'overview': calc_overview,
     })
 
@@ -32,7 +32,12 @@ def list_functions(request, project):
     proj_lines = SourceLine.objects.filter(project=project)
     functions = proj_lines.filter(kind='function').order_by('path', 'name')
 
-    return render(request, 'list_functions2.html', {
+    return shortcuts.render(request, 'list_functions2.html', {
         'functions': functions,
         'project': project,
         'symbol_count': proj_lines.count()})
+
+
+def render(request, project):
+    return HttpResponse(content=open('/tmp/z.png'),
+                        content_type='image/png')
