@@ -152,6 +152,9 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
     thispoint = thispoint_iter()
 
     def arg_iter():
+        """
+        iterate by "args", generally filenames
+        """
         for symbol in symbols:
             arg = getattr(symbol, argname)
             if depth and arg and argname.endswith('_json'):
@@ -159,19 +162,21 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
             else:
                 yield (symbol, arg)
 
+    def add_black_smudge():
+        for _ in xrange(3):
+            thispoint.next()
+
     for symbol,arg in arg_iter():
         if symbol.path != prev_path:
             if prev_path:
-                for _ in xrange(3):
-                    thispoint.next()
+                add_black_smudge()
             prev_path = symbol.path
-        if prev_arg != arg:
+        if prev_arg != arg:     # change color with new arg (file)
             hue = hue_iter.next()
             prev_arg = arg
             highlight = highlight_iter.next() # alternate args
         saturation = saturation_iter.next() # alternate symbols
-        pen_hsl = (hue, saturation, highlight)
-        pen = color_hsl(*pen_hsl)
+        pen = color_hsl(hue, saturation, highlight)
         grid.draw(thispoint.next(), pen)
         if symbol.length <= 1:
             continue
