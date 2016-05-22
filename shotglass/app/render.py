@@ -101,7 +101,7 @@ class Cursor(object):
                 self.dx *= -1
 
 def calc_width(project):
-    lines_total = SourceLine.objects.filter(
+    lines_total = SourceLine.objects.filter( # pylint: disable=no-member
         project=project).aggregate(Sum('length'))['length__sum']
     if not lines_total:
         print 'WARNING: {} is empty'.format(project)
@@ -126,13 +126,11 @@ def make_step_iter(step, max_):
 
 
 def grid_hilbert_arg(project, width, argname='path', depth=None):
-    # theme = Theme()
-    symbols = SourceLine.objects.filter(project=project
+    symbols = SourceLine.objects.filter( # pylint: disable=no-member
+        project=project
     ).order_by('tags_json', 'path', 'line_number')
-    # point = (0, 0)
     width *= 4                  # XX?
     grid = ImageGrid(width, width)
-    # first_spot = color_hsl(0, 0, 75) # light gray
 
     prev_arg = None
     prev_path = None
