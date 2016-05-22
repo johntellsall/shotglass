@@ -1,11 +1,14 @@
 # INSTALL
 
+```
     sudo apt install -y exuberant-ctags python-dev python-virtualenv
     virtualenv ./venv
     . ./venv/bin/activate
     pip install -r ./requirements.txt
     cd ./shotglass
     ./manage.py migrate
+```
+
 
 
 # DEMO: Flask, a small project
@@ -20,6 +23,7 @@ Overall workflow:
 - rename raw source directory to a short project name
 - store symbols in database index for quick processing
 
+```
     $ apt source python-flask
     $ mv flask-0.10.1 flask
     $ ./manage.py make_index flask
@@ -30,12 +34,15 @@ Overall workflow:
 
     $ ./manage.py render flask
     $ firefox flask_path.png
+```
+
 
 ![Flask](images/flask_path.png)
 
 
 # DEMO: Django, a bit larger
 
+``` shell
     $ apt source python-django
 
     $ ./manage.py make_index django
@@ -50,6 +57,8 @@ Overall workflow:
     django                 6,049   335    7   48,326
 
     $ ./manage.py render django
+```
+
 
 ![Django](images/django_path.png)
 

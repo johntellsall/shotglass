@@ -45,7 +45,7 @@ others, we'd see big blocks of new color in the renderings. If
 programmers did lots of fixes all over the codebase, we'd see lots of
 little changes.
 
-The following shows each minor version of Django, from 1.0 in 2008 to
+The following shows each minor release of Django, from 1.0 in 2008 to
 1.10 in 2016.
 
 ```
