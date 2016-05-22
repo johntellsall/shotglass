@@ -49,9 +49,9 @@ TEMPLATES = [
 ]
 
 
+#  boring settings
 ALLOWED_HOSTS = []
 LANGUAGE_CODE = 'en-us'
-ROOT_URLCONF = 'shotglass.urls'
 SECRET_KEY = 'qjg2s4mxb$mmv0e222yg7ot2obfg8rh+u7s@7l!fwv1@r*fa_n'
 TIME_ZONE = 'UTC'
 USE_I18N = True
@@ -59,6 +59,10 @@ USE_L10N = True
 USE_TZ = True
 WSGI_APPLICATION = 'shotglass.wsgi.application'
 
+# custom settings
+ROOT_URLCONF = 'shotglass.urls'
+
+# statics
 STATIC_URL = '/static/'
 
 DATABASES = {

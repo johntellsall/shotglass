@@ -7,10 +7,7 @@ from django.shortcuts import render
 from app.models import SourceLine
 
 def index(request):
-    if 0:
-        projects = SourceLine.objects.distinct('project')
-    else:
-        projects = ('flask',)
+    projects = SourceLine.projects()
     return render(request, 'index.html', {'projects': projects})
 
 
@@ -72,6 +69,16 @@ def overview(request, project):
 
 
 def list_functions(request, project):
+    proj_lines = SourceLine.objects.filter(project=project)
+    functions = proj_lines.filter(kind='function').order_by('path', 'name')
+
+    return render(request, 'list_functions2.html', {
+        'functions': functions,
+        'project': project})
+
+
+def source_index(request):
+    project = 'flask'
     proj_lines = SourceLine.objects.filter(project=project)
     functions = proj_lines.filter(kind='function').order_by('path', 'name')
 
