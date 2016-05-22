@@ -25,10 +25,10 @@ class Grid(object):
 
     def get_symbol_pen(self, symbol):
         return symbol.name[0]
-    
+
     def render(self, *args):
         pass
-    
+
 class TextGrid(Grid):
     def __init__(self, width, height):
         self.blank_row = ['.'] * width
@@ -42,7 +42,7 @@ class TextGrid(Grid):
             self.data[y][x] = pen
         except IndexError:
             pass
-        
+
     def render(self, *args):
         for row in self.data:
             print ''.join(row)
@@ -56,7 +56,7 @@ class ImageGrid(Grid):
 
     def moveto(self, xy):
         self.last = (xy[0]*2, xy[1]*2)
-        
+
     def draw(self, xy, pen):
         self.im_draw.point((xy[0]*2, xy[1]*2), pen)
 
@@ -68,7 +68,7 @@ class ImageGrid(Grid):
 
     def render(self, path):
         self.im.save(path)
-        
+
     def make_pen(self, args):
         return ImageColor.getrgb('hsl({0}, {1}%, {2}%)'.format(
             int(args[0]), args[1], args[2]))
@@ -76,18 +76,17 @@ class ImageGrid(Grid):
 class Theme(object):
     def get_symbol_hsl(self, symbol):
         if symbol.kind not in ('function', 'member'):
-            # print symbol.__dict__
             return (0, 25, 25)
         hue = random.randint(0, 360)
         return (hue, 75, 25)
-    
+
 class Cursor(object):
     def __init__(self, grid):
         self.x = 0
         self.y = 0
         self.grid = grid
         self.dx = 1
-        
+
     def step(self, pen, count=1):
         for _ in xrange(count):
             self.grid.draw(self.x, self.y, pen)
@@ -100,7 +99,7 @@ class Cursor(object):
                 self.x = 0
                 self.y += 1
                 self.dx *= -1
-        
+
 def calc_width(project):
     lines_total = SourceLine.objects.filter(
         project=project).aggregate(Sum('length'))['length__sum']
@@ -152,11 +151,10 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
                 yield (symbol, json.loads(arg)[:depth])
             else:
                 yield (symbol, arg)
-            
+
     for symbol,arg in arg_iter():
         if symbol.path != prev_path:
             if prev_path:
-                # print '\t', prev_path
                 for _ in xrange(3):
                     thispoint.next()
             prev_path = symbol.path
@@ -174,7 +172,7 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
         grid.moveto(thispoint.next())
         for _ in xrange(symbol.length-1):
             grid.drawto(thispoint.next(), pen)
-        
+
     detail = ''
     if depth:
         detail = '_{}'.format(depth)
@@ -183,7 +181,7 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
     grid.render(path)
     print path
 
-    
+
 class Command(BaseCommand):
     help = 'beer'
 
@@ -194,14 +192,14 @@ class Command(BaseCommand):
         parser.add_argument('--arg', choices=('path', 'tags'),
                             default='path')
         parser.add_argument('--depth', type=int, default=0)
-        
+
     def get_projects(self, projects):
         if projects != ['all']:
             return projects
         projects = SourceLine.objects.values('project').distinct(
         ).values_list('project', flat=True)
         return sorted(filter(None, projects))
-    
+
     def handle(self, *args, **options):
         if options['arg'] == 'tags':
             options['arg'] = 'tags_json'
@@ -211,5 +209,3 @@ class Command(BaseCommand):
             if not width:
                 continue
             grid_hilbert_arg(project, width, options['arg'], options['depth'])
-            
-            
