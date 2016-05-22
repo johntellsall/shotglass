@@ -77,6 +77,7 @@ class ImageGrid(Grid):
             int(args[0]), args[1], args[2]))
 
 
+# XX unused
 class Theme(object):
     def get_symbol_hsl(self, symbol):
         if symbol.kind not in ('function', 'member'):
@@ -85,6 +86,7 @@ class Theme(object):
         return (hue, 75, 25)
 
 
+# XX unused
 class Cursor(object):
     def __init__(self, grid):
         self.x = 0
@@ -113,15 +115,18 @@ def calc_width(project):
         return 0
     return int(math.sqrt(lines_total) + 1)
 
+
 def color_hsl(hue, saturation, lightness):
     return ImageColor.getrgb('hsl({}, {}%, {}%)'.format(
         hue, saturation, lightness))
+
 
 def thispoint_iter():
     index_ = 0
     while True:
         yield tuple(hilbert.int_to_Hilbert(index_))
         index_ += 1
+
 
 def make_step_iter(step, max_):
     num = 0
@@ -162,7 +167,6 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
             prev_path = symbol.path
         if prev_arg != arg:
             hue = hue_iter.next()
-            # print arg
             prev_arg = arg
             highlight = highlight_iter.next() # alternate args
         saturation = saturation_iter.next() # alternate symbols
