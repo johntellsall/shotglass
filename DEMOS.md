@@ -19,7 +19,7 @@ mysql-5.5             12,664  1418   23  299,741
 postgresql-9.3        29,078 22561   25  742,766
 ```
 
-Redis is unsurprisingly small, at 63KLOC.  Oddly, MySQL is less than
+Redis is unsurprisingly small, at 63 KLOC.  Oddly, MySQL is less than
 half the size of Postgres.
 
 SQLite is _half_ the size of Redis, despite needing to parse complex
@@ -35,7 +35,9 @@ SQL statements. Startling.
 ## Web frameworks
 
 Flask is a minimal web framework, facilitating the use of plugins to
-accomplish work.  Django is a mature "batteries included" framework.
+accomplish work.  Django is a mature "batteries included"
+framework. How do they compare in terms of size and complexity? Also
+examined are alternative Python web frameworks Bottle and Pyramid.
 
 ```
 $ ./manage.py show flask bottle pyramid django-1.9
