@@ -25,6 +25,13 @@ half the size of Postgres.
 SQLite is _half_ the size of Redis, despite needing to parse complex
 SQL statements. Startling.
 
+
+![sqlite](images/sqlite_path.png)
+![redis](images/redis_path.png)
+![mysql-5.5](images/mysql-5.5_path.png)
+![postgresql-9.3](images/postgresql-9.3_path.png)
+
+
 ## Web frameworks
 
 Flask is a minimal web framework, facilitating the use of plugins to
@@ -38,6 +45,12 @@ bottle                 1,059    92    5    5,999
 pyramid                1,933   462    7   15,174
 django-1.9             7,208   263    8   58,988
 ```
+
+![flask](images/flask_path.png)
+![bottle](images/bottle_path.png)
+![pyramid](images/pyramid_path.png)
+![django-1.9](images/django-1.9_path.png)
+
 
 ## Single codebase over time
 
@@ -64,3 +77,33 @@ django-1.8             7,152   263    8   58,605
 django-1.9             7,208   263    8   58,988
 django-1.10            7,323   266    8   59,900
 ```
+
+![django-1.0](images/django-1.0_path.png)
+![django-1.1](images/django-1.1_path.png)
+![django-1.2](images/django-1.2_path.png)
+![django-1.3](images/django-1.3_path.png)
+![django-1.4](images/django-1.4_path.png)
+![django-1.5](images/django-1.5_path.png)
+![django-1.6](images/django-1.6_path.png)
+![django-1.7](images/django-1.7_path.png)
+![django-1.8](images/django-1.8_path.png)
+![django-1.9](images/django-1.9_path.png)
+![django-1.10](images/django-1.10_path.png)
+
+
+## Another codebase across major releases
+
+Here is Python 2.7 vs Python 3.4:
+
+```
+./manage.py show python2 python3
+project              symbols   max  avg    total
+python2               75,532  2151   10  777,519
+python3               80,643  2137   10  817,999
+```
+
+Python is surprisingly large, eclipsing even Postgres. Python 3.4 is
+the largest codebase thus studied.
+
+![python2](images/python2_path.png)
+![python3](images/python3_path.png)
