@@ -192,9 +192,7 @@ class Command(BaseCommand):
     def get_projects(self, projects):
         if projects != ['all']:
             return projects
-        projects = SourceLine.objects.values('project').distinct(
-        ).values_list('project', flat=True)
-        return sorted(filter(None, projects))
+        return SourceLine.projects()
 
     def handle(self, *args, **options):
         argname = options['arg']
