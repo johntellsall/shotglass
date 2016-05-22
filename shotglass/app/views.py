@@ -2,6 +2,7 @@ import StringIO
 from collections import defaultdict, namedtuple
 from django.http import HttpResponse
 from django import shortcuts
+from PIL import Image
 
 from app import render as shotglass_render
 from app.models import SourceLine
@@ -40,9 +41,18 @@ def list_functions(request, project):
 
 
 def render(request, project):
+    zoom = float(request.GET.get('zoom', 0.))
+
     width = shotglass_render.calc_width(project)
+    if not width:
+        return HttpResponse(content='uhoh')
     grid = shotglass_render.grid_hilbert_arg(project, width)
+    image = grid.im
+
+    if zoom > 0.:
+        new_size = int(image.size[0]*zoom), int(image.size[1]*zoom)
+        image = image.resize(new_size) # , Image.ANTIALIAS)
     output = StringIO.StringIO()
-    grid.im.save(output, format='png')
+    image.save(output, format='png')
     output.seek(0)
     return HttpResponse(content=output, content_type='image/png')

@@ -1,11 +1,6 @@
 # pylint: disable=no-member
 
-# import itertools
-# import logging
-# import json
-# import math
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Avg, Max, Sum
+from django.core.management.base import BaseCommand
 
 from app import render
 from app.models import SourceLine
