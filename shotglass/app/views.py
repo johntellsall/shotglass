@@ -1,9 +1,10 @@
+import StringIO
 from collections import defaultdict, namedtuple
 from django.http import HttpResponse
 from django import shortcuts
 
+from app import render as shotglass_render
 from app.models import SourceLine
-
 
 def index(request):
     projects = SourceLine.projects()
@@ -39,5 +40,9 @@ def list_functions(request, project):
 
 
 def render(request, project):
-    return HttpResponse(content=open('/tmp/z.png'),
-                        content_type='image/png')
+    width = shotglass_render.calc_width(project)
+    grid = shotglass_render.grid_hilbert_arg(project, width)
+    output = StringIO.StringIO()
+    grid.im.save(output, format='png')
+    output.seek(0)
+    return HttpResponse(content=output, content_type='image/png')

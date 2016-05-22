@@ -163,7 +163,7 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
             prev_path = symbol.path
         if prev_arg != arg:
             hue = hue_iter.next()
-            print arg
+            # print arg
             prev_arg = arg
             highlight = highlight_iter.next() # alternate args
         saturation = saturation_iter.next() # alternate symbols
