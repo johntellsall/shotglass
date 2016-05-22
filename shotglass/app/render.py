@@ -23,6 +23,9 @@ class Grid(object):
     def get_symbol_pen(self, symbol):
         return symbol.name[0]
 
+    def finalize(self):
+        pass
+
     def render(self, *args):
         pass
 
@@ -63,15 +66,16 @@ class ImageGrid(Grid):
             self.im_draw.line((self.last, xy), pen)
         self.last = xy
 
-    def render(self, path, crop=True):
-        image = self.im
-        if crop:
-            image = image.crop(image.getbbox())
-        image.save(path)
+    def finalize(self):
+        self.im = self.im.crop(self.im.getbbox())
+
+    def render(self, path):
+        self.im.save(path)
 
     def make_pen(self, args):
         return ImageColor.getrgb('hsl({0}, {1}%, {2}%)'.format(
             int(args[0]), args[1], args[2]))
+
 
 class Theme(object):
     def get_symbol_hsl(self, symbol):
@@ -79,6 +83,7 @@ class Theme(object):
             return (0, 25, 25)
         hue = random.randint(0, 360)
         return (hue, 75, 25)
+
 
 class Cursor(object):
     def __init__(self, grid):
@@ -169,4 +174,5 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
         grid.moveto(thispoint.next())
         for _ in xrange(symbol.length-1):
             grid.drawto(thispoint.next(), pen)
+    grid.finalize()
     return grid
