@@ -1,20 +1,16 @@
 # app/render.py
 
 import itertools
-import logging
 import json
 import math
 import random
-import sys
-from collections import Counter
 
-import ctags
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Avg, Max, Sum
+from django.db.models import Sum
 from PIL import Image, ImageColor, ImageDraw
 
 from app import hilbert
 from app.models import SourceLine
+
 
 class Grid(object):
     def __init__(self, width, height):
@@ -130,13 +126,13 @@ def make_step_iter(step, max_):
 
 
 def grid_hilbert_arg(project, width, argname='path', depth=None):
-    theme = Theme()
+    # theme = Theme()
     symbols = SourceLine.objects.filter(project=project
     ).order_by('tags_json', 'path', 'line_number')
-    point = (0, 0)
+    # point = (0, 0)
     width *= 4                  # XX?
     grid = ImageGrid(width, width)
-    first_spot = color_hsl(0, 0, 75) # light gray
+    # first_spot = color_hsl(0, 0, 75) # light gray
 
     prev_arg = None
     prev_path = None
