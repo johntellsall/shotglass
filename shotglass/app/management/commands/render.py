@@ -13,6 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Avg, Max, Sum
 from PIL import Image, ImageColor, ImageDraw
 
+import hilbert
 from app.models import SourceLine
 
 class Grid(object):
@@ -66,8 +67,11 @@ class ImageGrid(Grid):
             self.im_draw.line((self.last, xy), pen)
         self.last = xy
 
-    def render(self, path):
-        self.im.save(path)
+    def render(self, path, crop=True):
+        image = self.im
+        if crop:
+            image = image.crop(image.getbbox())
+        image.save(path)
 
     def make_pen(self, args):
         return ImageColor.getrgb('hsl({0}, {1}%, {2}%)'.format(
@@ -113,10 +117,9 @@ def color_hsl(hue, saturation, lightness):
         hue, saturation, lightness))
 
 def thispoint_iter():
-    from .hilbert import int_to_Hilbert
     index_ = 0
     while True:
-        yield tuple(int_to_Hilbert(index_))
+        yield tuple(hilbert.int_to_Hilbert(index_))
         index_ += 1
 
 def make_step_iter(step, max_):
@@ -172,14 +175,7 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
         grid.moveto(thispoint.next())
         for _ in xrange(symbol.length-1):
             grid.drawto(thispoint.next(), pen)
-
-    detail = ''
-    if depth:
-        detail = '_{}'.format(depth)
-    argname = argname.split('_')[0]
-    path = '{}_{}{}.png'.format(project, argname, detail)
-    grid.render(path)
-    print path
+    return grid
 
 
 class Command(BaseCommand):
@@ -201,11 +197,20 @@ class Command(BaseCommand):
         return sorted(filter(None, projects))
 
     def handle(self, *args, **options):
-        if options['arg'] == 'tags':
-            options['arg'] = 'tags_json'
+        argname = options['arg']
+        if argname == 'tags':
+            argname = 'tags_json'
+        depth = options['depth']
+
         for project in self.get_projects(options['projects']):
             print '***', project
             width = options['width'] or calc_width(project)
             if not width:
                 continue
-            grid_hilbert_arg(project, width, options['arg'], options['depth'])
+            grid = grid_hilbert_arg(project, width, argname, depth)
+
+            detail = '_{}'.format(depth) if depth else ''
+            argname2 = argname.split('_')[0]
+            path = '{}_{}{}.png'.format(project, argname2, detail)
+            grid.render(path)
+            print path
