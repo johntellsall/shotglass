@@ -19,14 +19,9 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('projects', nargs='*')
 
-    def get_all_projects(self):
-        projects = SourceLine.objects.values('project').distinct(
-        ).values_list('project', flat=True)
-        return sorted(filter(None, projects))
-
     def handle(self, *args, **options):
         if not options['projects']:
-            all_projects = self.get_all_projects()
+            all_projects = SourceLine.projects()
             print('PROJECTS: {}'.format(', '.join(all_projects)))
             print('or "all"')
             return

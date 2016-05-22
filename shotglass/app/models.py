@@ -3,7 +3,7 @@ from django.db import models
 nullable = {'blank': True, 'null': True}
 
 class SourceLine(models.Model):
-                    
+
     project = models.CharField(max_length=200, **nullable)
     name = models.CharField(max_length=200)
     path = models.CharField(max_length=20)
@@ -16,3 +16,9 @@ class SourceLine(models.Model):
         return '<{} {} {}:{}>'.format(
             self.__class__.__name__, self.name,
             self.path, self.line_number)
+
+    @classmethod
+    def projects(cls):
+        projects = cls.objects.values('project').distinct(
+        ).values_list('project', flat=True)
+        return sorted(filter(None, projects))
