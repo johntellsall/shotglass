@@ -1,18 +1,15 @@
 #!/usr/bin/env python
 
-import argparse
-import fnmatch
 import logging
 import json
 import os
-import pprint
 import re
 import subprocess
 import sys
 
 import ctags
 import django.db
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from app.models import SourceLine
 
@@ -47,7 +44,7 @@ class Command(BaseCommand):
         # XX
         bad_dir_pat = re.compile(
             r'(contrib|debian|conf/locale|\.pc|pl|tests)')
-        for root, dirs, names in os.walk(top):
+        for root, _, names in os.walk(top):
             if bad_dir_pat.search(root):
                 continue
             names = (name for name in names if name.endswith(INDEX_SUFFIXES))
@@ -85,6 +82,7 @@ class Command(BaseCommand):
             django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
 
         # XX: delete project's index
+        # pylint: disable=no-member
         SourceLine.objects.filter(project=project).delete()
 
         prefix = None # options['prefix']
@@ -130,6 +128,7 @@ class Command(BaseCommand):
                 project_name, options['list_path'])
 
         self.make_index(project_name, options['tags'])
+        # pylint: disable=no-member
         project_source = SourceLine.objects.filter(project=project_name)
         logger.info('%s: %s tags', project_name,
                     '{:,}'.format(project_source.count()))
