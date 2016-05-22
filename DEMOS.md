@@ -109,3 +109,22 @@ the largest codebase thus studied.
 
 ![python2](images/python2_path.png)
 ![python3](images/python3_path.png)
+
+
+# Features
+
+## Tags mode
+
+In "tags mode", a source tree is colored per tag, or directory.  Since
+Flask has only one directory, it's not that interesting:
+
+![Flask](images/flask_tags.png)
+
+Django has lots of directories, so tags mode makes the different areas
+show more clearly. Compare
+
+![Django tags](images/django-1.9_tags.png)
+
+vs
+
+![Django](images/django-1.9_path.png)
