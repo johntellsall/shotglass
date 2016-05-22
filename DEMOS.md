@@ -3,8 +3,9 @@
 ## Databases
 
 Redis is a small, fast, special-purpose database. SQLite is similar,
-with a standard SQL front end.  MySQL and Postgres are both very
-mature databases. How big are these very different codebases?
+with a standard SQL front end.  MySQL and Postgres are both large,
+very mature database servers. How big are these very different
+codebases?
 
 Redis is probably smaller than MySQL/Postgres, but how do the latter
 two compare? SQL is tricky to parse, so SQLite is probably in between
@@ -118,7 +119,9 @@ the largest codebase thus studied.
 In "tags mode", a source tree is colored per tag, or directory.  Since
 Flask has only one directory, it's not that interesting:
 
-![Flask](images/flask_tags.png)
+![Flask tags](images/flask_tags.png)
+vs
+![Flask](images/flask_path.png)
 
 Django has lots of directories, so tags mode makes the different areas
 show more clearly. Compare
