@@ -6,6 +6,7 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index),
-    url(r'(?P<project>\w+)/$', views.list_functions, name='list_functions'),
-    url(r'(?P<project>\w+)/overview', views.overview, name='overview'),
+    url(r'(?P<project>.+)/$', views.list_functions, name='list_functions'),
+    url(r'(?P<project>.+)/overview', views.overview, name='overview'),
+    url(r'(?P<project>.+)/render', views.render, name='render'),
 ]

@@ -1,10 +1,9 @@
-# from django.shortcuts import render
-
 from collections import defaultdict, namedtuple
 from django.http import HttpResponse
 from django.shortcuts import render
 
 from app.models import SourceLine
+
 
 def index(request):
     projects = SourceLine.projects()
@@ -28,45 +27,6 @@ def overview(request, project):
         'overview': calc_overview,
     })
 
-# def overview2(request, project):
-#     WIDTH = 1000
-#     Block = namedtuple('Block', 'width css_class')
-
-#     proj_source = SourceLine.objects.filter(project=project)
-#     prev = None
-#     for source in proj_source.order_by('path', 'line_number'):
-#         if not prev:
-#             prev = source
-#             continue
-#         info = dict(prev.__dict__)
-#         info['length'] = source
-
-#     x = 0
-#     css_class = 'light'
-
-#         block = Block(line['
-#     def calc_overview():
-#         prev_lineno = 0
-#         prev_path = None
-#             if line.path != prev_path:
-#                 prev_lineno = 0
-#             info = dict(line.__dict__) # copy
-#             info['length'] = line.line_number - prev_lineno
-#             yield info
-
-#     def calc_rows():
-#         x = 0
-#         for info in calc_overview():
-#             info['x'] = x
-#             yield info
-#             x += info['length']
-#             if x > WIDTH:
-#                 x = 0
-
-#     return render(request, 'overview2.html', {
-#         'rows': rows,
-#     })
-
 
 def list_functions(request, project):
     proj_lines = SourceLine.objects.filter(project=project)
@@ -74,14 +34,5 @@ def list_functions(request, project):
 
     return render(request, 'list_functions2.html', {
         'functions': functions,
-        'project': project})
-
-
-def source_index(request):
-    project = 'flask'
-    proj_lines = SourceLine.objects.filter(project=project)
-    functions = proj_lines.filter(kind='function').order_by('path', 'name')
-
-    return render(request, 'list_functions2.html', {
-        'functions': functions,
-        'project': project})
+        'project': project,
+        'symbol_count': proj_lines.count()})

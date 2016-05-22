@@ -1,4 +1,4 @@
-<h3>howdy</h3>
+<h3>Shotglass</h3>
 {% for project in projects %}
-<li><a href="/app/{{ project }}/">{{ project }}</a></li>
+<li><a href="{% url 'list_functions' project=project %}">{{ project }}</a></li>
 {% endfor %}
