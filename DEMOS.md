@@ -1,4 +1,6 @@
-# Databases
+# Source Code Comparisons
+
+## Databases
 
 Redis is a small, fast, special-purpose database. SQLite is similar,
 with a standard SQL front end.  MySQL and Postgres are both very
@@ -23,7 +25,7 @@ half the size of Postgres.
 SQLite is _half_ the size of Redis, despite needing to parse complex
 SQL statements. Startling.
 
-# Web frameworks
+## Web frameworks
 
 Flask is a minimal web framework, facilitating the use of plugins to
 accomplish work.  Django is a mature "batteries included" framework.
@@ -37,7 +39,7 @@ pyramid                1,933   462    7   15,174
 django-1.9             7,208   263    8   58,988
 ```
 
-# Codebase over time
+## Single codebase over time
 
 Projects change over time.  Does Django change by importing projects?
 Or do people change little bits of code all over? If a project imports

@@ -20,7 +20,6 @@ code has a symbol definition, ...
 Overall workflow:
 
 - get source tree
-- rename raw source directory to a short project name
 - store symbols in database index for quick processing
 
 ```
@@ -42,7 +41,7 @@ Overall workflow:
 
 # DEMO: Django, a bit larger
 
-``` shell
+```
     $ apt source python-django
 
     $ ./manage.py make_index django
