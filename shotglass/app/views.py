@@ -42,11 +42,12 @@ def list_functions(request, project):
 
 def render(request, project):
     zoom = float(request.GET.get('zoom', 0.))
+    arg = request.GET.get('arg')
 
     width = shotglass_render.calc_width(project)
     if not width:
         return HttpResponse(content='uhoh')
-    grid = shotglass_render.grid_hilbert_arg(project, width)
+    grid = shotglass_render.grid_hilbert_arg(project, width, argname=arg)
     image = grid.im
 
     if zoom > 0.:

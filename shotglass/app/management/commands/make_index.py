@@ -65,6 +65,7 @@ class Command(BaseCommand):
         """
         from selected source, find symbols
         """
+        # Python: classes, functions, members, variables
         cmd = 'ctags --fields=afmikKlnsStz -L {} -o {}'
         tags_path = '{}.tags'.format(project)
         subprocess.check_call(

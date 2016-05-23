@@ -2,7 +2,12 @@
 
 symbols = {{ symbol_count }}
 
-<a href="{% url 'render' project=project %}">render</a>
+<form action="{% url 'render' project=project %}">
+    <input type="radio" name="arg" value="path" checked>path</input>
+    <input type="radio" name="arg" value="tags">tags</input>
+    <input type="submit" />
+</form>
+    <a href="{% url 'render' project=project %}">render</a>
 
 <h3>{{ functions|length }} functions</h3>
 

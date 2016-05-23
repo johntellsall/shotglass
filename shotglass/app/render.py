@@ -136,6 +136,8 @@ def make_step_iter(step, max_):
 
 
 def grid_hilbert_arg(project, width, argname='path', depth=None):
+    if argname == 'tags':
+        argname = 'tags_json'
     symbols = SourceLine.objects.filter( # pylint: disable=no-member
         project=project
     ).order_by('tags_json', 'path', 'line_number')
