@@ -121,7 +121,7 @@ def color_hsl(hue, saturation, lightness):
         hue, saturation, lightness))
 
 
-def thispoint_iter():
+def make_hilbert_iter():
     index_ = 0
     while True:
         yield tuple(hilbert.int_to_Hilbert(index_))
@@ -135,23 +135,7 @@ def make_step_iter(step, max_):
         num = (num + step) % max_
 
 
-def grid_hilbert_arg(project, width, argname='path', depth=None):
-    if argname == 'tags':
-        argname = 'tags_json'
-    symbols = SourceLine.objects.filter( # pylint: disable=no-member
-        project=project
-    ).order_by('tags_json', 'path', 'line_number')
-    width *= 4                  # XX?
-    grid = ImageGrid(width, width)
-
-    prev_arg = None
-    prev_path = None
-    highlight = 40
-    hue,saturation = 0, 0
-    hue_iter = make_step_iter(50, 360)
-    saturation_iter = itertools.cycle([25, 70])
-    highlight_iter = itertools.cycle([40, 60])
-    thispoint = thispoint_iter()
+def make_skeleton(symbols, argname, depth):
 
     def arg_iter():
         """
@@ -164,22 +148,48 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
             else:
                 yield (symbol, arg)
 
-    def add_black_smudge():
-        for _ in xrange(3):
-            thispoint.next()
-
+    prev_path = None
+    pos = 0
     for symbol,arg in arg_iter():
+        yield pos, symbol, arg
+        pos += 1
         if symbol.path != prev_path:
             if prev_path:
-                add_black_smudge()
+                pos += 3        # add black smudge
             prev_path = symbol.path
-        if prev_arg != arg:     # change color with new arg (file)
+        pos += symbol.length
+
+
+def grid_hilbert_arg(project, width, argname='path', depth=None):
+    symbols = SourceLine.objects.filter( # pylint: disable=no-member
+        project=project
+    ).order_by('tags_json', 'path', 'line_number')
+
+    if argname == 'tags':
+        argname = 'tags_json'
+    width *= 4                  # XX?
+    grid = ImageGrid(width, width)
+
+    skeleton = make_skeleton(symbols)
+
+    prev_arg = None
+    prev_path = None
+    highlight = 40
+    hue,saturation = 0, 0
+    hue_iter = make_step_iter(50, 360)
+    saturation_iter = itertools.cycle([30, 60, 80])
+    highlight_iter = itertools.cycle([40, 60])
+
+    for point, symbol, arg in skeleton:
+        # change color with new arg (file)
+        if prev_arg != arg:
             hue = hue_iter.next()
             prev_arg = arg
-            highlight = highlight_iter.next() # alternate args
-        saturation = saturation_iter.next() # alternate symbols
+            highlight = highlight_iter.next() # X?
+        # alternate symbols: different saturation
+        saturation = saturation_iter.next()
         pen = color_hsl(hue, saturation, highlight)
-        grid.draw(thispoint.next(), pen)
+        grid.draw(point, pen)
         if symbol.length <= 1:
             continue
         grid.moveto(thispoint.next())
