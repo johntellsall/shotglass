@@ -3,7 +3,6 @@
 import itertools
 import json
 import math
-import random
 
 from django.db.models import Sum
 from PIL import Image, ImageColor, ImageDraw
@@ -17,8 +16,8 @@ class Grid(object):
         self.width = width
         self.height = height
 
-    def draw(self, x, y, pen):
-        print 'draw: {}, {}, {}'.format(x, y, pen)
+    def draw(self, xy, pen):
+        print 'draw: {}, {}'.format(xy, pen)
 
     def get_symbol_pen(self, symbol):
         return symbol.name[0]
@@ -35,7 +34,8 @@ class TextGrid(Grid):
         self.data = []
         super(TextGrid, self).__init__(width, height)
 
-    def draw(self, x, y, pen):
+    def draw(self, xy, pen):
+        x,y = xy
         if y >= len(self.data):
             self.data.append(self.blank_row[:])
         try:
@@ -115,6 +115,9 @@ def get_xy(pos):
 
 
 def make_skeleton(symbols, argname, depth):
+    """
+    calculate position of each symbol
+    """
     def arg_iter():
         'iterate by "args", generally filenames'
         for symbol in symbols:
@@ -136,27 +139,13 @@ def make_skeleton(symbols, argname, depth):
         pos += symbol.length - 1
 
 
-def grid_hilbert_arg(project, width, argname='path', depth=None):
-    symbols = SourceLine.objects.filter( # pylint: disable=no-member
-        project=project
-    ).order_by('tags_json', 'path', 'line_number')
-
-    if argname == 'tags':
-        argname = 'tags_json'
-    skeleton = make_skeleton(symbols, argname, depth)
-
-    width *= 4                  # XX?
-    grid = ImageGrid(width, width)
-
+def add_color(skeleton):
     prev_arg = None
-    prev_path = None
     highlight = 40
     hue,saturation = 0, 0
     hue_iter = make_step_iter(50, 360)
     saturation_iter = itertools.cycle([30, 60, 80])
     highlight_iter = itertools.cycle([40, 60])
-
-    skeleton = list(skeleton)
 
     for pos, symbol, arg in skeleton:
         # change color with new arg (file)
@@ -167,17 +156,47 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
         # alternate symbols: different saturation
         saturation = saturation_iter.next()
         pen = color_hsl(hue, saturation, highlight)
+        yield pos, symbol, arg, pen
 
-        grid.draw(get_xy(pos), pen)
-        if symbol.length <= 1:
-            continue
-        grid.moveto(get_xy(pos + 1))
-        for offset in xrange(symbol.length):
-            grid.drawto(get_xy(pos + offset + 1), pen)
+
+def draw_symbol(grid, pos, symbol, pen):
+    grid.draw(get_xy(pos), pen)
+    if symbol.length <= 1:
+        return
+    grid.moveto(get_xy(pos + 1))
+    for offset in xrange(symbol.length):
+        grid.drawto(get_xy(pos + offset + 1), pen)
+
+
+class Diagram(list):
+    def render(self, symbols, argname, depth):
+        skeleton = make_skeleton(symbols, argname, depth)
+        self[:] = list(add_color(skeleton))
+
+    def dump(self, outfile):
+        pass
+
+
+def grid_hilbert_arg(project, width, argname='path', depth=None):
+    symbols = SourceLine.objects.filter( # pylint: disable=no-member
+        project=project
+    ).order_by('tags_json', 'path', 'line_number')
+
+    if argname == 'tags':
+        argname = 'tags_json'
+
+    diagram = Diagram()
+    diagram.render(symbols, argname, depth)
+
+    width *= 4                  # XX?
+    grid = ImageGrid(width, width)
+
+    for pos, symbol, _, pen in diagram:
+        draw_symbol(grid, pos, symbol, pen)
 
     if 1:
-        folder_pos = [pos for pos, symbol, _arg in skeleton
-                      if symbol.path.endswith('/blueprints.py')]
+        folder_pos = [pos for pos, symbol, _, _ in diagram
+                      if symbol.path.endswith('/setup.py')]
         folder_range = xrange(min(folder_pos), max(folder_pos))
         grid.draw_many((get_xy(pos) for pos in folder_range),
                        ImageColor.getrgb('white'))
