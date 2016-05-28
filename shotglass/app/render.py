@@ -152,9 +152,9 @@ def make_skeleton(symbols, argname, depth):
         pos += 1
         if symbol.path != prev_path:
             if prev_path:
-                pos += 3        # add black smudge
+                pos += 2        # add black smudge
             prev_path = symbol.path
-        pos += symbol.length
+        pos += symbol.length - 1
 
 
 def grid_hilbert_arg(project, width, argname='path', depth=None):
@@ -189,11 +189,12 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
         # alternate symbols: different saturation
         saturation = saturation_iter.next()
         pen = color_hsl(hue, saturation, highlight)
-        # grid.draw(get_xy(point), pen)
-        # if symbol.length <= 1:
-        #     continue
-        # grid.moveto(get_xy(point + 1))
-        for offset in xrange(symbol.length - 1):
+
+        grid.draw(get_xy(point), pen)
+        if symbol.length <= 1:
+            continue
+        grid.moveto(get_xy(point + 1))
+        for offset in xrange(symbol.length):
             grid.drawto(get_xy(point + offset + 1), pen)
 
     grid.finalize()
