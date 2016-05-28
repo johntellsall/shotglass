@@ -11,18 +11,21 @@ SYMBOLS = [
 ]
 
 
-def get_pos_arg(results):
-    return [(pos,arg) for pos,_symbol,arg in results]
+def get_arg(result):
+    return [arg for pos,_symbol,arg in result]
+def get_pos(result):
+    return [pos for pos,_symbol,arg in result]
 
 
 def test_skeleton():
     symbols = list(SYMBOLS)
 
-    result = render.make_skeleton(symbols, 'size', depth=None)
-    assert get_pos_arg(result) == [(0, 'M'), (2, 'L'), (5, 'S')]
+    result = list(render.make_skeleton(symbols, 'size', depth=None))
+    assert get_pos(result) == [0, 1, 3]
+    assert get_arg(result) == ['M', 'L', 'S']
 
     result = render.make_skeleton(symbols, 'length', depth=None)
-    assert get_pos_arg(result) == [(0, 1), (2, 2), (5, 3)]
+    assert get_arg(result) == [1, 2, 3]
 
 
 def test_skeleton_json():
@@ -32,7 +35,7 @@ def test_skeleton_json():
         AttrDict(symbol='func2', path='aux.py', tags_json='"dog"', length=3),
     ]
     result = render.make_skeleton(symbols, 'tags_json', depth=1)
-    assert get_pos_arg(result) == [(0, 'c'), (2, 'c'), (5, 'd')]
+    assert get_arg(result) == ['c', 'c', 'd']
 
     result = render.make_skeleton(symbols, 'tags_json', depth=2)
-    assert get_pos_arg(result) == [(0, 'ca'), (2, 'ca'), (5, 'do')]
+    assert get_arg(result) == ['ca', 'ca', 'do']
