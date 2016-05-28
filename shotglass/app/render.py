@@ -67,13 +67,9 @@ class ImageGrid(Grid):
         self.last = xy
 
     def draw_many(self, xy_iter, pen):
-        if 1:
-            self.moveto(xy_iter.next())
-            for xy in xy_iter:
-                self.drawto(xy, pen)
-        else:
-            for xy in xy_iter:
-                self.draw(xy, pen)
+        self.moveto(xy_iter.next())
+        for xy in xy_iter:
+            self.drawto(xy, pen)
 
     def finalize(self):
         self.im = self.im.crop(self.im.getbbox())
