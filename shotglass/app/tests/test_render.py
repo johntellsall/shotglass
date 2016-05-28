@@ -12,7 +12,7 @@ SYMBOLS = [
 
 
 def get_pos_arg(results):
-    return [(pos,arg) for pos,_,arg in results]
+    return [(pos,arg) for pos,_symbol,arg in results]
 
 
 def test_skeleton():

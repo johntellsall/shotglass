@@ -136,11 +136,8 @@ def make_step_iter(step, max_):
 
 
 def make_skeleton(symbols, argname, depth):
-
     def arg_iter():
-        """
-        iterate by "args", generally filenames
-        """
+        'iterate by "args", generally filenames'
         for symbol in symbols:
             arg = getattr(symbol, argname)
             if depth and arg and argname.endswith('_json'):
@@ -150,14 +147,14 @@ def make_skeleton(symbols, argname, depth):
 
     prev_path = None
     pos = 0
-    for symbol,arg in arg_iter():
+    for symbol, arg in arg_iter():
         yield pos, symbol, arg
         pos += 1
         if symbol.path != prev_path:
             if prev_path:
                 pos += 3        # add black smudge
             prev_path = symbol.path
-        pos += symbol.length
+        pos += symbol.length - 1
 
 
 def grid_hilbert_arg(project, width, argname='path', depth=None):
@@ -167,10 +164,13 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
 
     if argname == 'tags':
         argname = 'tags_json'
+    skeleton = make_skeleton(symbols, argname, depth)
+
     width *= 4                  # XX?
     grid = ImageGrid(width, width)
 
-    skeleton = make_skeleton(symbols)
+    def get_xy(pos):
+        return hilbert.int_to_Hilbert(pos)
 
     prev_arg = None
     prev_path = None
@@ -189,11 +189,12 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
         # alternate symbols: different saturation
         saturation = saturation_iter.next()
         pen = color_hsl(hue, saturation, highlight)
-        grid.draw(point, pen)
-        if symbol.length <= 1:
-            continue
-        grid.moveto(thispoint.next())
-        for _ in xrange(symbol.length-1):
-            grid.drawto(thispoint.next(), pen)
+        # grid.draw(get_xy(point), pen)
+        # if symbol.length <= 1:
+        #     continue
+        # grid.moveto(get_xy(point + 1))
+        for offset in xrange(symbol.length - 1):
+            grid.drawto(get_xy(point + offset + 1), pen)
+
     grid.finalize()
     return grid
