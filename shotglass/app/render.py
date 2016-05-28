@@ -154,7 +154,7 @@ def make_skeleton(symbols, argname, depth):
             if prev_path:
                 pos += 3        # add black smudge
             prev_path = symbol.path
-        pos += symbol.length - 1
+        pos += symbol.length
 
 
 def grid_hilbert_arg(project, width, argname='path', depth=None):
