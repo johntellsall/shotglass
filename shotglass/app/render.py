@@ -77,36 +77,6 @@ class ImageGrid(Grid):
             int(args[0]), args[1], args[2]))
 
 
-# XX unused
-class Theme(object):
-    def get_symbol_hsl(self, symbol):
-        if symbol.kind not in ('function', 'member'):
-            return (0, 25, 25)
-        hue = random.randint(0, 360)
-        return (hue, 75, 25)
-
-
-# XX unused
-class Cursor(object):
-    def __init__(self, grid):
-        self.x = 0
-        self.y = 0
-        self.grid = grid
-        self.dx = 1
-
-    def step(self, pen, count=1):
-        for _ in xrange(count):
-            self.grid.draw(self.x, self.y, pen)
-            self.x += self.dx
-            if self.x >= self.grid.width:
-                self.x = self.grid.width-1
-                self.y += 1
-                self.dx *= -1
-            elif self.x < 0:
-                self.x = 0
-                self.y += 1
-                self.dx *= -1
-
 def calc_width(project):
     lines_total = SourceLine.objects.filter( # pylint: disable=no-member
         project=project).aggregate(Sum('length'))['length__sum']
@@ -133,6 +103,10 @@ def make_step_iter(step, max_):
     while True:
         yield num
         num = (num + step) % max_
+
+
+def get_xy(pos):
+    return hilbert.int_to_Hilbert(pos)
 
 
 def make_skeleton(symbols, argname, depth):
@@ -168,9 +142,6 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
 
     width *= 4                  # XX?
     grid = ImageGrid(width, width)
-
-    def get_xy(pos):
-        return hilbert.int_to_Hilbert(pos)
 
     prev_arg = None
     prev_path = None
