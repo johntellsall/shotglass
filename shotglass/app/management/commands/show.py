@@ -8,6 +8,19 @@ from django.db.models import Avg, Max, Sum
 from app.models import SourceLine
 
 
+def show_index(projects):
+    FORMAT = '{name:30} {path}:{line_number}'
+
+    def fun_symbol(sym):
+        return sym.name[0] != '_'
+
+    for project in projects:
+        symbols = SourceLine.objects.filter(
+            project=project).order_by('name')
+        for symbol in filter(fun_symbol, symbols):
+            print FORMAT.format(**symbol.__dict__)
+
+
 def show_summary(projects):
     HEADER = '{:20} {:>7} {:>5} {:>4} {:>8}'.format(
         'project', 'symbols', 'max', 'avg', 'total')
@@ -46,4 +59,7 @@ class Command(BaseCommand):
         if projects == ['all']:
             projects = self.get_all_projects()
 
-        show_summary(projects)
+        if options['index']:
+            show_index(projects)
+        else:
+            show_summary(projects)
