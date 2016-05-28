@@ -66,6 +66,15 @@ class ImageGrid(Grid):
             self.im_draw.line((self.last, xy), pen)
         self.last = xy
 
+    def draw_many(self, xy_iter, pen):
+        if 1:
+            self.moveto(xy_iter.next())
+            for xy in xy_iter:
+                self.drawto(xy, pen)
+        else:
+            for xy in xy_iter:
+                self.draw(xy, pen)
+
     def finalize(self):
         self.im = self.im.crop(self.im.getbbox())
 
@@ -151,7 +160,9 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
     saturation_iter = itertools.cycle([30, 60, 80])
     highlight_iter = itertools.cycle([40, 60])
 
-    for point, symbol, arg in skeleton:
+    skeleton = list(skeleton)
+
+    for pos, symbol, arg in skeleton:
         # change color with new arg (file)
         if prev_arg != arg:
             hue = hue_iter.next()
@@ -161,12 +172,19 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
         saturation = saturation_iter.next()
         pen = color_hsl(hue, saturation, highlight)
 
-        grid.draw(get_xy(point), pen)
+        grid.draw(get_xy(pos), pen)
         if symbol.length <= 1:
             continue
-        grid.moveto(get_xy(point + 1))
+        grid.moveto(get_xy(pos + 1))
         for offset in xrange(symbol.length):
-            grid.drawto(get_xy(point + offset + 1), pen)
+            grid.drawto(get_xy(pos + offset + 1), pen)
+
+    if 1:
+        folder_pos = [pos for pos, symbol, _arg in skeleton
+                      if symbol.path.endswith('/blueprints.py')]
+        folder_range = xrange(min(folder_pos), max(folder_pos))
+        grid.draw_many((get_xy(pos) for pos in folder_range),
+                       ImageColor.getrgb('white'))
 
     grid.finalize()
     return grid
