@@ -27,11 +27,13 @@ SQLite is _half_ the size of Redis, despite needing to parse complex
 SQL statements. Startling.
 
 
-## SQLite - 36 KLOC, 2K symbols
+### SQLite - 36 KLOC, 2K symbols
 ![sqlite](images/sqlite_path.png)
-## Redis - 63 KLOC, 4K symbols
+### Redis - 63 KLOC, 4K symbols
 ![redis](images/redis_path.png)
+### MySQL - 300 KLOC, 13K symbols
 ![mysql-5.5](images/mysql-5.5_path.png)
+### PostgreSQL - 743 KLOC, 30K symbols
 ![postgresql-9.3](images/postgresql-9.3_path.png)
 
 
@@ -51,9 +53,13 @@ pyramid                1,933   462    7   15,174
 django-1.9             7,208   263    8   58,988
 ```
 
+### Flask - 4 KLOC, 0.5 K symbols
 ![flask](images/flask_path.png)
+### Bottle - 6 KLOC, 1K symbols
 ![bottle](images/bottle_path.png)
+### Pyramid - 15 KLOC, 2K symbols
 ![pyramid](images/pyramid_path.png)
+### Django - 60 KLOC, 7K symbols
 ![django-1.9](images/django-1.9_path.png)
 
 
@@ -110,7 +116,9 @@ python3               80,643  2137   10  817,999
 Python is surprisingly large, eclipsing even Postgres. Python 3.4 is
 the largest codebase thus studied.
 
+### Python 2.7 - 780 KLOC, 76K symbols
 ![python2](images/python2_path.png)
+### Python 3 - 820 KLOC, 81K symbols
 ![python3](images/python3_path.png)
 
 
