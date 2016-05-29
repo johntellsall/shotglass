@@ -173,22 +173,6 @@ class Diagram(list):
         skeleton = make_skeleton(symbols, argname, depth)
         self[:] = list(add_color(skeleton))
 
-    # def encode(self):
-    #     class MyJSON(json.JSONEncoder):
-    #         def default(self, obj):
-    #             if not isinstance(obj, SourceLine):
-    #                 return super(MyJSON, self).default(obj)
-    #             data = obj.__dict__
-    #             del data['_state']
-    #             del data['id']
-    #             return super(MyJSON, self).default(data)
-    #     return MyJSON().encode(self)
-    def write(self, outf):
-        my_encode = json.JSONEncoder().encode
-        for pos, symbol, arg, pen in self:
-            obj = [pos, arg, pen]
-            outf.write(my_encode(obj))
-
 
 def grid_hilbert_arg(project, width, argname='path', depth=None):
     symbols = SourceLine.objects.filter( # pylint: disable=no-member
@@ -200,11 +184,9 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
 
     diagram = Diagram()
     diagram.render(symbols, argname, depth)
-    import ipdb ;ipdb.set_trace()
     width *= 4                  # XX?
     grid = ImageGrid(width, width)
 
-    diagram.write(open('zdiag.json', 'w'))
     for pos, symbol, _, pen in diagram:
         draw_symbol(grid, pos, symbol, pen)
 
