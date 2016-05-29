@@ -172,6 +172,10 @@ class Diagram(list):
         skeleton = make_skeleton(symbols, argname, depth)
         self[:] = list(add_color(skeleton))
 
+    def draw(self, grid):
+        for pos, symbol, _, color in self:
+            draw_symbol(grid, pos, symbol, color)
+
     def dbsave(self):
         def make_symbols():
             for pos, symbol, arg, color in self:
@@ -196,9 +200,7 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
 
     width *= 4                  # XX?
     grid = ImageGrid(width, width)
-
-    for pos, symbol, _, color in diagram:
-        draw_symbol(grid, pos, symbol, color)
+    diagram.draw(grid)
 
     if 1:
         folder_pos = [pos for pos, symbol, _, _ in diagram
