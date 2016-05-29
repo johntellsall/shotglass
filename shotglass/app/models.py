@@ -33,5 +33,5 @@ class DiagramSymbol(models.Model):
     position = models.IntegerField()
     x = models.IntegerField()
     y = models.IntegerField()
-    pen = ColorField()
+    color = ColorField()
     sourceline = models.ForeignKey(SourceLine, on_delete=models.CASCADE)

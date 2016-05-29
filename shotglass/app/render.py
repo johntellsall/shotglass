@@ -48,6 +48,7 @@ class TextGrid(Grid):
         for row in self.data:
             print ''.join(row)
 
+
 class ImageGrid(Grid):
     def __init__(self, width, height):
         self.im = Image.new('RGB', (width, height))
@@ -78,10 +79,6 @@ class ImageGrid(Grid):
     def render(self, path):
         self.im.save(path)
 
-    def make_pen(self, args):
-        return ImageColor.getrgb('hsl({0}, {1}%, {2}%)'.format(
-            int(args[0]), args[1], args[2]))
-
 
 def calc_width(project):
     lines_total = SourceLine.objects.filter( # pylint: disable=no-member
@@ -90,11 +87,6 @@ def calc_width(project):
         print 'WARNING: {} is empty'.format(project)
         return 0
     return int(math.sqrt(lines_total) + 1)
-
-
-def color_hsl_pil(hue, saturation, lightness):
-    return ImageColor.getrgb('hsl({}, {}%, {}%)'.format(
-        hue, saturation, lightness))
 
 
 # X RGB values are off by one
@@ -181,10 +173,13 @@ class Diagram(list):
         self[:] = list(add_color(skeleton))
 
     def dbsave(self):
+        def make_symbols():
+            for pos, symbol, arg, color in self:
+                x,y = get_xy(pos)
+                yield DiagramSymbol(
+                    color=color, position=pos, x=x, y=y, sourceline=symbol)
         DiagramSymbol.objects.all().delete() # XX
-        for pos, symbol, arg, color in self:
-            x,y = get_xy(pos)
-            DiagramSymbol(position=pos, x=x, y=y, sourceline=symbol).save()
+        DiagramSymbol.objects.bulk_create(make_symbols())
 
 
 def grid_hilbert_arg(project, width, argname='path', depth=None):
