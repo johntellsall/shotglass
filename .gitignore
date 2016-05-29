@@ -60,3 +60,4 @@ tags
 *~
 *.lst
 TAGS
+venv
