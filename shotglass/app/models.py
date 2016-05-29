@@ -1,7 +1,11 @@
+from colorfield.fields import ColorField
 from django.db import models
+
 
 nullable = {'blank': True, 'null': True}
 
+
+# TODO: rename SourceLine to Symbol
 class SourceLine(models.Model):
 
     project = models.CharField(max_length=200, **nullable)
@@ -19,6 +23,15 @@ class SourceLine(models.Model):
 
     @classmethod
     def projects(cls):
-        projects = cls.objects.values('project').distinct(
+        projects = cls.objects.values(  # pylint: disable=no-member
+            'project').distinct(
         ).values_list('project', flat=True)
         return sorted(filter(None, projects))
+
+
+class DiagramSymbol(models.Model):
+    position = models.IntegerField()
+    x = models.IntegerField()
+    y = models.IntegerField()
+    pen = ColorField()
+    sourceline = models.ForeignKey(SourceLine, on_delete=models.CASCADE)

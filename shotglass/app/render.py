@@ -8,7 +8,7 @@ from django.db.models import Sum
 from PIL import Image, ImageColor, ImageDraw
 
 from app import hilbert
-from app.models import SourceLine
+from app.models import DiagramSymbol, SourceLine
 
 
 class Grid(object):
@@ -173,6 +173,12 @@ class Diagram(list):
         skeleton = make_skeleton(symbols, argname, depth)
         self[:] = list(add_color(skeleton))
 
+    def dbsave(self):
+        DiagramSymbol.objects.all().delete() # XX
+        for pos, symbol, arg, pen in self:
+            x,y = get_xy(pos)
+            DiagramSymbol(position=pos, x=x, y=y, sourceline=symbol).save()
+
 
 def grid_hilbert_arg(project, width, argname='path', depth=None):
     symbols = SourceLine.objects.filter( # pylint: disable=no-member
@@ -184,6 +190,8 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
 
     diagram = Diagram()
     diagram.render(symbols, argname, depth)
+    diagram.dbsave()
+
     width *= 4                  # XX?
     grid = ImageGrid(width, width)
 
