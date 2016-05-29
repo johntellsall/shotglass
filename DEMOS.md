@@ -27,7 +27,9 @@ SQLite is _half_ the size of Redis, despite needing to parse complex
 SQL statements. Startling.
 
 
+## SQLite - 36 KLOC, 2K symbols
 ![sqlite](images/sqlite_path.png)
+## Redis - 63 KLOC, 4K symbols
 ![redis](images/redis_path.png)
 ![mysql-5.5](images/mysql-5.5_path.png)
 ![postgresql-9.3](images/postgresql-9.3_path.png)
