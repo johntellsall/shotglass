@@ -17,6 +17,12 @@ def get_pos(result):
     return [pos for pos,_symbol,arg in result]
 
 
+def test_add_color():
+    diagram = [(0, 'x', 1), (1, 'y', 2)]
+    assert list(render.add_color(diagram)) == [
+        (0, 'x', 1, '#864747'), (1, 'y', 2, '#5dd3d7')]
+
+
 def test_skeleton():
     symbols = list(SYMBOLS)
 

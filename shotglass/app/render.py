@@ -1,5 +1,6 @@
 # app/render.py
 
+import colorsys
 import itertools
 import json
 import math
@@ -16,10 +17,10 @@ class Grid(object):
         self.width = width
         self.height = height
 
-    def draw(self, xy, pen):
-        print 'draw: {}, {}'.format(xy, pen)
+    def draw(self, xy, color):
+        print 'draw: {}, {}'.format(xy, color)
 
-    def get_symbol_pen(self, symbol):
+    def get_symbol_color(self, symbol):
         return symbol.name[0]
 
     def finalize(self):
@@ -34,12 +35,12 @@ class TextGrid(Grid):
         self.data = []
         super(TextGrid, self).__init__(width, height)
 
-    def draw(self, xy, pen):
+    def draw(self, xy, color):
         x,y = xy
         if y >= len(self.data):
             self.data.append(self.blank_row[:])
         try:
-            self.data[y][x] = pen
+            self.data[y][x] = color
         except IndexError:
             pass
 
@@ -91,9 +92,15 @@ def calc_width(project):
     return int(math.sqrt(lines_total) + 1)
 
 
-def color_hsl(hue, saturation, lightness):
+def color_hsl_pil(hue, saturation, lightness):
     return ImageColor.getrgb('hsl({}, {}%, {}%)'.format(
         hue, saturation, lightness))
+
+
+# X RGB values are off by one
+def color_hsl_hex(hue, saturation, lightness):
+    r,g,b = colorsys.hls_to_rgb(hue/99., lightness/99., saturation/99.)
+    return '#%02x%02x%02x' % (int(r*255), int(g*255), int(b*255))
 
 
 def make_hilbert_iter():
@@ -155,17 +162,17 @@ def add_color(skeleton):
             highlight = highlight_iter.next() # X?
         # alternate symbols: different saturation
         saturation = saturation_iter.next()
-        pen = color_hsl(hue, saturation, highlight)
-        yield pos, symbol, arg, pen
+        color = color_hsl_hex(hue, saturation, highlight)
+        yield pos, symbol, arg, color
 
 
-def draw_symbol(grid, pos, symbol, pen):
-    grid.draw(get_xy(pos), pen)
+def draw_symbol(grid, pos, symbol, color):
+    grid.draw(get_xy(pos), color)
     if symbol.length <= 1:
         return
     grid.moveto(get_xy(pos + 1))
     for offset in xrange(symbol.length):
-        grid.drawto(get_xy(pos + offset + 1), pen)
+        grid.drawto(get_xy(pos + offset + 1), color)
 
 
 class Diagram(list):
@@ -175,7 +182,7 @@ class Diagram(list):
 
     def dbsave(self):
         DiagramSymbol.objects.all().delete() # XX
-        for pos, symbol, arg, pen in self:
+        for pos, symbol, arg, color in self:
             x,y = get_xy(pos)
             DiagramSymbol(position=pos, x=x, y=y, sourceline=symbol).save()
 
@@ -195,8 +202,8 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
     width *= 4                  # XX?
     grid = ImageGrid(width, width)
 
-    for pos, symbol, _, pen in diagram:
-        draw_symbol(grid, pos, symbol, pen)
+    for pos, symbol, _, color in diagram:
+        draw_symbol(grid, pos, symbol, color)
 
     if 1:
         folder_pos = [pos for pos, symbol, _, _ in diagram
