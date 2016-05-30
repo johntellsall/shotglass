@@ -6,6 +6,12 @@
         &nbsp;&nbsp;
 </span>
 
-   &nbsp; {{ symbol.sourceline.name }}
+{% with src=symbol.sourceline %}
+&nbsp; <kbd>{{ src.name }}</kbd>
+<br/>
+len={{src.length}}
+kind={{src.kind}}
+{% endwith %}
+
 </p>
 {% endfor %}

@@ -73,6 +73,7 @@ def symbol_index(request, project): # X
     # pylint: disable=no-member
     index = DiagramSymbol.objects.exclude(
         sourceline__name__startswith='_'
+    ).exclude(sourceline__kind__in=['variable']
     ).order_by('sourceline__name')
     return shortcuts.render(request, 'symbol_index.html',
                             dict(symbol_index=index))
