@@ -167,9 +167,9 @@ def draw_symbol(grid, pos, symbol_length, color):
         grid.drawto(get_xy(pos + offset + 1), color)
 
 
-# XX
 class Diagram(list):
     @classmethod
+    # pylint: disable=no-member
     def FromDB(cls):
         return Diagram(DiagramSymbol.objects.all())
 
@@ -186,10 +186,12 @@ class Diagram(list):
 
     def draw(self, grid):
         for dsymbol in self:
-            draw_symbol(grid, dsymbol.position,
+            draw_symbol(grid,
+                        dsymbol.position,
                         symbol_length=dsymbol.sourceline.length,
                         color=dsymbol.color)
 
+    # pylint: disable=no-member
     def dbsave(self):
         DiagramSymbol.objects.all().delete() # XX
         DiagramSymbol.objects.bulk_create(self)
