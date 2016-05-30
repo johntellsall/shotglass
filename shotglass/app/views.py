@@ -70,7 +70,9 @@ def draw(request, project):     # XX
 
 
 def symbol_index(request, project): # X
-    index = DiagramSymbol.objects.order_by(
-        'sourceline__name')
+    # pylint: disable=no-member
+    index = DiagramSymbol.objects.exclude(
+        sourceline__name__startswith='_'
+    ).order_by('sourceline__name')
     return shortcuts.render(request, 'symbol_index.html',
                             dict(symbol_index=index))
