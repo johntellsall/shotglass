@@ -3,6 +3,7 @@
 import colorsys
 import itertools
 import json
+import logging
 import math
 
 from django.db.models import Sum
@@ -10,6 +11,9 @@ from PIL import Image, ImageColor, ImageDraw
 
 from app import hilbert
 from app.models import DiagramSymbol, SourceLine
+
+
+logger = logging.getLogger(__name__)
 
 
 class Grid(object):
@@ -167,6 +171,30 @@ def draw_symbol(grid, pos, symbol_length, color):
         grid.drawto(get_xy(pos + offset + 1), color)
 
 
+# X: unused
+def draw_highlight(grid, diagram):
+    folder_pos = [pos for pos, symbol, _, _ in diagram
+                  if symbol.path.endswith('/setup.py')]
+    folder_range = xrange(min(folder_pos), max(folder_pos))
+    grid.draw_many((get_xy(pos) for pos in folder_range),
+                   ImageColor.getrgb('white'))
+
+
+def draw_box(grid, dsymbols, outline='white', fill=None):
+    try:
+        upleft_x = min(dsym.x for dsym in dsymbols)
+        upleft_y = min(dsym.y for dsym in dsymbols)
+        downright_x = max(dsym.x for dsym in dsymbols)
+        downright_y = max(dsym.y for dsym in dsymbols)
+    except ValueError:
+        logger.warning('empty box: no symbols')
+        return
+    # 2? XX
+    grid.im_draw.rectangle(
+        [upleft_x*2, upleft_y*2, downright_x*2, downright_y*2],
+        fill=fill, outline=outline)
+
+
 class Diagram(list):
     @classmethod
     # pylint: disable=no-member
@@ -217,18 +245,27 @@ def draw(project):
 
     diagram = Diagram.FromDB()
     diagram.draw(grid)
+    grid.finalize()
+    return grid
 
-    if 0:
-        folder_pos = [pos for pos, symbol, _, _ in diagram
-                      if symbol.path.endswith('/setup.py')]
-        folder_range = xrange(min(folder_pos), max(folder_pos))
-        grid.draw_many((get_xy(pos) for pos in folder_range),
-                       ImageColor.getrgb('white'))
+
+def draw_bbox(project):
+    width = calc_width(project)
+    width *= 4                  # XX?
+    grid = ImageGrid(width, width)
+
+    diagram = Diagram.FromDB()
+
+    for path in set(dsym.sourceline.path for dsym in diagram):
+        syms = [dsym for dsym in diagram
+                if dsym.sourceline.path == path]
+        draw_box(grid, syms, fill=syms[0].color)
 
     grid.finalize()
     return grid
 
 
 def get_index(project):         # X
+    # pylint: disable=no-member
     return DiagramSymbol.objects.order_by(
         'sourceline__name')

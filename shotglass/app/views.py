@@ -55,8 +55,12 @@ def draw(request, project):     # XX
     draw rendered project into an image
     """
     zoom = float(request.GET.get('zoom', 0.))
+    style = request.GET.get('style')
 
-    grid = shotglass_render.draw(project) # XX
+    draw_func = {'bbox': shotglass_render.draw_bbox
+    }.get(style) or shotglass_render.draw
+
+    grid = draw_func(project) # XX
     image = grid.im
 
     if zoom > 0.:
