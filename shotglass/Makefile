@@ -3,6 +3,9 @@ VBIN := $(VIRTUAL_ENV)/bin
 CTAGS := ctags --fields=afmikKlnsStz --totals
 all:
 
+clean:
+	-$(RM) GPATH GRTAGS GSYMS GTAGS
+
 # apt-get source postgresql-9.3 python3.4 python3-flask mysql-common
 # apt-get source python2.7 python-django redis
 flask:

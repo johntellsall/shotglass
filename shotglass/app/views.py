@@ -41,18 +41,27 @@ def list_functions(request, project):
 
 
 def render(request, project):
-    zoom = float(request.GET.get('zoom', 0.))
-    arg = request.GET.get('arg')
-
     width = shotglass_render.calc_width(project)
     if not width:
         return HttpResponse(content='uhoh')
-    grid = shotglass_render.grid_hilbert_arg(project, width, argname=arg)
+    arg = request.GET.get('arg')
+    shotglass_render.render(project) # XX
+    return HttpResponse(content='okay', content_type='text/plain')
+
+
+def draw(request, project):     # XX
+    """
+    draw rendered project into an image
+    """
+    zoom = float(request.GET.get('zoom', 0.))
+
+    grid = shotglass_render.draw(project) # XX
     image = grid.im
 
     if zoom > 0.:
         new_size = int(image.size[0]*zoom), int(image.size[1]*zoom)
-        image = image.resize(new_size) # , Image.ANTIALIAS)
+        image = image.resize(new_size)
+
     output = StringIO.StringIO()
     image.save(output, format='png')
     output.seek(0)

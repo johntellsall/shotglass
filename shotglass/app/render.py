@@ -158,35 +158,44 @@ def add_color(skeleton):
         yield pos, symbol, arg, color
 
 
-def draw_symbol(grid, pos, symbol, color):
+def draw_symbol(grid, pos, symbol_length, color):
     grid.draw(get_xy(pos), color)
-    if symbol.length <= 1:
+    if symbol_length <= 1:
         return
     grid.moveto(get_xy(pos + 1))
-    for offset in xrange(symbol.length):
+    for offset in xrange(symbol_length):
         grid.drawto(get_xy(pos + offset + 1), color)
 
 
+# XX
 class Diagram(list):
+    @classmethod
+    def FromDB(cls):
+        return Diagram(DiagramSymbol.objects.all())
+
     def render(self, symbols, argname, depth):
-        skeleton = make_skeleton(symbols, argname, depth)
-        self[:] = list(add_color(skeleton))
-
-    def draw(self, grid):
-        for pos, symbol, _, color in self:
-            draw_symbol(grid, pos, symbol, color)
-
-    def dbsave(self):
-        def make_symbols():
-            for pos, symbol, arg, color in self:
+        def make_symbols(items):
+            for pos, symbol, arg, color in items:
                 x,y = get_xy(pos)
                 yield DiagramSymbol(
                     color=color, position=pos, x=x, y=y, sourceline=symbol)
+
+        skeleton = make_skeleton(symbols, argname, depth)
+        items = add_color(skeleton)
+        self[:] = make_symbols(items)
+
+    def draw(self, grid):
+        for dsymbol in self:
+            draw_symbol(grid, dsymbol.position,
+                        symbol_length=dsymbol.sourceline.length,
+                        color=dsymbol.color)
+
+    def dbsave(self):
         DiagramSymbol.objects.all().delete() # XX
-        DiagramSymbol.objects.bulk_create(make_symbols())
+        DiagramSymbol.objects.bulk_create(self)
 
 
-def grid_hilbert_arg(project, width, argname='path', depth=None):
+def render(project, argname='path', depth=None):
     symbols = SourceLine.objects.filter( # pylint: disable=no-member
         project=project
     ).order_by('tags_json', 'path', 'line_number')
@@ -198,11 +207,16 @@ def grid_hilbert_arg(project, width, argname='path', depth=None):
     diagram.render(symbols, argname, depth)
     diagram.dbsave()
 
+
+def draw(project):
+    width = calc_width(project)
     width *= 4                  # XX?
     grid = ImageGrid(width, width)
+
+    diagram = Diagram.FromDB()
     diagram.draw(grid)
 
-    if 1:
+    if 0:
         folder_pos = [pos for pos, symbol, _, _ in diagram
                       if symbol.path.endswith('/setup.py')]
         folder_range = xrange(min(folder_pos), max(folder_pos))
