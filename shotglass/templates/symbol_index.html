@@ -1,0 +1,11 @@
+{% for symbol in symbol_index %}
+
+<p>
+    <span display="inline"
+      style="background-color: {{ symbol.color }}">
+        &nbsp;&nbsp;
+</span>
+
+   &nbsp; {{ symbol.sourceline.name }}
+</p>
+{% endfor %}

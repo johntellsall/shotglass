@@ -227,3 +227,8 @@ def draw(project):
 
     grid.finalize()
     return grid
+
+
+def get_index(project):         # X
+    return DiagramSymbol.objects.order_by(
+        'sourceline__name')

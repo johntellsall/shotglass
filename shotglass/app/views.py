@@ -5,7 +5,8 @@ from django import shortcuts
 from PIL import Image
 
 from app import render as shotglass_render
-from app.models import SourceLine
+from app.models import DiagramSymbol, SourceLine
+
 
 def index(request):
     projects = SourceLine.projects()
@@ -66,3 +67,10 @@ def draw(request, project):     # XX
     image.save(output, format='png')
     output.seek(0)
     return HttpResponse(content=output, content_type='image/png')
+
+
+def symbol_index(request, project): # X
+    index = DiagramSymbol.objects.order_by(
+        'sourceline__name')
+    return shortcuts.render(request, 'symbol_index.html',
+                            dict(symbol_index=index))
