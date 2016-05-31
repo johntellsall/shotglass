@@ -35,14 +35,19 @@ class Command(BaseCommand):
             collections.Counter)
 
         for num,(name, path) in enumerate(namepaths):
-            names = [name]
+            names = [name.lower()]
             if '_' in name:
-                names = name.split('_')
+                names = name.lower().split('_')
             elif camelcase_pat.match(name):
-                names = camelcase_pat.findall(name)
+                names = camelcase_pat.findall(name.lower())
             path_words[path].update(filter(None, names))
             if num > 500:
                 break
 
         for path, words in sorted(path_words.iteritems()):
-            print path, words.most_common(3)
+            relpath = re.sub('^.+?/', '', path)
+            common = [(word, count)
+                      for word, count in words.most_common(3)
+                      if count > 1]
+            if common:
+                print '{:30} {}'.format(relpath, common if common else '')
