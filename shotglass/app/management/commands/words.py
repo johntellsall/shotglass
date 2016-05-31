@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import collections
 import logging
 import re
 import sys
@@ -30,12 +31,18 @@ class Command(BaseCommand):
         namepaths = SourceLine.objects.filter(
             project='flask').values_list(
             'name', 'path')
+        path_words = collections.defaultdict(
+            collections.Counter)
+
         for num,(name, path) in enumerate(namepaths):
+            names = [name]
             if '_' in name:
-                print name.split('_')
+                names = name.split('_')
             elif camelcase_pat.match(name):
-                print camelcase_pat.findall(name)
-            else:
-                print name
+                names = camelcase_pat.findall(name)
+            path_words[path].update(filter(None, names))
             if num > 500:
                 break
+
+        for path, words in sorted(path_words.iteritems()):
+            print path, words.most_common(3)
