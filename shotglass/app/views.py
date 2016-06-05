@@ -42,9 +42,6 @@ def list_functions(request, project):
 
 
 def render(request, project):
-    # width = shotglass_render.calc_width(project)
-    # if not width:
-    #     return HttpResponse(content='uhoh')
     shotglass_render.render(project) # XX
     return HttpResponse(content='okay', content_type='text/plain')
 

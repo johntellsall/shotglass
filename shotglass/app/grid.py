@@ -23,10 +23,16 @@ class Grid(object):
     def draw(self, xy, color):
         print 'draw: {}, {}'.format(xy, color)
 
+    def drawto(self, xy, color):
+        print 'drawto: {}, {}'.format(xy, color)
+
     def get_symbol_color(self, symbol):
         return symbol.name[0]
 
     def finalize(self):
+        pass
+
+    def moveto(self, xy):
         pass
 
     def render(self, *args):

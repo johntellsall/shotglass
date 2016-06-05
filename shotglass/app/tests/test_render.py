@@ -1,4 +1,6 @@
-from app import render
+import pickle
+
+from app import grid, render
 
 
 class AttrDict(dict):
@@ -45,3 +47,9 @@ def test_skeleton_json():
 
     result = render.make_skeleton(symbols, 'tags_json', depth=2)
     assert get_arg(result) == ['ca', 'ca', 'do']
+
+
+def test_draw():
+    diagram = pickle.load(open('/tmp/diagram.pickle'))
+    mygrid = grid.TextGrid(1000, 1000)
+    diagram.draw(mygrid)

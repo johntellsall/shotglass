@@ -159,6 +159,8 @@ def render(project, argname='path', depth=None):
 
     diagram = Diagram()
     diagram.render(symbols, argname, depth)
+    # import pickle
+    # pickle.dump(diagram, open('diagram.pickle', 'w'))
     diagram.dbsave()
 
 
