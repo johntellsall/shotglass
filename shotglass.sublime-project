@@ -1,0 +1,24 @@
+{
+    "folders":
+    [
+        {
+            "path": "shotglass",
+            "folder_exclude_patterns": ["backup"],
+            "follow_symlinks": true,
+            "file_exclude_patterns": [
+                ".*", "*.png", "db.sqlite3", "*.pyc"]
+        }
+    ],
+    "settings":
+    {
+        "tab_size": 4
+    },
+    "build_systems":
+    [
+        {
+            "name": "Py.test",
+            "path": "/home/johnm/lilbub/bin/",
+            "shell_cmd": "py.test"
+        }
+    ]
+}
