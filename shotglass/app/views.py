@@ -73,11 +73,11 @@ def draw(request, project):     # XX
     return HttpResponse(content=output, content_type='image/png')
 
 
-def symbol_index(request, project): # X
+def index_symbols(request, project): # X
     # pylint: disable=no-member
-    index = DiagramSymbol.objects.exclude(
+    symbols = DiagramSymbol.objects.exclude(
         sourceline__name__startswith='_'
     ).exclude(sourceline__kind__in=['variable']
     ).order_by('sourceline__name')
-    return shortcuts.render(request, 'symbol_index.html',
-                            dict(symbol_index=index))
+    return shortcuts.render(request, 'index_symbols.html',
+                            dict(project=project, symbols=symbols))

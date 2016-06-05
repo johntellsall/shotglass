@@ -10,5 +10,5 @@ urlpatterns = [
     url(r'(?P<project>.+)/overview', views.overview, name='overview'),
     url(r'(?P<project>.+)/render', views.render, name='render'),
     url(r'(?P<project>.+)/draw', views.draw, name='draw'),
-    url(r'(?P<project>.+)/symbol_index', views.symbol_index),
+    url(r'(?P<project>.+)/index_symbols', views.index_symbols),
 ]
