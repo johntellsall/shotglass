@@ -8,9 +8,9 @@ from app import render as shotglass_render
 from app.models import DiagramSymbol, SourceLine
 
 
-def index(request):
+def list_projects(request):
     projects = SourceLine.projects()
-    return shortcuts.render(request, 'index.html', {'projects': projects})
+    return shortcuts.render(request, 'list_projects.html', {'projects': projects})
 
 
 def overview(request, project):
