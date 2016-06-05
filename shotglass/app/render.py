@@ -34,8 +34,7 @@ def make_step_iter(step, max_):
         num = (num + step) % max_
 
 
-def get_xy(pos):
-    return hilbert.int_to_Hilbert(pos)
+get_xy = hilbert.int_to_Hilbert
 
 
 def make_skeleton(symbols, argname, depth):
