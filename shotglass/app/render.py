@@ -54,6 +54,12 @@ class TextGrid(Grid):
 
 
 class ImageGrid(Grid):
+    @classmethod
+    def FromProject(cls, project):
+        size = calc_width(project)
+        size *= 4  # XX?
+        return cls(size, size)
+
     def __init__(self, width, height):
         self.im = Image.new('RGB', (width, height))
         self.im_draw = ImageDraw.Draw(self.im)
@@ -226,6 +232,9 @@ class Diagram(list):
 
 
 def render(project, argname='path', depth=None):
+    """
+    render given project to database
+    """
     symbols = SourceLine.objects.filter( # pylint: disable=no-member
         project=project
     ).order_by('tags_json', 'path', 'line_number')
@@ -239,9 +248,10 @@ def render(project, argname='path', depth=None):
 
 
 def draw(project):
-    width = calc_width(project)
-    width *= 4                  # XX?
-    grid = ImageGrid(width, width)
+    """
+    draw rendered project into a grid/image
+    """
+    grid = ImageGrid.FromProject(project)
 
     diagram = Diagram.FromDB()
     diagram.draw(grid)
