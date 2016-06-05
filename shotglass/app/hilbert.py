@@ -8,7 +8,6 @@
 # http://www.tiac.net/~sw/2008/10/Hilbert
 
 
-from sys import argv
 from math import log, ceil
 
 

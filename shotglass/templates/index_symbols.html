@@ -1,0 +1,19 @@
+<h3>{{ project|default:"undefined" }}</h3>
+
+{% for symbol in symbols %}
+
+<p>
+    <span display="inline"
+      style="background-color: {{ symbol.color }}">
+        &nbsp;&nbsp;
+</span>
+
+{% with src=symbol.sourceline %}
+&nbsp; <kbd>{{ src.name }}</kbd>
+<br/>
+len={{src.length}}
+kind={{src.kind}}
+{% endwith %}
+
+</p>
+{% endfor %}
