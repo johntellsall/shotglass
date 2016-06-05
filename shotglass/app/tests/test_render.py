@@ -1,6 +1,8 @@
 import pickle
 
-from app import grid, render
+from pytest import mark
+
+from app import grid, models, render
 
 
 class AttrDict(dict):
@@ -53,3 +55,4 @@ def test_draw():
     diagram = pickle.load(open('/tmp/diagram.pickle'))
     mygrid = grid.TextGrid(1000, 1000)
     diagram.draw(mygrid)
+

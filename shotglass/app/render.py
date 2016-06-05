@@ -83,7 +83,6 @@ def add_color(skeleton):
 
 
 def draw_symbol(grid, pos, symbol_length, color):
-    grid.draw(get_xy(pos), color)
     if symbol_length <= 1:
         return
     grid.moveto(get_xy(pos + 1))
@@ -119,7 +118,7 @@ class Diagram(list):
     @classmethod
     # pylint: disable=no-member
     def FromDB(cls):
-        return Diagram(DiagramSymbol.objects.all())
+        return Diagram(DiagramSymbol.objects.select_related('sourceline'))
 
     def render(self, symbols, argname, depth):
         def make_symbols(items):
