@@ -3,7 +3,7 @@
     [
         {
             "path": "shotglass",
-            "folder_exclude_patterns": ["_*", ".cache", "backup", "migrations"],
+            "folder_exclude_patterns": ["_*", ".cache", "backup", "migrations", "prof"],
             "follow_symlinks": true,
             "file_exclude_patterns": [
                 ".*", "*.png", "db.sqlite3", "*.pyc"]

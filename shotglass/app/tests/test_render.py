@@ -52,6 +52,7 @@ def test_skeleton_json():
 
 
 def test_draw():
+    # XX move to fixture
     diagram = pickle.load(open('/tmp/diagram.pickle'))
     mygrid = grid.TextGrid(1000, 1000)
     diagram.draw(mygrid)
