@@ -100,6 +100,7 @@ def draw_highlight(grid, diagram):
                    ImageColor.getrgb('white'))
 
 
+# X BUG: doesn't account for symbol length
 def draw_box(grid, dsymbols, outline='white', fill=None):
     try:
         upleft_x = min(dsym.x for dsym in dsymbols)

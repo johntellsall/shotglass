@@ -1,8 +1,6 @@
 import StringIO
-from collections import defaultdict, namedtuple
 from django.http import HttpResponse
 from django import shortcuts
-from PIL import Image
 
 from app import render as shotglass_render
 from app.models import DiagramSymbol, SourceLine
