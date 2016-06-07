@@ -50,6 +50,7 @@ def draw(request, project):     # XX
     """
     zoom = float(request.GET.get('zoom', 0.))
     style = request.GET.get('style')
+    # tagnum = request.GET.get('tagnum')
 
     draw_func = {'bbox': shotglass_render.draw_bbox
     }.get(style) or shotglass_render.draw

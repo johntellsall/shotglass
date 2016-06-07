@@ -171,7 +171,19 @@ def draw(project):
     grid = ImageGrid.FromProject(project)
 
     diagram = Diagram.FromDB()
+
+    tags = sorted(set(dsym.sourceline.tags_json for dsym in diagram))
+    tag_num = 6
+
     diagram.draw(grid)
+    if tag_num is not None:
+        selected_tag = tags[tag_num]
+        print tag_num, selected_tag
+        selected = [dsym for dsym in diagram
+            if dsym.sourceline.tags_json == selected_tag]
+        print [dsym.sourceline.name for dsym in selected]
+        draw_box(grid, selected)
+
     grid.finalize()
     return grid
 
