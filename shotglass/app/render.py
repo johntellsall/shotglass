@@ -85,7 +85,8 @@ def add_color(skeleton):
 def draw_symbol(grid, pos, symbol_length, color):
     if symbol_length <= 1:
         return
-    grid.moveto(get_xy(pos + 1))
+    grid.moveto(get_xy(pos))
+    grid.drawto(get_xy(pos + 1), '#fff')
     for offset in xrange(symbol_length):
         grid.drawto(get_xy(pos + offset + 1), color)
 
