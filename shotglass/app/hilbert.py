@@ -93,10 +93,9 @@ def transpose_bits( srcs, nDests ):
     for j in range( nDests - 1, -1, -1 ):
         # Put dests together most-significant first, shifting up:
         dest = 0
-        if 1:
-            for ksrc in srcs:
-                dest = dest * 2 + ksrc % 2
-            srcs = [val/2 for val in srcs]
+        for ksrc in srcs:
+            dest = dest * 2 + ksrc % 2
+        srcs = [val/2 for val in srcs]
         dests[ j ] = dest
     return dests
 
