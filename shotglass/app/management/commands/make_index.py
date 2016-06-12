@@ -66,6 +66,25 @@ def index_ctags(project, ctags_path):
             break
 
 
+# X: doesn't calc last symbol of each file correctly
+def index_symbol_length(project):
+    logger.debug('%s: calculating symbol lengths', project)
+    source = SourceLine.objects.filter(project=project
+        ).order_by('path', 'line_number')
+    prev_path = None
+    prev_symbol = None
+    for symbol in source:
+        if symbol.path != prev_path:
+            prev_symbol = None
+            prev_path = symbol.path
+        if prev_symbol:
+            prev_symbol.length = symbol.line_number - prev_symbol.line_number
+            if prev_symbol.kind in ('variable', 'class'):
+                prev_symbol.length = 1
+            prev_symbol.save()
+        prev_symbol = symbol
+
+
 class Command(BaseCommand):
     help = 'beer'
 
@@ -116,6 +135,7 @@ class Command(BaseCommand):
         # pylint: disable=no-member
         SourceLine.objects.filter(project=project).delete()
         index_ctags(project, tags_path)
+        index_symbol_length(project)
 
     def format_project_name(self, project_dir):
         return project_dir.lstrip('./').rstrip('/')
@@ -140,22 +160,7 @@ class Command(BaseCommand):
         self.make_index(project_name, options['tags'])
         # pylint: disable=no-member
         project_source = SourceLine.objects.filter(project=project_name)
-        logger.info('%s: %s tags', project_name,
+        logger.info('%s: %s symbols', project_name,
                     '{:,}'.format(project_source.count()))
-
-        logger.debug('%s: calculating file sizes', project_name)
-        source = project_source.order_by('path', 'line_number')
-        prev_path = None
-        prev_symbol = None
-        for symbol in source:
-            if symbol.path != prev_path:
-                prev_symbol = None
-                prev_path = symbol.path
-            if prev_symbol:
-                prev_symbol.length = symbol.line_number - prev_symbol.line_number
-                if prev_symbol.kind in ('variable', 'class'):
-                    prev_symbol.length = 1
-                prev_symbol.save()
-            prev_symbol = symbol
 
         logger.debug('%s: done', project_name)
