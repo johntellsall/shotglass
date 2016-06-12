@@ -10,6 +10,8 @@
 
 from math import log, ceil
 
+from functools32 import lru_cache
+
 
 def int_to_Hilbert( i, nD=2 ):  # Default is the 2D Hilbert walk.
     index_chunks = unpack_index( i, nD )
@@ -186,9 +188,10 @@ def gray_decode_travel( start, end, mask, g ):
 #    always flips the same bit on the first, third, fifth, ... and last flip.
 #    The pattern works for any nD >= 1.
 #
+@lru_cache(maxsize=None)
 def child_start_end( parent_start, parent_end, mask, i ):
-   start_i = max( 0,    ( i - 1 ) & ~1 )  # next lower even number, or 0
-   end_i =   min( mask, ( i + 1 ) |  1 )  # next higher odd number, or mask
-   child_start = gray_encode_travel( parent_start, parent_end, mask, start_i )
-   child_end   = gray_encode_travel( parent_start, parent_end, mask, end_i )
-   return child_start, child_end
+    start_i = max( 0,    ( i - 1 ) & ~1 )  # next lower even number, or 0
+    end_i =   min( mask, ( i + 1 ) |  1 )  # next higher odd number, or mask
+    child_start = gray_encode_travel( parent_start, parent_end, mask, start_i )
+    child_end   = gray_encode_travel( parent_start, parent_end, mask, end_i )
+    return child_start, child_end

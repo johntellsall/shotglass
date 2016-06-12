@@ -11,3 +11,4 @@ django-debug-toolbar
 ipdb
 ipython
 pytest
+functools32==3.2.3-2
