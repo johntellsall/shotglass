@@ -1,8 +1,4 @@
-import sys
-from collections import Counter
-
-import ctags
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.db.models import Avg, Max, Sum
 
 from app.models import SourceLine
@@ -21,14 +17,17 @@ def show_index(projects):
             print FORMAT.format(**symbol.__dict__)
 
 
+# pylint: disable=unused-variable
 def show_summary(projects):
-    HEADER = '{:20} {:>7} {:>5} {:>4} {:>8}'.format(
-        'project', 'symbols', 'max', 'avg', 'total')
-    FORMAT = ('{project:20} {num_symbols:7,} {max_length:5}'
-              ' {avg_length:4} {total_length:8,}')
+    HEADER = '{:20} {:>7} {:>7} {:>5} {:>4} {:>8}'.format(
+        'project', 'functions', 'symbols', 'maxlen', 'avglen', 'total')
+    FORMAT = ('{project:20} {num_functions:9,} {num_symbols:7,}'
+        ' {max_length:6}'
+        ' {avg_length:6} {total_length:8,}')
 
     print HEADER
     for project in projects:
+        # pylint: disable=no-member
         symbols = SourceLine.objects.filter(project=project)
         num_symbols = symbols.count()
         num_functions = symbols.filter(kind__in=('function', 'member')).count()
