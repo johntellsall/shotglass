@@ -1,0 +1,6 @@
+- fields: {color: '#864747', position: 0,  x: 0, y: 0}
+  model: app.diagramsymbol
+  pk: 47050
+- fields: {color: '#5dd3d7', position: 0,  x: 0, y: 0}
+  model: app.diagramsymbol
+  pk: 47051

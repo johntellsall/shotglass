@@ -1,4 +1,4 @@
-import pickle
+import cProfile
 
 from django.test import TestCase
 from pytest import mark
@@ -58,7 +58,28 @@ def test_skeleton_json():
 #     mygrid = grid.TextGrid(1000, 1000)
 #     diagram.draw(mygrid)
 
+
 class TestDraw(TestCase):
     fixtures = ['diagram-django']
-    def test1(self):
-        assert models.DiagramSymbol.objects.count() == 0
+
+    def setUp(self):
+        stub = models.SourceLine.objects.create(
+            kind='k', length=3, line_number=2, name='name', path='path')
+        models.DiagramSymbol.objects.update(sourceline=stub)
+
+    def test_rawdraw(self):
+        def rawdraw():
+            diagram = render.Diagram.FromDB()
+            mygrid = grid.Grid(None, None)
+            diagram.draw(mygrid)
+
+        prof_name = 'rawdraw-{}.prof'.format(self.fixtures[0])
+        cProfile.runctx(
+            rawdraw.func_code,  # pylint: disable=no-member
+            globals=globals(), locals={},
+            filename=prof_name)
+
+        import pstats
+        p = pstats.Stats(prof_name)
+        p.strip_dirs().sort_stats('cumtime').print_stats(20)
+

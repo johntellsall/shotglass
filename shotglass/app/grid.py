@@ -21,10 +21,10 @@ class Grid(object):
         self.height = height
 
     def draw(self, xy, color):
-        print 'draw: {}, {}'.format(xy, color)
+        pass
 
     def drawto(self, xy, color):
-        print 'drawto: {}, {}'.format(xy, color)
+        pass
 
     def get_symbol_color(self, symbol):
         return symbol.name[0]
