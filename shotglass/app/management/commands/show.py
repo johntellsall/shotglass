@@ -57,7 +57,7 @@ class Command(BaseCommand):
             return
         projects = options['projects']
         if projects == ['all']:
-            projects = self.get_all_projects()
+            projects = SourceLine.projects()
 
         if options['index']:
             show_index(projects)
