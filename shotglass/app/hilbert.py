@@ -133,7 +133,8 @@ def gray_encode_travel( start, end, mask, i ):
     # Canonical Gray code travels the top bit, 2**(nBits-1).
     # So we need to rotate by ( p - (nBits-1) ) == (p + 1) mod nBits.
     # We rotate by multiplying and dividing by powers of two:
-    g = gray_encode( i ) * ( travel_bit * 2 )
+    gray_i = i ^ ( i / 2 ) # gray encode(i)
+    g = gray_i * ( travel_bit * 2 )
     return ( ( g | ( g / modulus ) ) & mask ) ^ start
 
 def gray_decode_travel( start, end, mask, g ):
