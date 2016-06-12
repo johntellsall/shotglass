@@ -1,5 +1,6 @@
 import cProfile
-
+import pstats
+ 
 from django.test import TestCase
 from pytest import mark
 
@@ -59,8 +60,12 @@ def test_skeleton_json():
 #     diagram.draw(mygrid)
 
 
+# PERFORMANCE TEST:
+# py.test -s app/tests/test_render.py::TestDraw
+#
 class TestDraw(TestCase):
-    fixtures = ['diagram-django']
+    fixtures = ['diagram-django']  # slow + useful
+    fixtures = ['diagram-min'] # minimal
 
     def setUp(self):
         stub = models.SourceLine.objects.create(
@@ -79,7 +84,6 @@ class TestDraw(TestCase):
             globals=globals(), locals={},
             filename=prof_name)
 
-        import pstats
         p = pstats.Stats(prof_name)
         p.strip_dirs().sort_stats('cumtime').print_stats(20)
 
