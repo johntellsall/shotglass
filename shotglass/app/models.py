@@ -34,4 +34,5 @@ class DiagramSymbol(models.Model):
     x = models.IntegerField()
     y = models.IntegerField()
     color = ColorField()
-    sourceline = models.ForeignKey(SourceLine, on_delete=models.CASCADE)
+    sourceline = models.ForeignKey(SourceLine, on_delete=models.CASCADE,
+        **nullable)

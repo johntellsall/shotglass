@@ -1,5 +1,6 @@
 import pickle
 
+from django.test import TestCase
 from pytest import mark
 
 from app import grid, models, render
@@ -51,9 +52,13 @@ def test_skeleton_json():
     assert get_arg(result) == ['ca', 'ca', 'do']
 
 
-def test_draw():
-    # XX move to fixture
-    diagram = pickle.load(open('/tmp/diagram.pickle'))
-    mygrid = grid.TextGrid(1000, 1000)
-    diagram.draw(mygrid)
+# def test_draw():
+#     # XX move to fixture
+#     diagram = pickle.load(open('/tmp/diagram.pickle'))
+#     mygrid = grid.TextGrid(1000, 1000)
+#     diagram.draw(mygrid)
 
+class TestDraw(TestCase):
+    fixtures = ['diagram-django']
+    def test1(self):
+        assert models.DiagramSymbol.objects.count() == 0

@@ -17,10 +17,15 @@ def int_to_Hilbert( i, nD=2 ):  # Default is the 2D Hilbert walk.
     mask = 2 ** nD - 1
     start, end = initial_start_end( nChunks, nD )
     coord_chunks = [0] * nChunks
-    for j in range( nChunks ):
-        i = index_chunks[ j ]
-        coord_chunks[ j ] = gray_encode_travel( start, end, mask, i )
-        start, end = child_start_end( start, end, mask, i )
+    if 0:
+        for j in range( nChunks ):
+            i = index_chunks[ j ]
+            coord_chunks[ j ] = gray_encode_travel( start, end, mask, i )
+            start, end = child_start_end( start, end, mask, i )
+    else:
+        for j,i in enumerate(index_chunks):
+            coord_chunks[ j ] = gray_encode_travel( start, end, mask, i )
+            start, end = child_start_end( start, end, mask, i )
     return pack_coords( coord_chunks, nD )
 
 
