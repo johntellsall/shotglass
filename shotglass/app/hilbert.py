@@ -13,6 +13,7 @@ from math import log, ceil
 from functools32 import lru_cache
 
 
+@lru_cache(maxsize=None)
 def int_to_Hilbert( i, nD=2 ):  # Default is the 2D Hilbert walk.
     index_chunks = unpack_index( i, nD )
     nChunks = len( index_chunks )
