@@ -11,6 +11,7 @@ def show_index(projects):
         return sym.name[0] != '_'
 
     for project in projects:
+        # pylint: disable=no-member
         symbols = SourceLine.objects.filter(
             project=project).order_by('name')
         for symbol in filter(fun_symbol, symbols):
