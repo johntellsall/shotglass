@@ -62,7 +62,7 @@ def make_skeleton(symbols, argname, depth):
         pos += symbol.length - 1
 
 
-def add_color(skeleton):
+def jm_add_color(skeleton):
     prev_arg = None
     highlight = 40
     hue,saturation = 0, 0
@@ -80,6 +80,21 @@ def add_color(skeleton):
         saturation = saturation_iter.next()
         color = color_hsl_hex(hue, saturation, highlight)
         yield pos, symbol, arg, color
+
+# palette examples
+# https://jiffyclub.github.io/palettable/colorbrewer/diverging/#brbg_11
+def pal_add_color(skeleton):
+    from palettable.colorbrewer import diverging as d
+    colors = d.RdBu_11_r.hex_colors
+    prev_arg = None
+    color_iter = itertools.cycle(colors)
+    for pos, symbol, arg in skeleton:
+        # change color with new arg (file)
+        if prev_arg != arg:
+            color = color_iter.next()
+            prev_arg = arg
+        yield pos, symbol, arg, color
+add_color = pal_add_color
 
 
 def draw_symbol(grid, pos, symbol_length, color):

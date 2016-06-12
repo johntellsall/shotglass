@@ -10,6 +10,7 @@ import sys
 import ctags
 import django.db
 from django.core.management.base import BaseCommand
+from radon.complexity import cc_visit
 
 from app.models import SourceLine
 
@@ -26,6 +27,45 @@ logging.getLogger('django.db.backends').propagate = False
 logger = logging.getLogger(__name__)
 
 
+def calc_radon(path):
+    code = open(path).read()
+    funcs_data = cc_visit(code)
+    # TODO: lines = max(func.endline for func in funcs_data)
+    return dict((func.name, func.complexity)
+        for func in funcs_data)
+
+
+def calc_path_tags(path):
+    tags = path.split('/')[:-1]
+    return tags
+
+
+def index_ctags(project, ctags_path):
+    tagFile = ctags.CTags(ctags_path)
+    entry = ctags.TagEntry()
+
+    if not tagFile.find(entry, '', ctags.TAG_PARTIALMATCH):
+        sys.exit('no tags?')
+
+    while True:
+        if entry['kind']:
+            path = entry['file']
+            tags = {'path': calc_path_tags(path)}
+            try:
+                SourceLine(name=entry['name'],
+                           project=project,
+                           path=path,
+                           length=0, # XX should be None
+                           line_number=entry['lineNumber'],
+                           kind=entry['kind'],
+                           tags_json=json.dumps(tags)).save()
+            except django.db.utils.ProgrammingError:
+                logger.error('%s: uhoh', entry['name'])
+        status = tagFile.findNext(entry)
+        if not status:
+            break
+
+
 class Command(BaseCommand):
     help = 'beer'
 
@@ -33,12 +73,7 @@ class Command(BaseCommand):
         parser.add_argument('project_dir', metavar='FILE')
         parser.add_argument('--project')
         parser.add_argument('--tags')
-        # parser.add_argument('--verbose', action='store_true')
-        # internal
         parser.add_argument('--list_path')
-
-        # $ find ./python-django-*/django
-        # | egrep -v '/(contrib|debian|conf/locale|\.pc|tests)/' > django.lst
 
     def find_source_paths(self, top):
         # XX
@@ -73,11 +108,6 @@ class Command(BaseCommand):
         return tags_path
 
     def make_index(self, project, tags_path):
-        tagFile = ctags.CTags(tags_path)
-        entry = ctags.TagEntry()
-
-        if not tagFile.find(entry, '', ctags.TAG_PARTIALMATCH):
-            sys.exit('no tags?')
 
         if django.db.connection.vendor == 'sqlite':
             django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
@@ -85,28 +115,7 @@ class Command(BaseCommand):
         # XX: delete project's index
         # pylint: disable=no-member
         SourceLine.objects.filter(project=project).delete()
-
-        prefix = None # options['prefix']
-        while True:
-            if entry['kind']:
-                path = entry['file']
-                if prefix and path.startswith(prefix):
-                    path = path[len(prefix):].lstrip('/')
-                tags = path.split('/')[:-1]
-                tags_json = json.dumps(tags) if tags else None
-                try:
-                    SourceLine(name=entry['name'],
-                               project=project,
-                               path=path,
-                               length=0, # XX should be None
-                               line_number=entry['lineNumber'],
-                               kind=entry['kind'],
-                               tags_json=tags_json).save()
-                except django.db.utils.ProgrammingError:
-                    logger.error('%s: uhoh', entry['name'])
-            status = tagFile.findNext(entry)
-            if not status:
-                break
+        index_ctags(project, tags_path)
 
     def format_project_name(self, project_dir):
         return project_dir.lstrip('./').rstrip('/')
