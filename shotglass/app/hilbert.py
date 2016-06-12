@@ -88,15 +88,15 @@ def pack_coords( chunks, nD ):
 #    earlier dests come from higher bits of srcs.
 def transpose_bits( srcs, nDests ):
     srcs = list( srcs )  # Make a copy we can modify safely.
-    nSrcs = len( srcs )
     dests = [ 0 ] * nDests
     # Break srcs down least-significant bit first, shifting down:
     for j in range( nDests - 1, -1, -1 ):
         # Put dests together most-significant first, shifting up:
         dest = 0
-        for k in range( nSrcs ):
-            dest = dest * 2 + srcs[ k ] % 2
-            srcs[ k ] /= 2
+        if 1:
+            for ksrc in srcs:
+                dest = dest * 2 + ksrc % 2
+            srcs = [val/2 for val in srcs]
         dests[ j ] = dest
     return dests
 
