@@ -12,7 +12,8 @@ def list_projects(request):
 
 
 def overview(request, project):
-    proj_lines = SourceLine.objects.filter(project=project)
+    proj_lines = SourceLine.objects.filter( # pylint: disable=no-member
+        project=project)
     def calc_overview():
         prev_lineno = 0
         prev_path = None

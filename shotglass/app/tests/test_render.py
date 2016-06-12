@@ -63,6 +63,7 @@ def test_skeleton_json():
 # PERFORMANCE TEST:
 # py.test -s app/tests/test_render.py::TestDraw
 #
+# TODO: disable this except when explicitly called
 class TestDraw(TestCase):
     fixtures = ['diagram-django']  # slow + useful
     fixtures = ['diagram-min'] # minimal
