@@ -31,8 +31,7 @@ def calc_radon(path):
     code = open(path).read()
     funcs_data = cc_visit(code)
     # TODO: lines = max(func.endline for func in funcs_data)
-    return dict((func.name, func.complexity)
-        for func in funcs_data)
+    return dict((func.lineno, func) for func in funcs_data)
 
 
 def calc_path_tags(path):
@@ -41,6 +40,9 @@ def calc_path_tags(path):
 
 
 def index_ctags(project, ctags_path):
+    """
+    use Exuberant Ctags to find symbols
+    """
     tagFile = ctags.CTags(ctags_path)
     entry = ctags.TagEntry()
 
@@ -66,9 +68,34 @@ def index_ctags(project, ctags_path):
             break
 
 
+def index_radon(project):
+    # X: Radon only supports Python
+    # pylint: disable=no-member
+    path_objs = SourceLine.objects.filter(
+        path__endswith='.py', project=project,
+        ).values('path').distinct()
+    paths = [pathobj.values()[0] for pathobj in path_objs]
+    for path in paths:
+        radon = calc_radon(path)
+        print path, len(radon)
+        for lineno,radon_obj in radon.iteritems():
+            try:
+                symbol = SourceLine.objects.get(
+                    path=path, project=project, line_number=lineno)
+                tags = json.loads(symbol.tags_json)
+                # X: expose the other fields?
+                tags['radon_cc'] = radon_obj.complexity
+                symbol.tags_json = json.dumps(tags)
+                symbol.save()
+            except SourceLine.DoesNotExist:
+                # XX Radon counts @-lines as start
+                print '?', path, lineno, radon_obj.name
+
+
 # X: doesn't calc last symbol of each file correctly
 def index_symbol_length(project):
     logger.debug('%s: calculating symbol lengths', project)
+    # pylint: disable=no-member
     source = SourceLine.objects.filter(project=project
         ).order_by('path', 'line_number')
     prev_path = None
@@ -136,6 +163,7 @@ class Command(BaseCommand):
         SourceLine.objects.filter(project=project).delete()
         index_ctags(project, tags_path)
         index_symbol_length(project)
+        index_radon(project)
 
     def format_project_name(self, project_dir):
         return project_dir.lstrip('./').rstrip('/')
