@@ -81,6 +81,7 @@ def jm_add_color(skeleton):
         color = color_hsl_hex(hue, saturation, highlight)
         yield pos, symbol, arg, color
 
+
 # palette examples
 # https://jiffyclub.github.io/palettable/colorbrewer/diverging/#brbg_11
 def pal_add_color(skeleton):
@@ -94,7 +95,20 @@ def pal_add_color(skeleton):
             color = color_iter.next()
             prev_arg = arg
         yield pos, symbol, arg, color
-add_color = pal_add_color
+
+
+def cc_add_color(skeleton):
+    from palettable.colorbrewer import diverging as d
+    colors = d.RdBu_11_r.hex_colors
+    for pos, symbol, arg in skeleton:
+        try:
+            radon_cc = json.loads(symbol.tags_json)['radon_cc']
+            yield pos, symbol, arg, 'white'
+        except KeyError:
+            print '?', symbol.name, symbol.tags_json
+            yield pos, symbol, arg, 'gray'
+        
+add_color = cc_add_color
 
 
 def draw_symbol(grid, pos, symbol_length, color):
