@@ -1,6 +1,7 @@
 {
     "folders":
     [
+        { "path": "SOURCE" },
         {
             "path": "shotglass",
             "folder_exclude_patterns": ["_*", ".cache", "backup", "migrations", "prof"],

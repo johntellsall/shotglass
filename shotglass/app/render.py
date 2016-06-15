@@ -99,13 +99,20 @@ def pal_add_color(skeleton):
 
 def cc_add_color(skeleton):
     from palettable.colorbrewer import diverging as d
-    colors = d.RdBu_11_r.hex_colors
+    from radon.complexity import cc_rank
+    colormap = dict(zip('ABCDE', d.RdBu_5_r.hex_colors))
+    colormap['F'] = colormap['E']
+
     for pos, symbol, arg in skeleton:
         try:
             radon_cc = json.loads(symbol.tags_json)['radon_cc']
-            yield pos, symbol, arg, 'white'
-        except KeyError:
-            print '?', symbol.name, symbol.tags_json
+            color = colormap[cc_rank(radon_cc)]
+            if cc_rank(radon_cc) >= 'D':
+                print symbol.path, symbol.line_number,
+                print symbol.name, radon_cc, cc_rank(radon_cc)
+            yield pos, symbol, arg, color
+        except (KeyError, TypeError):
+            # print '?', symbol.name, symbol.tags_json
             yield pos, symbol, arg, 'gray'
         
 add_color = cc_add_color
