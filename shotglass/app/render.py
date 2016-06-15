@@ -5,13 +5,15 @@ import itertools
 import json
 import logging
 
+from palettable import colorbrewer
+from radon.complexity import cc_rank
+
 from app import hilbert
 from app.grid import ImageGrid
 from app.models import DiagramSymbol, SourceLine
 
 
 logger = logging.getLogger(__name__)
-
 
 
 # X RGB values are off by one
@@ -85,8 +87,7 @@ def jm_add_color(skeleton):
 # palette examples
 # https://jiffyclub.github.io/palettable/colorbrewer/diverging/#brbg_11
 def pal_add_color(skeleton):
-    from palettable.colorbrewer import diverging as d
-    colors = d.RdBu_11_r.hex_colors
+    colors = colorbrewer.diverging.RdBu_11_r.hex_colors  # pylint: disable=no-member
     prev_arg = None
     color_iter = itertools.cycle(colors)
     for pos, symbol, arg in skeleton:
@@ -98,21 +99,17 @@ def pal_add_color(skeleton):
 
 
 def cc_add_color(skeleton):
-    from palettable.colorbrewer import diverging as d
-    from radon.complexity import cc_rank
-    colormap = dict(zip('ABCDE', d.RdBu_5_r.hex_colors))
+    colors = colorbrewer.diverging.RdBu_11_r.hex_colors # pylint: disable=no-member
+    colormap = dict(zip('ABCDE', colors))
     colormap['F'] = colormap['E']
 
     for pos, symbol, arg in skeleton:
         try:
             radon_cc = json.loads(symbol.tags_json)['radon_cc']
             color = colormap[cc_rank(radon_cc)]
-            if cc_rank(radon_cc) >= 'D':
-                print symbol.path, symbol.line_number,
-                print symbol.name, radon_cc, cc_rank(radon_cc)
             yield pos, symbol, arg, color
         except (KeyError, TypeError):
-            # print '?', symbol.name, symbol.tags_json
+            logger.debug('? %s %s', symbol.name, symbol.tags_json)
             yield pos, symbol, arg, 'gray'
         
 add_color = cc_add_color
@@ -195,8 +192,6 @@ def render(project, argname='path', depth=None):
 
     diagram = Diagram()
     diagram.render(symbols, argname, depth)
-    # import pickle
-    # pickle.dump(diagram, open('diagram.pickle', 'w'))
     diagram.dbsave()
 
 
