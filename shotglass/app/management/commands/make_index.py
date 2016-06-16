@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+'''
+make_index -- compile data from tree of source files
+'''
+
 import logging
 import json
 import os
@@ -12,7 +16,7 @@ import django.db
 from django.core.management.base import BaseCommand
 from radon.complexity import cc_visit
 
-from app.models import SourceLine
+from app.models import SourceLine, ProgPmccabe
 
 
 INDEX_SUFFIXES = ('.c', '.py')
@@ -112,6 +116,16 @@ def index_symbol_length(project):
         prev_symbol = symbol
 
 
+def index_c_mmcabe(project):
+    logger.debug('%s: calculating C complexity', project)
+    paths = SourceLine.objects.filter(
+        path__endswith='.c', project=project,
+        ).values_list('path', flat=True).distinct()
+    output = subprocess.check_output(
+        ['pmccabe'] + list(paths)).split('\n')
+    for line in output:
+        print line
+
 class Command(BaseCommand):
     help = 'beer'
 
@@ -162,6 +176,7 @@ class Command(BaseCommand):
         # pylint: disable=no-member
         SourceLine.objects.filter(project=project).delete()
         index_ctags(project, tags_path)
+        index_c_mmcabe(project)
         index_symbol_length(project)
         index_radon(project)
 

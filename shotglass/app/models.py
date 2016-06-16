@@ -10,7 +10,7 @@ class SourceLine(models.Model):
 
     project = models.CharField(max_length=200, **nullable)
     name = models.CharField(max_length=200)
-    path = models.CharField(max_length=20)
+    path = models.CharField(max_length=200)
     line_number = models.IntegerField()
     kind = models.CharField(max_length=12)
     length = models.IntegerField()
@@ -36,3 +36,14 @@ class DiagramSymbol(models.Model):
     color = ColorField()
     sourceline = models.ForeignKey(SourceLine, on_delete=models.CASCADE,
         **nullable)
+
+
+class ProgPmccabe(models.Model):
+    sourceline = models.ForeignKey(SourceLine, **nullable)
+
+    modified_mccabe = models.IntegerField()
+    mccabe = models.IntegerField()
+    num_statements = models.IntegerField()
+    first_line = models.IntegerField()
+    num_lines = models.IntegerField()
+    definition_line = models.IntegerField()
