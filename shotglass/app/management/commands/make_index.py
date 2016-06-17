@@ -134,7 +134,9 @@ def index_c_mmcabe(project, paths):
         '(?P<function> .+)',
         re.VERBOSE)
     for match in filter(None, (pat.match(line) for line in output)):
-        print match.groupdict()
+        data = [int(field) for field in match.group('data').split()]
+        print data
+        # ProgPmccabe()
 if __name__=='__main__':
     index_c_mmcabe(None, None)
     blam
