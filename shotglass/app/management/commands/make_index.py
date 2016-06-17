@@ -116,15 +116,28 @@ def index_symbol_length(project):
         prev_symbol = symbol
 
 
-def index_c_mmcabe(project):
+def index_c_mmcabe(project, paths):
     logger.debug('%s: calculating C complexity', project)
-    paths = SourceLine.objects.filter(
-        path__endswith='.c', project=project,
-        ).values_list('path', flat=True).distinct()
-    output = subprocess.check_output(
-        ['pmccabe'] + list(paths)).split('\n')
-    for line in output:
-        print line
+    # pylint: disable=no-member
+    # paths = SourceLine.objects.filter(
+    #     path__endswith='.c', project=project,
+    #     ).values_list('path', flat=True).distinct()
+    # output = subprocess.check_output(
+    #     ['pmccabe'] + list(paths)).split('\n')
+    cmd = 'pmccabe ../SOURCE/postgresql-9.3-9.3.13/*/*/a*.c'
+    output = subprocess.check_output(cmd, shell=True).split('\n')
+    print output
+    pat = re.compile(
+        r'^(?P<data> [0-9\t]+)'
+        '(?P<path> .+?)'
+        '\( (?P<definition_lineno> \d+) \): \s+ '
+        '(?P<function> .+)',
+        re.VERBOSE)
+    for match in filter(None, (pat.match(line) for line in output)):
+        print match.groupdict()
+if __name__=='__main__':
+    index_c_mmcabe(None, None)
+    blam
 
 class Command(BaseCommand):
     help = 'beer'
@@ -184,6 +197,7 @@ class Command(BaseCommand):
         return project_dir.lstrip('./').rstrip('/')
 
     def handle(self, *args, **options):
+        index_c_mmcabe(None, None) ; blam
         project_dir = options['project_dir']
         if not os.path.isdir(project_dir):
             sys.exit('{}: project must be directory'.format(project_dir))
