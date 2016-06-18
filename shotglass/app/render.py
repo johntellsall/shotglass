@@ -102,7 +102,7 @@ def pal_add_color(skeleton):
 
 def cc_add_color(skeleton):
     # pylint: disable=no-member
-    colors = colorbrewer.diverging.RdBu_11_r.hex_colors 
+    colors = colorbrewer.diverging.RdBu_5_r.hex_colors 
     colormap = dict(zip('ABCDE', colors))
     colormap['F'] = colormap['E']
 
