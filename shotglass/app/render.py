@@ -99,14 +99,18 @@ def pal_add_color(skeleton):
 
 
 def cc_add_color(skeleton):
-    colors = colorbrewer.diverging.RdBu_11_r.hex_colors # pylint: disable=no-member
+    # pylint: disable=no-member
+    colors = colorbrewer.diverging.RdBu_11_r.hex_colors 
     colormap = dict(zip('ABCDE', colors))
     colormap['F'] = colormap['E']
 
     for pos, symbol, arg in skeleton:
         try:
-            radon_cc = json.loads(symbol.tags_json)['radon_cc']
-            color = colormap[cc_rank(radon_cc)]
+            if 0:
+                cc_value = json.loads(symbol.tags_json)['radon_cc']
+            else:
+                cc_value = symbol.progpmccabe.mccabe
+            color = colormap[cc_rank(cc_value)]
             yield pos, symbol, arg, color
         except (KeyError, TypeError):
             logger.debug('? %s %s', symbol.name, symbol.tags_json)
