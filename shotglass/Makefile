@@ -1,7 +1,10 @@
 SRCDIR := ../../test-projects
 VBIN := $(VIRTUAL_ENV)/bin
 CTAGS := ctags --fields=afmikKlnsStz --totals
-all:
+all:	test
+
+test:
+	py.test
 
 clean:
 	-$(RM) GPATH GRTAGS GSYMS GTAGS

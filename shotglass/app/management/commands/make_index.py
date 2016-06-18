@@ -4,6 +4,8 @@
 make_index -- compile data from tree of source files
 '''
 
+# pylint: disable=bad-builtin
+
 import logging
 import json
 import os
@@ -115,31 +117,48 @@ def index_symbol_length(project):
             prev_symbol.save()
         prev_symbol = symbol
 
+import os
+
+def walk_type(topdir, name_func):
+    for root, _dirs, names in os.walk(topdir):
+        for path in (os.path.join(root, name) for name in names
+            if name_func(name)):
+                yield path
 
 def index_c_mmcabe(project, paths):
     logger.debug('%s: calculating C complexity', project)
     # pylint: disable=no-member
-    # paths = SourceLine.objects.filter(
-    #     path__endswith='.c', project=project,
-    #     ).values_list('path', flat=True).distinct()
-    # output = subprocess.check_output(
-    #     ['pmccabe'] + list(paths)).split('\n')
-    cmd = 'pmccabe ../SOURCE/postgresql-9.3-9.3.13/*/*/a*.c'
+    if 0:
+        paths = SourceLine.objects.filter(
+            path__endswith='.c', project=project,
+            ).values_list('path', flat=True).distinct()
+        output = subprocess.check_output(
+            ['pmccabe'] + list(paths)).split('\n')
+    else:
+        cmd = 'pmccabe ../SOURCE/postgresql-9.3-9.3.13/*/*/a*.c'
     output = subprocess.check_output(cmd, shell=True).split('\n')
     print output
     pat = re.compile(
         r'^(?P<data> [0-9\t]+)'
-        '(?P<path> .+?)'
-        '\( (?P<definition_lineno> \d+) \): \s+ '
-        '(?P<function> .+)',
+        r'(?P<path> .+?)'
+        r'\( (?P<definition_line> \d+) \): \s+ '
+        r'(?P<function> .+)',
         re.VERBOSE)
     for match in filter(None, (pat.match(line) for line in output)):
         data = [int(field) for field in match.group('data').split()]
-        print data
-        # ProgPmccabe()
-if __name__=='__main__':
-    index_c_mmcabe(None, None)
-    blam
+
+        num_lines = data[4]
+        definition_line = int(match.group('definition_line'))
+        ProgPmccabe(
+            first_line=data[3],
+            modified_mccabe=data[0],
+            mccabe=data[1],
+            num_statements=data[2],
+            # overlap
+            num_lines=num_lines,
+            definition_line=definition_line,
+            ).save()
+
 
 class Command(BaseCommand):
     help = 'beer'
@@ -199,6 +218,8 @@ class Command(BaseCommand):
         return project_dir.lstrip('./').rstrip('/')
 
     def handle(self, *args, **options):
+        is_python = re.compile(r'\.py$').search
+        print '\n'.join(walk_type('.', is_python)) ; blam
         index_c_mmcabe(None, None) ; blam
         project_dir = options['project_dir']
         if not os.path.isdir(project_dir):
