@@ -43,7 +43,7 @@ def list_symbols(request, project):
 
 def render(request, project):
     shotglass_render.render(project) # XX
-    return HttpResponse(content='okay', content_type='text/plain')
+    return shortcuts.redirect('draw', project=project)
 
 
 def draw(request, project):     # XX
