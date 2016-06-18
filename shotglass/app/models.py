@@ -14,7 +14,6 @@ class SourceLine(models.Model):
     line_number = models.IntegerField()
     kind = models.CharField(max_length=12)
     length = models.IntegerField()
-    tags_json = models.CharField(max_length=1000, **nullable)
 
     def __unicode__(self):
         return '<{} {} {}:{}>'.format(

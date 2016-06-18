@@ -92,18 +92,18 @@ def index_radon(project):
     for path in paths:
         radon = calc_radon(path)
         print path, len(radon)
-        for lineno,radon_obj in radon.iteritems():
-            try:
-                symbol = SourceLine.objects.get(
-                    path=path, project=project, line_number=lineno)
-                tags = json.loads(symbol.tags_json)
-                # X: expose the other fields?
-                tags['radon_cc'] = radon_obj.complexity
-                symbol.tags_json = json.dumps(tags)
-                symbol.save()
-            except SourceLine.DoesNotExist:
-                # XX Radon counts @-lines as start
-                print '?', path, lineno, radon_obj.name
+        # for lineno,radon_obj in radon.iteritems():
+            # try:
+            #     symbol = SourceLine.objects.get(
+            #         path=path, project=project, line_number=lineno)
+            #     tags = json.loads(symbol.tags_json)
+            #     # X: expose the other fields?
+            #     tags['radon_cc'] = radon_obj.complexity
+            #     symbol.tags_json = json.dumps(tags)
+            #     symbol.save()
+            # except SourceLine.DoesNotExist:
+            #     # XX Radon counts @-lines as start
+            #     print '?', path, lineno, radon_obj.name
 
 
 # # X: doesn't calc last symbol of each file correctly

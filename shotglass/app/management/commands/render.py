@@ -1,3 +1,5 @@
+BROKEN
+
 # pylint: disable=no-member
 
 from django.core.management.base import BaseCommand
@@ -13,7 +15,7 @@ class Command(BaseCommand):
         parser.add_argument('projects', nargs='+', default=['flask'])
         parser.add_argument('--grid', default='screen')
         parser.add_argument('--width', type=int)
-        parser.add_argument('--arg', choices=('path', 'tags'),
+        parser.add_argument('--arg', choices=('path',),
                             default='path')
         parser.add_argument('--depth', type=int, default=0)
 
@@ -23,10 +25,9 @@ class Command(BaseCommand):
         return SourceLine.projects()
 
     def handle(self, *args, **options):
-        argname = options['arg']
-        if argname == 'tags':
-            argname = 'tags_json'
+        # argname = options['arg']
         depth = options['depth']
+        argname = options['arg']
 
         for project in self.get_projects(options['projects']):
             print '***', project

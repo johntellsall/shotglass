@@ -25,7 +25,7 @@ def get_pos(result):
 
 def test_add_color():
     diagram = [(0, 'x', 1), (1, 'y', 2)]
-    assert list(render.add_color(diagram)) == [
+    assert list(render.jm_add_color(diagram)) == [
         (0, 'x', 1, '#864747'), (1, 'y', 2, '#5dd3d7')]
 
 
@@ -38,26 +38,6 @@ def test_skeleton():
 
     result = render.make_skeleton(symbols, 'length', depth=None)
     assert get_arg(result) == [1, 2, 3]
-
-
-def test_skeleton_json():
-    symbols = [
-        AttrDict(symbol='log', path='main.py', tags_json='"cat"', length=1),
-        AttrDict(symbol='func1', path='main.py', tags_json='"cat"', length=2),
-        AttrDict(symbol='func2', path='aux.py', tags_json='"dog"', length=3),
-    ]
-    result = render.make_skeleton(symbols, 'tags_json', depth=1)
-    assert get_arg(result) == ['c', 'c', 'd']
-
-    result = render.make_skeleton(symbols, 'tags_json', depth=2)
-    assert get_arg(result) == ['ca', 'ca', 'do']
-
-
-# def test_draw():
-#     # XX move to fixture
-#     diagram = pickle.load(open('/tmp/diagram.pickle'))
-#     mygrid = grid.TextGrid(1000, 1000)
-#     diagram.draw(mygrid)
 
 
 # PERFORMANCE TEST:

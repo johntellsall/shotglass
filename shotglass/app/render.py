@@ -13,6 +13,8 @@ from app.grid import ImageGrid
 from app.models import DiagramSymbol, SourceLine
 
 
+COLOR_CC_UNKNOWN = 'gray'
+
 logger = logging.getLogger(__name__)
 
 
@@ -106,15 +108,16 @@ def cc_add_color(skeleton):
 
     for pos, symbol, arg in skeleton:
         try:
-            if 0:
-                cc_value = json.loads(symbol.tags_json)['radon_cc']
-            else:
-                cc_value = symbol.progpmccabe.mccabe
+            cc_value = symbol.progpmccabe.mccabe
+        except AttributeError:
+            yield pos, symbol, arg, COLOR_CC_UNKNOWN
+            continue
+        try:
             color = colormap[cc_rank(cc_value)]
             yield pos, symbol, arg, color
         except (KeyError, TypeError):
-            logger.debug('? %s %s', symbol.name, symbol.tags_json)
-            yield pos, symbol, arg, 'gray'
+            logger.debug('? %s', symbol.name)
+            yield pos, symbol, arg, COLOR_CC_UNKNOWN
         
 add_color = cc_add_color
 
@@ -122,6 +125,7 @@ add_color = cc_add_color
 def draw_symbol(grid, pos, symbol_length, color):
     if symbol_length <= 1:
         return
+    # draw white "grain of rice" at start of symbol
     grid.moveto(get_xy(pos))
     grid.drawto(get_xy(pos + 1), '#fff')
     for offset in xrange(symbol_length):
@@ -189,10 +193,7 @@ def render(project, argname='path', depth=None):
     """
     symbols = SourceLine.objects.filter( # pylint: disable=no-member
         project=project
-    ).order_by('tags_json', 'path', 'line_number')
-
-    if argname == 'tags':
-        argname = 'tags_json'
+    ).order_by('path', 'line_number')
 
     diagram = Diagram()
     diagram.render(symbols, argname, depth)
@@ -207,20 +208,20 @@ def draw(project):
 
     diagram = Diagram.FromDB()
 
-    tags = sorted(set(dsym.sourceline.tags_json for dsym in diagram))
-    tag_num = 6
+    # tags = sorted(set(dsym.sourceline.tags_json for dsym in diagram))
 
     diagram.draw(grid)
-    if tag_num is not None:
-        try:
-            selected_tag = tags[tag_num]
-            print tag_num, selected_tag
-            selected = [dsym for dsym in diagram
-                if dsym.sourceline.tags_json == selected_tag]
-            print [dsym.sourceline.name for dsym in selected]
-            draw_box(grid, selected)
-        except IndexError:
-            pass
+    # tag_num = 6
+    # if tag_num is not None:
+    #     try:
+    #         selected_tag = tags[tag_num]
+    #         print tag_num, selected_tag
+    #         selected = [dsym for dsym in diagram
+    #             if dsym.sourceline.tags_json == selected_tag]
+    #         print [dsym.sourceline.name for dsym in selected]
+    #         draw_box(grid, selected)
+    #     except IndexError:
+    #         pass
 
     grid.finalize()
     return grid
