@@ -47,38 +47,39 @@ def calc_path_tags(path):
 
 def walk_type(topdir, name_func):
     for root, _, names in os.walk(topdir):
-        for path in (os.path.join(root, name) for name in names
-            if name_func(name)):
-                yield path
+        paths = (os.path.join(root, name) for name in names
+            if name_func(name))
+        for path in paths:
+            yield path
 
 
-def index_ctags(project, ctags_path):
-    """
-    use Exuberant Ctags to find symbols
-    """
-    tagFile = ctags.CTags(ctags_path)
-    entry = ctags.TagEntry()
+# def index_ctags(project, ctags_path):
+#     """
+#     use Exuberant Ctags to find symbols
+#     """
+#     tagFile = ctags.CTags(ctags_path)
+#     entry = ctags.TagEntry()
 
-    if not tagFile.find(entry, '', ctags.TAG_PARTIALMATCH):
-        sys.exit('no tags?')
+#     if not tagFile.find(entry, '', ctags.TAG_PARTIALMATCH):
+#         sys.exit('no tags?')
 
-    while True:
-        if entry['kind']:
-            path = entry['file']
-            tags = {'path': calc_path_tags(path)}
-            try:
-                SourceLine(name=entry['name'],
-                           project=project,
-                           path=path,
-                           length=0, # XX should be None
-                           line_number=entry['lineNumber'],
-                           kind=entry['kind'],
-                           tags_json=json.dumps(tags)).save()
-            except django.db.utils.ProgrammingError:
-                logger.error('%s: uhoh', entry['name'])
-        status = tagFile.findNext(entry)
-        if not status:
-            break
+#     while True:
+#         if entry['kind']:
+#             path = entry['file']
+#             tags = {'path': calc_path_tags(path)}
+#             try:
+#                 SourceLine(name=entry['name'],
+#                            project=project,
+#                            path=path,
+#                            length=0, # XX should be None
+#                            line_number=entry['lineNumber'],
+#                            kind=entry['kind'],
+#                            tags_json=json.dumps(tags)).save()
+#             except django.db.utils.ProgrammingError:
+#                 logger.error('%s: uhoh', entry['name'])
+#         status = tagFile.findNext(entry)
+#         if not status:
+#             break
 
 
 def index_radon(project):
@@ -105,24 +106,24 @@ def index_radon(project):
                 print '?', path, lineno, radon_obj.name
 
 
-# X: doesn't calc last symbol of each file correctly
-def index_symbol_length(project):
-    logger.debug('%s: calculating symbol lengths', project)
-    # pylint: disable=no-member
-    source = SourceLine.objects.filter(project=project
-        ).order_by('path', 'line_number')
-    prev_path = None
-    prev_symbol = None
-    for symbol in source:
-        if symbol.path != prev_path:
-            prev_symbol = None
-            prev_path = symbol.path
-        if prev_symbol:
-            prev_symbol.length = symbol.line_number - prev_symbol.line_number
-            if prev_symbol.kind in ('variable', 'class'):
-                prev_symbol.length = 1
-            prev_symbol.save()
-        prev_symbol = symbol
+# # X: doesn't calc last symbol of each file correctly
+# def index_symbol_length(project):
+#     logger.debug('%s: calculating symbol lengths', project)
+#     # pylint: disable=no-member
+#     source = SourceLine.objects.filter(project=project
+#         ).order_by('path', 'line_number')
+#     prev_path = None
+#     prev_symbol = None
+#     for symbol in source:
+#         if symbol.path != prev_path:
+#             prev_symbol = None
+#             prev_path = symbol.path
+#         if prev_symbol:
+#             prev_symbol.length = symbol.line_number - prev_symbol.line_number
+#             if prev_symbol.kind in ('variable', 'class'):
+#                 prev_symbol.length = 1
+#             prev_symbol.save()
+#         prev_symbol = symbol
 
 
 def index_c_mccabe(project, paths):
@@ -143,7 +144,14 @@ def index_c_mccabe(project, paths):
         data = [int(field) for field in match.group('data').split()]
         num_lines = data[4]
         definition_line = int(match.group('definition_line'))
-        ProgPmccabe(
+        sourceline = SourceLine.objects.create(
+            project=project,
+            path=match.group('path'),
+            name=match.group('function'),
+            line_number=definition_line,
+            length=num_lines)
+        ProgPmccabe.objects.create(
+            sourceline=sourceline,
             first_line=data[3],
             modified_mccabe=data[0],
             mccabe=data[1],
@@ -151,7 +159,8 @@ def index_c_mccabe(project, paths):
             # overlap w/ SourceLine
             num_lines=num_lines,
             definition_line=definition_line,
-            ).save()
+            )
+        
 
 
 class Command(BaseCommand):
@@ -209,8 +218,10 @@ class Command(BaseCommand):
         c_paths = walk_type(project_dir, is_c)
         index_c_mccabe(project, c_paths)
 
-        logger.info('%s: %d C files', project,
-            proj_source.count())
+        # shows as "0" because of the PRAGMA SYNC above
+        if 01:
+            logger.info('%s: %d C files', project,
+                proj_source.count())
         # index_ctags(project, tags_path)
         # index_symbol_length(project)
         # index_radon(project)
@@ -240,7 +251,8 @@ class Command(BaseCommand):
         # self.make_index(project_name, options['tags'])
         # pylint: disable=no-member
         project_source = SourceLine.objects.filter(project=project_name)
-        logger.info('%s: %s symbols', project_name,
+        if 01: # X: 0 because of PRAGMA SYNC
+            logger.info('%s: %s symbols', project_name,
                     '{:,}'.format(project_source.count()))
 
         logger.debug('%s: done', project_name)

@@ -39,7 +39,8 @@ class DiagramSymbol(models.Model):
 
 
 class ProgPmccabe(models.Model):
-    sourceline = models.ForeignKey(SourceLine, **nullable)
+    sourceline = models.ForeignKey(SourceLine, on_delete=models.CASCADE,
+        **nullable)
 
     modified_mccabe = models.IntegerField()
     mccabe = models.IntegerField()
