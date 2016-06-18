@@ -69,3 +69,4 @@ GRTAGS
 GTAGS
 prof
 *.tags
+*.sublime*

@@ -7,11 +7,9 @@ make_index -- compile data from tree of source files
 # pylint: disable=bad-builtin
 
 import logging
-import json
 import os
 import re
 import subprocess
-import sys
 
 import django.db
 from django.core.management.base import BaseCommand
@@ -45,11 +43,16 @@ def calc_path_tags(path):
     return tags
 
 
+def format_project_name(project_dir):
+    return project_dir.lstrip('./').rstrip('/')
+
+
 def walk_type(topdir, name_func):
     for root, _, names in os.walk(topdir):
         paths = (os.path.join(root, name) for name in names
             if name_func(name))
         for path in paths:
+            print path
             yield path
 
 
@@ -134,13 +137,16 @@ def index_c_mccabe(project, paths):
         r'(?P<function> .+)',
         re.VERBOSE)
 
-    logger.debug('%s: calculating C complexity', project)
+    paths = list(paths)
+    logger.debug('%s: calculating C complexity, %d files',
+        project, len(paths))
+    if not paths:
+        return
     output = subprocess.check_output(
-        ['pmccabe'] + list(paths)).split('\n')
+        ['pmccabe'] + paths).split('\n')
 
-    # pylint: disable=no-member
-    ProgPmccabe.objects.all().delete() # XX
     for match in filter(None, (map(pmccabe_pat.match, output))):
+        print match.group(0)
         data = [int(field) for field in match.group('data').split()]
         num_lines = data[4]
         definition_line = int(match.group('definition_line'))
@@ -158,51 +164,50 @@ def index_c_mccabe(project, paths):
             num_statements=data[2],
             # overlap w/ SourceLine
             num_lines=num_lines,
-            definition_line=definition_line,
-            )
+            definition_line=definition_line)
         
+
+    # def find_source_paths(self, top):
+    #     # XX
+    #     bad_dir_pat = re.compile(
+    #         r'(contrib|debian|conf/locale|\.pc|pl|tests)')
+    #     for root, _, names in os.walk(top):
+    #         if bad_dir_pat.search(root):
+    #             continue
+    #         names = (name for name in names if name.endswith(INDEX_SUFFIXES))
+    #         for path in (os.path.join(root, name) for name in names):
+    #             yield path
+
+    # def find_source(self, project_dir, project):
+    #     """
+    #     find source code in tree, write to list file
+    #     """
+    #     paths = self.find_source_paths(top=project_dir)
+    #     list_path = '{}.lst'.format(project)
+    #     with open(list_path, 'w') as listf:
+    #         listf.write('\n'.join(paths))
+    #     return list_path
+
+    # def find_tags(self, project, list_path):
+    #     """
+    #     from selected source, find symbols
+    #     """
+    #     # Python: classes, functions, members, variables
+    #     cmd = 'ctags --fields=afmikKlnsStz -L {} -o {}'
+    #     tags_path = '{}.tags'.format(project)
+    #     subprocess.check_call(
+    #         cmd.format(list_path, tags_path), shell=True)
+    #     return tags_path
 
 
 class Command(BaseCommand):
     help = 'beer'
 
     def add_arguments(self, parser):
-        parser.add_argument('project_dir', metavar='FILE')
+        parser.add_argument('project_dirs', metavar='FILE', nargs='+')
         parser.add_argument('--project')
         parser.add_argument('--tags')
         parser.add_argument('--list_path')
-
-    def find_source_paths(self, top):
-        # XX
-        bad_dir_pat = re.compile(
-            r'(contrib|debian|conf/locale|\.pc|pl|tests)')
-        for root, _, names in os.walk(top):
-            if bad_dir_pat.search(root):
-                continue
-            names = (name for name in names if name.endswith(INDEX_SUFFIXES))
-            for path in (os.path.join(root, name) for name in names):
-                yield path
-
-    def find_source(self, project_dir, project):
-        """
-        find source code in tree, write to list file
-        """
-        paths = self.find_source_paths(top=project_dir)
-        list_path = '{}.lst'.format(project)
-        with open(list_path, 'w') as listf:
-            listf.write('\n'.join(paths))
-        return list_path
-
-    def find_tags(self, project, list_path):
-        """
-        from selected source, find symbols
-        """
-        # Python: classes, functions, members, variables
-        cmd = 'ctags --fields=afmikKlnsStz -L {} -o {}'
-        tags_path = '{}.tags'.format(project)
-        subprocess.check_call(
-            cmd.format(list_path, tags_path), shell=True)
-        return tags_path
 
     def make_index(self, project, project_dir):
 
@@ -226,19 +231,24 @@ class Command(BaseCommand):
         # index_symbol_length(project)
         # index_radon(project)
 
-    def format_project_name(self, project_dir):
-        return project_dir.lstrip('./').rstrip('/')
-
     def handle(self, *args, **options):
         # is_python = fnmatch.fnmatch('*.py')
-        project_dir = options['project_dir']
-        if not os.path.isdir(project_dir):
-            sys.exit('{}: project must be directory'.format(project_dir))
-        project_name = options.get(
-            'project', self.format_project_name(project_dir))
+        for project_dir in options['project_dirs']:
+            if not os.path.isdir(project_dir):
+                logger.warning(
+                    '%s: project must be directory, skipping', project_dir)
+            # X: doesn't support multiple dirs
+            project_name = (options.get('project')
+                or format_project_name(project_dir))
 
-        logger.info('%s: start', project_name)
-        self.make_index(project_name, project_dir)
+            logger.info('%s: start', project_name)
+            self.make_index(project_name, project_dir)
+            project_source = SourceLine.objects.filter(project=project_name)
+            if 01: # X: 0 because of PRAGMA SYNC
+                logger.info('%s: %s symbols', project_name,
+                        '{:,}'.format(project_source.count()))
+
+            logger.debug('%s: done', project_name)
         # if not options['list_path']:
         #     logger.debug('%s: finding source', project_name)
         #     options['list_path'] = self.find_source(
@@ -250,9 +260,3 @@ class Command(BaseCommand):
 
         # self.make_index(project_name, options['tags'])
         # pylint: disable=no-member
-        project_source = SourceLine.objects.filter(project=project_name)
-        if 01: # X: 0 because of PRAGMA SYNC
-            logger.info('%s: %s symbols', project_name,
-                    '{:,}'.format(project_source.count()))
-
-        logger.debug('%s: done', project_name)
