@@ -45,6 +45,13 @@ def calc_path_tags(path):
     return tags
 
 
+def walk_type(topdir, name_func):
+    for root, _, names in os.walk(topdir):
+        for path in (os.path.join(root, name) for name in names
+            if name_func(name)):
+                yield path
+
+
 def index_ctags(project, ctags_path):
     """
     use Exuberant Ctags to find symbols
@@ -117,36 +124,23 @@ def index_symbol_length(project):
             prev_symbol.save()
         prev_symbol = symbol
 
-import os
 
-def walk_type(topdir, name_func):
-    for root, _dirs, names in os.walk(topdir):
-        for path in (os.path.join(root, name) for name in names
-            if name_func(name)):
-                yield path
-
-def index_c_mmcabe(project, paths):
-    logger.debug('%s: calculating C complexity', project)
-    # pylint: disable=no-member
-    if 0:
-        paths = SourceLine.objects.filter(
-            path__endswith='.c', project=project,
-            ).values_list('path', flat=True).distinct()
-        output = subprocess.check_output(
-            ['pmccabe'] + list(paths)).split('\n')
-    else:
-        cmd = 'pmccabe ../SOURCE/postgresql-9.3-9.3.13/*/*/a*.c'
-    output = subprocess.check_output(cmd, shell=True).split('\n')
-    print output
-    pat = re.compile(
+def index_c_mccabe(project, paths):
+    pmccabe_pat = re.compile(
         r'^(?P<data> [0-9\t]+)'
         r'(?P<path> .+?)'
         r'\( (?P<definition_line> \d+) \): \s+ '
         r'(?P<function> .+)',
         re.VERBOSE)
-    for match in filter(None, (pat.match(line) for line in output)):
-        data = [int(field) for field in match.group('data').split()]
 
+    logger.debug('%s: calculating C complexity', project)
+    output = subprocess.check_output(
+        ['pmccabe'] + list(paths)).split('\n')
+
+    # pylint: disable=no-member
+    ProgPmccabe.objects.all().delete() # XX
+    for match in filter(None, (map(pmccabe_pat.match, output))):
+        data = [int(field) for field in match.group('data').split()]
         num_lines = data[4]
         definition_line = int(match.group('definition_line'))
         ProgPmccabe(
@@ -154,7 +148,7 @@ def index_c_mmcabe(project, paths):
             modified_mccabe=data[0],
             mccabe=data[1],
             num_statements=data[2],
-            # overlap
+            # overlap w/ SourceLine
             num_lines=num_lines,
             definition_line=definition_line,
             ).save()
@@ -218,9 +212,7 @@ class Command(BaseCommand):
         return project_dir.lstrip('./').rstrip('/')
 
     def handle(self, *args, **options):
-        is_python = re.compile(r'\.py$').search
-        print '\n'.join(walk_type('.', is_python)) ; blam
-        index_c_mmcabe(None, None) ; blam
+        # is_python = fnmatch.fnmatch('*.py')
         project_dir = options['project_dir']
         if not os.path.isdir(project_dir):
             sys.exit('{}: project must be directory'.format(project_dir))
@@ -228,16 +220,21 @@ class Command(BaseCommand):
             'project', self.format_project_name(project_dir))
 
         logger.info('%s: start', project_name)
-        if not options['list_path']:
-            logger.debug('%s: finding source', project_name)
-            options['list_path'] = self.find_source(
-                project_dir=project_dir, project=project_name)
-        if not options['tags']:
-            logger.debug('%s: finding tags', project_name)
-            options['tags'] = self.find_tags(
-                project_name, options['list_path'])
+        
+        is_c = re.compile(r'\.c$').search
+        c_paths = walk_type(project_dir, is_c)
+        index_c_mccabe(project_name, c_paths)
 
-        self.make_index(project_name, options['tags'])
+        # if not options['list_path']:
+        #     logger.debug('%s: finding source', project_name)
+        #     options['list_path'] = self.find_source(
+        #         project_dir=project_dir, project=project_name)
+        # if not options['tags']:
+        #     logger.debug('%s: finding tags', project_name)
+        #     options['tags'] = self.find_tags(
+        #         project_name, options['list_path'])
+
+        # self.make_index(project_name, options['tags'])
         # pylint: disable=no-member
         project_source = SourceLine.objects.filter(project=project_name)
         logger.info('%s: %s symbols', project_name,
