@@ -44,6 +44,7 @@ def test_skeleton():
 # py.test -s app/tests/test_render.py::TestDraw
 #
 # TODO: disable this except when explicitly called
+@mark.skip(reason="performance test only")
 class TestDraw(TestCase):
     fixtures = ['diagram-django']  # slow + useful
     fixtures = ['diagram-min'] # minimal
