@@ -161,8 +161,10 @@ class Command(BaseCommand):
         # XX: delete project's index
         # pylint: disable=no-member
         SourceLine.objects.filter(project=project).delete()
-        index_ctags(project, tags_path)
-        index_symbol_length(project)
+        if 0:
+            index_ctags(project, tags_path)
+            index_symbol_length(project)
+        import ipdb ; ipdb.set_trace()
         index_radon(project)
 
     def format_project_name(self, project_dir):
