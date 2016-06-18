@@ -49,10 +49,9 @@ def format_project_name(project_dir):
 
 def walk_type(topdir, name_func):
     for root, _, names in os.walk(topdir):
-        paths = (os.path.join(root, name) for name in names
-            if name_func(name))
+        paths = [os.path.join(root, name) for name in names
+            if name_func(name)]
         for path in paths:
-            print path
             yield path
 
 
@@ -142,11 +141,11 @@ def index_c_mccabe(project, paths):
         project, len(paths))
     if not paths:
         return
+
     output = subprocess.check_output(
         ['pmccabe'] + paths).split('\n')
 
     for match in filter(None, (map(pmccabe_pat.match, output))):
-        print match.group(0)
         data = [int(field) for field in match.group('data').split()]
         num_lines = data[4]
         definition_line = int(match.group('definition_line'))
@@ -199,6 +198,28 @@ def index_c_mccabe(project, paths):
     #         cmd.format(list_path, tags_path), shell=True)
     #     return tags_path
 
+def make_index(project, project_dir):
+    if django.db.connection.vendor == 'sqlite':
+        django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
+
+    # XX: delete project's index
+    # pylint: disable=no-member
+    proj_source = SourceLine.objects.filter(project=project)
+    proj_source.delete()
+    
+    is_c = re.compile(r'\.c$').search
+    c_paths = list(walk_type(project_dir, is_c))
+    print 'PATHS:', c_paths
+    index_c_mccabe(project, c_paths)
+
+    # shows as "0" because of the PRAGMA SYNC above
+    if 01:
+        logger.info('%s: %d C files', project,
+            proj_source.count())
+    # index_ctags(project, tags_path)
+    # index_symbol_length(project)
+    # index_radon(project)
+
 
 class Command(BaseCommand):
     help = 'beer'
@@ -209,31 +230,10 @@ class Command(BaseCommand):
         parser.add_argument('--tags')
         parser.add_argument('--list_path')
 
-    def make_index(self, project, project_dir):
-
-        if django.db.connection.vendor == 'sqlite':
-            django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
-
-        # XX: delete project's index
-        # pylint: disable=no-member
-        proj_source = SourceLine.objects.filter(project=project)
-        proj_source.delete()
-        
-        is_c = re.compile(r'\.c$').search
-        c_paths = walk_type(project_dir, is_c)
-        index_c_mccabe(project, c_paths)
-
-        # shows as "0" because of the PRAGMA SYNC above
-        if 01:
-            logger.info('%s: %d C files', project,
-                proj_source.count())
-        # index_ctags(project, tags_path)
-        # index_symbol_length(project)
-        # index_radon(project)
-
     def handle(self, *args, **options):
         # is_python = fnmatch.fnmatch('*.py')
-        for project_dir in options['project_dirs']:
+        for project_dir in map(os.path.expanduser, options['project_dirs']):
+            # import ipdb ; ipdb.set_trace()
             if not os.path.isdir(project_dir):
                 logger.warning(
                     '%s: project must be directory, skipping', project_dir)
@@ -242,7 +242,7 @@ class Command(BaseCommand):
                 or format_project_name(project_dir))
 
             logger.info('%s: start', project_name)
-            self.make_index(project_name, project_dir)
+            make_index(project_name, project_dir)
             project_source = SourceLine.objects.filter(project=project_name)
             if 01: # X: 0 because of PRAGMA SYNC
                 logger.info('%s: %s symbols', project_name,
