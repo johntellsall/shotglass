@@ -38,7 +38,7 @@ def list_symbols(request, project):
     return shortcuts.render(request, 'list_symbols.html', {
         'symbols': symbols,
         'project': project,
-        'symbol_count': proj_lines.count()})
+        'symbol_count': symbols.count()})
 
 
 def render(request, project):
@@ -52,7 +52,6 @@ def draw(request, project):     # XX
     """
     zoom = float(request.GET.get('zoom', 0.))
     style = request.GET.get('style')
-    # tagnum = request.GET.get('tagnum')
 
     draw_func = {'bbox': shotglass_render.draw_bbox
     }.get(style) or shotglass_render.draw
