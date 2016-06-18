@@ -9,9 +9,9 @@ symbols = {{ symbol_count }}
 </form>
     <a href="{% url 'render' project=project %}">render</a>
 
-<h3>{{ functions|length }} functions</h3>
+<h3>{{ symbols|length }} symbols</h3>
 
-{% for function in functions %}
+{% for symbol in symbols %}
 
-<li>{{ function.path }} {{ function.name }}</li>
+<li>{{ symbol.path }} {{ symbol.name }}</li>
 {% endfor %}

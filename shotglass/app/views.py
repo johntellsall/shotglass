@@ -30,12 +30,13 @@ def overview(request, project):
     })
 
 
-def list_functions(request, project):
+def list_symbols(request, project):
+    # pylint: disable=no-member
     proj_lines = SourceLine.objects.filter(project=project)
-    functions = proj_lines.filter(kind='function').order_by('path', 'name')
+    symbols = proj_lines.order_by('path', 'name')
 
-    return shortcuts.render(request, 'list_functions2.html', {
-        'functions': functions,
+    return shortcuts.render(request, 'list_symbols.html', {
+        'symbols': symbols,
         'project': project,
         'symbol_count': proj_lines.count()})
 

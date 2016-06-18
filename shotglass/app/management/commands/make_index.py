@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+'''
+make_index -- compile data from tree of source files
+'''
+
+# pylint: disable=bad-builtin
+
 import logging
 import json
 import os
@@ -7,24 +13,24 @@ import re
 import subprocess
 import sys
 
-import ctags
 import django.db
 from django.core.management.base import BaseCommand
-from radon.complexity import cc_visit
+# from radon.complexity import cc_visit
 
-from app.models import SourceLine
+from app.models import SourceLine, ProgPmccabe
 
 
 INDEX_SUFFIXES = ('.c', '.py')
 
-logging.basicConfig(
-    format="%(asctime)-15s %(levelname)-8s %(message)s",
-    stream=sys.stderr,
-    level=logging.DEBUG)
-
-# disable db query logs
-logging.getLogger('django.db.backends').propagate = False
-logger = logging.getLogger(__name__)
+if 0:
+    # XX: never flushes logs!
+    logger = logging.getLogger(__name__)
+else:
+    class HackLogger(object):
+        def logme(self, myformat, *args):
+            print '*', myformat % args
+        debug = info = logme
+    logger = HackLogger()
 
 
 def calc_radon(path):
@@ -39,33 +45,41 @@ def calc_path_tags(path):
     return tags
 
 
-def index_ctags(project, ctags_path):
-    """
-    use Exuberant Ctags to find symbols
-    """
-    tagFile = ctags.CTags(ctags_path)
-    entry = ctags.TagEntry()
+def walk_type(topdir, name_func):
+    for root, _, names in os.walk(topdir):
+        paths = (os.path.join(root, name) for name in names
+            if name_func(name))
+        for path in paths:
+            yield path
 
-    if not tagFile.find(entry, '', ctags.TAG_PARTIALMATCH):
-        sys.exit('no tags?')
 
-    while True:
-        if entry['kind']:
-            path = entry['file']
-            tags = {'path': calc_path_tags(path)}
-            try:
-                SourceLine(name=entry['name'],
-                           project=project,
-                           path=path,
-                           length=0, # XX should be None
-                           line_number=entry['lineNumber'],
-                           kind=entry['kind'],
-                           tags_json=json.dumps(tags)).save()
-            except django.db.utils.ProgrammingError:
-                logger.error('%s: uhoh', entry['name'])
-        status = tagFile.findNext(entry)
-        if not status:
-            break
+# def index_ctags(project, ctags_path):
+#     """
+#     use Exuberant Ctags to find symbols
+#     """
+#     tagFile = ctags.CTags(ctags_path)
+#     entry = ctags.TagEntry()
+
+#     if not tagFile.find(entry, '', ctags.TAG_PARTIALMATCH):
+#         sys.exit('no tags?')
+
+#     while True:
+#         if entry['kind']:
+#             path = entry['file']
+#             tags = {'path': calc_path_tags(path)}
+#             try:
+#                 SourceLine(name=entry['name'],
+#                            project=project,
+#                            path=path,
+#                            length=0, # XX should be None
+#                            line_number=entry['lineNumber'],
+#                            kind=entry['kind'],
+#                            tags_json=json.dumps(tags)).save()
+#             except django.db.utils.ProgrammingError:
+#                 logger.error('%s: uhoh', entry['name'])
+#         status = tagFile.findNext(entry)
+#         if not status:
+#             break
 
 
 def index_radon(project):
@@ -92,24 +106,61 @@ def index_radon(project):
                 print '?', path, lineno, radon_obj.name
 
 
-# X: doesn't calc last symbol of each file correctly
-def index_symbol_length(project):
-    logger.debug('%s: calculating symbol lengths', project)
+# # X: doesn't calc last symbol of each file correctly
+# def index_symbol_length(project):
+#     logger.debug('%s: calculating symbol lengths', project)
+#     # pylint: disable=no-member
+#     source = SourceLine.objects.filter(project=project
+#         ).order_by('path', 'line_number')
+#     prev_path = None
+#     prev_symbol = None
+#     for symbol in source:
+#         if symbol.path != prev_path:
+#             prev_symbol = None
+#             prev_path = symbol.path
+#         if prev_symbol:
+#             prev_symbol.length = symbol.line_number - prev_symbol.line_number
+#             if prev_symbol.kind in ('variable', 'class'):
+#                 prev_symbol.length = 1
+#             prev_symbol.save()
+#         prev_symbol = symbol
+
+
+def index_c_mccabe(project, paths):
+    pmccabe_pat = re.compile(
+        r'^(?P<data> [0-9\t]+)'
+        r'(?P<path> .+?)'
+        r'\( (?P<definition_line> \d+) \): \s+ '
+        r'(?P<function> .+)',
+        re.VERBOSE)
+
+    logger.debug('%s: calculating C complexity', project)
+    output = subprocess.check_output(
+        ['pmccabe'] + list(paths)).split('\n')
+
     # pylint: disable=no-member
-    source = SourceLine.objects.filter(project=project
-        ).order_by('path', 'line_number')
-    prev_path = None
-    prev_symbol = None
-    for symbol in source:
-        if symbol.path != prev_path:
-            prev_symbol = None
-            prev_path = symbol.path
-        if prev_symbol:
-            prev_symbol.length = symbol.line_number - prev_symbol.line_number
-            if prev_symbol.kind in ('variable', 'class'):
-                prev_symbol.length = 1
-            prev_symbol.save()
-        prev_symbol = symbol
+    ProgPmccabe.objects.all().delete() # XX
+    for match in filter(None, (map(pmccabe_pat.match, output))):
+        data = [int(field) for field in match.group('data').split()]
+        num_lines = data[4]
+        definition_line = int(match.group('definition_line'))
+        sourceline = SourceLine.objects.create(
+            project=project,
+            path=match.group('path'),
+            name=match.group('function'),
+            line_number=definition_line,
+            length=num_lines)
+        ProgPmccabe.objects.create(
+            sourceline=sourceline,
+            first_line=data[3],
+            modified_mccabe=data[0],
+            mccabe=data[1],
+            num_statements=data[2],
+            # overlap w/ SourceLine
+            num_lines=num_lines,
+            definition_line=definition_line,
+            )
+        
 
 
 class Command(BaseCommand):
@@ -153,22 +204,33 @@ class Command(BaseCommand):
             cmd.format(list_path, tags_path), shell=True)
         return tags_path
 
-    def make_index(self, project, tags_path):
+    def make_index(self, project, project_dir):
 
         if django.db.connection.vendor == 'sqlite':
             django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
 
         # XX: delete project's index
         # pylint: disable=no-member
-        SourceLine.objects.filter(project=project).delete()
-        index_ctags(project, tags_path)
-        index_symbol_length(project)
-        index_radon(project)
+        proj_source = SourceLine.objects.filter(project=project)
+        proj_source.delete()
+        
+        is_c = re.compile(r'\.c$').search
+        c_paths = walk_type(project_dir, is_c)
+        index_c_mccabe(project, c_paths)
+
+        # shows as "0" because of the PRAGMA SYNC above
+        if 01:
+            logger.info('%s: %d C files', project,
+                proj_source.count())
+        # index_ctags(project, tags_path)
+        # index_symbol_length(project)
+        # index_radon(project)
 
     def format_project_name(self, project_dir):
         return project_dir.lstrip('./').rstrip('/')
 
     def handle(self, *args, **options):
+        # is_python = fnmatch.fnmatch('*.py')
         project_dir = options['project_dir']
         if not os.path.isdir(project_dir):
             sys.exit('{}: project must be directory'.format(project_dir))
@@ -176,19 +238,21 @@ class Command(BaseCommand):
             'project', self.format_project_name(project_dir))
 
         logger.info('%s: start', project_name)
-        if not options['list_path']:
-            logger.debug('%s: finding source', project_name)
-            options['list_path'] = self.find_source(
-                project_dir=project_dir, project=project_name)
-        if not options['tags']:
-            logger.debug('%s: finding tags', project_name)
-            options['tags'] = self.find_tags(
-                project_name, options['list_path'])
+        self.make_index(project_name, project_dir)
+        # if not options['list_path']:
+        #     logger.debug('%s: finding source', project_name)
+        #     options['list_path'] = self.find_source(
+        #         project_dir=project_dir, project=project_name)
+        # if not options['tags']:
+        #     logger.debug('%s: finding tags', project_name)
+        #     options['tags'] = self.find_tags(
+        #         project_name, options['list_path'])
 
-        self.make_index(project_name, options['tags'])
+        # self.make_index(project_name, options['tags'])
         # pylint: disable=no-member
         project_source = SourceLine.objects.filter(project=project_name)
-        logger.info('%s: %s symbols', project_name,
+        if 01: # X: 0 because of PRAGMA SYNC
+            logger.info('%s: %s symbols', project_name,
                     '{:,}'.format(project_source.count()))
 
         logger.debug('%s: done', project_name)
