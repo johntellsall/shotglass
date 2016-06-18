@@ -89,7 +89,8 @@ def jm_add_color(skeleton):
 # palette examples
 # https://jiffyclub.github.io/palettable/colorbrewer/diverging/#brbg_11
 def pal_add_color(skeleton):
-    colors = colorbrewer.diverging.RdBu_11_r.hex_colors  # pylint: disable=no-member
+    # pylint: disable=no-member
+    colors = colorbrewer.diverging.RdBu_11_r.hex_colors
     prev_arg = None
     color_iter = itertools.cycle(colors)
     for pos, symbol, arg in skeleton:
@@ -106,18 +107,19 @@ def cc_add_color(skeleton):
     colormap = dict(zip('ABCDE', colors))
     colormap['F'] = colormap['E']
 
+    # X: speedup w/ queryset.select_related('progpmccabe')
     for pos, symbol, arg in skeleton:
-        try:
-            cc_value = symbol.progpmccabe.mccabe
-        except AttributeError:
+        cc_value = getattr(symbol.progpmccabe, 'mccabe', None)
+        if cc_value is None:
+            # symbol lacks complexity value
             yield pos, symbol, arg, COLOR_CC_UNKNOWN
-            continue
-        try:
-            color = colormap[cc_rank(cc_value)]
-            yield pos, symbol, arg, color
-        except (KeyError, TypeError):
-            logger.debug('? %s', symbol.name)
-            yield pos, symbol, arg, COLOR_CC_UNKNOWN
+        else:
+            try:
+                color = colormap[cc_rank(cc_value)]
+                yield pos, symbol, arg, color
+            except (KeyError, TypeError):
+                logger.debug('? %s', symbol.name)
+                yield pos, symbol, arg, COLOR_CC_UNKNOWN
         
 add_color = cc_add_color
 
