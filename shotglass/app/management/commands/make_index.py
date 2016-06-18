@@ -13,24 +13,24 @@ import re
 import subprocess
 import sys
 
-import ctags
 import django.db
 from django.core.management.base import BaseCommand
-from radon.complexity import cc_visit
+# from radon.complexity import cc_visit
 
 from app.models import SourceLine, ProgPmccabe
 
 
 INDEX_SUFFIXES = ('.c', '.py')
 
-logging.basicConfig(
-    format="%(asctime)-15s %(levelname)-8s %(message)s",
-    stream=sys.stderr,
-    level=logging.DEBUG)
-
-# disable db query logs
-logging.getLogger('django.db.backends').propagate = False
-logger = logging.getLogger(__name__)
+if 0:
+    # XX: never flushes logs!
+    logger = logging.getLogger(__name__)
+else:
+    class HackLogger(object):
+        def logme(self, myformat, *args):
+            print '*', myformat % args
+        debug = info = logme
+    logger = HackLogger()
 
 
 def calc_radon(path):
@@ -195,18 +195,25 @@ class Command(BaseCommand):
             cmd.format(list_path, tags_path), shell=True)
         return tags_path
 
-    def make_index(self, project, tags_path):
+    def make_index(self, project, project_dir):
 
         if django.db.connection.vendor == 'sqlite':
             django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
 
         # XX: delete project's index
         # pylint: disable=no-member
-        SourceLine.objects.filter(project=project).delete()
-        index_ctags(project, tags_path)
-        index_c_mmcabe(project)
-        index_symbol_length(project)
-        index_radon(project)
+        proj_source = SourceLine.objects.filter(project=project)
+        proj_source.delete()
+        
+        is_c = re.compile(r'\.c$').search
+        c_paths = walk_type(project_dir, is_c)
+        index_c_mccabe(project, c_paths)
+
+        logger.info('%s: %d C files', project,
+            proj_source.count())
+        # index_ctags(project, tags_path)
+        # index_symbol_length(project)
+        # index_radon(project)
 
     def format_project_name(self, project_dir):
         return project_dir.lstrip('./').rstrip('/')
@@ -220,11 +227,7 @@ class Command(BaseCommand):
             'project', self.format_project_name(project_dir))
 
         logger.info('%s: start', project_name)
-        
-        is_c = re.compile(r'\.c$').search
-        c_paths = walk_type(project_dir, is_c)
-        index_c_mccabe(project_name, c_paths)
-
+        self.make_index(project_name, project_dir)
         # if not options['list_path']:
         #     logger.debug('%s: finding source', project_name)
         #     options['list_path'] = self.find_source(
