@@ -67,11 +67,24 @@ ROOT_URLCONF = 'shotglass.urls'
 STATIC_URL = '/static/'
 
 DATABASES = {
-    'default': {
+    'sqlite3': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    },
+    'postgres': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'shotglass',
+        'USER': 'shotglass',
+        'PASSWORD': 'beer',
+            # 'HOST': 'localhost',                      # Empty for localhost through domain sockets or           '127.0.0.1' for localhost through TCP.
+            # 'PORT': '',                      # Set to empty string for default.
     }
 }
+
+import socket
+DATABASES['default'] = DATABASES['sqlite3']
+if 'Lil-Bub.' in socket.gethostname():
+    DATABASES['default'] = DATABASES['postgres']
 
 LOGGING = {
     'version': 1,
