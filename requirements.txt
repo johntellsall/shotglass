@@ -15,4 +15,4 @@ functools32==3.2.3-2
 django-colorfield
 palettable
 radon
-psycopg2
+# psycopg2

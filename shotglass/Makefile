@@ -3,11 +3,15 @@ VBIN := $(VIRTUAL_ENV)/bin
 CTAGS := ctags --fields=afmikKlnsStz --totals
 all:	test
 
+server:
+		while true; do ./manage.py runserver; sleep 15; done
+		
 test:
 	py.test
 
 clean:
 	-$(RM) GPATH GRTAGS GSYMS GTAGS
+	-$(RM) $$(find . -name '*.pyc')
 
 # apt-get source postgresql-9.3 python3.4 python3-flask mysql-common
 # apt-get source python2.7 python-django redis
