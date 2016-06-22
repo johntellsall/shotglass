@@ -33,8 +33,13 @@ else:
 
 
 def calc_radon(path):
+    # return iter of blocks
     code = open(path).read()
-    return cc_visit(code) # iter of blocks
+    try:
+        return cc_visit(code)
+    except SyntaxError, error:
+        logger.warning('%s: %s', path, error)
+        return []
 
 
 def calc_path_tags(path):

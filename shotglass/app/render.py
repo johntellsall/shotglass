@@ -113,7 +113,10 @@ def cc_add_color(skeleton):
         try:
             cc_value = symbol.progpmccabe.mccabe
         except AttributeError:
-            pass
+            try:
+                cc_value = symbol.progradon.complexity
+            except AttributeError:
+                pass
         if cc_value is None:
             # symbol lacks complexity value
             yield pos, symbol, arg, COLOR_CC_UNKNOWN
