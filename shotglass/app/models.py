@@ -37,6 +37,15 @@ class DiagramSymbol(models.Model):
         **nullable)
 
 
+class ProgRadon(models.Model):
+    sourceline = models.OneToOneField(
+        SourceLine, on_delete=models.CASCADE,
+        **nullable)
+
+    kind = models.CharField(max_length=1)
+    complexity = models.IntegerField()
+
+
 class ProgPmccabe(models.Model):
     sourceline = models.OneToOneField(
         SourceLine, on_delete=models.CASCADE,

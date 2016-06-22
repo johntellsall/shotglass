@@ -16,7 +16,7 @@ from django.core.management.base import BaseCommand
 from radon.complexity import cc_visit
 from radon import visitors
 
-from app.models import SourceLine, ProgPmccabe
+from app import models
 
 
 INDEX_SUFFIXES = ('.c', '.py')
@@ -55,19 +55,25 @@ def walk_type(topdir, name_func):
             yield path
 
 
+# pylint: disable=no-member
 def index_py_radon(project, paths):
     # X: Radon only supports Python
     for path in paths:
         for block in calc_radon(path):
-            # pylint: disable=no-member
-            sourceline = SourceLine.objects.create(
+            sourceline = models.SourceLine.objects.create(
                 project=project,
                 path=path,
                 name=block.fullname,
                 line_number=block.lineno,
                 length=block.endline - block.lineno)
+            assert block.letter in 'CFM'
+            models.ProgRadon.objects.create(
+                sourceline=sourceline,
+                kind=block.letter,
+                complexity=block.complexity)
 
 
+# pylint: disable=no-member
 def index_c_mccabe(project, paths):
     pmccabe_pat = re.compile(
         r'^(?P<data> [0-9\t]+)'
@@ -89,13 +95,13 @@ def index_c_mccabe(project, paths):
         data = [int(field) for field in match.group('data').split()]
         num_lines = data[4]
         definition_line = int(match.group('definition_line'))
-        sourceline = SourceLine.objects.create(
+        sourceline = models.SourceLine.objects.create(
             project=project,
             path=match.group('path'),
             name=match.group('function'),
             line_number=definition_line,
             length=num_lines)
-        ProgPmccabe.objects.create(
+        models.ProgPmccabe.objects.create(
             sourceline=sourceline,
             first_line=data[3],
             modified_mccabe=data[0],
@@ -115,7 +121,7 @@ def make_index(project, project_dir):
 
     # XX: delete project's index
     # pylint: disable=no-member
-    SourceLine.objects.filter(project=project).delete()
+    models.SourceLine.objects.filter(project=project).delete()
     
     c_paths = list(walk_type(project_dir, is_c))
     logger.info('%s: %d C files', project, len(c_paths))
@@ -134,7 +140,6 @@ class Command(BaseCommand):
         parser.add_argument('project_dirs', metavar='FILE', nargs='+')
         parser.add_argument('--project')
         parser.add_argument('--tags')
-        parser.add_argument('--list_path')
 
     def handle(self, *args, **options):
         for project_dir in map(os.path.expanduser, options['project_dirs']):
@@ -142,6 +147,7 @@ class Command(BaseCommand):
                 logger.warning(
                     '%s: project must be directory, skipping', project_dir)
                 continue
+            
             # X: doesn't support multiple dirs
             project_name = (options.get('project')
                 or format_project_name(project_dir))
@@ -149,9 +155,11 @@ class Command(BaseCommand):
             logger.info('%s: start', project_name)
             make_index(project_name, project_dir)
 
-            project_source = SourceLine.objects.filter(project=project_name)
-            if 01: # X: 0 because of PRAGMA SYNC
-                logger.info('%s: %s symbols', project_name,
+            # pylint: disable=no-member
+            project_source = models.SourceLine.objects.filter(
+                project=project_name)
+            # X: 0 because of PRAGMA SYNC
+            logger.info('%s: %s symbols', project_name,
                         '{:,}'.format(project_source.count()))
 
             logger.debug('%s: done', project_name)

@@ -31,7 +31,7 @@ def show_summary(projects):
         # pylint: disable=no-member
         symbols = SourceLine.objects.filter(project=project)
         num_symbols = symbols.count()
-        num_functions = symbols.filter(kind__in=('function', 'member')).count()
+        num_functions = symbols.filter(kind__in=('F', 'M')).count()
         # TODO: optimize
         if not num_symbols:
             max_length = avg_length = total_length = 0
