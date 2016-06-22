@@ -44,7 +44,8 @@ def calc_path_tags(path):
 
 
 def format_project_name(project_dir):
-    return project_dir.lstrip('./').rstrip('/')
+    pdir = os.path.basename(project_dir.rstrip('/'))
+    return pdir
 
 
 def walk_type(topdir, name_func):
@@ -84,13 +85,9 @@ def walk_type(topdir, name_func):
 #             break
 
 
-def index_radon(project):
+def index_py_radon(project, paths):
     # X: Radon only supports Python
     # pylint: disable=no-member
-    path_objs = SourceLine.objects.filter(
-        path__endswith='.py', project=project,
-        ).values('path').distinct()
-    paths = [pathobj.values()[0] for pathobj in path_objs]
     for path in paths:
         radon = calc_radon(path)
         print path, len(radon)
@@ -199,23 +196,25 @@ def index_c_mccabe(project, paths):
     #     return tags_path
 
 def make_index(project, project_dir):
+    is_c = re.compile(r'\.c$').search
+    is_python = re.compile(r'\.py$').search
+    
     if django.db.connection.vendor == 'sqlite':
         django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
 
     # XX: delete project's index
     # pylint: disable=no-member
-    proj_source = SourceLine.objects.filter(project=project)
-    proj_source.delete()
+    SourceLine.objects.filter(project=project).delete()
     
-    is_c = re.compile(r'\.c$').search
     c_paths = list(walk_type(project_dir, is_c))
-    print 'PATHS:', c_paths
+    logger.info('%s: %d C files', project, len(c_paths))
     index_c_mccabe(project, c_paths)
-
     # shows as "0" because of the PRAGMA SYNC above
-    if 01:
-        logger.info('%s: %d C files', project,
-            proj_source.count())
+
+    py_paths = list(walk_type(project_dir, is_python))
+    logger.info('%s: %d python files', project, len(py_paths))
+    index_py_radon(project, py_paths)
+
     # index_ctags(project, tags_path)
     # index_symbol_length(project)
     # index_radon(project)
@@ -231,7 +230,6 @@ class Command(BaseCommand):
         parser.add_argument('--list_path')
 
     def handle(self, *args, **options):
-        # is_python = fnmatch.fnmatch('*.py')
         for project_dir in map(os.path.expanduser, options['project_dirs']):
             # import ipdb ; ipdb.set_trace()
             if not os.path.isdir(project_dir):
@@ -243,20 +241,10 @@ class Command(BaseCommand):
 
             logger.info('%s: start', project_name)
             make_index(project_name, project_dir)
+
             project_source = SourceLine.objects.filter(project=project_name)
             if 01: # X: 0 because of PRAGMA SYNC
                 logger.info('%s: %s symbols', project_name,
                         '{:,}'.format(project_source.count()))
 
             logger.debug('%s: done', project_name)
-        # if not options['list_path']:
-        #     logger.debug('%s: finding source', project_name)
-        #     options['list_path'] = self.find_source(
-        #         project_dir=project_dir, project=project_name)
-        # if not options['tags']:
-        #     logger.debug('%s: finding tags', project_name)
-        #     options['tags'] = self.find_tags(
-        #         project_name, options['list_path'])
-
-        # self.make_index(project_name, options['tags'])
-        # pylint: disable=no-member
