@@ -14,6 +14,7 @@ import subprocess
 import django.db
 from django.core.management.base import BaseCommand
 from radon.complexity import cc_visit
+from radon import visitors
 
 from app.models import SourceLine, ProgPmccabe
 
@@ -33,9 +34,7 @@ else:
 
 def calc_radon(path):
     code = open(path).read()
-    funcs_data = cc_visit(code)
-    # TODO: lines = max(func.endline for func in funcs_data)
-    return dict((func.lineno, func) for func in funcs_data)
+    return cc_visit(code) # iter of blocks
 
 
 def calc_path_tags(path):
@@ -87,24 +86,10 @@ def walk_type(topdir, name_func):
 
 def index_py_radon(project, paths):
     # X: Radon only supports Python
-    # pylint: disable=no-member
     for path in paths:
-        radon = calc_radon(path)
-        print path, len(radon)
-        # for lineno,radon_obj in radon.iteritems():
-            # try:
-            #     symbol = SourceLine.objects.get(
-            #         path=path, project=project, line_number=lineno)
-            #     tags = json.loads(symbol.tags_json)
-            #     # X: expose the other fields?
-            #     tags['radon_cc'] = radon_obj.complexity
-            #     symbol.tags_json = json.dumps(tags)
-            #     symbol.save()
-            # except SourceLine.DoesNotExist:
-            #     # XX Radon counts @-lines as start
-            #     print '?', path, lineno, radon_obj.name
-
-
+        for block in calc_radon(path):
+            print block
+        
 # # X: doesn't calc last symbol of each file correctly
 # def index_symbol_length(project):
 #     logger.debug('%s: calculating symbol lengths', project)
