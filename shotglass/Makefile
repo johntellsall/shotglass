@@ -13,9 +13,14 @@ test:
 clean:
 	-$(RM) $$(find . -name '*.pyc')
 
+index1:
+	file $(SRCDIR)/* | awk -F: '/directory/ {print $$1}' \
+	| egrep xv6 \
+	| xargs ./manage.py make_index
+
 index-all:
 	file $(SRCDIR)/* | awk -F: '/directory/ {print $$1}' \
-	| egrep pillow \
+	| egrep -v linux \
 	| xargs ./manage.py make_index
 
 # apt-get source postgresql-9.3 python3.4 python3-flask mysql-common

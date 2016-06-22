@@ -92,8 +92,8 @@ def index_c_mccabe(project, paths):
         return
 
     output = subprocess.check_output(
-        ['pmccabe'] + paths + ['2>/dev/null'],
-        shell=True).split('\n')
+        ['pmccabe'] + paths,
+        stderr=open(os.devnull, 'w')).split('\n')
 
     for match in filter(None, (map(pmccabe_pat.match, output))):
         data = [int(field) for field in match.group('data').split()]

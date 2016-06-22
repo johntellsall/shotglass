@@ -20,11 +20,11 @@ def show_index(projects):
 
 # pylint: disable=unused-variable
 def show_summary(projects):
-    HEADER = '{:20} {:>7} {:>7} {:>5} {:>4} {:>8}'.format(
+    HEADER = '{:30} {:>7} {:>9} {:>5} {:>4} {:>10}'.format(
         'project', 'functions', 'symbols', 'maxlen', 'avglen', 'total')
-    FORMAT = ('{project:20} {num_functions:9,} {num_symbols:7,}'
-        ' {max_length:6}'
-        ' {avg_length:6} {total_length:8,}')
+    FORMAT = ('{project:30} {num_functions:9,} {num_symbols:9,}'
+        ' {max_length:6,}'
+        ' {avg_length:6,} {total_length:10,}')
 
     print HEADER
     for project in projects:
