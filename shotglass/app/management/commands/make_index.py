@@ -55,35 +55,6 @@ def walk_type(topdir, name_func):
             yield path
 
 
-# def index_ctags(project, ctags_path):
-#     """
-#     use Exuberant Ctags to find symbols
-#     """
-#     tagFile = ctags.CTags(ctags_path)
-#     entry = ctags.TagEntry()
-
-#     if not tagFile.find(entry, '', ctags.TAG_PARTIALMATCH):
-#         sys.exit('no tags?')
-
-#     while True:
-#         if entry['kind']:
-#             path = entry['file']
-#             tags = {'path': calc_path_tags(path)}
-#             try:
-#                 SourceLine(name=entry['name'],
-#                            project=project,
-#                            path=path,
-#                            length=0, # XX should be None
-#                            line_number=entry['lineNumber'],
-#                            kind=entry['kind'],
-#                            tags_json=json.dumps(tags)).save()
-#             except django.db.utils.ProgrammingError:
-#                 logger.error('%s: uhoh', entry['name'])
-#         status = tagFile.findNext(entry)
-#         if not status:
-#             break
-
-
 def index_py_radon(project, paths):
     # X: Radon only supports Python
     for path in paths:
@@ -95,25 +66,6 @@ def index_py_radon(project, paths):
                 name=block.fullname,
                 line_number=block.lineno,
                 length=block.endline - block.lineno)
-            
-# # X: doesn't calc last symbol of each file correctly
-# def index_symbol_length(project):
-#     logger.debug('%s: calculating symbol lengths', project)
-#     # pylint: disable=no-member
-#     source = SourceLine.objects.filter(project=project
-#         ).order_by('path', 'line_number')
-#     prev_path = None
-#     prev_symbol = None
-#     for symbol in source:
-#         if symbol.path != prev_path:
-#             prev_symbol = None
-#             prev_path = symbol.path
-#         if prev_symbol:
-#             prev_symbol.length = symbol.line_number - prev_symbol.line_number
-#             if prev_symbol.kind in ('variable', 'class'):
-#                 prev_symbol.length = 1
-#             prev_symbol.save()
-#         prev_symbol = symbol
 
 
 def index_c_mccabe(project, paths):
@@ -152,39 +104,7 @@ def index_c_mccabe(project, paths):
             # overlap w/ SourceLine
             num_lines=num_lines,
             definition_line=definition_line)
-        
 
-    # def find_source_paths(self, top):
-    #     # XX
-    #     bad_dir_pat = re.compile(
-    #         r'(contrib|debian|conf/locale|\.pc|pl|tests)')
-    #     for root, _, names in os.walk(top):
-    #         if bad_dir_pat.search(root):
-    #             continue
-    #         names = (name for name in names if name.endswith(INDEX_SUFFIXES))
-    #         for path in (os.path.join(root, name) for name in names):
-    #             yield path
-
-    # def find_source(self, project_dir, project):
-    #     """
-    #     find source code in tree, write to list file
-    #     """
-    #     paths = self.find_source_paths(top=project_dir)
-    #     list_path = '{}.lst'.format(project)
-    #     with open(list_path, 'w') as listf:
-    #         listf.write('\n'.join(paths))
-    #     return list_path
-
-    # def find_tags(self, project, list_path):
-    #     """
-    #     from selected source, find symbols
-    #     """
-    #     # Python: classes, functions, members, variables
-    #     cmd = 'ctags --fields=afmikKlnsStz -L {} -o {}'
-    #     tags_path = '{}.tags'.format(project)
-    #     subprocess.check_call(
-    #         cmd.format(list_path, tags_path), shell=True)
-    #     return tags_path
 
 def make_index(project, project_dir):
     is_c = re.compile(r'\.c$').search
@@ -205,10 +125,6 @@ def make_index(project, project_dir):
     py_paths = list(walk_type(project_dir, is_python))
     logger.info('%s: %d Python files', project, len(py_paths))
     index_py_radon(project, py_paths)
-
-    # index_ctags(project, tags_path)
-    # index_symbol_length(project)
-    # index_radon(project)
 
 
 class Command(BaseCommand):
