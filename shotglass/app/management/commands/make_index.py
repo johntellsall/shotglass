@@ -13,7 +13,7 @@ import subprocess
 
 import django.db
 from django.core.management.base import BaseCommand
-# from radon.complexity import cc_visit
+from radon.complexity import cc_visit
 
 from app.models import SourceLine, ProgPmccabe
 
