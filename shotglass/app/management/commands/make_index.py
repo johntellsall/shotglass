@@ -38,7 +38,7 @@ def calc_radon(path):
     try:
         return cc_visit(code)
     except SyntaxError, error:
-        logger.warning('%s: %s', path, error)
+        # logger.warning('%s: %s', path, error)
         return []
 
 
@@ -88,13 +88,12 @@ def index_c_mccabe(project, paths):
         re.VERBOSE)
 
     paths = list(paths)
-    logger.debug('%s: calculating C complexity, %d files',
-        project, len(paths))
     if not paths:
         return
 
     output = subprocess.check_output(
-        ['pmccabe'] + paths).split('\n')
+        ['pmccabe'] + paths + ['2>/dev/null'],
+        shell=True).split('\n')
 
     for match in filter(None, (map(pmccabe_pat.match, output))):
         data = [int(field) for field in match.group('data').split()]
