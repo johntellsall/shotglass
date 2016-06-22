@@ -27,7 +27,7 @@ else:
     class HackLogger(object):
         def logme(self, myformat, *args):
             print '*', myformat % args
-        debug = info = logme
+        debug = info = warning = logme
     logger = HackLogger()
 
 
@@ -212,7 +212,7 @@ def make_index(project, project_dir):
     # shows as "0" because of the PRAGMA SYNC above
 
     py_paths = list(walk_type(project_dir, is_python))
-    logger.info('%s: %d python files', project, len(py_paths))
+    logger.info('%s: %d Python files', project, len(py_paths))
     index_py_radon(project, py_paths)
 
     # index_ctags(project, tags_path)
@@ -231,10 +231,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for project_dir in map(os.path.expanduser, options['project_dirs']):
-            # import ipdb ; ipdb.set_trace()
             if not os.path.isdir(project_dir):
                 logger.warning(
                     '%s: project must be directory, skipping', project_dir)
+                continue
             # X: doesn't support multiple dirs
             project_name = (options.get('project')
                 or format_project_name(project_dir))
