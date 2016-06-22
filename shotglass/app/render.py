@@ -109,7 +109,11 @@ def cc_add_color(skeleton):
 
     # X: speedup w/ queryset.select_related('progpmccabe')
     for pos, symbol, arg in skeleton:
-        cc_value = getattr(symbol.progpmccabe, 'mccabe', None)
+        cc_value = None
+        try:
+            cc_value = symbol.progpmccabe.mccabe
+        except AttributeError:
+            pass
         if cc_value is None:
             # symbol lacks complexity value
             yield pos, symbol, arg, COLOR_CC_UNKNOWN
