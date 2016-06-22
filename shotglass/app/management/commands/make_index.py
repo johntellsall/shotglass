@@ -88,8 +88,14 @@ def index_py_radon(project, paths):
     # X: Radon only supports Python
     for path in paths:
         for block in calc_radon(path):
-            print block
-        
+            # pylint: disable=no-member
+            sourceline = SourceLine.objects.create(
+                project=project,
+                path=path,
+                name=block.fullname,
+                line_number=block.lineno,
+                length=block.endline - block.lineno)
+            
 # # X: doesn't calc last symbol of each file correctly
 # def index_symbol_length(project):
 #     logger.debug('%s: calculating symbol lengths', project)
