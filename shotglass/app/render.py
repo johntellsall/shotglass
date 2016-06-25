@@ -213,17 +213,20 @@ class DrawStyle(object):
     """
     draw rendered project onto a grid (image)
     """
-    def draw(self, project):
-        pass
-
-
-class SimpleDraw(DrawStyle):
+    draw_diagram = NotImplementedError
+    
     def draw(self, project):
         grid = ImageGrid.FromProject(project)
         diagram = Diagram.FromDB()
-        diagram.draw(grid)
+        self.draw_diagram(grid, diagram)
         grid.finalize()
         return grid
+        
+
+
+class SimpleDraw(DrawStyle):
+    def draw_diagram(self, grid, diagram):
+        diagram.draw(grid)
 
 
 class BoundingBoxDraw(DrawStyle):
@@ -239,6 +242,16 @@ class BoundingBoxDraw(DrawStyle):
         grid.finalize()
         return grid
 
+if 0:
+    DRAW_STYLES = {
+        (name[:-len('Draw')], value)
+        for name, value in globals().iteritems()
+        if name.endswith('Draw') and issubclass(DrawStyle, value)
+    }
+else:
+    DRAW_STYLES = {
+    'boundingbox': BoundingBoxDraw,
+    'simple': SimpleDraw}
 
 # tags = sorted(set(dsym.sourceline.tags_json for dsym in diagram))
 # tag_num = 6

@@ -40,12 +40,26 @@ def test_skeleton():
     assert get_arg(result) == [1, 2, 3]
 
 
+class TestDraw(TestCase):
+    fixtures = ['diagram-min'] # minimal
+
+    def setUp(self):
+        stub = models.SourceLine.objects.create(
+            kind='k', length=3, line_number=2, name='name', path='path')
+        models.DiagramSymbol.objects.update(sourceline=stub)
+
+    def test_simple(self):
+        grid = render.SimpleDraw().draw(None)
+        self.assertDictContainsSubset(
+            {'last': (0, 2), 'height': 8, 'width': 8},
+            actual=vars(grid))
+
 # PERFORMANCE TEST:
 # py.test -s app/tests/test_render.py::TestDraw
 #
 # TODO: disable this except when explicitly called
 @mark.skip(reason="performance test only")
-class TestDraw(TestCase):
+class ProfileDraw(TestCase):
     fixtures = ['diagram-django']  # slow + useful
     fixtures = ['diagram-min'] # minimal
 
