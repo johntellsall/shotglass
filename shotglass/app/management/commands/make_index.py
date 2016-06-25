@@ -20,6 +20,7 @@ from app import models
 
 
 INDEX_SUFFIXES = ('.c', '.py')
+BORING_DIRS = ('.pc',) # X: make configurable
 
 if 0:
     # XX: never flushes logs!
@@ -37,7 +38,7 @@ def calc_radon(path):
     code = open(path).read()
     try:
         return cc_visit(code)
-    except SyntaxError, error:
+    except SyntaxError:
         # logger.warning('%s: %s', path, error)
         return []
 
@@ -53,7 +54,8 @@ def format_project_name(project_dir):
 
 
 def walk_type(topdir, name_func):
-    for root, _, names in os.walk(topdir):
+    for root, dirs, names in os.walk(topdir):
+        dirs = [mydir for mydir in dirs if mydir not in BORING_DIRS]
         paths = [os.path.join(root, name) for name in names
             if name_func(name)]
         for path in paths:

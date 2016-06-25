@@ -20,7 +20,7 @@ def overview(request, project):
         for line in proj_lines.order_by('path', 'line_number'):
             if line.path != prev_path:
                 prev_lineno = 0
-            info = dict(line.__dict__) # copy
+            info = dict(vars(line))
             info['length'] = line.line_number - prev_lineno
             info['bar'] = info['name'][0] * info['length']
             yield info
@@ -33,12 +33,12 @@ def overview(request, project):
 def list_symbols(request, project):
     # pylint: disable=no-member
     proj_lines = SourceLine.objects.filter(project=project)
-    symbols = proj_lines.order_by('path', 'name')
+    symbols = proj_lines.order_by('path', 'name')[:100]
 
     return shortcuts.render(request, 'list_symbols.html', {
         'symbols': symbols,
         'project': project,
-        'symbol_count': symbols.count()})
+        'symbol_count': proj_lines.count()})
 
 
 def render(request, project):
