@@ -1,4 +1,4 @@
-# app/render.py
+# app/Draw.py
 
 import colorsys
 import itertools
@@ -209,45 +209,49 @@ def render(project, argname='path', depth=None):
     diagram.dbsave()
 
 
-def draw(project):
+class DrawStyle(object):
     """
-    draw rendered project into a grid/image
+    draw rendered project onto a grid (image)
     """
-    grid = ImageGrid.FromProject(project)
-
-    diagram = Diagram.FromDB()
-
-    # tags = sorted(set(dsym.sourceline.tags_json for dsym in diagram))
-
-    diagram.draw(grid)
-    # tag_num = 6
-    # if tag_num is not None:
-    #     try:
-    #         selected_tag = tags[tag_num]
-    #         print tag_num, selected_tag
-    #         selected = [dsym for dsym in diagram
-    #             if dsym.sourceline.tags_json == selected_tag]
-    #         print [dsym.sourceline.name for dsym in selected]
-    #         draw_box(grid, selected)
-    #     except IndexError:
-    #         pass
-
-    grid.finalize()
-    return grid
+    def draw(self, project):
+        pass
 
 
-def draw_bbox(project):
-    grid = ImageGrid.FromProject(project)
+class SimpleDraw(DrawStyle):
+    def draw(self, project):
+        grid = ImageGrid.FromProject(project)
+        diagram = Diagram.FromDB()
+        diagram.draw(grid)
+        grid.finalize()
+        return grid
 
-    diagram = Diagram.FromDB()
 
-    for path in set(dsym.sourceline.path for dsym in diagram):
-        syms = [dsym for dsym in diagram
-                if dsym.sourceline.path == path]
-        draw_box(grid, syms, fill=syms[0].color)
+class BoundingBoxDraw(DrawStyle):
+    def draw(self, project):
+        grid = ImageGrid.FromProject(project)
+        diagram = Diagram.FromDB()
 
-    grid.finalize()
-    return grid
+        for path in set(dsym.sourceline.path for dsym in diagram):
+            syms = [dsym for dsym in diagram
+                    if dsym.sourceline.path == path]
+            draw_box(grid, syms, fill=syms[0].color)
+
+        grid.finalize()
+        return grid
+
+
+# tags = sorted(set(dsym.sourceline.tags_json for dsym in diagram))
+# tag_num = 6
+# if tag_num is not None:
+#     try:
+#         selected_tag = tags[tag_num]
+#         print tag_num, selected_tag
+#         selected = [dsym for dsym in diagram
+#             if dsym.sourceline.tags_json == selected_tag]
+#         print [dsym.sourceline.name for dsym in selected]
+#         draw_box(grid, selected)
+#     except IndexError:
+#         pass
 
 
 def get_index(project):         # X
