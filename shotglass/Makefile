@@ -13,12 +13,13 @@ test:
 clean:
 	-$(RM) $$(find . -name '*.pyc')
 
+# index1 -- index short C and Python projects
 index1:
 	file $(SRCDIR)/* | awk -F: '/directory/ {print $$1}' \
-	| egrep xv6 \
+	| egrep '(redis|flask)' \
 	| xargs ./manage.py make_index
 
-index-all:
+index-most:
 	file $(SRCDIR)/* | awk -F: '/directory/ {print $$1}' \
 	| egrep -v linux \
 	| xargs ./manage.py make_index
