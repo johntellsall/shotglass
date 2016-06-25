@@ -22,10 +22,19 @@ class SourceLine(models.Model):
 
     @classmethod
     def projects(cls):
-        projects = cls.objects.values(  # pylint: disable=no-member
+        # pylint: disable=no-member
+        projects = cls.objects.values(
             'project').distinct(
         ).values_list('project', flat=True)
         return sorted(filter(None, projects))
+
+    @classmethod
+    def paths(cls, project):
+        # pylint: disable=no-member
+        # X: sort?
+        source = cls.objects.filter(project=project)
+        return source.values('path').distinct().values_list(
+            'path', flat=True)
 
 
 class DiagramSymbol(models.Model):

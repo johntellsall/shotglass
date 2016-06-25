@@ -14,7 +14,6 @@ import subprocess
 import django.db
 from django.core.management.base import BaseCommand
 from radon.complexity import cc_visit
-from radon import visitors
 
 from app import models
 
@@ -53,6 +52,10 @@ def format_project_name(project_dir):
     return pdir
 
 
+def strip_project_dir(project_dir, path):
+    return path[len(project_dir):].lstrip('/')
+
+
 def walk_type(topdir, name_func):
     for root, dirs, names in os.walk(topdir):
         dirs = [mydir for mydir in dirs if mydir not in BORING_DIRS]
@@ -63,13 +66,14 @@ def walk_type(topdir, name_func):
 
 
 # pylint: disable=no-member
-def index_py_radon(project, paths):
+def index_py_radon(project, project_dir, paths):
     # X: Radon only supports Python
     for path in paths:
+        relpath = strip_project_dir(project_dir, path)
         for block in calc_radon(path):
             sourceline = models.SourceLine.objects.create(
                 project=project,
-                path=path,
+                path=relpath,
                 name=block.fullname,
                 line_number=block.lineno,
                 length=block.endline - block.lineno)
@@ -131,12 +135,14 @@ def make_index(project, project_dir):
     
     c_paths = list(walk_type(project_dir, is_c))
     logger.info('%s: %d C files', project, len(c_paths))
-    index_c_mccabe(project, c_paths)
+
+    if 0:
+        index_c_mccabe(project, project_dir, c_paths)
     # shows as "0" because of the PRAGMA SYNC above
 
     py_paths = list(walk_type(project_dir, is_python))
     logger.info('%s: %d Python files', project, len(py_paths))
-    index_py_radon(project, py_paths)
+    index_py_radon(project, project_dir, py_paths)
 
 
 class Command(BaseCommand):
