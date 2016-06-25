@@ -37,6 +37,7 @@ class SourceLine(models.Model):
             'path', flat=True)
 
 
+
 class DiagramSymbol(models.Model):
     position = models.IntegerField()
     x = models.IntegerField()

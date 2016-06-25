@@ -22,7 +22,7 @@ INDEX_SUFFIXES = ('.c', '.py')
 BORING_DIRS = ('.pc',) # X: make configurable
 
 if 0:
-    # XX: never flushes logs!
+    # XX: never flushes logs
     logger = logging.getLogger(__name__)
 else:
     class HackLogger(object):
@@ -42,11 +42,6 @@ def calc_radon(path):
         return []
 
 
-def calc_path_tags(path):
-    tags = path.split('/')[:-1]
-    return tags
-
-
 def format_project_name(project_dir):
     pdir = os.path.basename(project_dir.rstrip('/'))
     return pdir
@@ -57,8 +52,9 @@ def strip_project_dir(project_dir, path):
 
 
 def walk_type(topdir, name_func):
-    for root, dirs, names in os.walk(topdir):
-        dirs = [mydir for mydir in dirs if mydir not in BORING_DIRS]
+    for root, dirs, names in os.walk(topdir, topdown=True):
+        # don't scan boring directories
+        dirs[:] = [mydir for mydir in dirs if mydir not in BORING_DIRS]
         paths = [os.path.join(root, name) for name in names
             if name_func(name)]
         for path in paths:
@@ -85,7 +81,7 @@ def index_py_radon(project, project_dir, paths):
 
 
 # pylint: disable=no-member
-def index_c_mccabe(project, paths):
+def index_c_mccabe(project, project_dir, paths):
     pmccabe_pat = re.compile(
         r'^(?P<data> [0-9\t]+)'
         r'(?P<path> .+?)'
@@ -105,9 +101,10 @@ def index_c_mccabe(project, paths):
         data = [int(field) for field in match.group('data').split()]
         num_lines = data[4]
         definition_line = int(match.group('definition_line'))
+        relpath = strip_project_dir(project_dir, match.group('path'))
         sourceline = models.SourceLine.objects.create(
             project=project,
-            path=match.group('path'),
+            path=relpath,
             name=match.group('function'),
             line_number=definition_line,
             length=num_lines)
@@ -136,8 +133,7 @@ def make_index(project, project_dir):
     c_paths = list(walk_type(project_dir, is_c))
     logger.info('%s: %d C files', project, len(c_paths))
 
-    if 0:
-        index_c_mccabe(project, project_dir, c_paths)
+    index_c_mccabe(project, project_dir, c_paths)
     # shows as "0" because of the PRAGMA SYNC above
 
     py_paths = list(walk_type(project_dir, is_python))
