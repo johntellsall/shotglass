@@ -13,13 +13,16 @@ test:
 clean:
 	-$(RM) $$(find . -name '*.pyc')
 
+migrate:
+	./manage.py migrate
+
 # index1 -- index short C and Python projects
-index1:
+index1: migrate
 	file $(SRCDIR)/* | awk -F: '/directory/ {print $$1}' \
 	| egrep '(redis|flask)' \
 	| xargs ./manage.py make_index
 
-index-most:
+index-most: migrate
 	file $(SRCDIR)/* | awk -F: '/directory/ {print $$1}' \
 	| egrep -v linux \
 	| xargs ./manage.py make_index
