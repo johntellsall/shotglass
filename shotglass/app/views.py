@@ -11,25 +11,6 @@ def list_projects(request):
     return shortcuts.render(request, 'list_projects.html', {'projects': projects})
 
 
-def overview(request, project):
-    proj_lines = SourceLine.objects.filter( # pylint: disable=no-member
-        project=project)
-    def calc_overview():
-        prev_lineno = 0
-        prev_path = None
-        for line in proj_lines.order_by('path', 'line_number'):
-            if line.path != prev_path:
-                prev_lineno = 0
-            info = dict(vars(line))
-            info['length'] = line.line_number - prev_lineno
-            info['bar'] = info['name'][0] * info['length']
-            yield info
-
-    return shortcuts.render(request, 'overview.html', {
-        'overview': calc_overview,
-    })
-
-
 def list_symbols(request, project):
     # pylint: disable=no-member
     proj_lines = SourceLine.objects.filter(project=project)
