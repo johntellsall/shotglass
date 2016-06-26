@@ -2,14 +2,15 @@
 
 <h3>Hello, project {{ project }}</h3>
 
-symbols = {{ symbol_count }}
+<form action="{% url 'render' project=project %}" method="GET">
 
-<form action="{% url 'render' project=project %}">
-    <input type="radio" name="arg" value="path" checked>path</input>
-    <input type="radio" name="arg" value="tags">tags</input>
+<select name="style">
+  <option value="simple">Simple</option>
+  <option value="boundingbox">Bounding Box</option>
+</select>
+
     <input type="submit" />
 </form>
-    <a href="{% url 'render' project=project %}">render</a>
 
 <h3>{{ symbol_count }} symbols</h3>
 

@@ -1,6 +1,8 @@
 import StringIO
-from django.http import HttpResponse
+
 from django import shortcuts
+from django.core import urlresolvers
+from django.http import HttpResponse
 
 from app import render as shotglass_render
 from app.models import DiagramSymbol, SourceLine
@@ -8,15 +10,18 @@ from app.models import DiagramSymbol, SourceLine
 
 def list_projects(request):
     projects = SourceLine.projects()
-    return shortcuts.render(request, 'list_projects.html', {'projects': projects})
+    return shortcuts.render(request, 'list_projects.html', {
+        'projects': projects})
 
 
 def list_symbols(request, project):
     # pylint: disable=no-member
     proj_lines = SourceLine.objects.filter(project=project)
     symbols = proj_lines.order_by('path', 'name')[:100]
-
+    # TODO: render style menu from this var
+    draw_styles = sorted(shotglass_render.DRAW_STYLES.iterkeys())
     return shortcuts.render(request, 'list_symbols.html', {
+        'draw_styles': draw_styles,
         'symbols': symbols,
         'project': project,
         'symbol_count': proj_lines.count()})
@@ -24,7 +29,9 @@ def list_symbols(request, project):
 
 def render(request, project):
     shotglass_render.render(project) # XX
-    return shortcuts.redirect('draw', project=project)
+    return shortcuts.redirect('{}?{}'.format(
+        urlresolvers.reverse('draw', kwargs={'project': project}),
+        request.META['QUERY_STRING']))
 
 
 def draw(request, project):     # XX
