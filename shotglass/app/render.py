@@ -53,6 +53,9 @@ def make_skeleton(symbols, argname, depth):
                 yield (symbol, json.loads(arg)[:depth])
             else:
                 yield (symbol, arg)
+    if not argname:
+        def arg_iter():
+            return ((sym, None) for sym in symbols)
 
     prev_path = None
     pos = 0
@@ -99,6 +102,7 @@ def pal_add_color(skeleton):
             color = color_iter.next()
             prev_arg = arg
         yield pos, symbol, arg, color
+
 
 # X: speedup w/ queryset.select_related('progpmccabe')
 class Theme(object):
@@ -195,7 +199,7 @@ class Diagram(list):
     def render(self, symbols, argname, depth, color_func):
         self[:] = []
         skeleton = make_skeleton(symbols, argname, depth)
-        import ipdb ; ipdb.set_trace()
+        # import ipdb ; ipdb.set_trace()
         for pos, symbol, arg in skeleton:
             x,y = get_xy(pos)
             self.append(DiagramSymbol(
