@@ -29,6 +29,17 @@ def test_add_color():
         (0, 'x', 1, '#864747'), (1, 'y', 2, '#5dd3d7')]
 
 
+def test_render():
+    symbols = list(SYMBOLS)
+    symbols = [models.SourceLine(
+        name='beer', path='a.py', line_number=1, kind='', length=1)]
+    diagram = render.Diagram()
+    diagram.render(
+        symbols, argname=None, depth=None, 
+        color_func=lambda sym: 'x')
+    assert diagram == 'blam'
+
+
 def test_skeleton():
     symbols = list(SYMBOLS)
 

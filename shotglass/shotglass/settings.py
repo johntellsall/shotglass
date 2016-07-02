@@ -1,4 +1,8 @@
 import os
+import sys
+
+from django.core.management import call_command
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -67,7 +71,7 @@ ROOT_URLCONF = 'shotglass.urls'
 STATIC_URL = '/static/'
 
 DATABASES = {
-    'sqlite3': {
+    'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     },
@@ -79,8 +83,17 @@ DATABASES = {
     # }
 }
 
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'TEST_CHARSET': 'UTF8', # if your normal db is utf8
+        'NAME': ':memory:',
+        'TEST_NAME': ':memory:',
+    }
+    # tables don't get created automatically for me
+    # call_command('syncdb', migrate=True)
+
 import socket
-DATABASES['default'] = DATABASES['sqlite3']
 if 'Lil-Bub.' in socket.gethostname():
     DATABASES['default'] = DATABASES['postgres']
 

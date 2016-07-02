@@ -133,7 +133,7 @@ def theme_complexity(symbols):
             try:
                 yield colormap[cc_rank(cc_value)]
             except (KeyError, TypeError):
-                logger.debug('? %s', symbol.name)
+                logger.debug('? %s', cc_value)
                 yield COLOR_CC_UNKNOWN
 
 
@@ -192,15 +192,14 @@ class Diagram(list):
         items = add_color(skeleton)
         self[:] = make_symbols(items)
 
-    def render(self, symbols, argname, depth):
-        sym_color = Theme().calc_sym_color
+    def render(self, symbols, argname, depth, color_func):
         self[:] = []
-        skeleton = list(make_skeleton(symbols, argname, depth))
-        # colors = theme_complexity(skeleton)
+        skeleton = make_skeleton(symbols, argname, depth)
+        import ipdb ; ipdb.set_trace()
         for pos, symbol, arg in skeleton:
             x,y = get_xy(pos)
             self.append(DiagramSymbol(
-                color=sym_color(symbol),
+                color=color_func(symbol),
                 position=pos, x=x, y=y, 
                 sourceline=symbol))
 
