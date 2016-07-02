@@ -2,7 +2,7 @@ import cProfile
 import pstats
  
 from django.test import TestCase
-from pytest import mark
+import pytest
 
 from app import grid, models, render
 
@@ -29,15 +29,27 @@ def test_add_color():
         (0, 'x', 1, '#864747'), (1, 'y', 2, '#5dd3d7')]
 
 
+@pytest.mark.django_db
 def test_render():
-    symbols = list(SYMBOLS)
-    symbols = [models.SourceLine(
-        name='beer', path='a.py', line_number=1, kind='', length=1)]
+    models.SourceLine.objects.bulk_create([
+        models.SourceLine(
+        name='apple', path='a.py', line_number=1, kind='', length=1),
+        models.SourceLine(
+        name='bat', path='a.py', line_number=3, kind='', length=2),
+        models.SourceLine(
+        name='camel', path='b.py', line_number=2, kind='', length=1)])
+
+    def abc_color(sym):
+        return sym.name[0]
+
+    symbols = models.SourceLine.objects.all()
     diagram = render.Diagram()
     diagram.render(
         symbols, argname=None, depth=None, 
-        color_func=lambda sym: 'x')
-    assert diagram == 'blam'
+        color_func=abc_color)
+    
+    bits = [(ds.position, ds.color) for ds in diagram]
+    assert bits == [(0, 'a'), (1, 'b'), (3, 'c')]
 
 
 def test_skeleton():
@@ -65,11 +77,12 @@ class TestDraw(TestCase):
             {'last': (0, 2), 'height': 8, 'width': 8},
             actual=vars(grid))
 
+
 # PERFORMANCE TEST:
 # py.test -s app/tests/test_render.py::TestDraw
 #
 # TODO: disable this except when explicitly called
-@mark.skip(reason="performance test only")
+@pytest.mark.skip(reason="performance test only")
 class ProfileDraw(TestCase):
     fixtures = ['diagram-django']  # slow + useful
     fixtures = ['diagram-min'] # minimal
