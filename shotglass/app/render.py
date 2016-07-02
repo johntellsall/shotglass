@@ -100,35 +100,41 @@ def pal_add_color(skeleton):
             prev_arg = arg
         yield pos, symbol, arg, color
 
+# X: speedup w/ queryset.select_related('progpmccabe')
+class Theme(object):
+    def calc_sym_color(self, symbol):
+        return 'gray'
 
-def cc_add_color(skeleton):
+def theme_complexity(symbols):
+    """
+    give symbol a color based on code complexity
+    Red=high complexity, blue=low.
+    """
+    def get_complexity(sym):
+        try:
+            return sym.progpmccabe.mccabe
+        except AttributeError:
+            try:
+                return sym.progradon.complexity
+            except AttributeError:
+                pass
+        return None
+
     # pylint: disable=no-member
     colors = colorbrewer.diverging.RdBu_5_r.hex_colors 
     colormap = dict(zip('ABCDE', colors))
     colormap['F'] = colormap['E']
 
-    # X: speedup w/ queryset.select_related('progpmccabe')
-    for pos, symbol, arg in skeleton:
-        cc_value = None
-        try:
-            cc_value = symbol.progpmccabe.mccabe
-        except AttributeError:
-            try:
-                cc_value = symbol.progradon.complexity
-            except AttributeError:
-                pass
+    for cc_value in (get_complexity(sym) for sym in symbols):
         if cc_value is None:
             # symbol lacks complexity value
-            yield pos, symbol, arg, COLOR_CC_UNKNOWN
+            yield COLOR_CC_UNKNOWN
         else:
             try:
-                color = colormap[cc_rank(cc_value)]
-                yield pos, symbol, arg, color
+                yield colormap[cc_rank(cc_value)]
             except (KeyError, TypeError):
                 logger.debug('? %s', symbol.name)
-                yield pos, symbol, arg, COLOR_CC_UNKNOWN
-        
-add_color = cc_add_color
+                yield COLOR_CC_UNKNOWN
 
 
 def draw_symbol(grid, pos, symbol_length, color):
@@ -172,7 +178,10 @@ class Diagram(list):
     def FromDB(cls):
         return Diagram(DiagramSymbol.objects.select_related('sourceline'))
 
-    def render(self, symbols, argname, depth):
+    def OLD_render(self, symbols, argname, depth):
+        """
+        render "skeleton" of symbol information and position
+        """
         def make_symbols(items):
             for pos, symbol, arg, color in items:
                 x,y = get_xy(pos)
@@ -183,7 +192,22 @@ class Diagram(list):
         items = add_color(skeleton)
         self[:] = make_symbols(items)
 
+    def render(self, symbols, argname, depth):
+        sym_color = Theme().calc_sym_color
+        self[:] = []
+        skeleton = list(make_skeleton(symbols, argname, depth))
+        # colors = theme_complexity(skeleton)
+        for pos, symbol, arg in skeleton:
+            x,y = get_xy(pos)
+            self.append(DiagramSymbol(
+                color=sym_color(symbol),
+                position=pos, x=x, y=y, 
+                sourceline=symbol))
+
     def draw(self, grid):
+        """
+        draw and color symbols into grid based on info
+        """
         for dsymbol in self:
             draw_symbol(grid,
                         dsymbol.position,
@@ -221,7 +245,6 @@ class DrawStyle(object):
         self.draw_diagram(grid, diagram)
         grid.finalize()
         return grid
-        
 
 
 class SimpleDraw(DrawStyle):
@@ -230,24 +253,19 @@ class SimpleDraw(DrawStyle):
 
 
 class BoundingBoxDraw(DrawStyle):
-    def draw(self, project):
-        grid = ImageGrid.FromProject(project)
-        diagram = Diagram.FromDB()
-
+    def draw_diagram(self, grid, diagram):
         for path in set(dsym.sourceline.path for dsym in diagram):
             syms = [dsym for dsym in diagram
                     if dsym.sourceline.path == path]
             draw_box(grid, syms, fill=syms[0].color)
 
-        grid.finalize()
-        return grid
 
 if 0:
-    DRAW_STYLES = {
-        (name[:-len('Draw')], value)
+    DRAW_STYLES = dict(
+        ((name[:-len('Draw')], value)
         for name, value in globals().iteritems()
-        if name.endswith('Draw') and issubclass(DrawStyle, value)
-    }
+        if name.endswith('Draw') and issubclass(DrawStyle, value))
+    )
 else:
     DRAW_STYLES = {
     'boundingbox': BoundingBoxDraw,
@@ -266,8 +284,3 @@ else:
 #     except IndexError:
 #         pass
 
-
-def get_index(project):         # X
-    # pylint: disable=no-member
-    return DiagramSymbol.objects.order_by(
-        'sourceline__name')
