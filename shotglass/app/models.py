@@ -39,12 +39,13 @@ class SourceLine(models.Model):
 
 
 class DiagramSymbol(models.Model):
+    sourceline = models.ForeignKey(SourceLine, on_delete=models.CASCADE,
+        **nullable)
+
     position = models.IntegerField()
     x = models.IntegerField()
     y = models.IntegerField()
     color = ColorField()
-    sourceline = models.ForeignKey(SourceLine, on_delete=models.CASCADE,
-        **nullable)
 
 
 class ProgRadon(models.Model):

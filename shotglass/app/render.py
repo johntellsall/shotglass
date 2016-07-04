@@ -27,15 +27,16 @@ def make_skeleton(symbols, argname, depth):
     """
     calculate position of each symbol
     """
-    def arg_iter():
-        'iterate by "args", generally filenames'
-        for symbol in symbols:
-            arg = getattr(symbol, argname)
-            if depth and arg and argname.endswith('_json'):
-                yield (symbol, json.loads(arg)[:depth])
-            else:
-                yield (symbol, arg)
-    if not argname:
+    if argname:
+        def arg_iter():
+            'iterate by "args", generally filenames'
+            for symbol in symbols:
+                arg = getattr(symbol, argname)
+                if depth and arg and argname.endswith('_json'):
+                    yield (symbol, json.loads(arg)[:depth])
+                else:
+                    yield (symbol, arg)
+    else:
         def arg_iter():
             return ((sym, None) for sym in symbols)
 
@@ -51,49 +52,21 @@ def make_skeleton(symbols, argname, depth):
         pos += symbol.length - 1
 
 
-class Diagram(list):
-    @classmethod
-    # pylint: disable=no-member
-    def FromDB(cls):
-        return Diagram(DiagramSymbol.objects.select_related('sourceline'))
-
-    def render(self, symbols, argname, depth, color_func):
-        self[:] = []
-        skeleton = make_skeleton(symbols, argname, depth)
-        for pos, symbol, arg in skeleton:
-            x,y = get_xy(pos)
-            self.append(DiagramSymbol(
-                color=color_func(symbol),
-                position=pos, x=x, y=y, 
-                sourceline=symbol))
-
-    def draw(self, grid):
-        """
-        draw symbols onto grid
-        """
-        for dsymbol in self:
-            draw_symbol(grid,
-                        dsymbol.position,
-                        symbol_length=dsymbol.sourceline.length,
-                        color=dsymbol.color)
-
-    # pylint: disable=no-member
-    def dbsave(self):
-        DiagramSymbol.objects.all().delete() # XX
-        DiagramSymbol.objects.bulk_create(self)
-
-
-def render(project, argname='path', depth=None):
+def make_dsymbols(symbols, argname, depth):
     """
-    render given project to database
+    make skeleton, annotate X,Y position of each symbol
     """
-    symbols = SourceLine.objects.filter( # pylint: disable=no-member
-        project=project
-    ).order_by('path', 'line_number')
-
-    diagram = Diagram()
-    diagram.render(symbols, argname, depth,
-        color_func=ThemeComplexity.calc_sym_color)
-    diagram.dbsave()
+    skeleton = make_skeleton(symbols, argname, depth)
+    for pos, symbol, arg in skeleton:
+        x,y = get_xy(pos)
+        yield DiagramSymbol(position=pos, x=x, y=y, sourceline=symbol)
 
 
+# pylint: disable=no-member
+def render(symbols, argname, depth):
+    """
+    render skeleton, store in database
+    """
+    DiagramSymbol.objects.all.delete() # XX
+    dsyms = make_dsymbols(symbols, argname, depth)
+    DiagramSymbol.objects.bulk_create(dsyms)
