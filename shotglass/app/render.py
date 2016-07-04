@@ -7,6 +7,7 @@ import logging
 from app import hilbert
 from app.grid import ImageGrid
 from app.models import DiagramSymbol, SourceLine
+from app.utils import make_step_iter
 
 
 logger = logging.getLogger(__name__)
@@ -17,13 +18,6 @@ def make_hilbert_iter():
     while True:
         yield tuple(hilbert.int_to_Hilbert(index_))
         index_ += 1
-
-
-def make_step_iter(step, max_):
-    num = 0
-    while True:
-        yield num
-        num = (num + step) % max_
 
 
 get_xy = hilbert.int_to_Hilbert

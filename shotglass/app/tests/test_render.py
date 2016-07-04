@@ -1,8 +1,8 @@
 import cProfile
 import pstats
  
-from django.test import TestCase
 import pytest
+from django.test import TestCase
 
 from app import grid, models, render
 
@@ -21,12 +21,6 @@ def get_arg(result):
     return [arg for pos,_symbol,arg in result]
 def get_pos(result):
     return [pos for pos,_symbol,arg in result]
-
-
-def test_add_color():
-    diagram = [(0, 'x', 1), (1, 'y', 2)]
-    assert list(render.jm_add_color(diagram)) == [
-        (0, 'x', 1, '#864747'), (1, 'y', 2, '#5dd3d7')]
 
 
 @pytest.mark.django_db
@@ -61,21 +55,6 @@ def test_skeleton():
 
     result = render.make_skeleton(symbols, 'length', depth=None)
     assert get_arg(result) == [1, 2, 3]
-
-
-class TestDraw(TestCase):
-    fixtures = ['diagram-min'] # minimal
-
-    def setUp(self):
-        stub = models.SourceLine.objects.create(
-            kind='k', length=3, line_number=2, name='name', path='path')
-        models.DiagramSymbol.objects.update(sourceline=stub)
-
-    def test_simple(self):
-        grid = render.SimpleDraw().draw(None)
-        self.assertDictContainsSubset(
-            {'last': (0, 2), 'height': 8, 'width': 8},
-            actual=vars(grid))
 
 
 # PERFORMANCE TEST:

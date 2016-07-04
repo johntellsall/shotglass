@@ -8,6 +8,7 @@ from palettable import colorbrewer
 from radon.complexity import cc_rank
 
 from app.grid import ImageGrid
+from app.utils import make_step_iter
 
 
 COLOR_CC_UNKNOWN = 'gray'
