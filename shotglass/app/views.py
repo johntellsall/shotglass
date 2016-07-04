@@ -4,7 +4,7 @@ from django import shortcuts
 from django.core import urlresolvers
 from django.http import HttpResponse
 
-from app import render as shotglass_render
+import app
 from app.models import DiagramSymbol, SourceLine
 
 
@@ -19,7 +19,7 @@ def list_symbols(request, project):
     proj_lines = SourceLine.objects.filter(project=project)
     symbols = proj_lines.order_by('path', 'name')[:100]
     # TODO: render style menu from this var
-    draw_styles = sorted(shotglass_render.DRAW_STYLES.iterkeys())
+    draw_styles = [] # XX sorted(app.draw.DRAW_STYLES.iterkeys())
     return shortcuts.render(request, 'list_symbols.html', {
         'draw_styles': draw_styles,
         'symbols': symbols,
@@ -28,7 +28,8 @@ def list_symbols(request, project):
 
 
 def render(request, project):
-    shotglass_render.render(project) # XX
+    import ipdb ; ipdb.set_trace()
+    app.render.render(project) # XX
     return shortcuts.redirect('{}?{}'.format(
         urlresolvers.reverse('draw', kwargs={'project': project}),
         request.META['QUERY_STRING']))
@@ -41,8 +42,9 @@ def draw(request, project):     # XX
     zoom = float(request.GET.get('zoom', 0.))
     style = request.GET.get('style')
 
-    draw_class = shotglass_render.DRAW_STYLES.get(
-        style) or shotglass_render.SimpleDraw
+    draw_class = app.draw.SimpleDraw
+    # shotglass_render.DRAW_STYLES.get(
+    #     style) or shotglass_render.SimpleDraw
 
     grid = draw_class().draw(project) # XX
     image = grid.im
