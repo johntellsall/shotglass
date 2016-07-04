@@ -1,13 +1,10 @@
 # app/render.py
 
-import itertools
 import json
 import logging
 
 from app import hilbert
-from app.grid import ImageGrid
-from app.models import DiagramSymbol, SourceLine
-from app.utils import make_step_iter
+from .models import DiagramSymbol
 
 
 logger = logging.getLogger(__name__)
