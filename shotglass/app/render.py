@@ -109,36 +109,35 @@ class Theme(object):
     def calc_sym_color(self, symbol):
         return 'gray'
 
-def theme_complexity(symbols):
+class ThemeComplexity(Theme):
     """
     give symbol a color based on code complexity
     Red=high complexity, blue=low.
     """
-    def get_complexity(sym):
-        try:
-            return sym.progpmccabe.mccabe
-        except AttributeError:
+    COLOR_CC_UNKNOWN = 'gray'
+
+    def __init__(self):
+        # pylint: disable=no-member
+        colors = colorbrewer.diverging.RdBu_5_r.hex_colors 
+        self.colormap = dict(zip('ABCDE', colors))
+        self.colormap['F'] = self.colormap['E']
+
+    def calc_sym_color(self, symbol):
+        def get_complexity(sym):
             try:
-                return sym.progradon.complexity
+                return sym.progpmccabe.mccabe
             except AttributeError:
-                pass
-        return None
+                try:
+                    return sym.progradon.complexity
+                except AttributeError:
+                    pass
+            return None
 
-    # pylint: disable=no-member
-    colors = colorbrewer.diverging.RdBu_5_r.hex_colors 
-    colormap = dict(zip('ABCDE', colors))
-    colormap['F'] = colormap['E']
-
-    for cc_value in (get_complexity(sym) for sym in symbols):
-        if cc_value is None:
-            # symbol lacks complexity value
-            yield COLOR_CC_UNKNOWN
-        else:
-            try:
-                yield colormap[cc_rank(cc_value)]
-            except (KeyError, TypeError):
-                logger.debug('? %s', cc_value)
-                yield COLOR_CC_UNKNOWN
+        cc_value = get_complexity(symbol)
+        try:
+            return self.colormap[cc_rank(cc_value)]
+        except (KeyError, TypeError):
+            return self.COLOR_CC_UNKNOWN
 
 
 def draw_symbol(grid, pos, symbol_length, color):
@@ -182,24 +181,9 @@ class Diagram(list):
     def FromDB(cls):
         return Diagram(DiagramSymbol.objects.select_related('sourceline'))
 
-    def OLD_render(self, symbols, argname, depth):
-        """
-        render "skeleton" of symbol information and position
-        """
-        def make_symbols(items):
-            for pos, symbol, arg, color in items:
-                x,y = get_xy(pos)
-                yield DiagramSymbol(
-                    color=color, position=pos, x=x, y=y, sourceline=symbol)
-
-        skeleton = make_skeleton(symbols, argname, depth)
-        items = add_color(skeleton)
-        self[:] = make_symbols(items)
-
     def render(self, symbols, argname, depth, color_func):
         self[:] = []
         skeleton = make_skeleton(symbols, argname, depth)
-        # import ipdb ; ipdb.set_trace()
         for pos, symbol, arg in skeleton:
             x,y = get_xy(pos)
             self.append(DiagramSymbol(
@@ -209,7 +193,7 @@ class Diagram(list):
 
     def draw(self, grid):
         """
-        draw and color symbols into grid based on info
+        draw symbols onto grid
         """
         for dsymbol in self:
             draw_symbol(grid,
@@ -232,7 +216,8 @@ def render(project, argname='path', depth=None):
     ).order_by('path', 'line_number')
 
     diagram = Diagram()
-    diagram.render(symbols, argname, depth)
+    diagram.render(symbols, argname, depth,
+        color_func=ThemeComplexity.calc_sym_color)
     diagram.dbsave()
 
 
