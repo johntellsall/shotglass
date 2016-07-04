@@ -20,28 +20,10 @@ def get_arg(result):
 def get_pos(result):
     return [args[0] for args in result]
 
-
-# @pytest.mark.django_db
-# def test_render():
-#     models.SourceLine.objects.bulk_create([
-#         models.SourceLine(
-#         name='apple', path='a.py', line_number=1, kind='', length=1),
-#         models.SourceLine(
-#         name='bat', path='a.py', line_number=3, kind='', length=2),
-#         models.SourceLine(
-#         name='camel', path='b.py', line_number=2, kind='', length=1)])
-
-#     symbols = models.SourceLine.objects.all()
-#     diagram = render.Diagram()
-#     diagram.render(symbols, argname=None, depth=None),
-    
-#     bits = [ds.position for ds in diagram]
-#     assert bits == [(0, 'a'), (1, 'b'), (3, 'c')]
-
+# http://stackoverflow.com/a/11924754/143880
 def is_subset(d1, obj):
     d2 = vars(obj)
     return set(d1.items()).issubset(set(d2.items()))
-
 
 
 def test_skeleton():
