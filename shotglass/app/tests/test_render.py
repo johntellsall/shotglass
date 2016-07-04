@@ -1,6 +1,3 @@
-import cProfile
-import pstats
- 
 import pytest
 from django.test import TestCase
 
@@ -18,9 +15,9 @@ SYMBOLS = [
 
 
 def get_arg(result):
-    return [arg for pos,_symbol,arg in result]
+    return [args[2] for args in result]
 def get_pos(result):
-    return [pos for pos,_symbol,arg in result]
+    return [args[0] for args in result]
 
 
 @pytest.mark.django_db
@@ -55,34 +52,3 @@ def test_skeleton():
 
     result = render.make_skeleton(symbols, 'length', depth=None)
     assert get_arg(result) == [1, 2, 3]
-
-
-# PERFORMANCE TEST:
-# py.test -s app/tests/test_render.py::TestDraw
-#
-# TODO: disable this except when explicitly called
-@pytest.mark.skip(reason="performance test only")
-class ProfileDraw(TestCase):
-    fixtures = ['diagram-django']  # slow + useful
-    fixtures = ['diagram-min'] # minimal
-
-    def setUp(self):
-        stub = models.SourceLine.objects.create(
-            kind='k', length=3, line_number=2, name='name', path='path')
-        models.DiagramSymbol.objects.update(sourceline=stub)
-
-    def test_rawdraw(self):
-        def rawdraw():
-            diagram = render.Diagram.FromDB()
-            mygrid = grid.Grid(None, None)
-            diagram.draw(mygrid)
-
-        prof_name = 'rawdraw-{}.prof'.format(self.fixtures[0])
-        cProfile.runctx(
-            rawdraw.func_code,  # pylint: disable=no-member
-            globals=globals(), locals={},
-            filename=prof_name)
-
-        p = pstats.Stats(prof_name)
-        p.strip_dirs().sort_stats('cumtime').print_stats(20)
-
