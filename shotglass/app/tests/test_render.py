@@ -50,10 +50,10 @@ def test_dsymbols():
     dsymbols = list(render.make_dsymbols(
         SourceLine.objects.all(), None, None))
     
-    assert is_subset({'color': u'', 'x': 0, 'y': 0, 'position': 0}, 
+    assert is_subset({'x': 0, 'y': 0, 'position': 0}, 
         dsymbols[0])
-    assert is_subset({'color': u'', 'x': 1, 'y': 0, 'position': 1},
+    assert is_subset({'x': 1, 'y': 0, 'position': 1},
         dsymbols[1])
-    assert is_subset({'color': u'', 'x': 0, 'y': 1, 'position': 3},
+    assert is_subset({'x': 0, 'y': 1, 'position': 3},
         dsymbols[2])
     assert len(dsymbols) == 3
