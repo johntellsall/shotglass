@@ -3,3 +3,5 @@ A source tree is scanned for symbols, which are stored in SourceLine records; an
 The Render code turns the index into a "skeleton." For all symbols, the position and x,y location of each symbol is calculated.  If a user decides to exclude e.g. the Examples and Tests directories, the skeleton would change.
 
 Lastly, the Draw code colors in the skeleton based on specific needs. One drawing style puts colored boxes around each directory in the source tree. Another style draws each symbol in a different color, so the entire effect is like a rainbow.  Third-party information can also be rendered: draw each symbol with color based on complexity. Very complex code is seen as red, simple, clear code in blue.
+
+Draw code is of two types: _what_ is being drawn, and _what color_ it is. If we're just drawing the folders, then we don't are about symbol details. The former is known as a "draw style", and the latter is a (color) "theme".
