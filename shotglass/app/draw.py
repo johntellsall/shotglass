@@ -4,6 +4,7 @@ import colorsys
 import itertools
 import logging
 
+from hilbert import int_to_Hilbert as get_xy
 from palettable import colorbrewer
 from radon.complexity import cc_rank
 
@@ -94,14 +95,21 @@ class ThemeComplexity(Theme):
             return self.COLOR_CC_UNKNOWN
 
 
-def draw_symbol(grid, pos, symbol_length, color):
-    if symbol_length <= 1:
+def draw_symbol(grid, skel, color):
+    length = skel.sourceline.length
+    if length <= 1:
         return
     # draw white "grain of rice" at start of symbol
     if 0:
         grid.moveto(get_xy(pos))
         grid.drawto(get_xy(pos + 1), '#fff')
         for offset in xrange(symbol_length):
+            grid.drawto(get_xy(pos + offset + 1), color)
+    else:
+        pos = skel.position
+        grid.moveto(get_xy(pos))
+        grid.drawto(get_xy(pos + 1), '#fff')
+        for offset in xrange(length):
             grid.drawto(get_xy(pos + offset + 1), color)
 
 
@@ -147,8 +155,7 @@ class DrawStyle(object):
             color = theme.calc_sym_color(skeleton)
             draw_symbol(
                 grid,
-                pos=skeleton.position,
-                symbol_length=skeleton.sourceline.length,
+                skel=skeleton,
                 color=color)
         grid.finalize()
         return grid

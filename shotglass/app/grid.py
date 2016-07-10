@@ -7,7 +7,6 @@ from app.models import SourceLine
 
 
 def calc_width(project):
-    import ipdb ; ipdb.set_trace()
     lines_total = SourceLine.objects.filter( # pylint: disable=no-member
         project=project).aggregate(Sum('length'))['length__sum']
     if not lines_total:
