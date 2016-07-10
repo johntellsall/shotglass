@@ -7,6 +7,7 @@ import logging
 from palettable import colorbrewer
 from radon.complexity import cc_rank
 
+from app import models
 from app.grid import ImageGrid
 from app.utils import make_step_iter
 
@@ -97,10 +98,11 @@ def draw_symbol(grid, pos, symbol_length, color):
     if symbol_length <= 1:
         return
     # draw white "grain of rice" at start of symbol
-    grid.moveto(get_xy(pos))
-    grid.drawto(get_xy(pos + 1), '#fff')
-    for offset in xrange(symbol_length):
-        grid.drawto(get_xy(pos + offset + 1), color)
+    if 0:
+        grid.moveto(get_xy(pos))
+        grid.drawto(get_xy(pos + 1), '#fff')
+        for offset in xrange(symbol_length):
+            grid.drawto(get_xy(pos + offset + 1), color)
 
 
 # X: unused
@@ -136,8 +138,18 @@ class DrawStyle(object):
     
     def draw(self, project):
         grid = ImageGrid.FromProject(project)
-        diagram = Diagram.FromDB()
-        self.draw_diagram(grid, diagram)
+        import ipdb ; ipdb.set_trace()
+        # diagram = Diagram.FromDB()
+        # self.draw_diagram(grid, diagram)
+        theme = Theme()
+        for skeleton in models.Skeleton.objects.filter(
+            sourceline__project=project):
+            color = theme.calc_sym_color(skeleton)
+            draw_symbol(
+                grid,
+                pos=skeleton.position,
+                symbol_length=skeleton.sourceline.length,
+                color=color)
         grid.finalize()
         return grid
 
