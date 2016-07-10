@@ -16,6 +16,7 @@ from django.core.management.base import BaseCommand
 from radon.complexity import cc_visit
 
 from app import models
+from app import render
 
 
 INDEX_SUFFIXES = ('.c', '.py')
@@ -128,7 +129,8 @@ def make_index(project, project_dir):
 
     # XX: delete project's index
     # pylint: disable=no-member
-    models.SourceLine.objects.filter(project=project).delete()
+    proj_symbols = models.SourceLine.objects.filter(project=project)
+    proj_symbols.delete()
     
     c_paths = list(walk_type(project_dir, is_c))
     logger.info('%s: %d C files', project, len(c_paths))
@@ -140,6 +142,7 @@ def make_index(project, project_dir):
     logger.info('%s: %d Python files', project, len(py_paths))
     index_py_radon(project, project_dir, py_paths)
 
+    render.render(proj_symbols)
 
 class Command(BaseCommand):
     help = 'beer'

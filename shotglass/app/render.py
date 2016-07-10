@@ -43,6 +43,6 @@ def render(symbols):
     """
     render skeleton, store in database
     """
-    Skeleton.objects.all.delete() # XX
+    # Skeleton.objects.all.delete() # XX
     skel = make_skeleton(symbols)
     Skeleton.objects.bulk_create(skel)
