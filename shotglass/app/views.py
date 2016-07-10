@@ -5,7 +5,7 @@ from django.core import urlresolvers
 from django.http import HttpResponse
 
 import app
-from app.models import DiagramSymbol, SourceLine
+from app.models import SourceLine
 
 
 def list_projects(request):

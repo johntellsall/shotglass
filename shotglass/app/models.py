@@ -5,7 +5,6 @@ from django.db import models
 nullable = {'blank': True, 'null': True}
 
 
-# TODO: rename SourceLine to Symbol
 class SourceLine(models.Model):
 
     project = models.CharField(max_length=200, **nullable)
@@ -37,17 +36,6 @@ class SourceLine(models.Model):
             'path', flat=True)
 
 
-
-class DiagramSymbol(models.Model):
-    sourceline = models.ForeignKey(SourceLine, on_delete=models.CASCADE,
-        **nullable)
-
-    position = models.IntegerField()
-    x = models.IntegerField()
-    y = models.IntegerField()
-    color = ColorField()
-
-
 class ProgRadon(models.Model):
     sourceline = models.OneToOneField(
         SourceLine, on_delete=models.CASCADE,
@@ -68,3 +56,13 @@ class ProgPmccabe(models.Model):
     first_line = models.IntegerField()
     num_lines = models.IntegerField()
     definition_line = models.IntegerField()
+
+
+class Skeleton(models.Model):
+    sourceline = models.ForeignKey(SourceLine, on_delete=models.CASCADE,
+        **nullable)
+
+    position = models.IntegerField()
+    x = models.IntegerField()
+    y = models.IntegerField()
+    color = ColorField()
