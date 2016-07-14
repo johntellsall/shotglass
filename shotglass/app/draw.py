@@ -4,12 +4,12 @@ import colorsys
 import itertools
 import logging
 
-from hilbert import int_to_Hilbert as get_xy
 from palettable import colorbrewer
 from radon.complexity import cc_rank
 
 from app import models
 from app.grid import ImageGrid
+from app.hilbert import int_to_Hilbert as get_xy
 from app.utils import make_step_iter
 
 
@@ -177,17 +177,3 @@ else:
     DRAW_STYLES = {
     'boundingbox': BoundingBoxDraw,
     'simple': SimpleDraw}
-
-# tags = sorted(set(dsym.sourceline.tags_json for dsym in diagram))
-# tag_num = 6
-# if tag_num is not None:
-#     try:
-#         selected_tag = tags[tag_num]
-#         print tag_num, selected_tag
-#         selected = [dsym for dsym in diagram
-#             if dsym.sourceline.tags_json == selected_tag]
-#         print [dsym.sourceline.name for dsym in selected]
-#         draw_box(grid, selected)
-#     except IndexError:
-#         pass
-
