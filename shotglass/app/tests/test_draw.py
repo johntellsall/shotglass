@@ -10,7 +10,7 @@ class TestDraw(TestCase):
     def setUp(self):
         stub = models.SourceLine.objects.create(
             kind='k', length=3, line_number=2, name='name', path='path')
-        models.DiagramSymbol.objects.update(sourceline=stub)
+        models.Skeleton.objects.update(sourceline=stub)
 
     def test_simple(self):
         grid = draw.SimpleDraw().draw(None)

@@ -1,7 +1,10 @@
 import cProfile
 import pstats
  
+import pytest
 from django.test import TestCase
+
+from app import grid, models, render
 
 # PERFORMANCE TEST:
 # py.test -s app/tests/test_perf::ProfileDraw

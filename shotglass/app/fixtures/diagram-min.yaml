@@ -1,6 +1,6 @@
 - fields: {color: '#864747', position: 0,  x: 0, y: 0}
-  model: app.diagramsymbol
+  model: app.skeleton
   pk: 47050
 - fields: {color: '#5dd3d7', position: 0,  x: 0, y: 0}
-  model: app.diagramsymbol
+  model: app.skeleton
   pk: 47051

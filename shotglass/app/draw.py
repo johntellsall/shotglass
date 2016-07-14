@@ -97,20 +97,14 @@ class ThemeComplexity(Theme):
 
 def draw_symbol(grid, skel, color):
     length = skel.sourceline.length
-    if length <= 1:
+    if length < 1:
         return
     # draw white "grain of rice" at start of symbol
-    if 0:
-        grid.moveto(get_xy(pos))
-        grid.drawto(get_xy(pos + 1), '#fff')
-        for offset in xrange(symbol_length):
-            grid.drawto(get_xy(pos + offset + 1), color)
-    else:
-        pos = skel.position
-        grid.moveto(get_xy(pos))
-        grid.drawto(get_xy(pos + 1), '#fff')
-        for offset in xrange(length):
-            grid.drawto(get_xy(pos + offset + 1), color)
+    pos = skel.position
+    grid.moveto(get_xy(pos))
+    grid.drawto(get_xy(pos + 1), '#fff')
+    for offset in xrange(length):
+        grid.drawto(get_xy(pos + offset + 1), color)
 
 
 # X: unused
@@ -146,7 +140,6 @@ class DrawStyle(object):
     
     def draw(self, project):
         grid = ImageGrid.FromProject(project)
-        import ipdb ; ipdb.set_trace()
         # diagram = Diagram.FromDB()
         # self.draw_diagram(grid, diagram)
         theme = Theme()
