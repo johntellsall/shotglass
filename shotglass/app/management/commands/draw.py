@@ -18,9 +18,11 @@ class Command(BaseCommand):
         return SourceLine.projects()
 
     def handle(self, *args, **options):
+        themeClass = draw.ThemeRainbow
         for project in self.get_projects(options['projects']):
             print '***', project
-            grid = draw.SimpleDraw().draw(project)
+            grid = draw.SimpleDraw().draw(
+                project, theme=themeClass())
 
             depth = None
             argname = 'path'

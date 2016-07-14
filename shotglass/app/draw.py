@@ -24,26 +24,6 @@ def color_hsl_hex(hue, saturation, lightness):
     return '#%02x%02x%02x' % (int(r*255), int(g*255), int(b*255))
 
 
-def jm_add_color(skeleton):
-    prev_arg = None
-    highlight = 40
-    hue,saturation = 0, 0
-    hue_iter = make_step_iter(50, 360)
-    saturation_iter = itertools.cycle([30, 60, 80])
-    highlight_iter = itertools.cycle([40, 60])
-
-    for pos, symbol, arg in skeleton:
-        # change color with new arg (file)
-        if prev_arg != arg:
-            hue = hue_iter.next()
-            prev_arg = arg
-            highlight = highlight_iter.next() # X?
-        # alternate symbols: different saturation
-        saturation = saturation_iter.next()
-        color = color_hsl_hex(hue, saturation, highlight)
-        yield pos, symbol, arg, color
-
-
 # palette examples
 # https://jiffyclub.github.io/palettable/colorbrewer/diverging/#brbg_11
 def pal_add_color(skeleton):
@@ -63,6 +43,30 @@ def pal_add_color(skeleton):
 class Theme(object):
     def calc_sym_color(self, symbol):
         return 'gray'
+
+
+
+class ThemeRainbow(Theme):
+    def __init__(self):
+        self.hue_iter = make_step_iter(50, 360)
+        self.saturation_iter = itertools.cycle([30, 60, 80])
+        self.highlight_iter = itertools.cycle([40, 60])
+        self.hue_sat_highlight = 0, 0, 40
+
+    def calc_sym_color(self, symbol):
+        # prev_arg = None
+
+        # for symbol, arg in skeleton:
+            # change color with new arg (file)
+        # if prev_arg != arg:
+        #     hue = hue_iter.next()
+        #     prev_arg = arg
+        #     highlight = highlight_iter.next() # X?
+        # alternate symbols: different saturation
+        hue, _, highlight = self.hue_sat_highlight
+        saturation = self.saturation_iter.next()
+        return color_hsl_hex(hue, saturation, highlight)
+
 
 class ThemeComplexity(Theme):
     """
@@ -138,14 +142,14 @@ class DrawStyle(object):
     """
     draw_diagram = NotImplementedError
     
-    def draw(self, project):
+    def draw(self, project, theme=None):
         grid = ImageGrid.FromProject(project)
-        # diagram = Diagram.FromDB()
-        # self.draw_diagram(grid, diagram)
-        theme = Theme()
+        mytheme = theme or Theme()
+        color_cb = mytheme.calc_sym_color
+
         for skeleton in models.Skeleton.objects.filter(
             sourceline__project=project):
-            color = theme.calc_sym_color(skeleton)
+            color = color_cb(skeleton)
             draw_symbol(
                 grid,
                 skel=skeleton,
