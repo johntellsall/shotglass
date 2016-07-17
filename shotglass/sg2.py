@@ -30,15 +30,17 @@ range_all = 'v3.0.0..v4.0.0'
 test_repo = Repo(os.path.expanduser('~/src/iproute2'))
 
 
+    
 # TODO: skip "total" at end
-def zoot(mygit, myrange):
+def parse_diff_changes(diff_text):
     re_path_num = re.compile(r'^\s(\S+).+?(\d+)', re.MULTILINE)
-    diff_text = mygit.diff(myrange, stat=True)
     return re_path_num.finditer(diff_text)
 
 re_manpage = re.compile('man/.+[0-9]$')
 git = test_repo.git
-man_paths = [match.group(1) for match in zoot(git, range_all)
+diff_text = git.diff(range_all, stat=True)
+
+man_paths = [match.group(1) for match in parse_diff_changes(diff_text)
     if re_manpage.match(match.group(1))]
 man_paths.sort()
 
@@ -53,10 +55,14 @@ if 1:
         diff_index = old.commit.diff(new)
         print '{:7} - {:7}: {} commits'.format(
             old.name, new.name, len(diff_index))
-        man_diff = (set(diff.a_path for diff in diff_index)
+        man_diff_paths = (set(diff.a_path for diff in diff_index)
             & set(man_index))
-        print man_diff
-        print
+        diff_text = git.diff(
+            '{}..{}'.format(old.name, new.name), 
+            *man_diff_paths,
+            stat=True)
+        diff_path_changes = parse_diff_changes(diff_text)
+        print [m.groups() for m in diff_path_changes]
         #import ipdb ; ipdb.set_trace()
         old = new
 
