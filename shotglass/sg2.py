@@ -67,7 +67,7 @@ if 1:
     old = tags.pop(0)
     for new in tags:
         diff_index = old.commit.diff(new)
-        print '{:7}: '.format(new.name),
+        print '{:7}: {:3}'.format(new.name, len(diff_index)),
         man_diff_paths = (set(diff.a_path for diff in diff_index)
             & set(man_index))
         diff_text = git.diff(
