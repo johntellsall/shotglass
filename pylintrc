@@ -4,6 +4,8 @@ bad-functions=apply,input
 
 
 [MASTER]
+
+init-hook='sys.path.extend(["/home/johnm/lilbub/lib/python2.7/site-packages/", "/home/johnm/src/shotglass/shotglass"])'
 persistent=yes
 load-plugins=
 jobs=9
