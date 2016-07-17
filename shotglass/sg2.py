@@ -53,13 +53,9 @@ if 1:
         diff_index = old.commit.diff(new)
         print '{:7} - {:7}: {} commits'.format(
             old.name, new.name, len(diff_index))
-        for diff in diff_index:
-            # if diff.a_path.endswith('8'):
-            #     import ipdb ; ipdb.set_trace()
-            if diff.a_path in man_index:
-                print os.path.split(diff.a_path)[-1],
-            else:
-                print '.',
+        man_diff = (set(diff.a_path for diff in diff_index)
+            & set(man_index))
+        print man_diff
         print
         #import ipdb ; ipdb.set_trace()
         old = new
