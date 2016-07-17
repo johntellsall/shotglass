@@ -1,9 +1,9 @@
 import os
 
-# import pytest
-
 import git
+
 import sg2
+
 
 test_git = git.Repo(os.path.expanduser('~/src/iproute2')).git
 
