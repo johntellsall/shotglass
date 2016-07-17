@@ -1,0 +1,32 @@
+============================= test session starts ==============================
+platform linux2 -- Python 2.7.6, pytest-2.9.1, py-1.4.31, pluggy-0.3.1
+django settings: shotglass.settings (from ini file)
+rootdir: /home/johnm/src/shotglass/shotglass, inifile: pytest.ini
+plugins: django-2.9.1, profiling-1.1.1
+49 manpages
+v3.1.0 :   +                                   -        + .
+v3.2.0 :       -   ---+ -++  ++*                 +    +   .
+v3.3.0 :   ..  .   .... ...  ..-                 -   - +   
+v3.4.0 :      .   +            . ..  .    -       .        
+v3.5.0 :     +                         .   +. +  .  .     +
+v3.5.1 :                                                   
+v3.6.0 :     -                 -      .   . .+            +
+v3.7.0 :   .      -     .  +   .                           
+v3.8.0 :  .+-- -   ---.-- .  - -             .            .
+v3.9.0 :    .+    -          .+-        ..   ..          --
+v3.10.0:     -     -  - - - ----.     .      -          -  
+v3.11.0:                                                   
+v3.12.0:     -            -  .  .  -                       
+v3.14.0:              -               -         +  +      .
+v3.14.1:                                                   
+v3.15.0:     -                                      .    - 
+v3.16.0:                    -                              
+v3.17.0:                                                   
+v3.18.0:        -.  -   .     ..                           
+v3.19.0:     -          -      -      -                   -
+v4.0.0 :    .- .  ..... - -  . -    . . ....- .. . . .-. .-
+collected 1 items
+
+app/tests/test_sg2.py .
+
+================= 1 passed, 1 pytest-warnings in 0.52 seconds ==================

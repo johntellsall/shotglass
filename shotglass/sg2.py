@@ -36,6 +36,20 @@ def parse_diff_changes(diff_text):
     re_path_num = re.compile(r'^\s(\S+).+?(\d+)', re.MULTILINE)
     return re_path_num.finditer(diff_text)
 
+def format_path_changes(all_paths, path_changes):
+    def format_diff_value(value):
+        return '?.-+*'[len(value)]
+
+    change_dict = dict(match.groups() for match in path_changes)
+    def format_chars():
+        for path in all_paths:
+            if path not in change_dict:
+                yield ' '
+            else:
+                yield format_diff_value(change_dict[path])
+    return ''.join(format_chars())
+
+
 re_manpage = re.compile('man/.+[0-9]$')
 git = test_repo.git
 diff_text = git.diff(range_all, stat=True)
@@ -53,8 +67,7 @@ if 1:
     old = tags.pop(0)
     for new in tags:
         diff_index = old.commit.diff(new)
-        print '{:7} - {:7}: {} commits'.format(
-            old.name, new.name, len(diff_index))
+        print '{:7}: '.format(new.name),
         man_diff_paths = (set(diff.a_path for diff in diff_index)
             & set(man_index))
         diff_text = git.diff(
@@ -62,7 +75,8 @@ if 1:
             *man_diff_paths,
             stat=True)
         diff_path_changes = parse_diff_changes(diff_text)
-        print [m.groups() for m in diff_path_changes]
+        print format_path_changes(man_paths, diff_path_changes)
+        # print [m.groups() for m in diff_path_changes]
         #import ipdb ; ipdb.set_trace()
         old = new
 
