@@ -10,12 +10,13 @@ tags = [tag.name.lstrip('v') for tag in repo.tags
 tags.sort(key=lambda st: map(int, st.lstrip('v').split('.')))
 tags = [repo.tags['v'+version] for version in tags]
 
-old = tags.pop(0)
-for new in tags:
-    diff_index = old.commit.diff(new)
-    print '{:7} - {:7}: {} commits'.format(
-        old.name, new.name, len(diff_index))
-    old = new
+def show_version_diffs():
+    old = tags.pop(0)
+    for new in tags:
+        diff_index = old.commit.diff(new)
+        print '{:7} - {:7}: {} commits'.format(
+            old.name, new.name, len(diff_index))
+        old = new
 
 # IDEA: use iter_change_type('A') to get all file paths, even if they've been renamed/deleted
 # Or: git.diff('v3.0.0..v4.0.0',name_status=True)
@@ -25,8 +26,14 @@ for new in tags:
 range_1 = 'v3.0.0..v3.1.0'
 range_all = 'v3.0.0..v4.0.0'
 
-def zoot(mygit):
+# TODO: skip "total" at end
+def zoot(mygit, myrange):
     re_path_num = re.compile(r'^\s(\S+).+?(\d+)', re.MULTILINE)
-    diff_text = mygit.diff(range_1, stat=True)
+    diff_text = mygit.diff(myrange, stat=True)
     return re_path_num.finditer(diff_text)
 
+re_manpage = re.compile('man/.+[0-9]$')
+git = repo.git
+man_paths = [match.group(1) for match in zoot(repo.git, range_all)
+    if re_manpage.match(match.group(1))]
+print man_paths
