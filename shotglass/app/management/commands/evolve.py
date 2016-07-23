@@ -1,6 +1,11 @@
+"""
+evolve.py -- show code changes over time
+"""
+
 import os
 import re
 
+from django.core.management.base import BaseCommand
 from git import Repo
 
 
@@ -27,7 +32,6 @@ def show_version_diffs(tags):
 
 range_1 = 'v3.0.0..v3.1.0'
 range_all = 'v3.0.0..v4.0.0'
-test_repo = Repo(os.path.expanduser('~/src/iproute2'))
 
 
     
@@ -50,20 +54,20 @@ def format_path_changes(all_paths, path_changes):
     return ''.join(format_chars())
 
 
-re_manpage = re.compile('man/.+[0-9]$')
-git = test_repo.git
-diff_text = git.diff(range_all, stat=True)
+def main(repo):
+    re_manpage = re.compile('man/.+[0-9]$')
+    git = repo.git
+    diff_text = git.diff(range_all, stat=True)
 
-man_paths = [match.group(1) for match in parse_diff_changes(diff_text)
-    if re_manpage.match(match.group(1))]
-man_paths.sort()
+    man_paths = [match.group(1) for match in parse_diff_changes(diff_text)
+        if re_manpage.match(match.group(1))]
+    man_paths.sort()
 
-print len(man_paths), 'manpages'
-man_index = dict((path, index)
-    for index,path in enumerate(man_paths))
+    print len(man_paths), 'manpages'
+    man_index = dict((path, index)
+        for index,path in enumerate(man_paths))
 
-if 1:
-    tags = get_tags(test_repo)
+    tags = get_tags(repo)
     old = tags.pop(0)
     for new in tags:
         diff_index = old.commit.diff(new)
@@ -76,7 +80,16 @@ if 1:
             stat=True)
         diff_path_changes = parse_diff_changes(diff_text)
         print format_path_changes(man_paths, diff_path_changes)
-        # print [m.groups() for m in diff_path_changes]
-        #import ipdb ; ipdb.set_trace()
         old = new
 
+
+class Command(BaseCommand):
+    help = __doc__
+
+    def add_arguments(self, parser):
+        parser.add_argument('project_dirs', nargs='+')
+
+    def handle(self, *args, **options):
+        for project_dir in options['project_dirs']:
+            repo = Repo(os.path.expanduser(project_dir))
+            main(repo)
