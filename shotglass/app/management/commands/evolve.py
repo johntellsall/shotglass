@@ -7,7 +7,7 @@ import re
 
 from django.core.management.base import BaseCommand
 from git import Repo
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 def get_tags(repo):
@@ -55,6 +55,11 @@ def format_path_changes(all_paths, path_changes):
                 yield format_diff_value(change_dict[path])
     return ''.join(format_chars())
 
+def render_image(repo):
+    plt.plot([1,2,3,4])
+    plt.ylabel('some numbers')
+    # XX plt.show()
+    plt.savefig('z.png')
 
 def render_text(repo):
     re_manpage = re.compile('man/')
