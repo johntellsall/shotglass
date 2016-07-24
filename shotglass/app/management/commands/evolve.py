@@ -75,29 +75,34 @@ def get_paths(repo):
 
 
 def render_image(repo, matchfunc):
-    paths = filter(matchfunc, get_paths(repo))
-    print paths
+    good_paths = filter(matchfunc, get_paths(repo))
+    print good_paths
     tags = get_tags(repo)
 
-    path_index = dict((path, index)
-        for index,path in enumerate(paths))
+    good_index = dict((path, index)
+        for index,path in enumerate(good_paths))
+
+# TODO: currently does git-diff, then re-does diff to get each
+# "good" path's contribution.  Simplify to just do git-diff once.
 
     symbols = []
     old = tags.pop(0)
     for y,new in enumerate(tags):
         diff_index = old.commit.diff(new)
-        print '{:7}: {:3}'.format(new.name, len(diff_index))
         diff_versions = '{}..{}'.format(old.name, new.name)
-        diff_paths = set(paths) & set(path_index)
         old = new
+        print '{:7}: {:3}'.format(new.name, len(diff_index))
+        diff_paths = set(d.a_path for d in diff_index) & set(good_paths)
         if not diff_paths:
+            # version has diffs, but not in the region of interest
+            print '- skip:', new
             continue
         diff_text = repo.git.diff(diff_versions, *diff_paths, stat=True)
         diff_path_changes = parse_diff_changes(diff_text)
         for path,diff_count in (
             match.groups() for match in diff_path_changes):
             try:
-                x = path_index[path]
+                x = good_index[path]
             except IndexError:
                 print '?', path
                 continue
