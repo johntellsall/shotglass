@@ -87,13 +87,12 @@ def render_image(repo, matchfunc):
     for y,new in enumerate(tags):
         diff_index = old.commit.diff(new)
         print '{:7}: {:3}'.format(new.name, len(diff_index))
+        diff_versions = '{}..{}'.format(old.name, new.name)
         diff_paths = set(paths) & set(path_index)
+        old = new
         if not diff_paths:
             continue
-        diff_text = repo.git.diff(
-            '{}..{}'.format(old.name, new.name),
-            *diff_paths,
-            stat=True)
+        diff_text = repo.git.diff(diff_versions, *diff_paths, stat=True)
         diff_path_changes = parse_diff_changes(diff_text)
         for path,diff_count in (
             match.groups() for match in diff_path_changes):
@@ -104,7 +103,6 @@ def render_image(repo, matchfunc):
                 continue
             area = 6 * len(diff_count)
             symbols.append((x, y, area))
-        old = new
 
     xs, ys, areas = zip(*symbols)
     plt.scatter(xs, ys, s=areas)
