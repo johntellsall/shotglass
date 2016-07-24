@@ -76,6 +76,7 @@ def get_paths(repo):
 
 def render_image(repo, matchfunc):
     paths = filter(matchfunc, get_paths(repo))
+    print paths
     tags = get_tags(repo)
 
     path_index = dict((path, index)
@@ -86,13 +87,12 @@ def render_image(repo, matchfunc):
     for y,new in enumerate(tags):
         diff_index = old.commit.diff(new)
         print '{:7}: {:3}'.format(new.name, len(diff_index))
-        man_diff_paths = (set(diff.a_path for diff in diff_index)
-            & set(path_index))
-        if not man_diff_paths:
+        diff_paths = set(paths) & set(path_index)
+        if not diff_paths:
             continue
         diff_text = repo.git.diff(
-            '{}..{}'.format(old.name, new.name), 
-            *man_diff_paths,
+            '{}..{}'.format(old.name, new.name),
+            *diff_paths,
             stat=True)
         diff_path_changes = parse_diff_changes(diff_text)
         for path,diff_count in (
@@ -102,8 +102,7 @@ def render_image(repo, matchfunc):
             except IndexError:
                 print '?', path
                 continue
-            area = 8 * len(diff_count)
-            # '?.os*'[len(diff_count)]
+            area = 6 * len(diff_count)
             symbols.append((x, y, area))
         old = new
 
@@ -112,6 +111,7 @@ def render_image(repo, matchfunc):
     plt.xlabel('file index')
     plt.ylabel('version index')
     plt.savefig('z.png')
+    plt.savefig('z.svg')
 
 
 def render_text(repo, matchfunc):
@@ -126,11 +126,10 @@ def render_text(repo, matchfunc):
     for new in tags:
         diff_index = old.commit.diff(new)
         print '{:7}: {:3}'.format(new.name, len(diff_index)),
-        man_diff_paths = (set(diff.a_path for diff in diff_index)
-            & set(path_index))
+        diff_paths = set(paths) & set(path_index)
         diff_text = repo.git.diff(
             '{}..{}'.format(old.name, new.name), 
-            *man_diff_paths,
+            *diff_paths,
             stat=True)
         diff_path_changes = parse_diff_changes(diff_text)
         print format_path_changes(paths, diff_path_changes)
@@ -149,7 +148,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         render_func = globals()['render_{}'.format(options['style'])]
         matchfunc = {
-        'manpage': Matcher(r'man/').match,
+        # manpage -- in "man" subdir ending in .8 or .in
+        'manpage': Matcher(r'man/.*[0-9n]$').match,
         'source': Matcher(r'\.[ch]$').match,
         }.get(options['match']) or all_matcher
 
