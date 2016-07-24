@@ -7,6 +7,7 @@ import re
 
 from django.core.management.base import BaseCommand
 from git import Repo
+# import matplotlib.pyplot as plt
 
 
 def get_tags(repo):
