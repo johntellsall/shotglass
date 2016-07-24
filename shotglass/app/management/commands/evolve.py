@@ -75,7 +75,7 @@ def get_paths(repo):
 
 
 def render_image(repo, matchfunc):
-    paths = get_paths(repo, matchfunc)
+    paths = filter(matchfunc, get_paths(repo))
     tags = get_tags(repo)
 
     path_index = dict((path, index)
@@ -117,7 +117,7 @@ def render_image(repo, matchfunc):
 def render_text(repo, matchfunc):
     paths = filter(matchfunc, get_paths(repo))
 
-    print len(paths), 'manpages'
+    print len(paths), 'files'
     path_index = dict((path, index)
         for index,path in enumerate(paths))
 
