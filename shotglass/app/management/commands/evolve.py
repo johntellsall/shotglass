@@ -57,18 +57,25 @@ def format_path_changes(all_paths, path_changes):
     return ''.join(format_chars())
 
 
+class Matcher(object):
+    def __init__(self, pattern):
+        self.match = re.compile(pattern).search
+
+class ManpageMatcher(Matcher):
+    def __init__(self):
+        super(ManpageMatcher, self).__init__('man/')
+
+all_matcher = str
+
+
 def get_paths(repo):
-    re_manpage = re.compile('man/')
     diff_text = repo.git.diff(range_all, stat=True)
-
-    man_paths = [match.group(1) for match in parse_diff_changes(diff_text)
-        if re_manpage.match(match.group(1))]
-    man_paths.sort()
-    return man_paths
+    all_paths = (match.group(1) for match in parse_diff_changes(diff_text))
+    return sorted(all_paths)
 
 
-def render_image(repo):
-    paths = get_paths(repo)
+def render_image(repo, matchfunc):
+    paths = get_paths(repo, matchfunc)
     tags = get_tags(repo)
 
     path_index = dict((path, index)
@@ -107,8 +114,8 @@ def render_image(repo):
     plt.savefig('z.png')
 
 
-def render_text(repo):
-    paths = get_paths(repo)
+def render_text(repo, matchfunc):
+    paths = filter(matchfunc, get_paths(repo))
 
     print len(paths), 'manpages'
     path_index = dict((path, index)
@@ -134,12 +141,18 @@ class Command(BaseCommand):
     help = __doc__
 
     def add_arguments(self, parser):
+        parser.add_argument('--match', choices=('manpage', 'source'))
         parser.add_argument('--style', choices=('text', 'image'), 
             default='image')
         parser.add_argument('project_dirs', nargs='+')
 
     def handle(self, *args, **options):
         render_func = globals()['render_{}'.format(options['style'])]
+        matchfunc = {
+        'manpage': Matcher(r'man/').match,
+        'source': Matcher(r'\.[ch]$').match,
+        }.get(options['match']) or all_matcher
+
         for project_dir in options['project_dirs']:
             repo = Repo(os.path.expanduser(project_dir))
-            render_func(repo)
+            render_func(repo, matchfunc)
