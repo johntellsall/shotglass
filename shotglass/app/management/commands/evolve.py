@@ -29,6 +29,7 @@ def show_version_diffs(tags):
 # Or: git.diff('v3.0.0..v4.0.0',name_status=True)
 # ALSO
 # - git.diff('v3.0.0..v3.1.0',dirstat=True)
+# TODO: git blame --porcelain v3.0.0..v4.0.0 ip-fou.8
 
 range_1 = 'v3.0.0..v3.1.0'
 range_all = 'v3.0.0..v4.0.0'
@@ -54,7 +55,7 @@ def format_path_changes(all_paths, path_changes):
     return ''.join(format_chars())
 
 
-def main(repo):
+def render_text(repo):
     re_manpage = re.compile('man/')
     git = repo.git
     diff_text = git.diff(range_all, stat=True)
@@ -87,9 +88,12 @@ class Command(BaseCommand):
     help = __doc__
 
     def add_arguments(self, parser):
+        parser.add_argument('--style', choices=('text', 'image'), 
+            default='image')
         parser.add_argument('project_dirs', nargs='+')
 
     def handle(self, *args, **options):
+        render_func = globals()['render_{}'.format(options['style'])]
         for project_dir in options['project_dirs']:
             repo = Repo(os.path.expanduser(project_dir))
-            main(repo)
+            render_func(repo)
