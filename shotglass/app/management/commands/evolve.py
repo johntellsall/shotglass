@@ -36,10 +36,11 @@ range_1 = 'v3.0.0..v3.1.0'
 range_all = 'v3.0.0..v4.0.0'
 
 
-    
 # TODO: skip "total" at end
 def parse_diff_changes(diff_text):
-    re_path_num = re.compile(r'^\s(\S+).+?(\d+)', re.MULTILINE)
+    re_path_num = re.compile(
+        r'^\s(\S+) .+? \| \s+ (\d+)', 
+        re.MULTILINE | re.VERBOSE)
     return re_path_num.finditer(diff_text)
 
 def format_path_changes(all_paths, path_changes):
@@ -55,24 +56,63 @@ def format_path_changes(all_paths, path_changes):
                 yield format_diff_value(change_dict[path])
     return ''.join(format_chars())
 
-def render_image(repo):
-    plt.plot([1,2,3,4])
-    plt.ylabel('some numbers')
-    # XX plt.show()
-    plt.savefig('z.png')
 
-def render_text(repo):
+def get_paths(repo):
     re_manpage = re.compile('man/')
-    git = repo.git
-    diff_text = git.diff(range_all, stat=True)
+    diff_text = repo.git.diff(range_all, stat=True)
 
     man_paths = [match.group(1) for match in parse_diff_changes(diff_text)
         if re_manpage.match(match.group(1))]
     man_paths.sort()
+    return man_paths
 
-    print len(man_paths), 'manpages'
-    man_index = dict((path, index)
-        for index,path in enumerate(man_paths))
+
+def render_image(repo):
+    paths = get_paths(repo)
+    tags = get_tags(repo)
+
+    path_index = dict((path, index)
+        for index,path in enumerate(paths))
+
+    symbols = []
+    old = tags.pop(0)
+    for y,new in enumerate(tags):
+        diff_index = old.commit.diff(new)
+        print '{:7}: {:3}'.format(new.name, len(diff_index))
+        man_diff_paths = (set(diff.a_path for diff in diff_index)
+            & set(path_index))
+        if not man_diff_paths:
+            continue
+        diff_text = repo.git.diff(
+            '{}..{}'.format(old.name, new.name), 
+            *man_diff_paths,
+            stat=True)
+        diff_path_changes = parse_diff_changes(diff_text)
+        for path,diff_count in (
+            match.groups() for match in diff_path_changes):
+            try:
+                x = path_index[path]
+            except IndexError:
+                print '?', path
+                continue
+            area = 8 * len(diff_count)
+            # '?.os*'[len(diff_count)]
+            symbols.append((x, y, area))
+        old = new
+
+    xs, ys, areas = zip(*symbols)
+    plt.scatter(xs, ys, s=areas)
+    plt.xlabel('file index')
+    plt.ylabel('version index')
+    plt.savefig('z.png')
+
+
+def render_text(repo):
+    paths = get_paths(repo)
+
+    print len(paths), 'manpages'
+    path_index = dict((path, index)
+        for index,path in enumerate(paths))
 
     tags = get_tags(repo)
     old = tags.pop(0)
@@ -80,13 +120,13 @@ def render_text(repo):
         diff_index = old.commit.diff(new)
         print '{:7}: {:3}'.format(new.name, len(diff_index)),
         man_diff_paths = (set(diff.a_path for diff in diff_index)
-            & set(man_index))
-        diff_text = git.diff(
+            & set(path_index))
+        diff_text = repo.git.diff(
             '{}..{}'.format(old.name, new.name), 
             *man_diff_paths,
             stat=True)
         diff_path_changes = parse_diff_changes(diff_text)
-        print format_path_changes(man_paths, diff_path_changes)
+        print format_path_changes(paths, diff_path_changes)
         old = new
 
 
