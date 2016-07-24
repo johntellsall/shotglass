@@ -58,8 +58,50 @@ Overall workflow:
     $ ./manage.py render django
 ```
 
-
 ![Django](images/django_path.png)
+
+# Code over Time
+
+An important consideration is analyzing how code changes over time. For each release, how has the code changed? Many small patches implies code fixes. If a new big feature was merged in it will appear as a big spike in one file, with smaller patches in other files.  A security release will have a couple patches in a couple files.
+
+Here are the changes for manpages in the "iproute2" (aka "ip", the successor to "route").  A few things to note:
+
+- each release notes how many total changes there were
+- also, there's one char per manpage, showing num of patches
+- space = no changes, "." = 1-9 changes, -=10-99, +=100+, *=1000+
+
+For this specific project, iproute2:
+
+- v3.2 brought substantial changes to 8 manpages
+- the next release modifies those exact 8 manpages a bit
+- 3.8 and 3.10 have many small changes, mostly grammatical
+- 4.0, as befitting a major release, makes minor tweaks to nearly every manpage. Examination shows minor changes (changing from two to one space after a sentence), and a number of additions.
+- 3.5.1 and 3.14.1 have very few changes, and none on the manpages - these were probably important bugfix/security releases. This makes considering these are the only "point" (x.x.Y) versions.
+- 3.2 has a rare 2,700 line change, shown here with "*".  Looking it more closesly shows the ip.8 manpage was split into many sub-manpages, like ip-link.8 and ip-route.8.  ("git diff --stat v3.1.0..v3.2.0 man/man8")
+
+    v3.1.0 :  15  +                                   -        + .
+    v3.2.0 :  73      -   ---+ -++  ++*                 +    +   .
+    v3.3.0 :  60  ..  .   .... ...  ..-                 -   - +   
+    v3.4.0 :  61     .   +            . ..  .    -       .        
+    v3.5.0 :  43    +                         .   +. +  .  .     +
+    v3.5.1 :   4                                                  
+    v3.6.0 :  45    -                 -      .   . .+            +
+    v3.7.0 :  52  .      -     .  +   .                           
+    v3.8.0 : 131 .+-- -   ---.-- .  - -             .            .
+    v3.9.0 :  55   .+    -          .+-        ..   ..          --
+    v3.10.0:  52    -     -  - - - ----.     .      -          -  
+    v3.11.0:  36                                                  
+    v3.12.0:  41    -            -  .  .  -                       
+    v3.14.0:  81             -               -         +  +      .
+    v3.14.1:   1                                                  
+    v3.15.0:  46    -                                      .    - 
+    v3.16.0:  30                   -                              
+    v3.17.0:  50                                                  
+    v3.18.0:  83       -.  -   .     ..                           
+    v3.19.0:  56    -          -      -      -                   -
+    v4.0.0 :  79   .- .  ..... - -  . -    . . ....- .. . . .-. .-
+
+
 
 # [MORE DEMOS](DEMOS.md)
 

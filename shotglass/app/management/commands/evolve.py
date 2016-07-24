@@ -42,7 +42,7 @@ def parse_diff_changes(diff_text):
 
 def format_path_changes(all_paths, path_changes):
     def format_diff_value(value):
-        return '?.-+*'[len(value)]
+        return '?.-+*ABCD'[len(value)]
 
     change_dict = dict(match.groups() for match in path_changes)
     def format_chars():
@@ -55,7 +55,7 @@ def format_path_changes(all_paths, path_changes):
 
 
 def main(repo):
-    re_manpage = re.compile('man/.+[0-9]$')
+    re_manpage = re.compile('man/')
     git = repo.git
     diff_text = git.diff(range_all, stat=True)
 
