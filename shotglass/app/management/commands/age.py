@@ -5,6 +5,7 @@ age.py -- show age of code
 # list files in Git branch
 # git ls-tree --name-status --full-tree -r v4.0.0
 
+import datetime
 import os
 import re
 
@@ -124,35 +125,25 @@ def render_image(repo, matchfunc):
     plt.savefig('z.svg')
 
 
-def OLD_render_text(repo, matchfunc):
-    paths = filter(matchfunc, get_paths(repo))
-
-    print len(paths), 'files'
-    path_index = dict((path, index)
-        for index,path in enumerate(paths))
-
-    tags = get_tags(repo)
-    old = tags.pop(0)
-    for new in tags:
-        diff_index = old.commit.diff(new)
-        print '{:7}: {:3}'.format(new.name, len(diff_index)),
-        diff_paths = set(paths) & set(path_index)
-        diff_text = repo.git.diff(
-            '{}..{}'.format(old.name, new.name), 
-            *diff_paths,
-            stat=True)
-        diff_path_changes = parse_diff_changes(diff_text)
-        print format_path_changes(paths, diff_path_changes)
-        old = new
-
 def render_text(repo, matchfunc):
+    def format_age(mycommit):
+        """
+        format commit age as single character
+        * recent (1-9 days); + 10-99 days, - 100-999 days
+        """
+        delta = mycommit.authored_datetime - datetime.datetime.now(
+            mycommit.authored_datetime.tzinfo)
+        delta_num = len(str(delta.days)) - 1
+        return '?*+-.'[delta_num]
+
     tag = 'v4.0.0'
-    for path in get_tag_paths(repo, tag):
+    for path in filter(matchfunc, get_tag_paths(repo, tag)):
         blame = repo.blame(tag, path)
-        print path,':'
-        for commit, regions in blame:
-            print commit.authored_datetime.strftime('%x'), len(regions),
-        print
+        def path_age():
+            for commit, regions in blame:
+                yield format_age(commit) * len(regions)
+        print path,':', ''.join(path_age())
+
 
 class Command(BaseCommand):
     help = __doc__
