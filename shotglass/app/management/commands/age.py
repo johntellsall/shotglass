@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 from django.core.management.base import BaseCommand
 from git import Repo
 from palettable import colorbrewer
+from PIL import Image, ImageDraw
 
 
 def get_tags(repo):
@@ -165,8 +166,13 @@ def render_image(repo, matchfunc):
             for commit, regions in blame:
                 yield format_age(commit, latest), len(regions)
 
+    im = Image.new('RGB', (width, height))
+    im_draw = ImageDraw.Draw(self.im)
+
+    image_iter = serpentine_iter(width=width)
     for color, size in iter_source():
-        print color
+        x, y = image_iter.next()
+        print x, y, color
 
 
 def render_text(repo, matchfunc):

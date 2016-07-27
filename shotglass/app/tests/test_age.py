@@ -2,6 +2,7 @@ import itertools
 
 from app.management.commands import age
 
+
 def test_serpentine_iter():
     height, width = 4, 3
     rows = itertools.islice(age.serpentine_iter(width), width*height)
