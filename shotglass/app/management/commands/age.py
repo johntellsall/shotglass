@@ -1,6 +1,7 @@
 """
 age.py -- show age of code
 """
+# pylint: disable=W0640
 
 # list files in Git branch
 # git ls-tree --name-status --full-tree -r v4.0.0
@@ -82,6 +83,13 @@ def get_tag_paths(repo, tag):
         tag, full_tree=True, name_status=True, r=True)
     return ls_tree_text.split('\n')
 
+# X probably buggy
+def get_latest_datetime(repo, tag):
+    latest_opts = {'1': True, 'date': 'short', 'format': '%cd'}
+    log_text = repo.git.log(tag, **latest_opts)
+    log_date = datetime.datetime.strptime(log_text, '%Y-%m-%d')
+    return log_date
+
 def render_image(repo, matchfunc):
     good_paths = filter(matchfunc, get_paths(repo))
     print good_paths
@@ -126,22 +134,23 @@ def render_image(repo, matchfunc):
 
 
 def render_text(repo, matchfunc):
-    def format_age(mycommit):
+    def format_age(mycommit, mylatest):
         """
         format commit age as single character
-        * recent (1-9 days); + 10-99 days, - 100-999 days
+        * recent (0-9 days); + 10-99 days, - 100-999 days
         """
-        delta = mycommit.authored_datetime - datetime.datetime.now(
-            mycommit.authored_datetime.tzinfo)
-        delta_num = len(str(delta.days)) - 1
+        authored_dt = mycommit.authored_datetime.replace(tzinfo=None)
+        delta = mylatest - authored_dt
+        delta_num = len(str(delta.days))
         return '?*+-.'[delta_num]
 
     tag = 'v4.0.0'
+    latest = get_latest_datetime(repo, tag)
     for path in filter(matchfunc, get_tag_paths(repo, tag)):
         blame = repo.blame(tag, path)
         def path_age():
             for commit, regions in blame:
-                yield format_age(commit) * len(regions)
+                yield format_age(commit, latest) * len(regions)
         print path,':', ''.join(path_age())
 
 
