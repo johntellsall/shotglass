@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from django.core.management.base import BaseCommand
 from git import Repo
 from palettable import colorbrewer
-from PIL import Image, ImageDraw
+from PIL import Image, ImageColor, ImageDraw
 
 
 def get_tags(repo):
@@ -146,6 +146,7 @@ def serpentine_iter(width):
 
 def render_image(repo, matchfunc):
     width = 100
+    height = 1000
     colors = colorbrewer.diverging.RdBu_11_r.hex_colors
 
     def format_age(mycommit, mylatest):
@@ -167,12 +168,14 @@ def render_image(repo, matchfunc):
                 yield format_age(commit, latest), len(regions)
 
     im = Image.new('RGB', (width, height))
-    im_draw = ImageDraw.Draw(self.im)
+    im_draw = ImageDraw.Draw(im)
 
     image_iter = serpentine_iter(width=width)
     for color, size in iter_source():
-        x, y = image_iter.next()
-        print x, y, color
+        points = [image_iter.next() for index in [0]] # X size
+        print points, color
+        im_draw.point(points, fill=(200, 60, 20))
+    im.save('z.png')
 
 
 def render_text(repo, matchfunc):
