@@ -7,12 +7,14 @@ age.py -- show age of code
 # git ls-tree --name-status --full-tree -r v4.0.0
 
 import datetime
+import math
 import os
 import re
 
+import matplotlib.pyplot as plt
 from django.core.management.base import BaseCommand
 from git import Repo
-import matplotlib.pyplot as plt
+from palettable import colorbrewer
 
 
 def get_tags(repo):
@@ -90,7 +92,7 @@ def get_latest_datetime(repo, tag):
     log_date = datetime.datetime.strptime(log_text, '%Y-%m-%d')
     return log_date
 
-def render_image(repo, matchfunc):
+def OLD_render_image(repo, matchfunc):
     good_paths = filter(matchfunc, get_paths(repo))
     print good_paths
     tags = get_tags(repo)
@@ -132,6 +134,40 @@ def render_image(repo, matchfunc):
     plt.savefig('z.png')
     plt.savefig('z.svg')
 
+def serpentine_iter(width):
+    y = 0
+    while True:
+        for x in xrange(width):
+            yield x, y
+        for x in xrange(width):
+            yield width - x - 1, y + 1
+        y += 2
+
+def render_image(repo, matchfunc):
+    width = 100
+    colors = colorbrewer.diverging.RdBu_11_r.hex_colors
+
+    def format_age(mycommit, mylatest):
+        """
+        format commit age as single character
+        0-9 days / 10-99 days / 100-999 days
+        """
+        authored_dt = mycommit.authored_datetime.replace(tzinfo=None)
+        delta = mylatest - authored_dt
+        delta_num = math.log10(delta.days + 1) + 1.0
+        return colors[int(delta_num)]
+
+    tag = 'v4.0.0'
+    def iter_source():
+        latest = get_latest_datetime(repo, tag)
+        for path in filter(matchfunc, get_tag_paths(repo, tag)):
+            blame = repo.blame(tag, path)
+            for commit, regions in blame:
+                yield format_age(commit, latest), len(regions)
+
+    for color, size in iter_source():
+        print color
+
 
 def render_text(repo, matchfunc):
     def format_age(mycommit, mylatest):
@@ -151,7 +187,7 @@ def render_text(repo, matchfunc):
         def path_age():
             for commit, regions in blame:
                 yield format_age(commit, latest) * len(regions)
-        print path,':', ''.join(path_age())
+        print path, ':', ''.join(path_age())
 
 
 class Command(BaseCommand):
