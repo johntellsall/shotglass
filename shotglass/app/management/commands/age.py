@@ -147,7 +147,8 @@ def serpentine_iter(width):
 def render_image(repo, matchfunc):
     width = 100
     height = 1000
-    colors = colorbrewer.diverging.RdBu_11_r.hex_colors
+    COLORMAP = [tuple(color) for color in 
+        colorbrewer.diverging.RdBu_11_r.colors]
 
     def format_age(mycommit, mylatest):
         """
@@ -157,7 +158,7 @@ def render_image(repo, matchfunc):
         authored_dt = mycommit.authored_datetime.replace(tzinfo=None)
         delta = mylatest - authored_dt
         delta_num = math.log10(delta.days + 1) + 1.0
-        return colors[int(delta_num)]
+        return COLORMAP[int(delta_num)]
 
     tag = 'v4.0.0'
     def iter_source():
@@ -172,9 +173,8 @@ def render_image(repo, matchfunc):
 
     image_iter = serpentine_iter(width=width)
     for color, size in iter_source():
-        points = [image_iter.next() for index in [0]] # X size
-        print points, color
-        im_draw.point(points, fill=(200, 60, 20))
+        points = [image_iter.next() for _ in xrange(size)]
+        im_draw.point(points, fill=color)
     im.save('z.png')
 
 
