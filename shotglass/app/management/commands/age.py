@@ -160,6 +160,8 @@ def render_image(repo, matchfunc):
         authored_dt = mycommit.authored_datetime.replace(tzinfo=None)
         delta_days = (mylatest - authored_dt).days
         assert delta_days >= 0
+        if delta_days > MAX_DAYS:
+            return (50, 50, 50) # old = dark grey
         delta_days = min(delta_days, MAX_DAYS)
         delta_num = math.log10(delta_days + 1)
         delta_index = delta_num * CMAP_SCALE
