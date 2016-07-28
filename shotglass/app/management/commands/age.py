@@ -18,6 +18,7 @@ from palettable import colorbrewer
 from PIL import Image, ImageDraw
 
 
+BLACK = (0, 0, 0)
 CMAP_NAME = 'PiYG_11'
 CMAP_OBJ = getattr(colorbrewer.diverging, CMAP_NAME)
 CMAP_COLORS = map(tuple, CMAP_OBJ.colors)
@@ -153,7 +154,7 @@ def serpentine_iter(width):
 
 def render_image(repo, matchfunc):
     width = 100
-    height = 1000
+    height = 2000
 
     def format_age(mycommit, mylatest):
         """
@@ -162,7 +163,6 @@ def render_image(repo, matchfunc):
         """
         authored_dt = mycommit.authored_datetime.replace(tzinfo=None)
         delta_days = (mylatest - authored_dt).days
-        # assert delta_days >= 0
         if delta_days < 0:
             print 'UHOH:', delta_days
             return (255, 0, 0) # new = hot red
@@ -183,11 +183,12 @@ def render_image(repo, matchfunc):
 
     im = Image.new('RGB', (width, height))
     im_draw = ImageDraw.Draw(im)
+    im_pixel = im.load()
 
     image_iter = serpentine_iter(width=width)
     for color, size in iter_source():
-        points = [image_iter.next() for _ in xrange(size)]
-        im_draw.point(points, fill=color)
+        for _ in xrange(size):
+            im_pixel[image_iter.next()] = color
     im.save('z.png')
 
 
