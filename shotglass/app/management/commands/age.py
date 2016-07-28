@@ -147,8 +147,10 @@ def serpentine_iter(width):
 def render_image(repo, matchfunc):
     width = 100
     height = 1000
-    COLORMAP = [tuple(color) for color in 
+    CMAP_COLORS = [tuple(color) for color in 
         colorbrewer.diverging.RdBu_11_r.colors]
+    MAX_DAYS = 5 * 365
+    CMAP_SCALE = (len(CMAP_COLORS) - 1) / math.log10(MAX_DAYS)
 
     def format_age(mycommit, mylatest):
         """
@@ -156,9 +158,12 @@ def render_image(repo, matchfunc):
         0-9 days / 10-99 days / 100-999 days
         """
         authored_dt = mycommit.authored_datetime.replace(tzinfo=None)
-        delta = mylatest - authored_dt
-        delta_num = math.log10(delta.days + 1) + 1.0
-        return COLORMAP[int(delta_num)]
+        delta_days = (mylatest - authored_dt).days
+        assert delta_days >= 0
+        delta_days = min(delta_days, MAX_DAYS)
+        delta_num = math.log10(delta_days + 1)
+        delta_index = delta_num * CMAP_SCALE
+        return CMAP_COLORS[int(delta_index)]
 
     tag = 'v4.0.0'
     def iter_source():
