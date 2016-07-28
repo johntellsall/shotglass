@@ -152,7 +152,7 @@ def serpentine_iter(width):
             yield width - x - 1, y + 1
         y += 2
 
-def render_image(repo, matchfunc):
+def render_image_tag(repo, matchfunc, tag):
     width = 100
     height = 2000
 
@@ -163,34 +163,48 @@ def render_image(repo, matchfunc):
         """
         authored_dt = mycommit.authored_datetime.replace(tzinfo=None)
         delta_days = (mylatest - authored_dt).days
-        if delta_days < 0:
+        if delta_days < -1:
             print 'UHOH:', delta_days
-            return (255, 0, 0) # new = hot red
+            return (255, 0, 0) # bogus = hot red
         if delta_days > MAX_DAYS:
             return (50, 50, 50) # old = dark grey
-        delta_days = min(delta_days, MAX_DAYS)
-        delta_num = math.log10(delta_days + 1)
-        delta_index = delta_num * CMAP_SCALE
-        return CMAP_COLORS[int(delta_index)]
+        delta_days = min(max(0, delta_days), MAX_DAYS)
+        if 0:
+            delta_num = math.log10(delta_days + 1)
+            delta_index = delta_num * CMAP_SCALE
+        else:
+            delta_index = len(CMAP_COLORS) * delta_days / MAX_DAYS
+        try:
+            return CMAP_COLORS[int(delta_index)]
+        except IndexError:
+            print 'UHOH:', delta_index
+            return (40, 40, 40)
 
-    tag = 'v4.0.0'
     def iter_source():
         latest = get_latest_datetime(repo, tag)
+        print '-', tag, latest
         for path in filter(matchfunc, get_tag_paths(repo, tag)):
             blame = repo.blame(tag, path)
             for commit, regions in blame:
                 yield format_age(commit, latest), len(regions)
 
     im = Image.new('RGB', (width, height))
-    im_draw = ImageDraw.Draw(im)
     im_pixel = im.load()
 
     image_iter = serpentine_iter(width=width)
     for color, size in iter_source():
         for _ in xrange(size):
             im_pixel[image_iter.next()] = color
-    im.save('z.png')
+    return im
 
+def render_image(repo, matchfunc):
+    num_tags = 10
+    image = Image.new('RGB', ( (100+10)*num_tags, 2000))
+    for index,tag in enumerate(get_tags(repo)[:num_tags]):
+        print tag, ':'
+        subimage = render_image_tag(repo, matchfunc, tag)
+        image.paste(subimage, (110*index, 0))
+    image.save('z.png')
 
 def render_text(repo, matchfunc):
     def format_age(mycommit, mylatest):
