@@ -15,7 +15,14 @@ import matplotlib.pyplot as plt
 from django.core.management.base import BaseCommand
 from git import Repo
 from palettable import colorbrewer
-from PIL import Image, ImageColor, ImageDraw
+from PIL import Image, ImageDraw
+
+
+CMAP_NAME = 'PiYG_11'
+CMAP_OBJ = getattr(colorbrewer.diverging, CMAP_NAME)
+CMAP_COLORS = map(tuple, CMAP_OBJ.colors)
+MAX_DAYS = 5 * 365
+CMAP_SCALE = (len(CMAP_COLORS) - 1) / math.log10(MAX_DAYS)
 
 
 def get_tags(repo):
@@ -147,10 +154,6 @@ def serpentine_iter(width):
 def render_image(repo, matchfunc):
     width = 100
     height = 1000
-    CMAP_COLORS = [tuple(color) for color in 
-        colorbrewer.diverging.RdBu_11_r.colors]
-    MAX_DAYS = 5 * 365
-    CMAP_SCALE = (len(CMAP_COLORS) - 1) / math.log10(MAX_DAYS)
 
     def format_age(mycommit, mylatest):
         """
@@ -159,7 +162,10 @@ def render_image(repo, matchfunc):
         """
         authored_dt = mycommit.authored_datetime.replace(tzinfo=None)
         delta_days = (mylatest - authored_dt).days
-        assert delta_days >= 0
+        # assert delta_days >= 0
+        if delta_days < 0:
+            print 'UHOH:', delta_days
+            return (255, 0, 0) # new = hot red
         if delta_days > MAX_DAYS:
             return (50, 50, 50) # old = dark grey
         delta_days = min(delta_days, MAX_DAYS)

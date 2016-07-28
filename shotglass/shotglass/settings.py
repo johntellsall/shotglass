@@ -1,8 +1,6 @@
 import os
 import sys
 
-from django.core.management import call_command
-
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -69,6 +67,12 @@ ROOT_URLCONF = 'shotglass.urls'
 
 # statics
 STATIC_URL = '/static/'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
 
 DATABASES = {
     'default': {
