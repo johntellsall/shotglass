@@ -187,6 +187,7 @@ def render_image_tag(repo, matchfunc, tag):
         latest = get_latest_datetime(repo, tag)
         print '-', tag, latest
         for path in filter(matchfunc, get_tag_paths(repo, tag)):
+            print '.', path
             blame = repo.blame(tag, path)
             for commit, regions in blame:
                 yield format_age(commit, latest), len(regions)
@@ -200,11 +201,12 @@ def render_image_tag(repo, matchfunc, tag):
             im_pixel[image_iter.next()] = color
     return im
 
-def render_image(repo, matchfunc):
-    num_tags = 3
-    size = (COL_WIDTH + COL_GAP)*num_tags, COL_HEIGHT
+def render_image(repo, matchfunc, options):
+    tags_limit = options['num_tags'] or 3
+    tags = get_tags(repo)[:tags_limit]
+    size = (COL_WIDTH + COL_GAP)*len(tags), COL_HEIGHT
     image = Image.new('RGB', size)
-    for index,tag in enumerate(get_tags(repo)[:num_tags]):
+    for index,tag in enumerate(tags):
         print tag, ':'
         subimage = render_image_tag(repo, matchfunc, tag)
         image.paste(subimage, ((COL_WIDTH + COL_GAP)*index, 0))
@@ -237,6 +239,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--match', choices=('manpage', 'source'))
+        parser.add_argument('--num_tags', type=int)
         parser.add_argument('--style', choices=('text', 'image'), 
             default='image')
         parser.add_argument('project_dirs', nargs='+')
@@ -251,4 +254,4 @@ class Command(BaseCommand):
 
         for project_dir in options['project_dirs']:
             repo = Repo(os.path.expanduser(project_dir))
-            render_func(repo, matchfunc)
+            render_func(repo, matchfunc, options)
