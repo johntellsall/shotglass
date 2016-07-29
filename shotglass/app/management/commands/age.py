@@ -25,6 +25,9 @@ CMAP_COLORS = map(tuple, CMAP_OBJ.colors)
 MAX_DAYS = 5 * 365
 CMAP_SCALE = (len(CMAP_COLORS) - 1) / math.log10(MAX_DAYS)
 
+COL_WIDTH, COL_HEIGHT = 100, 2000
+COL_GAP = 10
+
 
 def get_tags(repo):
     tags = [tag.name.lstrip('v') for tag in repo.tags
@@ -153,8 +156,8 @@ def serpentine_iter(width):
         y += 2
 
 def render_image_tag(repo, matchfunc, tag):
-    width = 100
-    height = 2000
+    width = COL_WIDTH
+    height = COL_HEIGHT
 
     def format_age(mycommit, mylatest):
         """
@@ -198,12 +201,14 @@ def render_image_tag(repo, matchfunc, tag):
     return im
 
 def render_image(repo, matchfunc):
-    num_tags = 10
-    image = Image.new('RGB', ( (100+10)*num_tags, 2000))
+    num_tags = 3
+    size = (COL_WIDTH + COL_GAP)*num_tags, COL_HEIGHT
+    image = Image.new('RGB', size)
     for index,tag in enumerate(get_tags(repo)[:num_tags]):
         print tag, ':'
         subimage = render_image_tag(repo, matchfunc, tag)
-        image.paste(subimage, (110*index, 0))
+        image.paste(subimage, ((COL_WIDTH + COL_GAP)*index, 0))
+    image = image.crop(image.getbbox())
     image.save('z.png')
 
 def render_text(repo, matchfunc):
