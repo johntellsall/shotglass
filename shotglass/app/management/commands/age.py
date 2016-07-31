@@ -155,33 +155,35 @@ def serpentine_iter(width):
             yield width - x - 1, y + 1
         y += 2
 
+
+def format_age(mycommit, mylatest):
+    """
+    format commit age as single character
+    0-9 days / 10-99 days / 100-999 days
+    """
+    authored_dt = mycommit.authored_datetime.replace(tzinfo=None)
+    delta_days = (mylatest - authored_dt).days
+    if delta_days < -1:
+        print 'UHOH:', delta_days
+        return (255, 0, 0) # bogus = hot red
+    if delta_days > MAX_DAYS:
+        return (50, 50, 50) # old = dark grey
+    delta_days = min(max(0, delta_days), MAX_DAYS)
+    if 0:
+        delta_num = math.log10(delta_days + 1)
+        delta_index = delta_num * CMAP_SCALE
+    else:
+        delta_index = len(CMAP_COLORS) * delta_days / MAX_DAYS
+    try:
+        return CMAP_COLORS[int(delta_index)]
+    except IndexError:
+        print 'UHOH:', delta_index
+        return (40, 40, 40)
+
+
 def render_image_tag(repo, matchfunc, tag):
     width = COL_WIDTH
     height = COL_HEIGHT
-
-    def format_age(mycommit, mylatest):
-        """
-        format commit age as single character
-        0-9 days / 10-99 days / 100-999 days
-        """
-        authored_dt = mycommit.authored_datetime.replace(tzinfo=None)
-        delta_days = (mylatest - authored_dt).days
-        if delta_days < -1:
-            print 'UHOH:', delta_days
-            return (255, 0, 0) # bogus = hot red
-        if delta_days > MAX_DAYS:
-            return (50, 50, 50) # old = dark grey
-        delta_days = min(max(0, delta_days), MAX_DAYS)
-        if 0:
-            delta_num = math.log10(delta_days + 1)
-            delta_index = delta_num * CMAP_SCALE
-        else:
-            delta_index = len(CMAP_COLORS) * delta_days / MAX_DAYS
-        try:
-            return CMAP_COLORS[int(delta_index)]
-        except IndexError:
-            print 'UHOH:', delta_index
-            return (40, 40, 40)
 
     def iter_source():
         latest = get_latest_datetime(repo, tag)
@@ -212,6 +214,7 @@ def render_image(repo, matchfunc, options):
         image.paste(subimage, ((COL_WIDTH + COL_GAP)*index, 0))
     image = image.crop(image.getbbox())
     image.save('z.png')
+
 
 def render_text(repo, matchfunc):
     def format_age(mycommit, mylatest):
