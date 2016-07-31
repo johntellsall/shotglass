@@ -181,24 +181,25 @@ def format_age(mycommit, mylatest):
         return (40, 40, 40)
 
 
+def iter_source(repo, tag, tag_paths):
+    latest = get_latest_datetime(repo, tag)
+    print '-', tag, latest
+    for tag_path in tag_paths:
+        print '.', tag_path
+        blame = repo.blame(tag, tag_path)
+        for commit, regions in blame:
+            yield format_age(commit, latest), len(regions)
+
+
 def render_image_tag(repo, matchfunc, tag):
     width = COL_WIDTH
     height = COL_HEIGHT
-
-    def iter_source():
-        latest = get_latest_datetime(repo, tag)
-        print '-', tag, latest
-        for path in filter(matchfunc, get_tag_paths(repo, tag)):
-            print '.', path
-            blame = repo.blame(tag, path)
-            for commit, regions in blame:
-                yield format_age(commit, latest), len(regions)
+    tag_paths = filter(matchfunc, get_tag_paths(repo, tag))
 
     im = Image.new('RGB', (width, height))
     im_pixel = im.load()
-
     image_iter = serpentine_iter(width=width)
-    for color, size in iter_source():
+    for color, size in iter_source(repo, tag, tag_paths):
         for _ in xrange(size):
             im_pixel[image_iter.next()] = color
     return im
@@ -215,8 +216,17 @@ def render_image(repo, matchfunc, options):
     image = image.crop(image.getbbox())
     image.save('z.png')
 
+# Quickly find all functions (not Python?):
+# git grep --line-number --no-color --show-function --word-regexp 
+# -E '\S'  | egrep '=[0-9]+='
+# Find all directories with source:
+# find . -name '*.py' | xargs dirname | sort -u >source-dirs
 
-def render_text(repo, matchfunc):
+def render_func(repo, matchfunc, options):
+    pass
+# git grep --line-number --no-color --show-function --word-regexp . $(cat source-dirs) | egrep =[0-9]+=
+
+def render_text(repo, matchfunc, options):
     def format_age(mycommit, mylatest):
         """
         format commit age as single character
@@ -235,6 +245,8 @@ def render_text(repo, matchfunc):
             for commit, regions in blame:
                 yield format_age(commit, latest) * len(regions)
         print path, ':', ''.join(path_age())
+
+# find . -name '*.c' | xargs dirname | sort -u
 
 
 class Command(BaseCommand):
