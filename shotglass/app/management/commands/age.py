@@ -224,11 +224,11 @@ def render_image(repo, matchfunc, options):
 # find . -name '*.py' | xargs dirname | sort -u >source-dirs
 
 def render_index(repo, matchfunc, options):
-    func_re = re.compile('(.+?)=(\d+)=(.+)')
-    grep_out = repo.git.grep('.', 'tc', line_number=True, no_color=True, show_function=True,  word_regexp=True)
+    func_re = re.compile(r'(.+?)=(\d+)=(.+)')
+    grep_out = repo.git.grep('.', line_number=True, no_color=True, show_function=True,  word_regexp=True)
     for match in func_re.finditer(grep_out):
         print match.groups()
-    #  . $(cat source-dirs) | egrep =[0-9]+=
+
 
 def render_text(repo, matchfunc, options):
     def format_age(mycommit, mylatest):
