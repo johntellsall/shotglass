@@ -204,6 +204,7 @@ def render_image_tag(repo, matchfunc, tag):
             im_pixel[image_iter.next()] = color
     return im
 
+
 def render_image(repo, matchfunc, options):
     tags_limit = options['num_tags'] or 3
     tags = get_tags(repo)[:tags_limit]
@@ -222,9 +223,12 @@ def render_image(repo, matchfunc, options):
 # Find all directories with source:
 # find . -name '*.py' | xargs dirname | sort -u >source-dirs
 
-def render_func(repo, matchfunc, options):
-    pass
-# git grep --line-number --no-color --show-function --word-regexp . $(cat source-dirs) | egrep =[0-9]+=
+def render_index(repo, matchfunc, options):
+    func_re = re.compile('(.+?)=(\d+)=(.+)')
+    grep_out = repo.git.grep('.', 'tc', line_number=True, no_color=True, show_function=True,  word_regexp=True)
+    for match in func_re.finditer(grep_out):
+        print match.groups()
+    #  . $(cat source-dirs) | egrep =[0-9]+=
 
 def render_text(repo, matchfunc, options):
     def format_age(mycommit, mylatest):
@@ -253,9 +257,12 @@ class Command(BaseCommand):
     help = __doc__
 
     def add_arguments(self, parser):
+        render_styles = [name.split('_')[-1] for name in globals()
+            if name.startswith('render_')]
+
         parser.add_argument('--match', choices=('manpage', 'source'))
         parser.add_argument('--num_tags', type=int)
-        parser.add_argument('--style', choices=('text', 'image'), 
+        parser.add_argument('--style', choices=render_styles, 
             default='image')
         parser.add_argument('project_dirs', nargs='+')
 
