@@ -230,6 +230,24 @@ def render_index(repo, matchfunc, options):
         print match.groups()
 
 
+def render_summary(repo, matchfunc, options):
+    file_pats = ['*.[ch]', '*.py']
+    func_re = re.compile(
+        r'(.+?) ([=:]) (\d+) [=:] (\s*) (.+)\n', 
+        re.VERBOSE)
+    grep_out = repo.git.grep(
+        '.', '--', *file_pats, 
+        line_number=True, no_color=True, show_function=True,  word_regexp=True)
+    match_fields = (m.groups() for m in func_re.finditer(grep_out))
+    for path, is_func, lineno, indent, line in match_fields:
+        print path,
+        if is_func == '=':
+            print indent + line
+        else:
+            print indent + '-' * len(line)
+        
+
+
 def render_text(repo, matchfunc, options):
     def format_age(mycommit, mylatest):
         """
