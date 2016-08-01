@@ -231,6 +231,11 @@ def render_index(repo, matchfunc, options):
 
 
 def render_summary(repo, matchfunc, options):
+    def format_text(fis_func, findent, fline):
+        if fis_func == '=':
+            return findent + fline
+        return findent + '-' * len(fline)
+
     file_pats = ['*.[ch]', '*.py']
     func_re = re.compile(
         r'(.+?) ([=:]) (\d+) [=:] (\s*) (.+)\n', 
@@ -240,11 +245,7 @@ def render_summary(repo, matchfunc, options):
         line_number=True, no_color=True, show_function=True,  word_regexp=True)
     match_fields = (m.groups() for m in func_re.finditer(grep_out))
     for path, is_func, lineno, indent, line in match_fields:
-        print path,
-        if is_func == '=':
-            print indent + line
-        else:
-            print indent + '-' * len(line)
+        print path, format_text(is_func, indent, line)
         
 
 
