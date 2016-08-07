@@ -231,21 +231,28 @@ def render_index(repo, matchfunc, options):
 
 ENTITY_HORIZONAL_BAR = '&#8213;'
 
+# BUG: doesnt handle "space tab", will give 9 vs correct 8
+def calc_indent(indent_str):
+    indent_spaces = len(re.findall(r' ', indent_str))
+    indent_tabs = len(re.findall(r'\t', indent_str))
+    return indent_tabs*8 + indent_spaces
+
+
 def render_summary(repo, matchfunc, options):
     def format_text(fis_func, findent, fline):
         if fis_func == '=':
             return findent + fline
         return findent + '-' * len(fline)
     def format_html(fis_func, findent, fline):
-        indent_spaces = len(re.findall(r' ', findent))
-        indent_tabs = len(re.findall(r'\t', findent))
-        indent_ems = indent_tabs*8 + indent_spaces
+        indent_ems = calc_indent(findent)
         if fis_func != '=':
             fline = ENTITY_HORIZONAL_BAR * len(fline)
         if not indent_ems:
             return '{}<br />'.format(fline)
         return '<span style="text-indent: {} em">{}</span><br />'.format(indent_ems, fline)
-
+    def format_pixels(fis_func, findent, fline):
+        return calc_indent(findent), len(fline)
+    
     file_pats = ['*.[ch]', '*.py']
     func_re = re.compile(
         r'(.+?) ([=:]) (\d+) [=:] (\s*) (.+)\n', 
@@ -254,8 +261,18 @@ def render_summary(repo, matchfunc, options):
         '.', '--', *file_pats, 
         line_number=True, no_color=True, show_function=True,  word_regexp=True)
     match_fields = (m.groups() for m in func_re.finditer(grep_out))
-    for path, is_func, lineno, indent, line in match_fields:
-        print path, format_html(is_func, indent, line)
+    if 0:
+        for path, is_func, lineno, indent, line in match_fields:
+            print path, format_html(is_func, indent, line)
+    else:
+        im = Image.new('RGB', (width, height))
+        im_pixel = im.load()
+        for y, (path, is_func, _, indent, line) in enumerate(match_fields):
+            bg_color = (40, 40, 40)
+            code_color = (200, 200, 200) if is_func else (30, 100, 10)
+            indent_width, line_width = format_pixels()
+            im.line(0, y, 
+
 
 
 def render_text(repo, matchfunc, options):
