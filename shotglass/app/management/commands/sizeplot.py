@@ -1,5 +1,6 @@
 import re
 
+import matplotlib.pyplot as plt
 from django.core.management.base import BaseCommand
 from django.db.models import Sum
 
@@ -36,9 +37,20 @@ class Command(BaseCommand):
         tags = sorted(tags, key=natural_sort_key)
         print tags
 
+        tag_length = {}
+        tag_lengths = []
         for tag in tags:
             stats = get_stats(tag)
+            tag_length[tag] = stats['length']
+            tag_lengths.append(stats['length'])
             print tag, stats['length']
+
+        plt.plot(tag_lengths)
+        plt.title('Ansible')
+        plt.xlabel('Version')
+        plt.ylabel('function length')
+        # plt.show()
+        plt.savefig('z.png')
         # render_func = globals()['render_{}'.format(options['style'])]
         # matchfunc = {
         # # manpage -- in "man" subdir ending in .8 or .in
