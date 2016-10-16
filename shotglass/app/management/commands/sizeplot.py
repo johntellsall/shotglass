@@ -1,6 +1,7 @@
 import re
 
 from django.core.management.base import BaseCommand
+from django.db.models import Sum
 
 from app import models
 
@@ -8,6 +9,12 @@ from app import models
 def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
     return [int(text) if text.isdigit() else text.lower()
             for text in re.split(_nsre, s)]    
+
+
+def get_stats(tag):
+    symbols = models.SourceLine.objects.filter(project=tag)
+    length = symbols.aggregate(Sum('length')).values()[0]
+    return dict(length=length)
 
 
 class Command(BaseCommand):
@@ -24,11 +31,14 @@ class Command(BaseCommand):
     #     parser.add_argument('project_dirs', nargs='+')
 
     def handle(self, *args, **options):
-        tags = models.SourceLine.objects.filter(project__startswith='ansible-').values_list('project', flat=True).distinct()
+        tags = models.SourceLine.objects.filter(
+            project__startswith='ansible-').values_list('project', flat=True).distinct()
         tags = sorted(tags, key=natural_sort_key)
         print tags
 
-
+        for tag in tags:
+            stats = get_stats(tag)
+            print tag, stats['length']
         # render_func = globals()['render_{}'.format(options['style'])]
         # matchfunc = {
         # # manpage -- in "man" subdir ending in .8 or .in
