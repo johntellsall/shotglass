@@ -22,7 +22,7 @@ tags = [tag.name for tag in repos.tags
 
 checkout_cmd = 'cd {name} ; git checkout {tag}'
 index_cmd = './manage.py make_index --project={name}-{tag} {name}'
-for tag in tags[:2]:
+for tag in tags:
     cmd = checkout_cmd.format(name=NAME, tag=tag)
     print '>>>', cmd
     if subprocess.call(cmd, shell=True):
