@@ -98,6 +98,7 @@ def index_c_mccabe(project, project_dir, paths):
         ['pmccabe'] + paths,
         stderr=open(os.devnull, 'w')).split('\n')
 
+    mccabe_objs = []
     for match in filter(None, (map(pmccabe_pat.match, output))):
         data = [int(field) for field in match.group('data').split()]
         num_lines = data[4]
@@ -109,7 +110,7 @@ def index_c_mccabe(project, project_dir, paths):
             name=match.group('function'),
             line_number=definition_line,
             length=num_lines)
-        models.ProgPmccabe.objects.create(
+        mccabe_objs.append(models.ProgPmccabe.objects.create(
             sourceline=sourceline,
             first_line=data[3],
             modified_mccabe=data[0],
@@ -117,7 +118,10 @@ def index_c_mccabe(project, project_dir, paths):
             num_statements=data[2],
             # overlap w/ SourceLine
             num_lines=num_lines,
-            definition_line=definition_line)
+            definition_line=definition_line))
+    import ipdb ; ipdb.set_trace()
+    out = models.ProgPmccabe.bulk_create(mccabe_objs)
+    print '???', out
 
 
 def make_index(project, project_dir):

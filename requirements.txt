@@ -16,3 +16,4 @@ django-colorfield
 palettable
 radon
 # psycopg2
+pylint-django
