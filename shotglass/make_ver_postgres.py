@@ -14,6 +14,8 @@ import sys
 import git
 from natsort import natsorted
 
+from app import models
+
 
 class Project(object):
     def __init__(self, name, bad_tag_pat=None, good_tag_pat=None):
@@ -31,21 +33,40 @@ class Project(object):
         tags = natsorted(tags)
         return tags
 
-proj = Project('postgres', good_tag_pat='^REL',
-    bad_tag_pat='(ALPHA|BETA|RC|REL2_0)')
-print proj.get_tags()
-blam
+def main():
+    proj = Project('postgres',
+        good_tag_pat='^REL',
+        bad_tag_pat='(ALPHA|BETA|RC|REL2_0'
+        '|[^9]_._[^0]' # < v9.0, skip micro changes
+        ')')
+    tags = proj.get_tags()
+    # tags = tags[:3]
 
+    # distinct projects
+    if 0:
+        projects = set(
+            (proj.split('-', 1)[0]
+                for proj in SourceLine.objects.values_list(
+                    'project', flat=True))
+        )
 
+    proj_versions = set(models.SourceLine.objects.filter(
+        project__startswith='postgres-').values_list('project', flat=True))
+    have_tags = [projvers.split('-', 1)[1]
+        for projvers in proj_versions]
+    print have_tags
 
-checkout_cmd = 'cd {dir} ; git checkout {tag}'
-index_cmd = './manage.py make_index --project={name}-{tag} {dir}'
-for tag in tags:
-    cmd = checkout_cmd.format(dir=PROJ_DIR, tag=tag)
-    print '>>>', cmd
-    if subprocess.call(cmd, shell=True):
-        sys.exit(0)
-    cmd = index_cmd.format(dir=PROJ_DIR, name=PROJECT, tag=tag)
-    print '>>>', cmd
-    out = subprocess.check_output(cmd, shell=True)
-    print out
+    checkout_cmd = 'cd {dir} ; git checkout {tag}'
+    index_cmd = './manage.py make_index --project={name}-{tag} {dir}'
+    for tag in tags:
+        cmd = checkout_cmd.format(dir=proj.proj_dir, tag=tag)
+        print '>>>', cmd
+        if subprocess.call(cmd, shell=True):
+            sys.exit(0)
+        cmd = index_cmd.format(dir=proj.proj_dir, name=proj.name, tag=tag)
+        print '>>>', cmd
+        out = subprocess.check_output(cmd, shell=True)
+        print out
+
+if __name__ == '__main__':
+    main()
