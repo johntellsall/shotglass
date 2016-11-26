@@ -65,20 +65,26 @@ def walk_type(topdir, name_func):
 # pylint: disable=no-member
 def index_py_radon(project, project_dir, paths):
     # X: Radon only supports Python
+    sourceline_objs = []
+    radon_objs = []
     for path in paths:
         relpath = strip_project_dir(project_dir, path)
         for block in calc_radon(path):
-            sourceline = models.SourceLine.objects.create(
+            sourceline_objs.append(models.SourceLine(
                 project=project,
                 path=relpath,
                 name=block.fullname,
                 line_number=block.lineno,
-                length=block.endline - block.lineno)
+                length=block.endline - block.lineno))
             assert block.letter in 'CFM'
-            models.ProgRadon.objects.create(
-                sourceline=sourceline,
+            radon_objs.append(models.ProgRadon(
+                sourceline=sourceline_objs[-1],
                 kind=block.letter,
-                complexity=block.complexity)
+                complexity=block.complexity))
+    out = models.SourceLine.objects.bulk_create(sourceline_objs)
+    # print '???', out
+    out = models.ProgRadon.objects.bulk_create(radon_objs)
+    # print '???', out
 
 
 # pylint: disable=no-member

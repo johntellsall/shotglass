@@ -5,7 +5,9 @@ make_versions -- index many versions of a project
 USAGE:
 * list project's tags that match patterns:
 
-./manage.py make_versions --name=django --include=. --info --exclude='([abc])' --include='\.1$' ./SOURCE/django/ 
+Ex: show each minor version of Django; just output tags. Hide RC, Alpha and micro-change versions:
+./manage.py make_versions --info --exclude='([abc])' --include='\.1$' \
+./SOURCE/django/ 
 
 ['1.0.1', '1.1', '1.1.1', ...  '1.10.1']
 '''
@@ -95,7 +97,7 @@ class Command(BaseCommand):
                 print proj, ':'
                 print proj.get_tags()
             return
-                        # '|[^9]_._[^0]' # < v9.0, skip micro changes
+
         for proj in projects:
             make_project(proj, dryrun=options['dryrun'])
 
