@@ -70,18 +70,17 @@ def index_py_radon(project, project_dir, paths):
     for path in paths:
         relpath = strip_project_dir(project_dir, path)
         for block in calc_radon(path):
-            sourceline_objs.append(models.SourceLine(
+            assert block.letter in 'CFM'
+            sourceline = models.SourceLine.objects.create(
                 project=project,
                 path=relpath,
                 name=block.fullname,
                 line_number=block.lineno,
-                length=block.endline - block.lineno))
-            assert block.letter in 'CFM'
+                length=block.endline - block.lineno)
             radon_objs.append(models.ProgRadon(
-                sourceline=sourceline_objs[-1],
+                sourceline=sourceline,
                 kind=block.letter,
                 complexity=block.complexity))
-    models.SourceLine.objects.bulk_create(sourceline_objs)
     models.ProgRadon.objects.bulk_create(radon_objs)
 
 
