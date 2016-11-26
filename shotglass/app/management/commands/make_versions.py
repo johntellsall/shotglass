@@ -1,7 +1,13 @@
 '''
 make_versions -- index many versions of a project
 
-ALPHA code, will need modification for general use.
+
+USAGE:
+* list project's tags that match patterns:
+
+./manage.py make_versions --name=django --include=. --info --exclude='([abc])' --include='\.1$' ./SOURCE/django/ 
+
+['1.0.1', '1.1', '1.1.1', ...  '1.10.1']
 '''
 
 import itertools
@@ -17,23 +23,24 @@ from app import models
 
 
 class Project(object):
-    def __init__(self, name, bad_tag_pat=None, good_tag_pat=None):
+    def __init__(self, name, proj_dir, bad_tag_pat=None, good_tag_pat=None):
         self.name = name
-        self.proj_dir = 'SOURCE/{}'.format(name)
-        self.good_tag_re = re.compile(good_tag_pat)
-        self.bad_tag_re = re.compile('never-match')
-        if bad_tag_pat:
-            self.bad_tag_re = re.compile(bad_tag_pat)
+        self.proj_dir = proj_dir
+        self.good_tag_re = re.compile(good_tag_pat) if good_tag_pat else None
+        self.bad_tag_re = re.compile(bad_tag_pat) if bad_tag_pat else None
 
     def get_tags(self):
         repos = git.Repo(self.proj_dir)
-        tags = filter(self.good_tag_re.search, (tag.name for tag in repos.tags))
-        tags = itertools.ifilterfalse(self.bad_tag_re.search, tags)
+        tags = (tag.name for tag in repos.tags)
+        if self.good_tag_re:
+            tags = filter(self.good_tag_re.search, tags)
+        if self.bad_tag_re:
+            tags = itertools.ifilterfalse(self.bad_tag_re.search, tags)
         tags = natsorted(tags)
         return tags
 
 
-def make_project(proj):
+def make_project(proj, dryrun=False):
     tags = proj.get_tags()
     tags = tags[:3]
 
@@ -42,7 +49,7 @@ def make_project(proj):
         project__startswith=proj_prefix).values_list('project', flat=True))
     have_tags = set(projvers.split('-', 1)[1]
         for projvers in proj_versions)
-    have_tags = set()
+    have_tags = set() # XX
 
     checkout_cmd = 'cd {dir} ; git checkout {tag}'
     index_cmd = './manage.py make_index --project={name}-{tag} {dir}'
@@ -56,6 +63,8 @@ def make_project(proj):
             sys.exit(0)
         cmd = index_cmd.format(dir=proj.proj_dir, name=proj.name, tag=tag)
         print '>>>', cmd
+        if dryrun:
+            continue
         out = subprocess.check_output(cmd, shell=True)
         print out
 
@@ -65,17 +74,28 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('projects', nargs=1)
+        parser.add_argument('--dryrun', action='store_true')
+        parser.add_argument('--info', action='store_true')
         parser.add_argument('--include')
         parser.add_argument('--exclude')
         parser.add_argument('--name')
 
     def handle(self, *args, **options):
-        for proj_dir in options['projects']:
-            name = options['name']
-            proj = Project(name,
-                        good_tag_pat=options['include'],
-                        bad_tag_pat=options['exclude'],
+        assert len(options['projects']) == 1
+        assert options['name']
+
+        projects = [Project(
+            name=options['name'],
+            proj_dir=options['projects'][0],
+            good_tag_pat=options['include'],
+            bad_tag_pat=options['exclude'])]
+
+        if options['info']:
+            for proj in projects:
+                print proj, ':'
+                print proj.get_tags()
+            return
                         # '|[^9]_._[^0]' # < v9.0, skip micro changes
-                        )
-            make_project(proj)
+        for proj in projects:
+            make_project(proj, dryrun=options['dryrun'])
 
