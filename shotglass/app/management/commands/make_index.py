@@ -20,7 +20,7 @@ from app import render
 
 
 INDEX_SUFFIXES = ('.c', '.py')
-BORING_DIRS = ('.pc',) # X: make configurable
+BORING_DIRS = ('.pc',) # TODO: make configurable
 
 if 0:
     # XX: never flushes logs
@@ -119,7 +119,6 @@ def index_c_mccabe(project, project_dir, paths):
             # overlap w/ SourceLine
             num_lines=num_lines,
             definition_line=definition_line))
-    # import ipdb ; ipdb.set_trace()
     out = models.ProgPmccabe.objects.bulk_create(mccabe_objs)
     print '???', out
 
