@@ -42,9 +42,10 @@ class Project(object):
         return tags
 
 
-def make_project(proj, dryrun=False):
+def make_project(proj, dryrun=False, limit=None):
     tags = proj.get_tags()
-    tags = tags[:3]
+    if limit:
+        tags = tags[:limit]
 
     proj_prefix = '{}-'.format(proj.name)
     proj_versions = set(models.SourceLine.objects.filter(
@@ -80,6 +81,7 @@ class Command(BaseCommand):
         parser.add_argument('--info', action='store_true')
         parser.add_argument('--include')
         parser.add_argument('--exclude')
+        parser.add_argument('--limit', type=int)
         parser.add_argument('--name')
 
     def handle(self, *args, **options):
@@ -99,5 +101,6 @@ class Command(BaseCommand):
             return
 
         for proj in projects:
-            make_project(proj, dryrun=options['dryrun'])
+            make_project(
+                proj, dryrun=options['dryrun'], limit=options['limit'])
 
