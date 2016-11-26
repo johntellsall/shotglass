@@ -52,7 +52,6 @@ class Command(BaseCommand):
             project__startswith='postgres-').values_list('project', flat=True))
         have_tags = set(projvers.split('-', 1)[1]
             for projvers in proj_versions)
-        print have_tags
 
         checkout_cmd = 'cd {dir} ; git checkout {tag}'
         index_cmd = './manage.py make_index --project={name}-{tag} {dir}'

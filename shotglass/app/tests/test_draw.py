@@ -1,3 +1,4 @@
+import pytest
 from django.test import TestCase
 
 from app import draw
@@ -12,6 +13,7 @@ class TestDraw(TestCase):
             kind='k', length=3, line_number=2, name='name', path='path')
         models.Skeleton.objects.update(sourceline=stub)
 
+    @pytest.mark.skip('OLD')
     def test_simple(self):
         grid = draw.SimpleDraw().draw(None)
         self.assertDictContainsSubset(
@@ -19,6 +21,7 @@ class TestDraw(TestCase):
             actual=vars(grid))
 
 
+@pytest.mark.skip('OLD')
 def test_add_color():
     diagram = [(0, 'x', 1), (1, 'y', 2)]
     assert list(draw.jm_add_color(diagram)) == [

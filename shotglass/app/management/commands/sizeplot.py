@@ -7,7 +7,6 @@ import re
 import matplotlib.pyplot as plt
 from django.core.management.base import BaseCommand
 from django.db.models import Sum
-from matplotlib.ticker import FuncFormatter, MaxNLocator
 
 from app import models
 
@@ -38,7 +37,7 @@ class Command(BaseCommand):
             project__startswith=project
             ).values_list('project', flat=True).distinct()
         tags = sorted(tags, key=natural_sort_key)
-        tags = [tag for tag in tags if '_' not in tag]
+        # tags = [tag for tag in tags if '_' not in tag]
         if 0:
             tags = tags[:10]
 

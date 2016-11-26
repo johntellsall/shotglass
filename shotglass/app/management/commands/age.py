@@ -271,7 +271,7 @@ def render_summary(repo, matchfunc, options):
             bg_color = (40, 40, 40)
             code_color = (200, 200, 200) if is_func else (30, 100, 10)
             indent_width, line_width = format_pixels()
-            im.line(0, y, 
+            # XXXXX im.line(0, y, 
 
 
 

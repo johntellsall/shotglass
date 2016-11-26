@@ -119,8 +119,8 @@ def index_c_mccabe(project, project_dir, paths):
             # overlap w/ SourceLine
             num_lines=num_lines,
             definition_line=definition_line))
-    import ipdb ; ipdb.set_trace()
-    out = models.ProgPmccabe.bulk_create(mccabe_objs)
+    # import ipdb ; ipdb.set_trace()
+    out = models.ProgPmccabe.objects.bulk_create(mccabe_objs)
     print '???', out
 
 
