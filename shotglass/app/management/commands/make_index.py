@@ -65,7 +65,6 @@ def walk_type(topdir, name_func):
 # pylint: disable=no-member
 def index_py_radon(project, project_dir, paths):
     # X: Radon only supports Python
-    sourceline_objs = []
     radon_objs = []
     for path in paths:
         relpath = strip_project_dir(project_dir, path)
