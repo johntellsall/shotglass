@@ -81,10 +81,8 @@ def index_py_radon(project, project_dir, paths):
                 sourceline=sourceline_objs[-1],
                 kind=block.letter,
                 complexity=block.complexity))
-    out = models.SourceLine.objects.bulk_create(sourceline_objs)
-    # print '???', out
-    out = models.ProgRadon.objects.bulk_create(radon_objs)
-    # print '???', out
+    models.SourceLine.objects.bulk_create(sourceline_objs)
+    models.ProgRadon.objects.bulk_create(radon_objs)
 
 
 # pylint: disable=no-member
