@@ -65,7 +65,7 @@ def walk_type(topdir, name_func):
 # pylint: disable=no-member
 def index_py_radon(project, project_dir, paths):
     # X: Radon only supports Python
-    radon_objs = []
+    #radon_objs = []
     for path in paths:
         relpath = strip_project_dir(project_dir, path)
         for block in calc_radon(path):
@@ -76,11 +76,16 @@ def index_py_radon(project, project_dir, paths):
                 name=block.fullname,
                 line_number=block.lineno,
                 length=block.endline - block.lineno)
-            radon_objs.append(models.ProgRadon(
+            models.ProgRadon.objects.create(
                 sourceline=sourceline,
                 kind=block.letter,
-                complexity=block.complexity))
-    models.ProgRadon.objects.bulk_create(radon_objs)
+                complexity=block.complexity)
+    # 
+            # radon_objs.append(models.ProgRadon(
+            #     sourceline=sourceline,
+            #     kind=block.letter,
+            #     complexity=block.complexity))
+    # models.ProgRadon.objects.bulk_create(radon_objs)
 
 
 # pylint: disable=no-member
@@ -155,7 +160,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('project_dirs', metavar='FILE', nargs='+')
         parser.add_argument('--project')
-        parser.add_argument('--tags')
+        # parser.add_argument('--tags')
 
     def handle(self, *args, **options):
         for project_dir in map(os.path.expanduser, options['project_dirs']):

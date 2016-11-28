@@ -1,3 +1,5 @@
+import itertools
+import operator
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -13,13 +15,27 @@ class Command(BaseCommand):
         parser.add_argument('projects', nargs='+')
 
     def handle(self, *args, **options):
-        data = models.SourceLine.objects.values_list(
-            'progpmccabe__num_lines', 'progpmccabe__num_statements',
-            'progpmccabe__mccabe')
-        xs, ys, areas = zip(*data)
-        ys = areas
-        colors = np.random.rand(len(xs))
-        plt.scatter(xs, ys, c=colors) # s=areas)
+        fs = 10  # fontsize
+        
+        versions = models.SourceLine.objects.filter(
+            project__startswith='django-').order_by(
+            'project').values_list(
+            'project', 'progradon__complexity')
+        for vers, complexity_iter in itertools.groupby(
+            versions, key=operator.itemgetter(1)):
+            print vers, ':'
+            print '-', ', '.join(str(x) for x in complexity_iter)
+        data = models.SourceLine.objects.filter(
+            project='django-1.0.1').values_list(
+            'progradon__complexity', flat=True)
+        plt.boxplot(data) # , labels=labels)
+        
+        plt.show()
+
+        # xs, ys, areas = zip(*data)
+        # ys = areas
+        # colors = np.random.rand(len(xs))
+        # plt.scatter(xs, ys, c=colors) # s=areas)
         # plt.xlabel('file index')
         # plt.ylabel('version index')
         plt.savefig('z.png')
