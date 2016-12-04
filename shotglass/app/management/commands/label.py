@@ -10,7 +10,7 @@ import itertools
 
 from django.core.management.base import BaseCommand
 from palettable import colorbrewer
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from app.models import SourceLine
 
@@ -38,12 +38,27 @@ def render(funcs, color_gen):
     height = COL_HEIGHT
     im = Image.new('RGB', (width, height))
     im_pixel = im.load()
+    im_draw = ImageDraw.Draw(im)
     image_iter = serpentine_iter(width=width)
+    first_ch = None
+    new_labels = []
     for func in funcs:
-        print func.name
+        name = func.name
+        new_label = False
+        if name[0] != first_ch:
+            new_label = True
+            first_ch = name[0]
+            print func.name
+        if new_label:
+            new_labels.append([func, image_iter.next()])
         color = color_gen()
         for _ in xrange(func.length):
             im_pixel[image_iter.next()] = color
+    print new_labels
+    for func, label_pos in new_labels:
+        x,y = label_pos
+        rect = [x-1,y-1, x+2,y+2]
+        im_draw.rectangle(rect, fill='black')
     return im
 
 
