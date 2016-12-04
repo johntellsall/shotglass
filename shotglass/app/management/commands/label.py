@@ -10,9 +10,9 @@ import datetime
 import math
 import os
 import re
+import itertools
 
 from django.core.management.base import BaseCommand
-from git import Repo
 from palettable import colorbrewer
 from PIL import Image, ImageDraw
 
@@ -147,14 +147,14 @@ COL_GAP = 10
 #     plt.savefig('z.png')
 #     plt.savefig('z.svg')
 
-# def serpentine_iter(width):
-#     y = 0
-#     while True:
-#         for x in xrange(width):
-#             yield x, y
-#         for x in xrange(width):
-#             yield width - x - 1, y + 1
-#         y += 2
+def serpentine_iter(width):
+    y = 0
+    while True:
+        for x in xrange(width):
+            yield x, y
+        for x in xrange(width):
+            yield width - x - 1, y + 1
+        y += 2
 
 
 # def format_age(mycommit, mylatest):
@@ -192,18 +192,18 @@ COL_GAP = 10
 #             yield format_age(commit, latest), len(regions)
 
 
-# def render_image_tag(repo, matchfunc, tag):
-#     width = COL_WIDTH
-#     height = COL_HEIGHT
-#     tag_paths = filter(matchfunc, get_tag_paths(repo, tag))
-
-#     im = Image.new('RGB', (width, height))
-#     im_pixel = im.load()
-#     image_iter = serpentine_iter(width=width)
-#     for color, size in iter_source(repo, tag, tag_paths):
-#         for _ in xrange(size):
-#             im_pixel[image_iter.next()] = color
-#     return im
+def render(funcs, color_gen):
+    width = COL_WIDTH
+    height = COL_HEIGHT
+    im = Image.new('RGB', (width, height))
+    im_pixel = im.load()
+    image_iter = serpentine_iter(width=width)
+    for func in funcs:
+        print func.name
+        color = color_gen()
+        for _ in xrange(func.length):
+            im_pixel[image_iter.next()] = color
+    return im
 
 
 # def render_image(repo, matchfunc, options):
@@ -319,12 +319,17 @@ class Command(BaseCommand):
         # 'manpage': Matcher(r'man/.*[0-9n]$').match,
         # 'source': Matcher(r'\.[ch]$').match,
         # }.get(options['match']) or all_matcher
+        color_iter = itertools.cycle(
+            CMAP_COLORS + list(reversed(CMAP_COLORS)))
 
         for project in options['projects']:
             p = SourceLine.objects.filter(project=project)
             print project
             print 'all:', p.count()
-            print 'no tests:', p.exclude(path__startswith='tests/').count()
+            funcs = p.exclude(path__startswith='tests/').exclude(
+                path__startswith='examples/')
+            print 'no tests:', funcs.count()
 
-            # repo = Repo(os.path.expanduser(projects))
-            # render_func(repo, matchfunc, options)
+            funcs = funcs.order_by('name')
+            img = render(funcs, color_iter.next)
+            img.save('{}.png'.format(project))
