@@ -16,8 +16,7 @@ from app.models import SourceLine
 
 
 BLACK = (0, 0, 0)
-CMAP_NAME = 'PiYG_11'
-CMAP_OBJ = getattr(colorbrewer.diverging, CMAP_NAME)
+CMAP_OBJ = colorbrewer.qualitative.Set3_12
 CMAP_COLORS = map(tuple, CMAP_OBJ.colors)
 
 COL_WIDTH, COL_HEIGHT = 100, 2000
@@ -57,6 +56,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         color_iter = itertools.cycle(
             CMAP_COLORS + list(reversed(CMAP_COLORS)))
+        # color_iter = itertools.cycle(CMAP_COLORS)
 
         for project in options['projects']:
             p = SourceLine.objects.filter(project=project)
