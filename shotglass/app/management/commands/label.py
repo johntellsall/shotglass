@@ -33,7 +33,7 @@ def serpentine_iter(width):
         y += 2
 
 
-def render(funcs, color_gen):
+def render_funcs(funcs, color_gen):
     width = COL_WIDTH
     height = COL_HEIGHT
     im = Image.new('RGB', (width, height))
@@ -62,6 +62,27 @@ def render(funcs, color_gen):
     return im
 
 
+def render_paths(funcs, color_gen):
+    width = COL_WIDTH
+    height = COL_HEIGHT
+    im = Image.new('RGB', (width, height))
+    im_pixel = im.load()
+    im_draw = ImageDraw.Draw(im)
+    image_iter = serpentine_iter(width=width)
+    prev_path = None
+    color = None
+    for func in funcs:
+        if func.path != prev_path:
+            prev_path = func.path
+            color = color_gen()
+            x,y = image_iter.next()
+            rect = [x-1,y-1, x+2,y+2]
+            im_draw.rectangle(rect, fill='black')
+        for _ in xrange(func.length):
+            im_pixel[image_iter.next()] = color
+    return im
+
+
 class Command(BaseCommand):
     help = __doc__
 
@@ -81,6 +102,11 @@ class Command(BaseCommand):
                 path__startswith='examples/')
             print 'no tests:', funcs.count()
 
-            funcs = funcs.order_by('name')
-            img = render(funcs, color_iter.next)
+            if 0:
+                funcs = funcs.order_by('name')
+                img = render_funcs(funcs, color_iter.next)
+            else:
+                funcs = funcs.order_by('path')
+                img = render_paths(funcs, color_iter.next)
+
             img.save('{}.png'.format(project))
