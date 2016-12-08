@@ -6,20 +6,11 @@ label.py --
 # list files in Git branch
 # git ls-tree --name-status --full-tree -r v4.0.0
 
-import itertools
 import re
 import subprocess
 
 from django.core.management.base import BaseCommand
-from palettable import colorbrewer
 from PIL import Image, ImageDraw
-
-from app.models import SourceLine
-
-
-# BLACK = (0, 0, 0)
-# CMAP_OBJ = colorbrewer.qualitative.Set3_12
-# CMAP_COLORS = map(tuple, CMAP_OBJ.colors)
 
 COL_WIDTH, COL_HEIGHT = 100, 2000
 # COL_GAP = 10
@@ -72,6 +63,7 @@ class Render(object):
             x += len(text)
         self.y += 1
 
+
 def render(path):
     hlines = render_highlight(path)
     # hlines = hlines[:200]
@@ -93,9 +85,6 @@ class Command(BaseCommand):
         parser.add_argument('paths', nargs='+')
 
     def handle(self, *args, **options):
-        # color_iter = itertools.cycle(
-        #     CMAP_COLORS + list(reversed(CMAP_COLORS)))
-
         for path in options['paths']:
             img = render(path)
             img.save('{}.png'.format('z'))
