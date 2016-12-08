@@ -4,10 +4,10 @@ VBIN := $(VIRTUAL_ENV)/bin
 
 all:	test
 
-.PHONY: base.html
-base.html:
+.PHONY: query.html
+query.html:
 	source-highlight -o $@ -i \
-	SOURCE/django/django/db/models/base.py
+	SOURCE/django/django/db/models/query.py
 
 source.lst:
 	find SOURCE/django/ -name '*.py' \

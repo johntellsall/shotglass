@@ -55,8 +55,6 @@ class Render(object):
                 orig_len = len(text)
                 text = text.lstrip(' ')
                 x += orig_len - len(text)
-            print '{:03d} {:10s} "{}"'.format(
-                x, colors[-1], text)
             self.draw.line(
                 (x,self.y, x+len(text),self.y),
                 fill=colors[-1])
@@ -66,15 +64,12 @@ class Render(object):
 
 def render(path):
     hlines = render_highlight(path)
-    # hlines = hlines[:200]
     width = COL_WIDTH
     height = COL_HEIGHT
     im = Image.new('RGB', (width, height), color='white')
     rend = Render(draw=ImageDraw.Draw(im), x=0, y=0)
     for line in hlines:
-        print '\tin:', line
         rend.add_line(line)
-        print
     return im
 
 
