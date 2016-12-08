@@ -12,7 +12,8 @@ import subprocess
 from django.core.management.base import BaseCommand
 from PIL import Image, ImageDraw
 
-COL_WIDTH, COL_HEIGHT = 100, 2000
+IMAGE_WIDTH = IMAGE_HEIGHT = 1000
+COL_WIDTH, COL_HEIGHT = 100, 1000
 # COL_GAP = 10
 
 
@@ -40,7 +41,7 @@ class Render(object):
         self.symbol_re = re.compile('<(.+?)>([^<]*)')
 
     def add_line(self, line):
-        x = 0
+        relx = 0
         colors = ['black']
         line = '<x>' + line # process text before HTML
         mgroups = (match.groups() for match in self.symbol_re.finditer(line))
@@ -54,22 +55,23 @@ class Render(object):
             if text.startswith(' '):
                 orig_len = len(text)
                 text = text.lstrip(' ')
-                x += orig_len - len(text)
+                relx += orig_len - len(text)
             self.draw.line(
-                (x,self.y, x+len(text),self.y),
+                (self.x+relx,self.y, self.x+relx+len(text),self.y),
                 fill=colors[-1])
-            x += len(text)
+            relx += len(text)
         self.y += 1
 
 
 def render(path):
     hlines = render_highlight(path)
-    width = COL_WIDTH
-    height = COL_HEIGHT
-    im = Image.new('RGB', (width, height), color='white')
+    im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
     rend = Render(draw=ImageDraw.Draw(im), x=0, y=0)
     for line in hlines:
         rend.add_line(line)
+        if rend.y >= IMAGE_HEIGHT:
+            rend.y = 0
+            rend.x += COL_WIDTH
     return im
 
 
