@@ -4,6 +4,12 @@ VBIN := $(VIRTUAL_ENV)/bin
 
 all:	test
 
+.PHONY: base.html
+base.html:
+	source-highlight -o $@ -i \
+	SOURCE/django/django/db/models/base.py
+
+
 server:
 		while true; do ./manage.py runserver; sleep 15; done
 

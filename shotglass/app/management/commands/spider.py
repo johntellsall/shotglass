@@ -48,12 +48,13 @@ def render(path):
     # hlines = hlines[:200]
     width = COL_WIDTH
     height = COL_HEIGHT
-    im = Image.new('RGB', (width, height), color='gray')
+    im = Image.new('RGB', (width, height), color='white')
     im_draw = ImageDraw.Draw(im)
     colors = ['black']
     for y,line in enumerate(hlines):
-        print '\t*', line
+        print '\tin:', line
         x = 0
+        line = '<x>' + line # process text before HTML
         mgroups = (match.groups() for match in symbol_re.finditer(line))
         for sym, text in mgroups:
             if sym.startswith('font '):
@@ -66,8 +67,11 @@ def render(path):
                 orig_len = len(text)
                 text = text.lstrip(' ')
                 x += orig_len - len(text)
-            print colors[-1], '"{}"'.format(text)
+            print '{:03d} {:10s} "{}"'.format(
+                x, colors[-1], text)
             im_draw.line( (x,y, x+len(text),y), fill=colors[-1])
+            x += len(text)
+        print
     return im
 
 
