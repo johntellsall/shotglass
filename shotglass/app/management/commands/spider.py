@@ -42,20 +42,17 @@ def render_highlight(path):
     return output.split('\n')
 
 
-def render(path):
-    symbol_re = re.compile('<(.+?)>([^<]*)')
-    hlines = render_highlight(path)
-    # hlines = hlines[:200]
-    width = COL_WIDTH
-    height = COL_HEIGHT
-    im = Image.new('RGB', (width, height), color='white')
-    im_draw = ImageDraw.Draw(im)
-    colors = ['black']
-    for y,line in enumerate(hlines):
-        print '\tin:', line
+class Render(object):
+    def __init__(self, draw, x, y):
+        self.draw = draw
+        self.x, self.y = x, y
+        self.symbol_re = re.compile('<(.+?)>([^<]*)')
+
+    def add_line(self, line):
         x = 0
+        colors = ['black']
         line = '<x>' + line # process text before HTML
-        mgroups = (match.groups() for match in symbol_re.finditer(line))
+        mgroups = (match.groups() for match in self.symbol_re.finditer(line))
         for sym, text in mgroups:
             if sym.startswith('font '):
                 colors.append(sym.split('"')[1])
@@ -69,8 +66,22 @@ def render(path):
                 x += orig_len - len(text)
             print '{:03d} {:10s} "{}"'.format(
                 x, colors[-1], text)
-            im_draw.line( (x,y, x+len(text),y), fill=colors[-1])
+            self.draw.line(
+                (x,self.y, x+len(text),self.y),
+                fill=colors[-1])
             x += len(text)
+        self.y += 1
+
+def render(path):
+    hlines = render_highlight(path)
+    # hlines = hlines[:200]
+    width = COL_WIDTH
+    height = COL_HEIGHT
+    im = Image.new('RGB', (width, height), color='white')
+    rend = Render(draw=ImageDraw.Draw(im), x=0, y=0)
+    for line in hlines:
+        print '\tin:', line
+        rend.add_line(line)
         print
     return im
 
