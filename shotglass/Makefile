@@ -9,6 +9,11 @@ base.html:
 	source-highlight -o $@ -i \
 	SOURCE/django/django/db/models/base.py
 
+source.lst:
+	find SOURCE/django/ -name '*.py' \
+	| egrep -v '/(bin|contrib|docs|examples|tests)/' \
+	> $@
+	xargs < source.lst wc -l | tail -1
 
 server:
 		while true; do ./manage.py runserver; sleep 15; done
