@@ -103,7 +103,7 @@ def render_file(path, renderObj):
             renderObj.x += COL_WIDTH
 
 
-def render(paths):
+def render_blocks(paths):
     im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
     if 1:
         CMAP_OBJ = colorbrewer.qualitative.Set3_12
@@ -126,12 +126,27 @@ def render(paths):
         draw.text(**text_args)
     return im
 
+# XX merge render_source and render_files
+
+def render_source(paths):
+    im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
+    renderClass = RenderSource
+    draw = ImageDraw.Draw(im)
+    rend = renderClass(draw=draw, x=0, y=0)
+    for path in paths:
+        render_file(path, rend)
+    return im
+
 class Command(BaseCommand):
     help = __doc__
 
     def add_arguments(self, parser):
+        parser.add_argument('--style')
         parser.add_argument('paths', nargs='+')
 
     def handle(self, *args, **options):
+        render = render_source
+        if options['style'] == 'blocks':
+            render = render_blocks
         img = render(paths=options['paths'])
         img.save('{}.png'.format('z'))
