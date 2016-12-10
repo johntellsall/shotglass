@@ -15,7 +15,8 @@ from django.core.management.base import BaseCommand
 from palettable import colorbrewer
 from PIL import Image, ImageDraw, ImageFont
 
-IMAGE_WIDTH = IMAGE_HEIGHT = 1000
+IMAGE_WIDTH = 10*1000
+IMAGE_HEIGHT = 1000
 COL_WIDTH, COL_HEIGHT = 100, 1000
 COL_GAP = 10
 
