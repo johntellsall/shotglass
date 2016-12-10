@@ -6,6 +6,7 @@ label.py --
 # list files in Git branch
 # git ls-tree --name-status --full-tree -r v4.0.0
 
+import os
 import re
 import subprocess
 
@@ -109,10 +110,19 @@ def render(paths):
         CMAP_COLORS = map(tuple, CMAP_OBJ.colors)
         cmap = iter(CMAP_COLORS)
         renderClass = RenderFile
-        rend = renderClass(draw=ImageDraw.Draw(im), x=0, y=0)
+        draw = ImageDraw.Draw(im)
+        rend = renderClass(draw=draw, x=0, y=0)
+        fnt = None
+    text_color = (0,0,0, 128)
     for path in paths:
+        text_args = dict(
+            xy=(rend.x, rend.y),
+            text=os.path.basename(path),
+            font=fnt,
+            fill=text_color)
         rend.colors = [cmap.next()]
         render_file(path, rend)
+        draw.text(**text_args)
     return im
 
 class Command(BaseCommand):
