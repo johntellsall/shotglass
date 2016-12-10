@@ -6,6 +6,7 @@ label.py --
 # list files in Git branch
 # git ls-tree --name-status --full-tree -r v4.0.0
 
+import itertools
 import os
 import re
 import subprocess
@@ -108,7 +109,7 @@ def render_blocks(paths):
     if 1:
         CMAP_OBJ = colorbrewer.qualitative.Set3_12
         CMAP_COLORS = map(tuple, CMAP_OBJ.colors)
-        cmap = iter(CMAP_COLORS)
+        colormap = itertools.cycle(CMAP_COLORS)
         renderClass = RenderFile
         draw = ImageDraw.Draw(im)
         rend = renderClass(draw=draw, x=0, y=0)
@@ -121,7 +122,7 @@ def render_blocks(paths):
             text=os.path.basename(path),
             font=fnt,
             fill=text_color)
-        rend.colors = [cmap.next()]
+        rend.colors = [colormap.next()]
         render_file(path, rend)
         draw.text(**text_args)
     return im

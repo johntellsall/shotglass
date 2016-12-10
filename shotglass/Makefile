@@ -12,6 +12,7 @@ query.html:
 z.html:
 	source-highlight -o $@ -i z.py
 
+.PHONY: source.lst
 source.lst:
 	find SOURCE/django/ -name '*.py' \
 	| egrep -v '/(bin|contrib|docs|examples|tests)/' \
