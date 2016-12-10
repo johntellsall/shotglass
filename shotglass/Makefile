@@ -8,6 +8,9 @@ all:	test
 query.html:
 	source-highlight -o $@ -i \
 	SOURCE/django/django/db/models/query.py
+.PHONY: z.html
+z.html:
+	source-highlight -o $@ -i z.py
 
 source.lst:
 	find SOURCE/django/ -name '*.py' \

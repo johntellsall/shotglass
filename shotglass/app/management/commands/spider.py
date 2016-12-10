@@ -39,34 +39,54 @@ class Render(object):
         self.draw = draw
         self.x, self.y = x, y
         self.symbol_re = re.compile('<(.+?)>([^<]*)')
+        self.colors = ['black']
+
+    def add_text(self, text):
+        raise NotImplmentedError
 
     def add_line(self, line):
-        relx = 0
-        colors = ['black']
         line = '<x>' + line # process text before HTML
         mgroups = (match.groups() for match in self.symbol_re.finditer(line))
         for sym, text in mgroups:
             if sym.startswith('font '):
-                colors.append(sym.split('"')[1])
+                self.colors.append(sym.split('"')[1])
             elif sym == '/font':
-                colors.pop()
-            if not text:
-                continue
-            if text.startswith(' '):
-                orig_len = len(text)
-                text = text.lstrip(' ')
-                relx += orig_len - len(text)
-            self.draw.line(
-                (self.x+relx,self.y, self.x+relx+len(text),self.y),
-                fill=colors[-1])
-            relx += len(text)
+                self.colors.pop()
+            if text:
+                self.add_text(text)
         self.y += 1
+
+
+# TODO: trim lines outside column (~80)
+
+class RenderSource(Render):
+    """
+    draw individual source code lines with colors + indent
+    """
+    def __init__(self, *args, **kwargs):
+        self.relx = None
+        super(RenderSource, self).__init__(*args, **kwargs)
+
+    def add_line(self, line):
+        self.relx = 0
+        super(RenderSource, self).add_line(line)
+
+    def add_text(self, text):
+        if text.startswith(' '):
+            orig_len = len(text)
+            text = text.lstrip(' ')
+            self.relx += orig_len - len(text)
+        self.draw.line(
+            (self.x+self.relx,self.y, 
+                self.x+self.relx+len(text),self.y),
+            fill=self.colors[-1])
+        self.relx += len(text) + 1
 
 
 def render(path):
     hlines = render_highlight(path)
     im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
-    rend = Render(draw=ImageDraw.Draw(im), x=0, y=0)
+    rend = RenderSource(draw=ImageDraw.Draw(im), x=0, y=0)
     for line in hlines:
         rend.add_line(line)
         if rend.y >= IMAGE_HEIGHT:
