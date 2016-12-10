@@ -10,6 +10,7 @@ import re
 import subprocess
 
 from django.core.management.base import BaseCommand
+from palettable import colorbrewer
 from PIL import Image, ImageDraw
 
 IMAGE_WIDTH = IMAGE_HEIGHT = 1000
@@ -84,15 +85,11 @@ class RenderSource(Render):
 
 
 class RenderFile(Render):
-    def __init__(self, color, *args, **kwargs):
-        self.color = color
-        super(RenderFile, self).__init__(*args, **kwargs)
-
     def add_line(self, line):
         self.draw.line(
             (self.x, self.y, 
                 self.x + COL_WIDTH - COL_GAP, self.y),
-            fill=self.color)
+            fill=self.colors[-1])
         self.y += 1
 
 
@@ -108,9 +105,13 @@ def render_file(path, renderObj):
 def render(paths):
     im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
     if 1:
+        CMAP_OBJ = colorbrewer.qualitative.Set3_12
+        CMAP_COLORS = map(tuple, CMAP_OBJ.colors)
+        cmap = iter(CMAP_COLORS)
         renderClass = RenderFile
-        rend = renderClass(draw=ImageDraw.Draw(im), x=0, y=0, color='pink')
+        rend = renderClass(draw=ImageDraw.Draw(im), x=0, y=0)
     for path in paths:
+        rend.colors = [cmap.next()]
         render_file(path, rend)
     return im
 
