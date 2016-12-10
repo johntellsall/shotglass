@@ -42,7 +42,7 @@ class Render(object):
         self.colors = ['black']
 
     def add_text(self, text):
-        raise NotImplmentedError
+        raise NotImplementedError
 
     def add_line(self, line):
         line = '<x>' + line # process text before HTML
@@ -96,19 +96,23 @@ class RenderFile(Render):
         self.y += 1
 
 
-def render(path):
+def render_file(path, renderObj):
     hlines = render_highlight(path)
+    for line in hlines:
+        renderObj.add_line(line)
+        if renderObj.y >= IMAGE_HEIGHT:
+            renderObj.y = 0
+            renderObj.x += COL_WIDTH
+
+
+def render(paths):
     im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
     if 1:
         renderClass = RenderFile
         rend = renderClass(draw=ImageDraw.Draw(im), x=0, y=0, color='pink')
-    for line in hlines:
-        rend.add_line(line)
-        if rend.y >= IMAGE_HEIGHT:
-            rend.y = 0
-            rend.x += COL_WIDTH
+    for path in paths:
+        render_file(path, rend)
     return im
-
 
 class Command(BaseCommand):
     help = __doc__
@@ -117,6 +121,5 @@ class Command(BaseCommand):
         parser.add_argument('paths', nargs='+')
 
     def handle(self, *args, **options):
-        for path in options['paths']:
-            img = render(path)
-            img.save('{}.png'.format('z'))
+        img = render(paths=options['paths'])
+        img.save('{}.png'.format('z'))
