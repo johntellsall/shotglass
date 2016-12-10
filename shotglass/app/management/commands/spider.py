@@ -12,7 +12,7 @@ import subprocess
 
 from django.core.management.base import BaseCommand
 from palettable import colorbrewer
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 IMAGE_WIDTH = IMAGE_HEIGHT = 1000
 COL_WIDTH, COL_HEIGHT = 100, 1000
@@ -112,7 +112,8 @@ def render(paths):
         renderClass = RenderFile
         draw = ImageDraw.Draw(im)
         rend = renderClass(draw=draw, x=0, y=0)
-        fnt = None
+        # X: size in points, not pixels
+        fnt = ImageFont.truetype('Umpush-Light.ttf', size=14)
     text_color = (0,0,0, 128)
     for path in paths:
         text_args = dict(
