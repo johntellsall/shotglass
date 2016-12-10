@@ -14,7 +14,7 @@ from PIL import Image, ImageDraw
 
 IMAGE_WIDTH = IMAGE_HEIGHT = 1000
 COL_WIDTH, COL_HEIGHT = 100, 1000
-# COL_GAP = 10
+COL_GAP = 10
 
 
 def serpentine_iter(width):
@@ -83,10 +83,25 @@ class RenderSource(Render):
         self.relx += len(text) + 1
 
 
+class RenderFile(Render):
+    def __init__(self, color, *args, **kwargs):
+        self.color = color
+        super(RenderFile, self).__init__(*args, **kwargs)
+
+    def add_line(self, line):
+        self.draw.line(
+            (self.x, self.y, 
+                self.x + COL_WIDTH - COL_GAP, self.y),
+            fill=self.color)
+        self.y += 1
+
+
 def render(path):
     hlines = render_highlight(path)
     im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
-    rend = RenderSource(draw=ImageDraw.Draw(im), x=0, y=0)
+    if 1:
+        renderClass = RenderFile
+        rend = renderClass(draw=ImageDraw.Draw(im), x=0, y=0, color='pink')
     for line in hlines:
         rend.add_line(line)
         if rend.y >= IMAGE_HEIGHT:
