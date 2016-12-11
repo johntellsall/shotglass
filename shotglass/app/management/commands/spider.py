@@ -6,6 +6,7 @@ label.py --
 # list files in Git branch
 # git ls-tree --name-status --full-tree -r v4.0.0
 
+from __future__ import print_function
 import itertools
 import os
 import re
@@ -36,6 +37,18 @@ def render_highlight(path):
         ['source-highlight', '-i', path])
     output = re.compile('^.+<pre><tt>', re.DOTALL).sub('', output)
     return output.split('\n')
+
+
+def get_count(paths):
+    output = subprocess.check_output(
+        ['wc', '--lines'] + paths)
+    wordcount_re = re.compile(
+        r'^\s*  ([0-9]+)'
+        r'\s+   (.+)    $',
+        re.MULTILINE|re.VERBOSE)
+    matches = wordcount_re.finditer(output)
+    return {int(count): path
+        for count,path in (m.groups() for m in matches)}
 
 
 class Render(object):
@@ -139,6 +152,11 @@ def render_source(paths):
         render_file(path, rend)
     return im
 
+
+def render_diff(paths):
+    x = get_count(paths)
+    print(x.items()[:20])
+
 class Command(BaseCommand):
     help = __doc__
 
@@ -150,5 +168,6 @@ class Command(BaseCommand):
         render = render_source
         if options['style'] == 'blocks':
             render = render_blocks
+        render = render_diff
         img = render(paths=options['paths'])
         img.save('{}.png'.format('z'))
