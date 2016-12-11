@@ -8,8 +8,10 @@ all:	test
 query.html:
 	source-highlight -o $@ -i \
 	SOURCE/django/django/db/models/query.py
+
 .PHONY: z.html
 z.html:
+	cat SOURCE/django/django/db/models/*.py > z.py
 	source-highlight -o $@ -i z.py
 
 .PHONY: source.lst
