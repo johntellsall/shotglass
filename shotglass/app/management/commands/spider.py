@@ -16,7 +16,7 @@ from django.core.management.base import BaseCommand
 from palettable import colorbrewer
 from PIL import Image, ImageDraw, ImageFont
 
-IMAGE_WIDTH = 10*1000
+IMAGE_WIDTH = 1000
 IMAGE_HEIGHT = 1000
 COL_WIDTH, COL_HEIGHT = 100, 1000
 COL_GAP = 10
@@ -118,6 +118,11 @@ def render_file(path, renderObj):
             renderObj.x += COL_WIDTH
 
 
+def get_colormap():
+    cmap_obj = colorbrewer.qualitative.Set3_12
+    cmap_colors = map(tuple, cmap_obj.colors)
+    return itertools.cycle(cmap_colors)
+
 def render_blocks(paths):
     im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
     if 1:
@@ -157,13 +162,16 @@ def render_diff(paths):
     count_dict = get_count(paths)
     im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
     draw = ImageDraw.Draw(im)
-    percent_scale = len(count_dict)
+    scale = IMAGE_HEIGHT / float(count_dict['total'])
+    colormap_iter = get_colormap()
     y = 0
     for path in sorted(count_dict):
-        next_y = y + count_dict[path] * percent_scale
+        next_y = y + count_dict[path] * scale
+        color = colormap_iter.next()
         draw.rectangle(
             (0, y, COL_WIDTH-COL_GAP, next_y),
-            outline='green')
+            fill=color,
+            outline='black')
         y = next_y
     return im
 
