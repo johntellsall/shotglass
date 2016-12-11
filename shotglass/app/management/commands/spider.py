@@ -47,7 +47,7 @@ def get_count(paths):
         r'\s+   (.+)    $',
         re.MULTILINE|re.VERBOSE)
     matches = wordcount_re.finditer(output)
-    return {int(count): path
+    return {path: int(count)
         for count,path in (m.groups() for m in matches)}
 
 
@@ -154,8 +154,19 @@ def render_source(paths):
 
 
 def render_diff(paths):
-    x = get_count(paths)
-    print(x.items()[:20])
+    count_dict = get_count(paths)
+    im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
+    draw = ImageDraw.Draw(im)
+    percent_scale = len(count_dict)
+    y = 0
+    for path in sorted(count_dict):
+        next_y = y + count_dict[path] * percent_scale
+        draw.rectangle(
+            (0, y, COL_WIDTH-COL_GAP, next_y),
+            outline='green')
+        y = next_y
+    return im
+
 
 class Command(BaseCommand):
     help = __doc__
@@ -168,6 +179,7 @@ class Command(BaseCommand):
         render = render_source
         if options['style'] == 'blocks':
             render = render_blocks
-        render = render_diff
+        elif options['style'] == 'diff':
+            render = render_diff
         img = render(paths=options['paths'])
         img.save('{}.png'.format('z'))
