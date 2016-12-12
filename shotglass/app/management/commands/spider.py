@@ -186,7 +186,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--output', default='z.png')
-        parser.add_argument('--style')
+        parser.add_argument('--style', default='source')
         parser.add_argument('paths', nargs='+')
 
     def handle(self, *args, **options):
@@ -196,5 +196,5 @@ class Command(BaseCommand):
             render = render_blocks
         elif options['style'] == 'diff':
             render = render_diff
-        img = render(image=im, paths=options['paths'])
-        img.save(options['output'])
+        render(image=im, paths=options['paths'])
+        im.save(options['output'])
