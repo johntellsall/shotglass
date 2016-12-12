@@ -124,6 +124,9 @@ def get_colormap():
     return itertools.cycle(cmap_colors)
 
 def render_blocks(paths):
+    """
+    draw each file as a colored block, annotated with filename
+    """
     im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
     if 1:
         CMAP_OBJ = colorbrewer.qualitative.Set3_12
@@ -149,6 +152,9 @@ def render_blocks(paths):
 # XX merge render_* functions
 
 def render_source(paths):
+    """
+    draw each line of source one pixel high, syntaxed colored, like a compressed minimap
+    """
     im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
     renderClass = RenderSource
     draw = ImageDraw.Draw(im)
@@ -159,6 +165,10 @@ def render_source(paths):
 
 
 def render_diff(paths):
+    """
+    draw each file as a colored slice, in prep to showing differences between versions.
+    XXX not useful atm
+    """
     count_dict = get_count(paths)
     im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
     draw = ImageDraw.Draw(im)
