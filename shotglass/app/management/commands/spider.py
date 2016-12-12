@@ -123,17 +123,16 @@ def get_colormap():
     cmap_colors = map(tuple, cmap_obj.colors)
     return itertools.cycle(cmap_colors)
 
-def render_blocks(paths):
+def render_blocks(image, paths):
     """
     draw each file as a colored block, annotated with filename
     """
-    im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
     if 1:
         CMAP_OBJ = colorbrewer.qualitative.Set3_12
         CMAP_COLORS = map(tuple, CMAP_OBJ.colors)
         colormap = itertools.cycle(CMAP_COLORS)
         renderClass = RenderFile
-        draw = ImageDraw.Draw(im)
+        draw = ImageDraw.Draw(image)
         rend = renderClass(draw=draw, x=0, y=0)
         # X: size in points, not pixels
         fnt = ImageFont.truetype('Umpush-Light.ttf', size=14)
@@ -147,31 +146,28 @@ def render_blocks(paths):
         rend.colors = [colormap.next()]
         render_file(path, rend)
         draw.text(**text_args)
-    return im
+    return image
 
 # XX merge render_* functions
 
-def render_source(paths):
+def render_source(image, paths):
     """
     draw each line of source one pixel high, syntaxed colored, like a compressed minimap
     """
-    im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
     renderClass = RenderSource
-    draw = ImageDraw.Draw(im)
+    draw = ImageDraw.Draw(image)
     rend = renderClass(draw=draw, x=0, y=0)
     for path in paths:
         render_file(path, rend)
-    return im
 
 
-def render_diff(paths):
+def render_diff(image, paths):
     """
     draw each file as a colored slice, in prep to showing differences between versions.
     XXX not useful atm
     """
     count_dict = get_count(paths)
-    im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
-    draw = ImageDraw.Draw(im)
+    draw = ImageDraw.Draw(image)
     scale = IMAGE_HEIGHT / float(count_dict['total'])
     colormap_iter = get_colormap()
     y = 0
@@ -183,7 +179,6 @@ def render_diff(paths):
             fill=color,
             outline='black')
         y = next_y
-    return im
 
 
 class Command(BaseCommand):
@@ -195,10 +190,11 @@ class Command(BaseCommand):
         parser.add_argument('paths', nargs='+')
 
     def handle(self, *args, **options):
+        im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
         render = render_source
         if options['style'] == 'blocks':
             render = render_blocks
         elif options['style'] == 'diff':
             render = render_diff
-        img = render(paths=options['paths'])
+        img = render(image=im, paths=options['paths'])
         img.save(options['output'])
