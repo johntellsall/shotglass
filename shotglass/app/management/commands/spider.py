@@ -146,7 +146,7 @@ def render_blocks(paths):
         draw.text(**text_args)
     return im
 
-# XX merge render_source and render_files
+# XX merge render_* functions
 
 def render_source(paths):
     im = Image.new('RGB', (IMAGE_WIDTH, IMAGE_HEIGHT), color='white')
@@ -180,6 +180,7 @@ class Command(BaseCommand):
     help = __doc__
 
     def add_arguments(self, parser):
+        parser.add_argument('--output', default='z.png')
         parser.add_argument('--style')
         parser.add_argument('paths', nargs='+')
 
@@ -190,4 +191,4 @@ class Command(BaseCommand):
         elif options['style'] == 'diff':
             render = render_diff
         img = render(paths=options['paths'])
-        img.save('{}.png'.format('z'))
+        img.save(options['output'])
