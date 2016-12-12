@@ -39,6 +39,12 @@ def render_highlight(path):
     return output.split('\n')
 
 
+def get_colormap():
+    cmap_obj = colorbrewer.qualitative.Set3_12
+    cmap_colors = map(tuple, cmap_obj.colors)
+    return itertools.cycle(cmap_colors)
+
+
 def get_count(paths):
     output = subprocess.check_output(
         ['wc', '--lines'] + paths)
@@ -117,11 +123,6 @@ def render_file(path, renderObj):
             renderObj.y = 0
             renderObj.x += COL_WIDTH
 
-
-def get_colormap():
-    cmap_obj = colorbrewer.qualitative.Set3_12
-    cmap_colors = map(tuple, cmap_obj.colors)
-    return itertools.cycle(cmap_colors)
 
 def render_blocks(image, paths):
     """
