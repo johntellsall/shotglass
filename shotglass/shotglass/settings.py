@@ -20,7 +20,7 @@ INSTALLED_APPS = (
 
     'app',
     'django_extensions',
-    'debug_toolbar',
+    # 'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -96,10 +96,6 @@ if 'test' in sys.argv:
     }
     # tables don't get created automatically for me
     # call_command('syncdb', migrate=True)
-
-import socket
-if 'Lil-Bub.' in socket.gethostname():
-    DATABASES['default'] = DATABASES['postgres']
 
 LOGGING = {
     'version': 1,

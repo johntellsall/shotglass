@@ -13,7 +13,7 @@ import subprocess
 
 import django.db
 from django.core.management.base import BaseCommand
-from radon.complexity import cc_visit
+# from radon.complexity import cc_visit
 
 from app import models
 from app import render
@@ -22,7 +22,7 @@ from app import render
 INDEX_SUFFIXES = ('.c', '.py')
 BORING_DIRS = ('.pc',) # TODO: make configurable
 
-if 0:
+if 01:
     # XX: never flushes logs
     logger = logging.getLogger(__name__)
 else:
@@ -33,23 +33,24 @@ else:
     logger = HackLogger()
 
 
-def calc_radon(path):
-    # return iter of blocks
-    code = open(path).read()
-    try:
-        return cc_visit(code)
-    except SyntaxError:
-        # logger.warning('%s: %s', path, error)
-        return []
+# def calc_radon(path):
+#     # return iter of blocks
+#     code = open(path).read()
+#     try:
+#         return cc_visit(code)
+#     except SyntaxError:
+#         # logger.warning('%s: %s', path, error)
+#         return []
 
 
 def format_project_name(project_dir):
-    pdir = os.path.basename(project_dir.rstrip('/'))
-    return pdir
+    return os.path.basename(project_dir.rstrip('/'))
 
+def test_format_project_name():
+    assert format_project_name('/a/b/') == 'b'
 
-def strip_project_dir(project_dir, path):
-    return path[len(project_dir):].lstrip('/')
+# def strip_project_dir(project_dir, path):
+#     return path[len(project_dir):].lstrip('/')
 
 
 def walk_type(topdir, name_func):
@@ -62,77 +63,9 @@ def walk_type(topdir, name_func):
             yield path
 
 
-# pylint: disable=no-member
-def index_py_radon(project, project_dir, paths):
-    # X: Radon only supports Python
-    #radon_objs = []
-    for path in paths:
-        relpath = strip_project_dir(project_dir, path)
-        for block in calc_radon(path):
-            assert block.letter in 'CFM'
-            sourceline = models.SourceLine.objects.create(
-                project=project,
-                path=relpath,
-                name=block.fullname,
-                line_number=block.lineno,
-                length=block.endline - block.lineno)
-            models.ProgRadon.objects.create(
-                sourceline=sourceline,
-                kind=block.letter,
-                complexity=block.complexity)
-    # 
-            # radon_objs.append(models.ProgRadon(
-            #     sourceline=sourceline,
-            #     kind=block.letter,
-            #     complexity=block.complexity))
-    # models.ProgRadon.objects.bulk_create(radon_objs)
-
-
-# pylint: disable=no-member
-def index_c_mccabe(project, project_dir, paths):
-    pmccabe_pat = re.compile(
-        r'^(?P<data> [0-9\t]+)'
-        r'(?P<path> .+?)'
-        r'\( (?P<definition_line> \d+) \): \s+ '
-        r'(?P<function> .+)',
-        re.VERBOSE)
-
-    paths = list(paths)
-    if not paths:
-        return
-
-    output = subprocess.check_output(
-        ['pmccabe'] + paths,
-        stderr=open(os.devnull, 'w')).split('\n')
-
-    mccabe_objs = []
-    for match in filter(None, (map(pmccabe_pat.match, output))):
-        data = [int(field) for field in match.group('data').split()]
-        num_lines = data[4]
-        definition_line = int(match.group('definition_line'))
-        relpath = strip_project_dir(project_dir, match.group('path'))
-        sourceline = models.SourceLine.objects.create(
-            project=project,
-            path=relpath,
-            name=match.group('function'),
-            line_number=definition_line,
-            length=num_lines)
-        mccabe_objs.append(models.ProgPmccabe.objects.create(
-            sourceline=sourceline,
-            first_line=data[3],
-            modified_mccabe=data[0],
-            mccabe=data[1],
-            num_statements=data[2],
-            # overlap w/ SourceLine
-            num_lines=num_lines,
-            definition_line=definition_line))
-    out = models.ProgPmccabe.objects.bulk_create(mccabe_objs)
-    print '???', out
-
-
 def make_index(project, project_dir):
-    is_c = re.compile(r'\.c$').search
-    is_python = re.compile(r'\.py$').search
+#     is_c = re.compile(r'\.c$').search
+#     is_python = re.compile(r'\.py$').search
     
     if django.db.connection.vendor == 'sqlite':
         django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
@@ -142,17 +75,17 @@ def make_index(project, project_dir):
     proj_symbols = models.SourceLine.objects.filter(project=project)
     proj_symbols.delete()
     
-    c_paths = list(walk_type(project_dir, is_c))
-    logger.info('%s: %d C files', project, len(c_paths))
+#     c_paths = list(walk_type(project_dir, is_c))
+#     logger.info('%s: %d C files', project, len(c_paths))
 
-    index_c_mccabe(project, project_dir, c_paths)
-    # shows as "0" because of the PRAGMA SYNC above
+#     index_c_mccabe(project, project_dir, c_paths)
+#     # shows as "0" because of the PRAGMA SYNC above
 
     py_paths = list(walk_type(project_dir, is_python))
     logger.info('%s: %d Python files', project, len(py_paths))
-    index_py_radon(project, project_dir, py_paths)
+#     index_py_radon(project, project_dir, py_paths)
 
-    render.render(proj_symbols)
+#     render.render(proj_symbols)
 
 class Command(BaseCommand):
     help = 'beer'
