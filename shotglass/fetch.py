@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 
 '''
 fetch.py -- check out interesting projects
@@ -7,13 +7,14 @@ fetch.py -- check out interesting projects
 from __future__ import print_function
 import os
 import subprocess
+import sys
 
-URLS = [
-	'https://github.com/django/django',
-	'https://github.com/pallets/flask.git',
-	'https://github.com/odoo/odoo.git',
-	'https://github.com/Pylons/pyramid.git',
-	'https://github.com/zzzeek/sqlalchemy'
+# URLS = [
+# 	'https://github.com/django/django',
+# 	'https://github.com/pallets/flask.git',
+# 	'https://github.com/odoo/odoo.git',
+# 	'https://github.com/Pylons/pyramid.git',
+# 	'https://github.com/zzzeek/sqlalchemy'
 ]
 
 def get_name(url):
@@ -27,12 +28,12 @@ def clone(url):
 	print(name)
 	cmd = 'git clone --depth=1'.split()
 	cmd += [url]
-	print(cmd)
+	print('>>> {}'.format(' '.join(cmd)))
 	subprocess.check_call(cmd)
 
 def main():
 	os.chdir('../SOURCE')
-	for url in URLS:
+	for url in sys.argv[1:]:
 		name = get_name(url)
 		print('{}: '.format(name), end='')
 		if os.path.exists(name):
