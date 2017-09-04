@@ -72,7 +72,6 @@ def index_lines(project, num_path_iter):
             num_lines=num)
 
 def make_index(project, project_dir, replace=True):
-    import ipdb ; ipdb.set_trace()
     def is_source(path):
         return os.path.splitext(path)[-1] in LANGUAGE_TYPES
     
@@ -86,11 +85,11 @@ def make_index(project, project_dir, replace=True):
         proj_files.delete()
  
     logger.info('%s: looking for source', project)
-    py_paths = list(walk_type(project_dir, is_python))
-    logger.info('%s: %d Python files', 
-        project, len(py_paths))
+    paths = list(walk_type(project_dir, is_source))
+    logger.info('%s: %d source files', 
+        project, len(paths))
 
-    proj_info = count_lines(project_dir, py_paths)
+    proj_info = count_lines(project_dir, paths)
     index_lines(project, proj_info)
     logger.info('%s: indexed %d files', 
         project, SourceFile.objects.filter(project=project).count())
