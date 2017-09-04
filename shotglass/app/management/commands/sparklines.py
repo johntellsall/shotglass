@@ -26,6 +26,21 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def plot(project):
+    WIDTH = 20
+    query = SourceFile.objects.order_by(
+        '-num_lines').values_list('num_lines', flat=True)
+    largest, count = query.first(), query.count()
+    print '{project}: {count} Python files, largest = {largest} lines'.format(
+        **locals())
+
+    def make_sparkline():
+        for i in range(0, len(query), len(query)/WIDTH):
+            yield query[i]
+    import ipdb ; ipdb.set_trace()
+    print sparklines.sparklines(make_sparkline())
+
+
 class Command(BaseCommand):
     help = __doc__
 
@@ -37,17 +52,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for project in options['projects']:
             print project
-        # for project_dir in map(os.path.expanduser, options['project_dirs']):
-        #     if not os.path.isdir(project_dir):
-        #         logger.warning(
-        #             '%s: project must be directory, skipping', project_dir)
-        #         continue
-            
-        #     # X: doesn't support multiple dirs
-        #     project_name = (options.get('project')
-        #         or format_project_name(project_dir))
-
-        #     logger.info('%s: start', project_name)
-        #     make_index(project_name, project_dir)
-
-        #     logger.debug('%s: done', project_name)
+            plot(project)
