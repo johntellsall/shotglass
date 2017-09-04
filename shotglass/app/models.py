@@ -13,6 +13,16 @@ class SourceFile(models.Model):
     kind = models.CharField(max_length=12)
     num_lines = models.IntegerField()
 
+    @classmethod
+    def projects(cls):
+        # pylint: disable=no-member
+        projects = cls.objects.values(
+            'project').distinct(
+        ).order_by('project').values_list('project', flat=True)
+        return list(projects)
+
+
+# DEPRECATED:
 class SourceLine(models.Model):
 
     project = models.CharField(max_length=200, **nullable)

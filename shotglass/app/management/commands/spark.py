@@ -50,10 +50,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('projects', nargs='+')
-        # parser.add_argument('--project')
-        # # parser.add_argument('--tags')
 
     def handle(self, *args, **options):
-        for project in options['projects']:
-            print project
+        projects = options['projects']
+        if projects == ['all']:
+            projects = SourceFile.projects()
+
+        for project in projects:
+            print 'PROJECT {}:'.format(project.upper())
             plot(project)
