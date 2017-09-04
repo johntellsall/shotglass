@@ -30,15 +30,12 @@ def plot(project):
     WIDTH = 20
     query = SourceFile.objects.order_by(
         '-num_lines').values_list('num_lines', flat=True)
-    largest, count = query.first(), query.count()
-    print '{project}: {count} Python files, largest = {largest} lines'.format(
+    largest, num_files = query.first(), query.count()
+    print '{project}: {num_files} Python files, largest = {largest} lines'.format(
         **locals())
 
-    def make_sparkline():
-        for i in range(0, len(query), len(query)/WIDTH):
-            yield query[i]
-    import ipdb ; ipdb.set_trace()
-    print sparklines.sparklines(make_sparkline())
+    data = [query[i] for i in range(0, num_files, num_files/WIDTH)]
+    print sparklines.sparklines(data)[0]
 
 
 class Command(BaseCommand):
