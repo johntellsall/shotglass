@@ -1,0 +1,32 @@
+version: '3'
+services:
+  
+  app:
+    build: .
+    volumes:
+      - .:/app
+  #   depends_on:
+  #     - postgres
+
+  # postgres:
+  #     image: postgres:9.6
+  #     ports:
+  #       - "5432:5432"
+  #     environment:
+  #       POSTGRES_PASSWORD: f16bd7543d707954
+
+#     ports:
+#     - "5000:5000"
+#     volumes:
+#     - .:/code
+#     - logvolume01:/var/log
+#     links:
+#     - redis
+#   redis:
+#     image: redis
+
+#   # fetch:
+#   #   build: 
+# volumes:
+#   logvolume01: {}
+
