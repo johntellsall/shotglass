@@ -6,6 +6,12 @@ from django.db import models
 
 nullable = {'blank': True, 'null': True}
 
+class SourceFile(models.Model):
+    project = models.CharField(max_length=200, **nullable)
+    name = models.CharField(max_length=200)
+    path = models.CharField(max_length=200)
+    kind = models.CharField(max_length=12)
+    num_lines = models.IntegerField()
 
 class SourceLine(models.Model):
 
