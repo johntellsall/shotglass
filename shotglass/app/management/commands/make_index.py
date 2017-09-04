@@ -14,7 +14,6 @@ import sys
 
 import django.db
 from django.core.management.base import BaseCommand
-# from radon.complexity import cc_visit
 
 from app.models import SourceFile
 from app import render
@@ -50,7 +49,7 @@ def walk_type(topdir, name_func):
 def count_lines(project_dir, paths):
     cmd = ['wc', '-l']
     pat = re.compile(r'\s*(\d+)\s+(.+)')
-    def is_interesting((num_str, path)):
+    def is_interesting((num_str, path),):
        return num_str != '0' and path != 'total'
 
     result = subprocess.check_output(cmd + paths)
@@ -74,9 +73,8 @@ def make_index(project, project_dir):
     if django.db.connection.vendor == 'sqlite':
         django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
 
-    # XX: delete project's index
-    # pylint: disable=no-member
     logger.info("project %s", project)
+    # XX: delete project's index
     if 1:
         logger.info("%s: zapping old data", project)
         proj_files = SourceFile.objects.filter(project=project)
@@ -86,11 +84,11 @@ def make_index(project, project_dir):
     py_paths = list(walk_type(project_dir, is_python))
     logger.info('%s: %d Python files', 
         project, len(py_paths))
+
     proj_info = count_lines(project_dir, py_paths)
     index_lines(project, proj_info)
-    logger.info('%s: counted %d files', 
+    logger.info('%s: indexed %d files', 
         project, SourceFile.objects.filter(project=project).count())
-#     render.render(proj_symbols)
 
 class Command(BaseCommand):
     help = __doc__
