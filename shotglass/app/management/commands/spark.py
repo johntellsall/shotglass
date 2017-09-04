@@ -28,8 +28,6 @@ logger = logging.getLogger(__name__)
 
 def plot(project):
     WIDTH = 20
-    # query = SourceFile.objects.exclude(
-    #     path__contains='tests/').order_by('-num_lines')
     query = SourceFile.objects.filter(project=project).order_by('-num_lines')
     num_lines = query.values_list('num_lines', flat=True)
     largest, num_files = num_lines.first(), num_lines.count()
