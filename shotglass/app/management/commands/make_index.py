@@ -19,7 +19,11 @@ from app.models import SourceFile
 from app import render
 
 
-INDEX_SUFFIXES = ('.c', '.py')
+LANGUAGE_TYPES = {
+    '.c': 'c',
+    '.go': 'golang',
+    '.py': 'python',
+}
 BORING_DIRS = ('.pc',) # TODO: make configurable
 
 logging.basicConfig(
@@ -67,20 +71,21 @@ def index_lines(project, num_path_iter):
             path=rel_path,
             num_lines=num)
 
-def make_index(project, project_dir):
-    is_python = re.compile(r'\.py$').search
+def make_index(project, project_dir, replace=True):
+    import ipdb ; ipdb.set_trace()
+    def is_source(path):
+        return os.path.splitext(path)[-1] in LANGUAGE_TYPES
     
     if django.db.connection.vendor == 'sqlite':
         django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
 
     logger.info("project %s", project)
-    # XX: delete project's index
-    if 1:
+    if replace:
         logger.info("%s: zapping old data", project)
         proj_files = SourceFile.objects.filter(project=project)
         proj_files.delete()
  
-    logger.info('%s: looking for files', project)
+    logger.info('%s: looking for source', project)
     py_paths = list(walk_type(project_dir, is_python))
     logger.info('%s: %d Python files', 
         project, len(py_paths))
@@ -95,7 +100,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('project_dirs', metavar='FILE', nargs='+')
-        parser.add_argument('--project')
 
     def handle(self, *args, **options):
         for project_dir in map(os.path.expanduser, options['project_dirs']):

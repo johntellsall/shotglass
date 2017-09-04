@@ -5,6 +5,10 @@ python-ctags==1.0.5
 six==1.9.0
 wsgiref==0.1.2
 Pillow==3.1.1
+bokeh
+
+# X: sparklines requires 'future'
+sparklines
 
 # developer
 django-debug-toolbar
@@ -14,10 +18,8 @@ pytest
 functools32==3.2.3-2
 django-colorfield
 palettable
-radon
+# radon
 # psycopg2
 pylint-django
 pytest-django
-bokeh
-sparklines
-future
+

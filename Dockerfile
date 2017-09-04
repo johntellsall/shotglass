@@ -11,6 +11,9 @@ RUN mkdir /app
 WORKDIR /app
 
 COPY ./requirements.txt /tmp/
+RUN pip install --upgrade pip
+# X: sparklines requires 'future'
+RUN pip install future
 RUN pip install -r /tmp/requirements.txt
 
 COPY . /app
