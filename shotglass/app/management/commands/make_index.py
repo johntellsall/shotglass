@@ -96,7 +96,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('project_dirs', metavar='FILE', nargs='+')
         parser.add_argument('--project')
-        # parser.add_argument('--tags')
 
     def handle(self, *args, **options):
         for project_dir in map(os.path.expanduser, options['project_dirs']):
@@ -112,11 +111,4 @@ class Command(BaseCommand):
             logger.info('%s: start', project_name)
             make_index(project_name, project_dir)
 
-            # pylint: disable=no-member
-            # project_source = models.SourceLine.objects.filter(
-            #     project=project_name)
-            # # X: 0 because of PRAGMA SYNC
-            # logger.info('%s: %s symbols', project_name,
-            #             '{:,}'.format(project_source.count()))
-
-            logger.debug('%s: done', project_name)
+            logger.info('%s: done', project_name)
