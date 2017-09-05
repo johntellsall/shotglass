@@ -25,21 +25,24 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def plot2():
-    # prepare some data
-    x = [1, 2, 3, 4, 5]
-    y = [6, 7, 2, 4, 5]
+def plot2(project):
+    query = SourceFile.objects.filter(
+        project=project).order_by('path')
+    num_lines = query.values_list('num_lines', flat=True)
 
-    # output to static HTML file
     bplot.output_file("lines.html")
 
     # create a new plot with a title and axis labels
-    p = bplot.figure(title="simple line example", x_axis_label='x', y_axis_label='y')
+    p = bplot.figure(
+        title="{} Source".format(project.title()),
+        x_axis_label='index', 
+        y_axis_label='number of lines')
+
+    y = num_lines
+    x = range(y.count())
 
     # add a line renderer with legend and line thickness
-    p.line(x, y, legend="Temp.", line_width=2)
-
-    # show the results
+    p.line(x, y, legend="", line_width=2)
     bplot.show(p)
 
 def plot(project):
@@ -66,12 +69,10 @@ class Command(BaseCommand):
         parser.add_argument('projects', nargs='+')
 
     def handle(self, *args, **options):
-        plot2()
-        blam
         projects = options['projects']
         if projects == ['all']:
             projects = SourceFile.projects()
 
         for project in projects:
             print 'PROJECT {}:'.format(project.upper())
-            plot(project)
+            plot2(project)
