@@ -66,8 +66,10 @@ def count_lines(project_dir, paths):
 
 def index_lines(project, num_path_iter):
     for num, rel_path in num_path_iter:
+        name = os.path.split(rel_path)[-1]
         SourceFile.objects.create(
             project=project,
+            name=name,
             path=rel_path,
             num_lines=num)
 
@@ -78,7 +80,7 @@ def make_index(project, project_dir, replace=True):
     if django.db.connection.vendor == 'sqlite':
         django.db.connection.cursor().execute('PRAGMA synchronous=OFF')
 
-    logger.info("project %s", project)
+    logger.info("project %s, directory %s", project, project_dir)
     if replace:
         logger.info("%s: zapping old data", project)
         proj_files = SourceFile.objects.filter(project=project)

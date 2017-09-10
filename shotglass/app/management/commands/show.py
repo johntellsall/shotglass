@@ -1,10 +1,21 @@
 from django.core.management.base import BaseCommand
 from django.db.models import Avg, Max, Sum
 
-from app.models import SourceLine
+from app.models import SourceFile
 
 
-def show_index(projects):
+def show_file_index(projects):
+    FORMAT = '{name:20} {path:50} {num_lines:>5}'
+
+    for project in projects:
+        # pylint: disable=no-member
+        files = SourceFile.objects.filter(
+            project=project).order_by('name')
+        for file_ in files:
+            print FORMAT.format(**vars(file_))
+
+# XX V1
+def show_symbol_index(projects):
     FORMAT = '{name:30} {path}:{line_number}'
 
     def fun_symbol(sym):
@@ -50,16 +61,16 @@ class Command(BaseCommand):
         parser.add_argument('--index', action="store_true")
 
     def handle(self, *args, **options):
-        if not options['projects']:
-            all_projects = SourceLine.projects()
+        all_projects = SourceFile.projects()
+        projects = options['projects']
+        if not projects:
             print('PROJECTS: {}'.format(', '.join(all_projects)))
             print('or "all"')
             return
-        projects = options['projects']
         if projects == ['all']:
-            projects = SourceLine.projects()
+            projects = all_projects
 
         if options['index']:
-            show_index(projects)
+            show_file_index(projects)
         else:
             show_summary(projects)

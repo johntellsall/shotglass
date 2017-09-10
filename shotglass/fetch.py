@@ -15,7 +15,7 @@ import sys
 # 	'https://github.com/odoo/odoo.git',
 # 	'https://github.com/Pylons/pyramid.git',
 # 	'https://github.com/zzzeek/sqlalchemy'
-]
+# ]
 
 def get_name(url):
 	name = os.path.split(url)[-1]
