@@ -29,6 +29,7 @@ def show_symbol_index(projects):
             print FORMAT.format(**symbol.__dict__)
 
 
+# XX V1
 # pylint: disable=unused-variable
 def show_summary(projects):
     HEADER = '{:30} {:>7} {:>9} {:>5} {:>4} {:>10}'.format(
@@ -58,7 +59,10 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('projects', nargs='*')
-        parser.add_argument('--index', action="store_true")
+        if 0: # XX V1
+            parser.add_argument('--index', action="store_true")
+        else:
+            parser.add_argument('--index', default=True)
 
     def handle(self, *args, **options):
         all_projects = SourceFile.projects()
