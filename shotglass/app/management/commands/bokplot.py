@@ -30,7 +30,7 @@ def plot2(project):
         project=project).order_by('path')
     num_lines = query.values_list('num_lines', flat=True)
 
-    bplot.output_file("lines.html")
+    bplot.output_file("{}.html".format(project))
 
     # create a new plot with a title and axis labels
     p = bplot.figure(
