@@ -81,7 +81,9 @@ class Command(BaseCommand):
         if 0: # XX V1
             parser.add_argument('--index', action="store_true")
         else:
-            parser.add_argument('--dirindex', action="store_true")
+            parser.add_argument('--dirindex', 
+                action="store_true",
+                help="show source lines per directory")
             parser.add_argument('--index', default=True)
 
     def handle(self, *args, **options):
