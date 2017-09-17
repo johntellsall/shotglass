@@ -4,16 +4,17 @@
 pack -- 
 '''
 
+import json
 import logging
 import operator
 import math
+import os
 import sys
 
 import django.db
 import rectpack
+from bokeh.plotting import figure, output_file
 from django.core.management.base import BaseCommand
-from bokeh.plotting import figure, show, output_file
-# from bokeh.sampledata.iris import flowers
 
 from app.models import SourceFile
 from app import render
@@ -61,19 +62,19 @@ def pack(project):
     
     packer = rectpack.newPacker()
     packer.add_bin(*box_dimensions(bin_lines))
-    for path,num_lines in file_data[:22]:
+    for path,num_lines in file_data:
         packer.add_rect(*box_dimensions(num_lines), rid=path)
 
-    logger.info('%s: %d rectangles, packing', project, len(file_data))
-    packer.pack()
-    logger.info('%s: packing done', project)
+    cache_path = 'rect.json'
+    if not os.path.exists(cache_path):
+        logger.info('%s: %d rectangles, packing', project, len(file_data))
+        packer.pack()
+        logger.info('%s: packing done', project)
+        with open(cache_path, 'w') as rectf:
+            json.dump(packer.rect_list(), rectf)
 
-    render(packer.rect_list())
-
-    # (b, x, y, w, h, rid)
-    # for pack_info in packer.rect_list():
-    #     print pack_info[1], pack_info[-1]
-
+    rects = json.load(open(cache_path))
+    render(rects)
 
 
 class Command(BaseCommand):
@@ -91,17 +92,3 @@ class Command(BaseCommand):
 
         for project in projects:
             pack(project)
-        # for project_dir in map(os.path.expanduser, options['project_dirs']):
-        #     if not os.path.isdir(project_dir):
-        #         logger.warning(
-        #             '%s: project must be directory, skipping', project_dir)
-        #         continue
-            
-        #     # X: doesn't support multiple dirs
-        #     project_name = (options.get('project')
-        #         or format_project_name(project_dir))
-
-        #     logger.info('%s: start', project_name)
-        #     make_index(project_name, project_dir)
-
-        #     logger.debug('%s: done', project_name)

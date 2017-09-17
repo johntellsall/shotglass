@@ -7,7 +7,6 @@ RUN apt install -y \
 RUN apt install -y \
 	ack-grep
 
-RUN mkdir /app
 WORKDIR /app
 
 COPY ./requirements.txt /tmp/
@@ -16,6 +15,7 @@ RUN pip install --upgrade pip
 RUN pip install future
 RUN pip install -r /tmp/requirements.txt
 
-COPY . /app
+WORKDIR /app/shotglass
+# COPY . /app
     # cd ./shotglass
     # ./manage.py migrate

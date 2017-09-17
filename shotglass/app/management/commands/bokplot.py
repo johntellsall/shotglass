@@ -10,6 +10,7 @@ import logging
 import sys
 
 import django.db
+import numpy as np
 from bokeh import plotting as bplot
 from django.core.management.base import BaseCommand
 
@@ -25,12 +26,37 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def plot2(project):
+from bokeh.plotting import figure, show, output_file
+
+def s_color(project):
+    TOOLS="hover,crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,"
+
+    info = list(SourceFile.objects.filter(project=project))
+    N = len(info)
+    x = np.random.random(size=N) * 100
+    y = np.random.random(size=N) * 100
+    radii = np.random.random(size=N) * 1.5
+    colors = [
+        "#%02x%02x%02x" % (int(r), int(g), 150) for r, g in zip(50+2*x, 30+2*y)
+    ]
+
+    p = figure(tools=TOOLS)
+
+    p.scatter(x, y, radius=radii,
+              fill_color=colors, fill_alpha=0.6,
+              line_color=None)
+
+    output_file("color_scatter.html", title="{}".format(project))
+    show(p)
+    print('color_scatter.html')
+
+def s_plot(project):
     query = SourceFile.objects.filter(
         project=project).order_by('path')
     num_lines = query.values_list('num_lines', flat=True)
 
-    bplot.output_file("{}.html".format(project))
+    outpath = "{}.html".format(project)
+    bplot.output_file(outpath)
 
     # create a new plot with a title and axis labels
     p = bplot.figure(
@@ -44,8 +70,9 @@ def plot2(project):
     # add a line renderer with legend and line thickness
     p.line(x, y, legend="", line_width=2)
     bplot.show(p)
+    print(outpath)
 
-def plot(project):
+def s_spark(project):
     WIDTH = 20
     query = SourceFile.objects.filter(project=project).order_by('-num_lines')
     num_lines = query.values_list('num_lines', flat=True)
@@ -67,12 +94,19 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('projects', nargs='+')
+        parser.add_argument('--style', default='color')
 
     def handle(self, *args, **options):
         projects = options['projects']
         if projects == ['all']:
             projects = SourceFile.projects()
 
+        try:
+            style_fname = 's_{}'.format(options['style'])
+            plotfunc = globals()[style_fname]
+        except KeyError:
+            sys.exit("{}: unknown style".format(options['style']))
+
         for project in projects:
             print 'PROJECT {}:'.format(project.upper())
-            plot2(project)
+            plotfunc(project)
