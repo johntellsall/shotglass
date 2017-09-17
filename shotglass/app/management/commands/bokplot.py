@@ -12,6 +12,8 @@ import sys
 import django.db
 import numpy as np
 from bokeh import plotting as bplot
+from bokeh.models import HoverTool
+from bokeh.plotting import figure, output_file, show, ColumnDataSource
 from django.core.management.base import BaseCommand
 
 from app.models import SourceFile
@@ -41,19 +43,37 @@ def s_color(project):
 
     N = len(sizes)
     print 'num: {}, max: {}'.format(N, size_max)
-    
+    hover = HoverTool(tooltips=[
+        ("name", "@name"),
+        ("lines", "@num_lines"),
+        ])
     x = np.random.random(size=N) * 100
     y = np.random.random(size=N) * 100
     radii = [mysize(sizes[i])/500*3 for i in range(N)]
     colors = [
         "#%02x%02x%02x" % (int(r), int(g), 150) for r, g in zip(50+2*x, 30+2*y)
     ]
+    # XX hover?
+    source = ColumnDataSource(data=dict(
+        x=x,
+        y=y,
+        fill_color=colors,
+        num_lines=query.values_list('num_lines', flat=True),
+        name=query.values_list('name', flat=True),
+        radius=radii
+        ))
+    # XX p = figure(tools=TOOLS)
+    p = figure(tools=[hover])
 
-    p = figure(tools=TOOLS)
-
-    p.scatter(x, y, radius=radii,
-              fill_color=colors, fill_alpha=0.6,
-              line_color=None)
+    p.scatter(
+        'x', 'y', 
+        fill_color='fill_color',
+        name='name',
+        radius='radius',
+        source=source,
+        fill_alpha=0.6,
+        line_color=None,
+        )
 
     output_file("color_scatter.html", title="{}".format(project))
     show(p)
