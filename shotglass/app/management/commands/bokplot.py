@@ -31,11 +31,20 @@ from bokeh.plotting import figure, show, output_file
 def s_color(project):
     TOOLS="hover,crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,"
 
-    info = list(SourceFile.objects.filter(project=project))
-    N = len(info)
+    query = SourceFile.objects.filter(project=project)
+    sizes = query.values_list('num_lines', flat=True)
+    from django.db.models import Max
+    size_max = query.all().aggregate(Max('num_lines')).get(
+        'num_lines__max')
+    def mysize(num):
+        return min(num, 500) # XX
+
+    N = len(sizes)
+    print 'num: {}, max: {}'.format(N, size_max)
+    
     x = np.random.random(size=N) * 100
     y = np.random.random(size=N) * 100
-    radii = np.random.random(size=N) * 1.5
+    radii = [mysize(sizes[i])/500*3 for i in range(N)]
     colors = [
         "#%02x%02x%02x" % (int(r), int(g), 150) for r, g in zip(50+2*x, 30+2*y)
     ]
