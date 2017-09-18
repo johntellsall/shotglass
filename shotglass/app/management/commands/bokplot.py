@@ -82,7 +82,7 @@ def s_color(project):
 def s_plot(project):
     query = SourceFile.objects.filter(
         project=project).order_by('path')
-    num_lines = query.values_list('num_lines', flat=True)
+    num_lines = query.order_by('-num_lines').values_list('num_lines', flat=True)
 
     outpath = "{}.html".format(project)
     bplot.output_file(outpath)
