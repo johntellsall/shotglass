@@ -11,13 +11,14 @@ import sys
 
 import django.db
 import numpy as np
+import sparklines
 from bokeh import plotting as bplot
 from bokeh.models import HoverTool
 from bokeh.plotting import figure, output_file, show, ColumnDataSource
 from django.core.management.base import BaseCommand
 
-from app.models import SourceFile
 from app import render
+from app.models import SourceFile
 
 
 logging.basicConfig(
@@ -28,7 +29,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-from bokeh.plotting import figure, show, output_file
 
 def s_color(project):
     TOOLS="hover,crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,"
@@ -75,9 +75,10 @@ def s_color(project):
         line_color=None,
         )
 
-    output_file("color_scatter.html", title="{}".format(project))
+    outpath = "{}.html".format(project)
+    output_file(outpath, title="{}".format(project))
     show(p)
-    print('color_scatter.html')
+
 
 def s_plot(project):
     query = SourceFile.objects.filter(
@@ -100,6 +101,7 @@ def s_plot(project):
     p.line(x, y, legend="", line_width=2)
     bplot.show(p)
     print(outpath)
+
 
 def s_spark(project):
     WIDTH = 20
