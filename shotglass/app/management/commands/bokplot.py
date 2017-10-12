@@ -39,8 +39,7 @@ def s_color(project):
     color = TBD
     hover = TBD
     """
-    TOOLS="hover,crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,"
-    # TOOLS = "hover"
+    TOOLS="crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,"
 
     query = SourceFile.objects.filter(project=project).order_by('path')
     size_max = query.all().aggregate(Max('num_lines')).get(
@@ -70,7 +69,8 @@ def s_color(project):
         # radius=50
         ))
 
-    p = figure(tools=[hover])
+    p = figure(tools=TOOLS)
+    p.add_tools(hover)
     p.scatter(
         'x', 'y', 
         # fill_color='fill_color',
