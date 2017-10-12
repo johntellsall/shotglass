@@ -9,7 +9,8 @@ sparklines -- XX
 import logging
 import sys
 
-import django.db
+from django.db.models import Max
+
 import numpy as np
 import sparklines
 from bokeh import plotting as bplot
@@ -31,48 +32,53 @@ logger = logging.getLogger(__name__)
 
 
 def s_color(project):
+    """
+    x = file index -- files in same dir are next to each other
+    y = file length
+    size = TBD
+    color = TBD
+    hover = TBD
+    """
     TOOLS="hover,crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,"
+    # TOOLS = "hover"
 
-    query = SourceFile.objects.filter(project=project)
-    sizes = query.values_list('num_lines', flat=True)
-    from django.db.models import Max
+    query = SourceFile.objects.filter(project=project).order_by('path')
     size_max = query.all().aggregate(Max('num_lines')).get(
         'num_lines__max')
+    sizes = query.values_list('path', 'num_lines')
     def mysize(num):
         return min(num, 500) # XX
 
-    N = len(sizes)
-    print 'num: {}, max: {}'.format(N, size_max)
+    num_files = len(sizes)
+    print 'num files: {}, max num lines: {}'.format(num_files, size_max)
     hover = HoverTool(tooltips=[
         ("name", "@name"),
         ("lines", "@num_lines"),
         ])
-    x = np.random.random(size=N) * 100
-    y = np.random.random(size=N) * 100
-    radii = [mysize(sizes[i])/500*3 for i in range(N)]
-    colors = [
-        "#%02x%02x%02x" % (int(r), int(g), 150) for r, g in zip(50+2*x, 30+2*y)
-    ]
-    # XX hover?
+    x = range(num_files)
+    y = [size for _path,size in sizes]
+    # radii = [mysize(sizes[i])/500*3 for i in range(num_files)]
+    # colors = [
+    #     "#%02x%02x%02x" % (int(r), int(g), 150) for r, g in zip(50+2*x, 30+2*y)
+    # ]
     source = ColumnDataSource(data=dict(
         x=x,
         y=y,
-        fill_color=colors,
-        num_lines=query.values_list('num_lines', flat=True),
+        # fill_color=colors,
+        # num_lines=y,
         name=query.values_list('name', flat=True),
-        radius=radii
+        # radius=50
         ))
-    # XX p = figure(tools=TOOLS)
-    p = figure(tools=[hover])
 
+    p = figure(tools=[hover])
     p.scatter(
         'x', 'y', 
-        fill_color='fill_color',
+        # fill_color='fill_color',
         name='name',
-        radius='radius',
+        # radius='radius',
         source=source,
         fill_alpha=0.6,
-        line_color=None,
+        # line_color=num_filesone,
         )
 
     outpath = "{}.html".format(project)
