@@ -44,8 +44,6 @@ def s_color(project):
     size_max = query.all().aggregate(Max('num_lines')).get(
         'num_lines__max')
     sizes = query.values_list('path', 'num_lines')
-    def mysize(num):
-        return min(num, 500) # XX
 
     num_files = len(sizes)
     print 'num files: {}, max num lines: {}'.format(num_files, size_max)
@@ -55,30 +53,20 @@ def s_color(project):
         ])
     x = range(num_files)
     y = [size for _path,size in sizes]
-    # radii = [mysize(sizes[i])/500*3 for i in range(num_files)]
-    # colors = [
-    #     "#%02x%02x%02x" % (int(r), int(g), 150) for r, g in zip(50+2*x, 30+2*y)
-    # ]
     source = ColumnDataSource(data=dict(
         x=x,
         y=y,
-        # fill_color=colors,
         num_lines=y,
         name=query.values_list('name', flat=True),
-        # radius=50
         ))
-    del x,y
 
     p = figure(tools=TOOLS)
     p.add_tools(hover)
     p.scatter(
         'x', 'y', 
-        # fill_color='fill_color',
         name='name',
-        # radius='radius',
         source=source,
         fill_alpha=0.6,
-        # line_color=num_filesone,
         )
 
     if 1: # add vertical lines to separate directories
@@ -89,7 +77,7 @@ def s_color(project):
         dir_changes = [
             dir_index for dir_index in range(len(dir_paths)-1)
             if dir_paths[dir_index] != dir_paths[dir_index+1]]
-        p.renderers.extend([make_vline(x) for x in dir_changes])
+        p.renderers.extend([make_vline(dx) for dx in dir_changes])
 
     outpath = "{}.html".format(project)
     output_file(outpath, title="{}".format(project))

@@ -1,5 +1,6 @@
 import collections
 import os
+import sys
 
 from django.core.management.base import BaseCommand
 from django.db.models import Avg, Max, Sum
@@ -50,7 +51,7 @@ def show_symbol_index(projects):
 
 # XX V1
 # pylint: disable=unused-variable
-def show_summary(projects):
+def v1_show_summary(projects):
     HEADER = '{:30} {:>7} {:>9} {:>5} {:>4} {:>10}'.format(
         'project', 'functions', 'symbols', 'maxlen', 'avglen', 'total')
     FORMAT = ('{project:30} {num_functions:9,} {num_symbols:9,}'
@@ -72,19 +73,47 @@ def show_summary(projects):
             total_length = symbols.aggregate(Sum('length')).values()[0]
         print FORMAT.format(**locals())
 
+def show_summary(projects):
+    HEADER = '{:30} {:>7} {:>9} {:>5} {:>4}'.format(
+        'project', 'files', 'lines', 'maxlen', 'avglen')
+    FORMAT = ('{project:30} {num_files:9,} {num_lines:9,}'
+        ' {max_length:6,}'
+        ' {avg_length:6,} {total_length:10,}')
+
+    print HEADER
+    for project in projects:
+        # pylint: disable=no-member
+        paths = SourceFile.objects.filter(project=project)
+        num_files = paths.count()
+        num_lines = -1
+        max_length = -1
+        avg_length = -1
+        total_length = -1
+        # num_functions = symbols.filter(kind__in=('F', 'M')).count()
+        # # TODO: optimize
+        # if not num_symbols:
+        #     max_length = avg_length = total_length = 0
+        # else:
+        #     max_length = symbols.aggregate(Max('length')).values()[0]
+        #     avg_length = int(symbols.aggregate(Avg('length')).values()[0])
+        #     total_length = symbols.aggregate(Sum('length')).values()[0]
+        print FORMAT.format(**locals())
+
 
 class Command(BaseCommand):
     help = 'beer'
 
     def add_arguments(self, parser):
         parser.add_argument('projects', nargs='*')
-        if 0: # XX V1
-            parser.add_argument('--index', action="store_true")
-        else:
-            parser.add_argument('--dirindex', 
-                action="store_true",
-                help="show source lines per directory")
-            parser.add_argument('--index', default=True)
+        parser.add_argument('--style', default='summary')
+
+        # if 0: # XX V1
+        #     parser.add_argument('--index', action="store_true")
+        # else:
+        #     parser.add_argument('--dirindex', 
+        #         action="store_true",
+        #         help="show source lines per directory")
+        #     parser.add_argument('--index', default=True)
 
     def handle(self, *args, **options):
         all_projects = SourceFile.projects()
@@ -96,9 +125,15 @@ class Command(BaseCommand):
         if projects == ['all']:
             projects = all_projects
 
-        if options['dirindex']:
-            show_dir_index(projects)
-        elif options['index']:
-            show_file_index(projects)
-        else:
-            show_summary(projects)
+        try:
+            style_fname = 'show_{}'.format(options['style'])
+            infofunc = globals()[style_fname]
+        except KeyError:
+            sys.exit("{}: unknown style".format(options['style']))
+        infofunc(projects)
+        # if options['dirindex']:
+        #     show_dir_index(projects)
+        # elif options['index']:
+        #     show_file_index(projects)
+        # else:
+        #     show_summary(projects)
