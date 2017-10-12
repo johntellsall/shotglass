@@ -7,18 +7,17 @@ sparklines -- XX
 # pylint: disable=bad-builtin
 
 import logging
+import os
 import sys
 
 from django.db.models import Max
 
-import numpy as np
 import sparklines
 from bokeh import plotting as bplot
-from bokeh.models import HoverTool
+from bokeh.models import HoverTool, Span
 from bokeh.plotting import figure, output_file, show, ColumnDataSource
 from django.core.management.base import BaseCommand
 
-from app import render
 from app.models import SourceFile
 
 
@@ -68,6 +67,7 @@ def s_color(project):
         name=query.values_list('name', flat=True),
         # radius=50
         ))
+    del x,y
 
     p = figure(tools=TOOLS)
     p.add_tools(hover)
@@ -80,6 +80,16 @@ def s_color(project):
         fill_alpha=0.6,
         # line_color=num_filesone,
         )
+
+    if 1: # add vertical lines to separate directories
+        def make_vline(loc):
+            return Span(location=loc, dimension='height', 
+                line_color='red', line_width=1)
+        dir_paths = [os.path.dirname(path) for path, _ in sizes]
+        dir_changes = [
+            dir_index for dir_index in range(len(dir_paths)-1)
+            if dir_paths[dir_index] != dir_paths[dir_index+1]]
+        p.renderers.extend([make_vline(x) for x in dir_changes])
 
     outpath = "{}.html".format(project)
     output_file(outpath, title="{}".format(project))
