@@ -9,7 +9,7 @@ from app.models import SourceFile
 
 def show_file_index(projects):
     FORMAT = '{name:20} {path:50} {num_lines:>5}'
-
+    print FORMAT.format(name='NAME', path='PATH', num_lines="LINES")
     for project in projects:
         # pylint: disable=no-member
         files = SourceFile.objects.filter(
