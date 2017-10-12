@@ -65,7 +65,7 @@ def s_color(project):
         x=x,
         y=y,
         # fill_color=colors,
-        # num_lines=y,
+        num_lines=y,
         name=query.values_list('name', flat=True),
         # radius=50
         ))
