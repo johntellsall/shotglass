@@ -49,54 +49,21 @@ def show_symbol_index(projects):
             print FORMAT.format(**symbol.__dict__)
 
 
-# XX V1
-# pylint: disable=unused-variable
-def v1_show_summary(projects):
-    HEADER = '{:30} {:>7} {:>9} {:>5} {:>4} {:>10}'.format(
-        'project', 'functions', 'symbols', 'maxlen', 'avglen', 'total')
-    FORMAT = ('{project:30} {num_functions:9,} {num_symbols:9,}'
-        ' {max_length:6,}'
-        ' {avg_length:6,} {total_length:10,}')
-
-    print HEADER
-    for project in projects:
-        # pylint: disable=no-member
-        symbols = SourceLine.objects.filter(project=project)
-        num_symbols = symbols.count()
-        num_functions = symbols.filter(kind__in=('F', 'M')).count()
-        # TODO: optimize
-        if not num_symbols:
-            max_length = avg_length = total_length = 0
-        else:
-            max_length = symbols.aggregate(Max('length')).values()[0]
-            avg_length = int(symbols.aggregate(Avg('length')).values()[0])
-            total_length = symbols.aggregate(Sum('length')).values()[0]
-        print FORMAT.format(**locals())
-
 def show_summary(projects):
-    HEADER = '{:30} {:>7} {:>9} {:>5} {:>4}'.format(
-        'project', 'files', 'lines', 'maxlen', 'avglen')
-    FORMAT = ('{project:30} {num_files:9,} {num_lines:9,}'
+    HEADER = '{:30} {:>9} {:>6} {:>6} {:>10}'.format(
+        'project', 'files', 'avglen', 'maxlen', 'total')
+    FORMAT = ('{project:30} {num_files:9,}'
+        ' {avg_length:6,}'
         ' {max_length:6,}'
-        ' {avg_length:6,} {total_length:10,}')
+        ' {total_length:10,}')
 
     print HEADER
     for project in projects:
-        # pylint: disable=no-member
-        paths = SourceFile.objects.filter(project=project)
-        num_files = paths.count()
-        num_lines = -1
-        max_length = -1
-        avg_length = -1
-        total_length = -1
-        # num_functions = symbols.filter(kind__in=('F', 'M')).count()
-        # # TODO: optimize
-        # if not num_symbols:
-        #     max_length = avg_length = total_length = 0
-        # else:
-        #     max_length = symbols.aggregate(Max('length')).values()[0]
-        #     avg_length = int(symbols.aggregate(Avg('length')).values()[0])
-        #     total_length = symbols.aggregate(Sum('length')).values()[0]
+        proj_qs = SourceFile.objects.filter(project=project)
+        num_files = proj_qs.count()
+        avg_length = int(proj_qs.aggregate(Avg('num_lines')).values()[0])
+        max_length = proj_qs.aggregate(Max('num_lines')).values()[0]
+        total_length = proj_qs.aggregate(Sum('num_lines')).values()[0]
         print FORMAT.format(**locals())
 
 
