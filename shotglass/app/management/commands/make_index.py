@@ -21,7 +21,9 @@ from app import render
 
 LANGUAGE_TYPES = {
     '.c': 'c',
+    '.cc': 'c++',
     '.go': 'golang',
+    '.h': 'c',
     '.py': 'python',
 }
 BORING_DIRS = ('.pc',) # TODO: make configurable
