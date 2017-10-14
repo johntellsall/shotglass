@@ -7,6 +7,9 @@ RUN apt install -y \
 RUN apt install -y \
 	ack-grep
 
+RUN git clone https://github.com/universal-ctags/ctags.git
+RUN cd ctags ; ./autogen.sh ; ./configure ; make install
+
 WORKDIR /app
 
 COPY ./requirements.txt /tmp/

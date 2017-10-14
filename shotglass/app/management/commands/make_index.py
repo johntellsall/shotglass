@@ -6,6 +6,8 @@ make_index -- compile data from tree of source files
 
 # pylint: disable=bad-builtin
 
+from __future__ import print_function
+
 import logging
 import os
 import re
@@ -16,7 +18,6 @@ import django.db
 from django.core.management.base import BaseCommand
 
 from app.models import SourceFile
-from app import render
 
 
 LANGUAGE_TYPES = {
@@ -75,6 +76,18 @@ def index_lines(project, num_path_iter):
             path=rel_path,
             num_lines=num)
 
+def index_symbols(project, paths):
+    cmd = ['ctags', '--fields=*', '-f', '-']
+    cmd += paths
+    for line in subprocess.check_output(cmd, universal_newlines=True).split('\n'):
+        print(line)
+
+def index_files(project, project_dir, paths):
+    proj_info = count_lines(project_dir, paths)
+    index_lines(project, proj_info)
+    logger.info('%s: indexed %d files', 
+        project, SourceFile.objects.filter(project=project).count())
+
 def make_index(project, project_dir, replace=True):
     def is_source(path):
         return os.path.splitext(path)[-1] in LANGUAGE_TYPES
@@ -93,10 +106,9 @@ def make_index(project, project_dir, replace=True):
     logger.info('%s: %d source files', 
         project, len(paths))
 
-    proj_info = count_lines(project_dir, paths)
-    index_lines(project, proj_info)
-    logger.info('%s: indexed %d files', 
-        project, SourceFile.objects.filter(project=project).count())
+    index_files(project, project_dir, paths)
+    index_symbols(project, paths)
+
 
 class Command(BaseCommand):
     help = __doc__

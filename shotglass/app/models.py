@@ -22,6 +22,14 @@ class SourceFile(models.Model):
         return list(projects)
 
 
+class Symbol(models.Model):
+    project = models.ForeignKey(SourceFile)
+    label = models.CharField(max_length=200)
+    line_number = models.IntegerField()
+    # kind = models.CharField(max_length=12)
+    # length = models.IntegerField()
+
+
 # DEPRECATED:
 class SourceLine(models.Model):
 
