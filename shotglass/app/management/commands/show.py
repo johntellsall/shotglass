@@ -5,7 +5,7 @@ import sys
 from django.core.management.base import BaseCommand
 from django.db.models import Avg, Max, Sum
 
-from app.models import SourceFile
+from app.models import SourceFile, Symbol
 
 
 def show_file_index(projects):
@@ -50,12 +50,13 @@ def show_symbol_index(projects):
 
 
 def show_summary(projects):
-    HEADER = '{:30} {:>9} {:>6} {:>6} {:>10}'.format(
-        'project', 'files', 'avglen', 'maxlen', 'total')
+    HEADER = '{:30} {:>9} {:>6} {:>6} {:>10} {:>9}'.format(
+        'project', 'files', 'avglen', 'maxlen', 'total', 'symbols')
     FORMAT = ('{project:30} {num_files:9,}'
         ' {avg_length:6,}'
         ' {max_length:6,}'
-        ' {total_length:10,}')
+        ' {total_length:10,}'
+        ' {num_symbols:9,}')
 
     print HEADER
     for project in projects:
@@ -64,6 +65,8 @@ def show_summary(projects):
         avg_length = int(proj_qs.aggregate(Avg('num_lines')).values()[0])
         max_length = proj_qs.aggregate(Max('num_lines')).values()[0]
         total_length = proj_qs.aggregate(Sum('num_lines')).values()[0]
+        proj_symbols = Symbol.objects.filter(source_file__project=project)
+        num_symbols = proj_symbols.count()
         print FORMAT.format(**locals())
 
 
