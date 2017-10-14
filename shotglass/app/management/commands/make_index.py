@@ -17,7 +17,7 @@ import sys
 import django.db
 from django.core.management.base import BaseCommand
 
-from app.models import SourceFile
+from app.models import SourceFile, Symbol
 
 
 LANGUAGE_TYPES = {
@@ -67,7 +67,35 @@ def count_lines(project_dir, paths):
         rel_path = path.split(project_dir)[-1].lstrip('/')
         yield int(num_str), rel_path
 
-def index_lines(project, num_path_iter):
+# TODO speed up by processing mult files at once
+# TODO get more info from 'info' and/or more ctags options
+def get_symbols(file_obj, path):
+    def parse_addr(symaddr):
+        keyvals = symaddr.split(';"', 1)[-1].split('\t')
+        assert keyvals[0] == ''
+        keyvals.pop(0)
+        return dict(item.split(':', 1) for item in keyvals)
+
+    cmd = ['ctags', '--fields=*', '-f', '-']
+    cmd += [path]
+    # import ipdb ; ipdb.set_trace()
+    lines = subprocess.check_output(cmd, universal_newlines=True).split('\n')
+    for line in filter(None, lines):
+        try:
+            tagname,tagpath,tagaddr = line.split('\t', 2)
+        except ValueError:
+            print('?', line); 
+            import ipdb ; ipdb.set_trace()
+            sys.exit(1)
+        info = parse_addr(tagaddr)
+        yield Symbol(
+            source_file=file_obj,
+            label=tagname,
+            line_number=info['line'],
+            )
+
+def index_files(project, project_dir, paths):
+    num_path_iter = count_lines(project_dir, paths)
     for num, rel_path in num_path_iter:
         name = os.path.split(rel_path)[-1]
         SourceFile.objects.create(
@@ -75,18 +103,6 @@ def index_lines(project, num_path_iter):
             name=name,
             path=rel_path,
             num_lines=num)
-
-def index_symbols(project, paths):
-    cmd = ['ctags', '--fields=*', '-f', '-']
-    cmd += paths
-    for line in subprocess.check_output(cmd, universal_newlines=True).split('\n'):
-        print(line)
-
-def index_files(project, project_dir, paths):
-    proj_info = count_lines(project_dir, paths)
-    index_lines(project, proj_info)
-    logger.info('%s: indexed %d files', 
-        project, SourceFile.objects.filter(project=project).count())
 
 def make_index(project, project_dir, replace=True):
     def is_source(path):
@@ -98,8 +114,7 @@ def make_index(project, project_dir, replace=True):
     logger.info("project %s, directory %s", project, project_dir)
     if replace:
         logger.info("%s: zapping old data", project)
-        proj_files = SourceFile.objects.filter(project=project)
-        proj_files.delete()
+        SourceFile.objects.filter(project=project).delete()
  
     logger.info('%s: looking for source', project)
     paths = list(walk_type(project_dir, is_source))
@@ -107,7 +122,15 @@ def make_index(project, project_dir, replace=True):
         project, len(paths))
 
     index_files(project, project_dir, paths)
-    index_symbols(project, paths)
+    logger.info('%s: indexed %d files', 
+        project, SourceFile.objects.filter(project=project).count())
+
+    for src_file in SourceFile.objects.filter(project=project):
+        src_path = os.path.join(project_dir, src_file.path)
+        path_symbols = get_symbols(src_file, src_path)
+        Symbol.objects.bulk_create(path_symbols)
+    proj_syms = Symbol.objects.filter(source_file__project=project)
+    logger.info('%s: indexed %d symbols', project, proj_syms.count())
 
 
 class Command(BaseCommand):

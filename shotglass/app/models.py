@@ -6,6 +6,7 @@ from django.db import models
 
 nullable = {'blank': True, 'null': True}
 
+
 class SourceFile(models.Model):
     project = models.CharField(max_length=200, **nullable)
     name = models.CharField(max_length=200)
@@ -22,8 +23,12 @@ class SourceFile(models.Model):
         return list(projects)
 
 
+# {'kind': 'function', 'end': '384', 'language': 'Python',
+# 'access': 'private', 'file': '', 'signature': '(x, y)',
+# 'scope': 'function:TestRoutes.invoke.create_app', 'line': '383'}
+
 class Symbol(models.Model):
-    project = models.ForeignKey(SourceFile)
+    source_file = models.ForeignKey(SourceFile)
     label = models.CharField(max_length=200)
     line_number = models.IntegerField()
     # kind = models.CharField(max_length=12)
