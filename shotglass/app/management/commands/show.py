@@ -50,11 +50,13 @@ def show_symbol_index(projects):
 
 
 def show_summary(projects):
-    HEADER = '{:30} {:>9} {:>6} {:>6} {:>10} {:>9}'.format(
+    HEADER = '{:30} {:>9} {:>6} {:>7} {:>10} {:>9}'.format(
         'project', 'files', 'avglen', 'maxlen', 'total', 'symbols')
-    FORMAT = ('{project:30} {num_files:9,}'
+    FORMAT = (
+        '{project:30}'
+        ' {num_files:9,}'
         ' {avg_length:6,}'
-        ' {max_length:6,}'
+        ' {max_length:7,}'
         ' {total_length:10,}'
         ' {num_symbols:9,}')
 

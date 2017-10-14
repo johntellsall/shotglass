@@ -72,26 +72,23 @@ def count_lines(project_dir, paths):
 def get_symbols(file_obj, path):
     def parse_addr(symaddr):
         keyvals = symaddr.split(';"', 1)[-1].split('\t')
-        assert keyvals[0] == ''
         keyvals.pop(0)
         return dict(item.split(':', 1) for item in keyvals)
 
     cmd = ['ctags', '--fields=*', '-f', '-']
     cmd += [path]
-    # import ipdb ; ipdb.set_trace()
     lines = subprocess.check_output(cmd, universal_newlines=True).split('\n')
     for line in filter(None, lines):
         try:
             tagname,tagpath,tagaddr = line.split('\t', 2)
         except ValueError:
             print('?', line); 
-            import ipdb ; ipdb.set_trace()
             sys.exit(1)
         info = parse_addr(tagaddr)
         yield Symbol(
             source_file=file_obj,
             label=tagname,
-            line_number=info['line'],
+            line_number=info.get('line'),
             )
 
 def index_files(project, project_dir, paths):
