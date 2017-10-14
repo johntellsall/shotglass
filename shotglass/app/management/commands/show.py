@@ -34,19 +34,20 @@ def show_dir_index(projects):
         for dir_path,num_lines in sorted(count.iteritems()):
             print FORMAT.format(**locals())
 
-# XX V1
+
 def show_symbol_index(projects):
-    FORMAT = '{name:30} {path}:{line_number}'
+    FORMAT = '{0:30} {1}:{2}'
 
     def fun_symbol(sym):
         return sym.name[0] != '_'
 
     for project in projects:
         # pylint: disable=no-member
-        symbols = SourceLine.objects.filter(
-            project=project).order_by('name')
-        for symbol in filter(fun_symbol, symbols):
-            print FORMAT.format(**symbol.__dict__)
+        proj_symbols = Symbol.objects.filter(
+            source_file__project=project)
+        fun_symbols = proj_symbols.exclude(label__startswith='_').order_by('label')
+        for symbol in fun_symbols:
+            print FORMAT.format(symbol.label, symbol.source_file.path, symbol.line_number)
 
 
 def show_summary(projects):
