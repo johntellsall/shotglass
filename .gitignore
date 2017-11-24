@@ -72,3 +72,5 @@ prof
 *.sublime*
 misc
 SOURCE
+.DS_Store
+*.html
