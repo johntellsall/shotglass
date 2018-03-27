@@ -1,4 +1,4 @@
-import StringIO
+# import StringIO
 
 from django import shortcuts
 from django.core import urlresolvers

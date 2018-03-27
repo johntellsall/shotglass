@@ -1,5 +1,12 @@
 # INSTALL
 
+NEW
+```
+    xcode-select --install
+    brew install pipenv
+```
+
+OLD
 ```
     sudo apt install -y exuberant-ctags python-dev python-virtualenv
     virtualenv ./venv

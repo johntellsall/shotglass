@@ -1,21 +1,22 @@
-Django==1.10.3
-argparse==1.2.1
-django-extensions>=1.6.7
-python-ctags==1.0.5
-six==1.9.0
-wsgiref==0.1.2
-Pillow==3.1.1
+Django<2.0
+argparse
+django-extensions
+# python-ctags
+# six
+# wsgiref
+Pillow
 bokeh
+gitpython
 
 # X: sparklines requires 'future'
-sparklines
+# sparklines
 
 # developer
 django-debug-toolbar
 ipdb
 ipython
 pytest
-functools32==3.2.3-2
+# functools32
 django-colorfield
 palettable
 # radon
@@ -25,3 +26,57 @@ pytest-django
 
 rectpack
 
+
+# FROZEN
+appnope==0.1.0
+astroid==1.6.2
+attrs==17.4.0
+bokeh==0.12.14
+decorator==4.2.1
+Django==1.11.11
+django-colorfield==0.1.14
+django-debug-toolbar==1.9.1
+django-extensions==2.0.6
+ipdb==0.11
+ipython==6.2.1
+ipython-genutils==0.2.0
+isort==4.3.4
+jedi==0.11.1
+Jinja2==2.10
+lazy-object-proxy==1.3.1
+linecache2==1.0.0
+MarkupSafe==1.0
+mccabe==0.6.1
+more-itertools==4.1.0
+nose==1.3.7
+numpy==1.14.2
+packaging==17.1
+palettable==3.1.0
+parso==0.1.1
+pexpect==4.4.0
+pickleshare==0.7.4
+Pillow==5.0.0
+pluggy==0.6.0
+prompt-toolkit==1.0.15
+ptyprocess==0.5.2
+py==1.5.3
+Pygments==2.2.0
+pylint==1.8.3
+pylint-django==0.9.4
+pylint-plugin-utils==0.2.6
+pyparsing==2.2.0
+pytest==3.5.0
+pytest-django==3.1.2
+python-dateutil==2.7.1
+pytz==2018.3
+PyYAML==3.12
+rectpack==0.2.1
+simplegeneric==0.8.1
+six==1.11.0
+sqlparse==0.2.4
+tornado==5.0.1
+traceback2==1.4.0
+traitlets==4.3.2
+unittest2==1.1.0
+wcwidth==0.1.7
+wrapt==1.10.11
