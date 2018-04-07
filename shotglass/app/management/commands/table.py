@@ -40,36 +40,26 @@ def interesting_paths(tree):
 
 
 def do_project(project):
-    repo = git.Repo(project)
-    versions_labels = ['0.8', '0.10', '0.12']
-
     def get_tree(label):
         return repo.tags[label].commit.tree
-
-    latest_label = versions_labels[-1]
-    paths = set(interesting_paths(get_tree(latest_label)))
 
     def in_latest(item, _):
         return item.path in paths
 
-    grid = {} # key=(version, path); value=item
+    repo = git.Repo(project)
+    versions_labels = ['0.6', '0.8', '0.10', '0.12']
+
+    latest_label = versions_labels[-1]
+    paths = set(interesting_paths(get_tree(latest_label)))
+
+    grid = {}  # key=(version, path); value=item
     for label in versions_labels:
         tree = get_tree(label)
         for item in tree.traverse(predicate=in_latest):
             grid[(label, item.path)] = item
 
-    # versions = dict((name, repo.tags[name]) for name in versions_labels)
-    # detail = {}
-    # for ver_label, version in versions.items():
-    #     detail[ver_label] = dict(do_version(version.commit.tree))
-
-    # # TODO: don't count lines of paths that aren't in latest
-    # latest = detail[versions_labels[-1]]
-    # for path in latest:
-    #     path_ver_count = {}
-    #     for ver_label, ver_detail in detail.items():
-    #         if path in ver_detail:
-    #             path_ver_count[(path, ver_label)] = ver_detail[path]['count']
+    headers = (f'{label:>4}' for label in versions_labels)
+    print(f'{"":30} {" ".join(headers)}')
 
     for path in sorted(paths):
         counts = []
@@ -79,15 +69,7 @@ def do_project(project):
                 counts.append(f'{count_lines(item):4}')
             else:
                 counts.append(f'{"":4}')
-        # items = get_items()
-        # import ipdb ; ipdb.set_trace()
-        # counts = [f'{value}' for value in 
         print(f'{path:30} {" ".join(counts)}')
-
-        # later_item = later[path]
-        # earlier_count = ''
-        # if path in earlier:
-        #     earlier_count = earlier[path]['count']
 
 
 class Command(BaseCommand):
