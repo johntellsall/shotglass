@@ -38,7 +38,8 @@ def do_project(project):
     earlier = dict(do_version(repo.tags['0.8'].commit.tree))
     later = dict(do_version(repo.tags['0.9'].commit.tree))
     for item in sorted(later, key=blob_path):
-        print(f'{item.path}')
+        count_later = count_lines(item)
+        print(f'{item.path:30} {count_later}')
     # diffs = repo.commit('0.8').diff('0.9')
     # diffs = [d for d in diffs if is_interesting(d.b_path)]
     # for diff in diffs:
