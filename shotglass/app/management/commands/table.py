@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 
 
 def is_interesting(path):
-    if re.search('(examples|scripts|testsuite)/', path):
+    if re.search('(docs|examples|scripts|testsuite)/', path):
         return False
     return os.path.splitext(path)[-1] in ['.py']
 
@@ -25,12 +25,20 @@ def do_version(tree):
         return is_interesting(i.path)
 
     for item in tree.traverse(predicate=interestingp):
-        num_lines = count_lines(item)
-        print(f'{num_lines}\t{item.path}')
+        yield (item, count_lines(item))
+        # print(f'{num_lines}\t{item.path}')
 
 def do_project(project):
+    import operator
+    blob_path = operator.attrgetter('path')
+    # def compare_blobs(a,b):
+    #     return cmp(a.path, b.path)
+
     repo = git.Repo(project)
-    do_version(repo.tags['0.9'].commit.tree)
+    earlier = dict(do_version(repo.tags['0.8'].commit.tree))
+    later = dict(do_version(repo.tags['0.9'].commit.tree))
+    for item in sorted(later, key=blob_path):
+        print(f'{item.path}')
     # diffs = repo.commit('0.8').diff('0.9')
     # diffs = [d for d in diffs if is_interesting(d.b_path)]
     # for diff in diffs:
