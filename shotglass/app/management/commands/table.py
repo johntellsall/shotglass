@@ -28,35 +28,37 @@ def do_version(tree):
         yield (item.path, {'item':item, 'count':count_lines(item)})
         # print(f'{num_lines}\t{item.path}')
 
+# def do_project(project):
+#     # import operator
+#     # blob_path = operator.attrgetter('path')
+
+#     repo = git.Repo(project)
+#     import ipdb ; ipdb.set_trace()
+#     earlier = dict(do_version(repo.tags['0.8'].commit.tree))
+#     later = dict(do_version(repo.tags['0.9'].commit.tree))
+#     for path in sorted(later):
+#         later_item = later[path]
+#         earlier_count = ''
+#         if path in earlier:
+#             earlier_count = earlier[path]['count']
+#         # count_later = count_lines(item)
+#         print(f'{path:30} {earlier_count:4} {later_item["count"]:4}')
+
 def do_project(project):
-    # import operator
-    # blob_path = operator.attrgetter('path')
-
     repo = git.Repo(project)
-    earlier = dict(do_version(repo.tags['0.8'].commit.tree))
-    later = dict(do_version(repo.tags['0.9'].commit.tree))
-    for path in sorted(later):
-        later_item = later[path]
-        earlier_count = ''
-        if path in earlier:
-            earlier_count = earlier[path]['count']
-        # count_later = count_lines(item)
-        print(f'{path:30} {earlier_count:4} {later_item["count"]:4}')
-    # diffs = repo.commit('0.8').diff('0.9')
-    # diffs = [d for d in diffs if is_interesting(d.b_path)]
-    # for diff in diffs:
-    #     print('{}'.format(diff.b_path))
-    #     a_text = get_text(diff.a_blob)
-    #     b_text = get_text(diff.b_blob)
-    #     try:
-    #         parts = difflib.Differ().compare(a_text, b_text)
-    #         print(", ".join(parts))
-    #     except Exception as exc:
-    #         print('?', exc)
-        # import ipdb ; ipdb.set_trace()
-        # print('{}\t{}'.format(diff.b_path, 
-        #     diff.b_blob.data_stream.read()[:40]))
-
+    versions_names = ['0.8', '0.10', '0.12']
+    versions = dict((name, repo.tags[name]) for name in versions_names)
+    detail = {}
+    for name, version in versions.items():
+        detail[name] = dict(do_version(version.commit.tree))
+    # later = dict(do_version(repo.tags['0.9'].commit.tree))
+    # for path in sorted(later):
+    #     later_item = later[path]
+    #     earlier_count = ''
+    #     if path in earlier:
+    #         earlier_count = earlier[path]['count']
+    #     # count_later = count_lines(item)
+    #     print(f'{path:30} {earlier_count:4} {later_item["count"]:4}')
 
 class Command(BaseCommand):
     help = __doc__
