@@ -43,9 +43,20 @@ def do_project(project):
     repo = git.Repo(project)
     versions_labels = ['0.8', '0.10', '0.12']
 
-    label = versions_labels[-1]
-    import ipdb ; ipdb.set_trace()
-    paths = list(interesting_paths(repo.tags[label].commit.tree))
+    def get_tree(label):
+        return repo.tags[label].commit.tree
+
+    latest_label = versions_labels[-1]
+    paths = set(interesting_paths(get_tree(latest_label)))
+
+    def in_latest(item, _):
+        return item.path in paths
+
+    grid = {} # key=(version, path); value=item
+    for label in versions_labels:
+        tree = get_tree(label)
+        for item in tree.traverse(predicate=in_latest):
+            grid[(label, item.path)] = item
 
     # versions = dict((name, repo.tags[name]) for name in versions_labels)
     # detail = {}
@@ -61,15 +72,17 @@ def do_project(project):
     #             path_ver_count[(path, ver_label)] = ver_detail[path]['count']
 
     for path in sorted(paths):
-        for ver_label in versions_labels:
-            version = repo.tags[ver_label]
-            import ipdb ; ipdb.set_trace()
+        def get_items():
+            for ver_label in versions_labels:
+                yield grid.get((ver_label, path))
+        items = get_items()
+
+        print(f'{path:30}')
 
         # later_item = later[path]
         # earlier_count = ''
         # if path in earlier:
         #     earlier_count = earlier[path]['count']
-        print(f'{path:30}')
 
 
 class Command(BaseCommand):
