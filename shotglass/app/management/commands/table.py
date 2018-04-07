@@ -25,7 +25,7 @@ def do_version(tree):
         return is_interesting(i.path)
 
     for item in tree.traverse(predicate=interestingp):
-        yield (item, count_lines(item))
+        yield (item.path, {'item':item, 'count':count_lines(item)})
         # print(f'{num_lines}\t{item.path}')
 
 def do_project(project):
@@ -37,9 +37,12 @@ def do_project(project):
     repo = git.Repo(project)
     earlier = dict(do_version(repo.tags['0.8'].commit.tree))
     later = dict(do_version(repo.tags['0.9'].commit.tree))
-    for item in sorted(later, key=blob_path):
-        count_later = count_lines(item)
-        print(f'{item.path:30} {count_later}')
+    for path in sorted(later):
+        later_item = later[path]
+        # import ipdb ; ipdb.set_trace()
+        count_earlier = '' # earlier.get(item.path, '')
+        # count_later = count_lines(item)
+        print(f'{path:30} {count_earlier:4} {later_item["count"]:4}')
     # diffs = repo.commit('0.8').diff('0.9')
     # diffs = [d for d in diffs if is_interesting(d.b_path)]
     # for diff in diffs:
