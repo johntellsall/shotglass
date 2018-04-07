@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 
 
 def is_interesting(path):
-    if re.search('(docs|examples|scripts|testsuite)/', path):
+    if re.search('(docs|examples|scripts|tests|testsuite)/', path):
         return False
     return os.path.splitext(path)[-1] in ['.py']
 
@@ -51,14 +51,13 @@ def do_project(project):
     detail = {}
     for name, version in versions.items():
         detail[name] = dict(do_version(version.commit.tree))
-    # later = dict(do_version(repo.tags['0.9'].commit.tree))
-    # for path in sorted(later):
-    #     later_item = later[path]
-    #     earlier_count = ''
-    #     if path in earlier:
-    #         earlier_count = earlier[path]['count']
-    #     # count_later = count_lines(item)
-    #     print(f'{path:30} {earlier_count:4} {later_item["count"]:4}')
+    latest = detail[versions_names[-1]]
+    for path in sorted(latest):
+        # later_item = later[path]
+        # earlier_count = ''
+        # if path in earlier:
+        #     earlier_count = earlier[path]['count']
+        print(f'{path:30}')
 
 class Command(BaseCommand):
     help = __doc__
