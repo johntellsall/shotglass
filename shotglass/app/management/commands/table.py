@@ -29,20 +29,19 @@ def do_version(tree):
         # print(f'{num_lines}\t{item.path}')
 
 def do_project(project):
-    import operator
-    blob_path = operator.attrgetter('path')
-    # def compare_blobs(a,b):
-    #     return cmp(a.path, b.path)
+    # import operator
+    # blob_path = operator.attrgetter('path')
 
     repo = git.Repo(project)
     earlier = dict(do_version(repo.tags['0.8'].commit.tree))
     later = dict(do_version(repo.tags['0.9'].commit.tree))
     for path in sorted(later):
         later_item = later[path]
-        # import ipdb ; ipdb.set_trace()
-        count_earlier = '' # earlier.get(item.path, '')
+        earlier_count = ''
+        if path in earlier:
+            earlier_count = earlier[path]['count']
         # count_later = count_lines(item)
-        print(f'{path:30} {count_earlier:4} {later_item["count"]:4}')
+        print(f'{path:30} {earlier_count:4} {later_item["count"]:4}')
     # diffs = repo.commit('0.8').diff('0.9')
     # diffs = [d for d in diffs if is_interesting(d.b_path)]
     # for diff in diffs:
