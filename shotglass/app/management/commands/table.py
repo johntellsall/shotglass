@@ -72,12 +72,17 @@ def do_project(project):
     #             path_ver_count[(path, ver_label)] = ver_detail[path]['count']
 
     for path in sorted(paths):
-        def get_items():
-            for ver_label in versions_labels:
-                yield grid.get((ver_label, path))
-        items = get_items()
-
-        print(f'{path:30}')
+        counts = []
+        for ver_label in versions_labels:
+            item = grid.get((ver_label, path))
+            if item:
+                counts.append(f'{count_lines(item):4}')
+            else:
+                counts.append(f'{"":4}')
+        # items = get_items()
+        # import ipdb ; ipdb.set_trace()
+        # counts = [f'{value}' for value in 
+        print(f'{path:30} {" ".join(counts)}')
 
         # later_item = later[path]
         # earlier_count = ''
