@@ -32,14 +32,16 @@ def interesting_paths(tree, ignore_pat, suffixes):
     ignore_re = re.compile(ignore_pat)
     suffix_set = set(f'.{suffix}' for suffix in suffixes)
 
-    def is_interesting(path):
-        print(path)
-        if ignore_re.search(path):
+    def not_ignored(path):
+        if ignore_pat and ignore_re.search(path):
             return False
+        return True
+
+    def good_suffix(path):
         return os.path.splitext(path)[-1] in suffix_set
 
     def interestingp(item, _):
-        return is_interesting(item.path)
+        return not_ignored(item.path) and good_suffix(item.path)
 
     for item in tree.traverse(predicate=interestingp):
         yield item.path
@@ -64,18 +66,18 @@ def show_project_grid(project, versions, ignore_pat, suffixes):
         for item in tree.traverse(predicate=in_latest):
             grid[(label, item.path)] = item
 
-    headers = (f'{label:>4}' for label in versions)
-    print(f'{"":30} {" ".join(headers)}')
+    headers = (f'{label:>8}' for label in versions)
+    print(f'{"":40} {" ".join(headers)}')
 
     for path in sorted(paths):
         counts = []
         for ver_label in versions:
             item = grid.get((ver_label, path))
             if item:
-                counts.append(f'{count_lines(item):4}')
+                counts.append(f'{count_lines(item):8}')
             else:
-                counts.append(f'{"":4}')
-        print(f'{path:30} {" ".join(counts)}')
+                counts.append(f'{"":8}')
+        print(f'{path:40} {" ".join(counts)}')
 
 
 def usage_versions(project):
