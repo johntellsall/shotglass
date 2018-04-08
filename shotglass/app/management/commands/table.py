@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 
 import git
 from django.core.management.base import BaseCommand
@@ -63,6 +64,11 @@ def show_project_grid(project, versions):
         print(f'{path:30} {" ".join(counts)}')
 
 
+def usage_versions(project):
+    repo = git.Repo(project)
+    tags_names = sorted(tag.name for tag in repo.tags)
+    print(f'project {project}: tags/versions {tags_names}')
+
 class Command(BaseCommand):
     help = __doc__
 
@@ -71,6 +77,9 @@ class Command(BaseCommand):
         parser.add_argument('projects', nargs=1)
 
     def handle(self, *args, **options):
+        if not options['versions']:
+            usage_versions(options['projects'][0])
+            sys.exit(1)
         for proj in options['projects']:
             versions = options['versions'].split(',')
             show_project_grid(proj, versions)
