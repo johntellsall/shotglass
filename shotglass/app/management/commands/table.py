@@ -39,7 +39,7 @@ def interesting_paths(tree):
         yield item.path
 
 
-def do_project(project):
+def show_project_grid(project, versions):
     def get_tree(label):
         return repo.tags[label].commit.tree
 
@@ -47,23 +47,22 @@ def do_project(project):
         return item.path in paths
 
     repo = git.Repo(project)
-    versions_labels = ['0.6', '0.8', '0.10', '0.12']
 
-    latest_label = versions_labels[-1]
+    latest_label = versions[-1]
     paths = set(interesting_paths(get_tree(latest_label)))
 
     grid = {}  # key=(version, path); value=item
-    for label in versions_labels:
+    for label in versions:
         tree = get_tree(label)
         for item in tree.traverse(predicate=in_latest):
             grid[(label, item.path)] = item
 
-    headers = (f'{label:>4}' for label in versions_labels)
+    headers = (f'{label:>4}' for label in versions)
     print(f'{"":30} {" ".join(headers)}')
 
     for path in sorted(paths):
         counts = []
-        for ver_label in versions_labels:
+        for ver_label in versions:
             item = grid.get((ver_label, path))
             if item:
                 counts.append(f'{count_lines(item):4}')
@@ -76,8 +75,11 @@ class Command(BaseCommand):
     help = __doc__
 
     def add_arguments(self, parser):
+        # versions = ['0.6', '0.8', '0.10', '0.12']
+        parser.add_argument('--versions')
         parser.add_argument('projects', nargs=1)
 
     def handle(self, *args, **options):
         for proj in options['projects']:
-            do_project(proj)
+            versions = options['versions'].split(',')
+            show_project_grid(proj, versions)
