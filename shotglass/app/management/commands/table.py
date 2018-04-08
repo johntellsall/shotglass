@@ -4,11 +4,14 @@ import sys
 
 import git
 from django.core.management.base import BaseCommand
+from natsort import natsorted
 
 
 def is_interesting(path):
+    # TODO add to command line args
     if re.search('(docs|examples|scripts|tests|testsuite)/', path):
         return False
+    # TODO add to command line args
     return os.path.splitext(path)[-1] in ['.py']
 
 # TODO: filter diff types, e.g. hcommit.diff('HEAD~1').iter_change_type('A'):
@@ -23,16 +26,25 @@ def get_text(blob):
 def count_lines(blob):
     return sum(1 for line in blob.data_stream.stream.readlines())
 
+# if re.search('(docs|examples|scripts|tests|testsuite)/', path):
 
-def interesting_paths(tree):
-    def interestingp(i, _):
-        return is_interesting(i.path)
+def interesting_paths(tree, ignore_pat, suffixes):
+    ignore_re = re.compile(ignore_pat)
+    suffix_set = set(f'.{suffix}' for suffix in suffixes)
+
+    def is_interesting(path):
+        if ignore_re.search(path):
+            return False
+        return os.path.splitext(path)[-1] in suffix_set
+
+    def interestingp(item, _):
+        return is_interesting(item.path)
 
     for item in tree.traverse(predicate=interestingp):
         yield item.path
 
 
-def show_project_grid(project, versions):
+def show_project_grid(project, versions, ignore_pat, suffixes):
     def get_tree(label):
         return repo.tags[label].commit.tree
 
@@ -42,7 +54,8 @@ def show_project_grid(project, versions):
     repo = git.Repo(project)
 
     latest_label = versions[-1]
-    paths = set(interesting_paths(get_tree(latest_label)))
+    paths = set(interesting_paths(
+        get_tree(latest_label), ignore_pat, suffixes))
 
     grid = {}  # key=(version, path); value=item
     for label in versions:
@@ -66,13 +79,16 @@ def show_project_grid(project, versions):
 
 def usage_versions(project):
     repo = git.Repo(project)
-    tags_names = sorted(tag.name for tag in repo.tags)
+    tags_names = natsorted(tag.name for tag in repo.tags)
     print(f'project {project}: tags/versions {tags_names}')
+
 
 class Command(BaseCommand):
     help = __doc__
 
     def add_arguments(self, parser):
+        parser.add_argument('--ignore', default='')
+        parser.add_argument('--suffixes', default='py')
         parser.add_argument('--versions')
         parser.add_argument('projects', nargs=1)
 
@@ -82,4 +98,8 @@ class Command(BaseCommand):
             sys.exit(1)
         for proj in options['projects']:
             versions = options['versions'].split(',')
-            show_project_grid(proj, versions)
+            suffixes = options['suffixes'].split(',')
+            show_project_grid(
+                proj, versions,
+                ignore_pat=options['ignore'],
+                suffixes=suffixes)
