@@ -33,6 +33,7 @@ def interesting_paths(tree, ignore_pat, suffixes):
     suffix_set = set(f'.{suffix}' for suffix in suffixes)
 
     def is_interesting(path):
+        print(path)
         if ignore_re.search(path):
             return False
         return os.path.splitext(path)[-1] in suffix_set
