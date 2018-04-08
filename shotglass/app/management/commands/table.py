@@ -1,4 +1,3 @@
-import difflib
 import os
 import re
 
@@ -23,13 +22,6 @@ def get_text(blob):
 def count_lines(blob):
     return sum(1 for line in blob.data_stream.stream.readlines())
 
-
-# def do_version(tree):
-#     def interestingp(i, _):
-#         return is_interesting(i.path)
-
-#     for item in tree.traverse(predicate=interestingp):
-#         yield (item.path, {'item': item, 'count': count_lines(item)})
 
 def interesting_paths(tree):
     def interestingp(i, _):
@@ -75,7 +67,6 @@ class Command(BaseCommand):
     help = __doc__
 
     def add_arguments(self, parser):
-        # versions = ['0.6', '0.8', '0.10', '0.12']
         parser.add_argument('--versions')
         parser.add_argument('projects', nargs=1)
 
