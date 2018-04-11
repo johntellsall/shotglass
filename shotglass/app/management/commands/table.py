@@ -7,13 +7,6 @@ from django.core.management.base import BaseCommand
 from natsort import natsorted
 
 
-def is_interesting(path):
-    # TODO add to command line args
-    if re.search('(docs|examples|scripts|tests|testsuite)/', path):
-        return False
-    # TODO add to command line args
-    return os.path.splitext(path)[-1] in ['.py']
-
 # TODO: filter diff types, e.g. hcommit.diff('HEAD~1').iter_change_type('A'):
 
 
@@ -54,8 +47,14 @@ def show_project_grid(project, versions, ignore_pat, suffixes):
     def in_latest(item, _):
         return item.path in paths
 
-    repo = git.Repo(project)
+    # TODO simplify
+    def render_cell(item):
+        if item is None:
+            return f'{"":8}'
+        count = count_lines(item)
+        return f'{count:8}'
 
+    repo = git.Repo(project)
     latest_label = versions[-1]
     paths = set(interesting_paths(
         get_tree(latest_label), ignore_pat, suffixes))
@@ -70,14 +69,20 @@ def show_project_grid(project, versions, ignore_pat, suffixes):
     print(f'{"":40} {" ".join(headers)}')
 
     for path in sorted(paths):
-        counts = []
-        for ver_label in versions:
-            item = grid.get((ver_label, path))
-            if item:
-                counts.append(f'{count_lines(item):8}')
-            else:
-                counts.append(f'{"":8}')
-        print(f'{path:40} {" ".join(counts)}')
+        row = [grid.get((ver_label, path))
+            for ver_label in versions]
+        num_nonzero = sum(1 for count in row if count)
+        if num_nonzero < 3:
+            # print(f'{path} not common, ignored')
+            continue
+        cells = map(render_cell, row)
+        print(f'{path:40} {" ".join(cells)}')
+
+
+def parse_versions(opt_versions):
+    if os.path.exists(opt_versions):
+        return [line.strip() for line in open(opt_versions)]
+    return opt_versions.split(',')
 
 
 def usage_versions(project):
@@ -99,8 +104,9 @@ class Command(BaseCommand):
         if not options['versions']:
             usage_versions(options['projects'][0])
             sys.exit(1)
+        versions = parse_versions(options['versions'])
+
         for proj in options['projects']:
-            versions = options['versions'].split(',')
             suffixes = options['suffixes'].split(',')
             show_project_grid(
                 proj, versions,

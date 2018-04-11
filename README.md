@@ -51,6 +51,7 @@ The `table` command lists files in the latest version, then tracks those files b
 
 - what dates correspond to the listed versions?
 - even if a file has the same line count, its contents can change over time -- `git diff` will show this.
+- the column widths can easily become hard to read
 
 ### Example: Redis
 
@@ -95,44 +96,10 @@ The above table shows three alpha versions and a major version jump. We see:
 
 <HR>
 
-# INSTALL
 
-NEW
-```
-    xcode-select --install
-    brew install pipenv
-```
+## Command: MAKE_INDEX
 
-OLD
-```
-    sudo apt install -y exuberant-ctags python-dev python-virtualenv
-    virtualenv ./venv
-    . ./venv/bin/activate
-    pip install -r ./requirements.txt
-    cd ./shotglass
-    ./manage.py migrate
-```
-
-## Install 2, using Docker
-
-1. install Docker and Docker Compose
-2. `docker-compose up`
-3. `cd shotglass`
-4. `./manage show all`
-
-More detail:
-```
-$ alias dc='docker-compose'
-
-# kill old containers (optional)
-$ docker stop $(docker ps -a -q)
-
-# build containers, run interactively
-$ dc run app bash
-```
-
-
-# DEMO: Flask, a small project
+### DEMO: Flask, a small project
 
 Shotglass displays information about all source files in a large
 project. For each file, it renders a single dot per line of code. If
@@ -229,3 +196,7 @@ v4.0.0 :  79       ..- -.  .+.... - --  . -    . . ....- .. . . .-. .-
 # [MORE DEMOS](DEMOS.md)
 
 # [EXPERIMENTS](EXPERIMENTS.md)
+
+# Related Projects
+
+* [A Repository with 44 Years of Unix Evolution](https://www2.dmst.aueb.gr/dds/pubs/conf/2015-MSR-Unix-History/html/Spi15c.html)
