@@ -72,8 +72,9 @@ def show_project_grid(project, versions, ignore_pat, suffixes):
         row = [grid.get((ver_label, path))
             for ver_label in versions]
         num_nonzero = sum(1 for count in row if count)
-        if num_nonzero < 3:
-            # print(f'{path} not common, ignored')
+        # TODO move to option
+        if num_nonzero < 4:
+            # path only in a couple releases: ignore
             continue
         cells = map(render_cell, row)
         print(f'{path:40} {" ".join(cells)}')
@@ -95,6 +96,7 @@ class Command(BaseCommand):
     help = __doc__
 
     def add_arguments(self, parser):
+        parser.add_argument('--ignore-dirs', default='') # TODO
         parser.add_argument('--ignore', default='')
         parser.add_argument('--suffixes', default='py')
         parser.add_argument('--versions')
