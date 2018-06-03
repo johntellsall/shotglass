@@ -3,6 +3,7 @@ import os
 import re
 
 import git
+import natsort
 from django.core.management.base import BaseCommand
 
 
@@ -24,13 +25,6 @@ def count_lines(blob):
     return sum(1 for line in blob.data_stream.stream.readlines())
 
 
-# def do_version(tree):
-#     def interestingp(i, _):
-#         return is_interesting(i.path)
-
-#     for item in tree.traverse(predicate=interestingp):
-#         yield (item.path, {'item': item, 'count': count_lines(item)})
-
 def interesting_paths(tree):
     def interestingp(i, _):
         return is_interesting(i.path)
@@ -38,9 +32,10 @@ def interesting_paths(tree):
     for item in tree.traverse(predicate=interestingp):
         yield item.path
 
-# TODO natsort
+
 def get_versions(repos):
-    return [tag.name for tag in repos.tags]
+    return natsort.natsorted([tag.name for tag in repos.tags])
+
 
 def do_project(project, versions):
     def get_tree(label):
@@ -50,7 +45,7 @@ def do_project(project, versions):
         return item.path in paths
 
     repo = git.Repo(project)
-
+    import ipdb ; ipdb.set_trace()
     versions_labels = versions or get_versions(repo)
     latest_label = versions_labels[-1]
     paths = set(interesting_paths(get_tree(latest_label)))
