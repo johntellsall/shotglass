@@ -1,6 +1,7 @@
 import difflib
 import os
 import re
+import sys
 
 import git
 import natsort
@@ -46,6 +47,8 @@ def do_project(project, versions):
 
     repo = git.Repo(project)
     versions_labels = versions or get_versions(repo)
+    if not versions_labels:
+        sys.exit('No tags/branches found')
     latest_label = versions_labels[-1]
     paths = set(interesting_paths(get_tree(latest_label)))
 
