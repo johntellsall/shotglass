@@ -76,6 +76,7 @@ class Command(BaseCommand):
     help = __doc__
 
     def add_arguments(self, parser):
+        parser.add_argument('--versions')
         parser.add_argument('projects', nargs=1)
 
     def handle(self, *args, **options):
