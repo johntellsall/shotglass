@@ -38,8 +38,11 @@ def interesting_paths(tree):
     for item in tree.traverse(predicate=interestingp):
         yield item.path
 
+# TODO natsort
+def get_versions(repos):
+    return [tag.name for tag in repos.tags]
 
-def do_project(project):
+def do_project(project, versions):
     def get_tree(label):
         return repo.tags[label].commit.tree
 
@@ -47,8 +50,8 @@ def do_project(project):
         return item.path in paths
 
     repo = git.Repo(project)
-    versions_labels = ['0.6', '0.8', '0.10', '0.12']
 
+    versions_labels = versions or get_versions(repo)
     latest_label = versions_labels[-1]
     paths = set(interesting_paths(get_tree(latest_label)))
 
@@ -80,5 +83,8 @@ class Command(BaseCommand):
         parser.add_argument('projects', nargs=1)
 
     def handle(self, *args, **options):
+        versions = None
+        if options['versions']:
+            versions = options['versions'].split(',')
         for proj in options['projects']:
-            do_project(proj)
+            do_project(proj, versions)
