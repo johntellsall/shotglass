@@ -75,9 +75,7 @@ def compile(project_dir):
     })
     return df
 
-def main(project_dir):
-    logging.basicConfig(datefmt='%X', format=LOG_FORMAT, level=logging.INFO)
-
+def make_project(project_dir):
     project_dir = sys.argv[1]
     project_name = os.path.basename(project_dir)
     project_data_path = f'{project_name}.pkl'
@@ -89,9 +87,13 @@ def main(project_dir):
         df.to_pickle(project_data_path)
     logging.info(f'{project_name}: {len(df)} files')
 
+def main(argv):
+    logging.basicConfig(datefmt='%X', format=LOG_FORMAT, level=logging.INFO)
+    for project_dir in argv:
+        make_project(project_dir)
 
 if __name__=='__main__':
-    main(sys.argv[1])
+    main(sys.argv[1:])
 
 
 # df = pd.DataFrame({'path': [8, 3, 4, 2],
