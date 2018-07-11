@@ -54,8 +54,10 @@ def make_linecount(path):
 def is_source(path):
     return os.path.splitext(path)[-1] in GOOD_EXTENSIONS
 
-def compile(project_dir):
-    source_paths = list(filter(is_source, walk_tree(project_dir)))
+def compile(project_dir, paths=None):
+    source_paths = paths
+    if source_paths is None:
+        source_paths = list(filter(is_source, walk_tree(project_dir)))
     logging.info((f'{project_dir}: {len(source_paths)} files'))
     pool = mpool.Pool()
     start_tm = time.time()
@@ -70,7 +72,7 @@ def compile(project_dir):
 
     df = pd.DataFrame({
         'path': source_paths,
-        'ctags': ctags_rows,
+        'ctags_raw': ctags_rows,
         # 'linecount': count_rows,
     })
     return df
