@@ -34,7 +34,11 @@ def format_index_cmd(path):
 def make_ctags(path):
     cmd = format_index_cmd(path)
     out = subprocess.check_output(cmd)
-    out = out.decode("utf-8", errors='ignore')
+    try:
+        out = out.decode("utf-8", errors='ignore')
+    except UnicodeDecodeError:
+        logging.error(f'{path}: bad Unicode')
+        return None
     return out
     # return {"path": path, "ctags": out}
 
@@ -56,7 +60,8 @@ def compile(project_dir):
     pool = mpool.Pool()
     start_tm = time.time()
     ctags_rows = pool.map(make_ctags, source_paths)
-    count_rows = pool.map(make_linecount, source_paths)
+    if 0:
+        count_rows = pool.map(make_linecount, source_paths)
     pool.close()
     pool.join()
     elapsed_tm = time.time() - start_tm
@@ -66,7 +71,7 @@ def compile(project_dir):
     df = pd.DataFrame({
         'path': source_paths,
         'ctags': ctags_rows,
-        'linecount': count_rows,
+        # 'linecount': count_rows,
     })
     return df
 
@@ -82,7 +87,7 @@ def main(project_dir):
     else:
         df = compile(project_dir)
         df.to_pickle(project_data_path)
-    import ipdb ; ipdb.set_trace()
+    logging.info(f'{project_name}: {len(df)} files')
 
 
 if __name__=='__main__':
