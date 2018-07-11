@@ -34,8 +34,8 @@ def walk_tree(topdir):
 def is_source(path):
     return os.path.splitext(path)[-1] == '.py'
 
-
-source_paths = list(filter(is_source, walk_tree(sys.argv[1])))
+project_dir = sys.argv[1]
+source_paths = list(filter(is_source, walk_tree(project_dir)))
 line_counts = list(map(count_lines, source_paths))
 names = list(map(os.path.basename, source_paths))
 print(names)
@@ -48,4 +48,6 @@ squarify.plot(
     sizes=df['line_counts'],
     label=df['names'], alpha=.8)
 plt.axis('off')
+title = os.path.basename(project_dir).title()
+plt.title(title)
 plt.savefig('tree.png')
