@@ -76,7 +76,6 @@ def compile(project_dir):
     return df
 
 def make_project(project_dir):
-    project_dir = sys.argv[1]
     project_name = os.path.basename(project_dir)
     project_data_path = f'{project_name}.pkl'
 
