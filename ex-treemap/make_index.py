@@ -85,7 +85,8 @@ def compile(project_dir, paths=None):
     return df
 
 def make_project(project_dir):
-    project_name = os.path.basename(project_dir)
+    project_name = os.path.basename(project_dir.rstrip('/'))
+    assert project_name
     project_data_path = f'{project_name}.pkl'
 
     if os.path.exists(project_data_path):
