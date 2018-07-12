@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import logging
 import multiprocessing.pool as mpool
 import os
@@ -5,6 +7,7 @@ import pandas as pd
 import subprocess
 import sys
 import time
+import traceback
 
 
 DULL_DIRECTORIES = set(['.git'])
@@ -13,7 +16,10 @@ LOG_FORMAT = '%(asctime)-15s %(message)s'
 
 
 def count_lines(path):
-    return sum(1 for line in open(path))
+    try:
+        return sum(1 for line in open(path, newline=None))
+    except UnicodeDecodeError:
+        return None
 
 
 # TODO make configurable
@@ -40,13 +46,15 @@ def make_ctags(path):
         logging.error(f'{path}: bad Unicode')
         return None
     return out
-    # return {"path": path, "ctags": out}
 
 
 def make_linecount(path):
-    count = count_lines(path)
-    return count
-    # return {"path": path, "lines": count}
+    try:
+        count = count_lines(path)
+        return count
+    except Exception as e:
+        traceback.print_exc()
+        raise
 
 # TODO make configurable
 
@@ -62,8 +70,7 @@ def compile(project_dir, paths=None):
     pool = mpool.Pool()
     start_tm = time.time()
     ctags_rows = pool.map(make_ctags, source_paths)
-    if 0:
-        count_rows = pool.map(make_linecount, source_paths)
+    count_rows = pool.map(make_linecount, source_paths)
     pool.close()
     pool.join()
     elapsed_tm = time.time() - start_tm
@@ -73,7 +80,7 @@ def compile(project_dir, paths=None):
     df = pd.DataFrame({
         'path': source_paths,
         'ctags_raw': ctags_rows,
-        # 'linecount': count_rows,
+        'linecount': count_rows,
     })
     return df
 
@@ -96,9 +103,3 @@ def main(argv):
 if __name__=='__main__':
     main(sys.argv[1:])
 
-
-# df = pd.DataFrame({'path': [8, 3, 4, 2],
-#     'group': [
-# if 1:
-#     print(result1[0])
-#     print(result2[0])

@@ -2,3 +2,4 @@ squarify
 matplotlib
 pandas
 pytest
+pytest-watch
