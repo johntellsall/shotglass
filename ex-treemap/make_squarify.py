@@ -11,9 +11,13 @@ import squarify
 
 def make_squarify(project_data_path):
     df = pd.read_pickle(project_data_path)
-    squarify.plot(sizes=df['linecount'], label=df['name'], alpha=.8)
+    df = df[df.linecount > 0]
+    squarify.plot(sizes=df.linecount, label=df.name, alpha=.8)
     plt.axis('off')
-    plt.savefig('dir.png')
+    name = os.path.splitext(os.path.basename(project_data_path))[0]
+    out_path = f'{name}.png'
+    print(out_path)
+    plt.savefig(out_path)
 
 
 if __name__ == '__main__':
