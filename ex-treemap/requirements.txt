@@ -3,3 +3,4 @@ matplotlib
 pandas
 pytest
 pytest-watch
+pdbpp

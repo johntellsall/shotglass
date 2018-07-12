@@ -66,11 +66,16 @@ def compile(project_dir, paths=None):
     source_paths = paths
     if source_paths is None:
         source_paths = list(filter(is_source, walk_tree(project_dir)))
-    logging.info((f'{project_dir}: {len(source_paths)} files'))
+    if not os.path.exists(project_dir):
+        logging.error(f"{project_dir}: doesn't exist, skipping")
+        return None
+
+    logging.info(f'{project_dir}: {len(source_paths)} files')
     pool = mpool.Pool()
     start_tm = time.time()
     ctags_rows = pool.map(make_ctags, source_paths)
     count_rows = pool.map(make_linecount, source_paths)
+    names_rows = list(map(os.path.basename, source_paths))
     pool.close()
     pool.join()
     elapsed_tm = time.time() - start_tm
@@ -79,6 +84,7 @@ def compile(project_dir, paths=None):
 
     df = pd.DataFrame({
         'path': source_paths,
+        'name': names_rows,
         'ctags_raw': ctags_rows,
         'linecount': count_rows,
     })
