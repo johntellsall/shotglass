@@ -66,7 +66,7 @@ def compile(project_dir, paths=None):
     source_paths = paths
     if source_paths is None:
         source_paths = list(filter(is_source, walk_tree(project_dir)))
-    if not os.path.exists(project_dir):
+    if project_dir and not os.path.exists(project_dir):
         logging.error(f"{project_dir}: doesn't exist, skipping")
         return None
 
