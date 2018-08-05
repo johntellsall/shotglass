@@ -13,6 +13,10 @@ from git import Repo
 from natsort import natsorted
 
 
+def count_lines(path):
+    return sum(1 for line in open(path, newline=None))
+
+
 # TODO make configurable
 def is_interesting_name(name):
     return os.path.splitext(name)[-1] in ['.py']
@@ -38,4 +42,6 @@ for tag in natsorted(repo.tags, key=lambda t: t.name):
             continue
         if not is_interesting_name(item.name):
             continue
-        print(item.path)
+        # import ipdb ; ipdb.set_trace()
+        num_bytes = item.size
+        print(f'{num_bytes:5} {item.path}')
