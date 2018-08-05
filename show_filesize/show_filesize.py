@@ -8,7 +8,7 @@ import os
 import re
 import sys
 
-from colorama import Fore, Style
+from colorama import Back, Fore, Style
 from git import Repo
 from natsort import natsorted
 
@@ -30,10 +30,11 @@ def is_interesting_path(path):
         return False
     return True
 
+# def calc_stripe(tree):
 
 repo = Repo(sys.argv[1])
 for tag in natsorted(repo.tags, key=lambda t: t.name):
-    print(Fore.GREEN + f'### {tag.name}' + Style.RESET_ALL)
+    print(Back.GREEN + Fore.BLACK+ f'### {tag.name}' + Style.RESET_ALL)
 
     for item in tag.commit.tree.traverse():
         if item.type != 'blob':
