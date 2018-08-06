@@ -53,6 +53,7 @@ def by_name(source):
     return source.name
 
 
+# TODO only count the N-largest files in the last tag tree
 repo = Repo(sys.argv[1])
 path_column = {}
 for tag in natsorted(repo.tags, key=lambda t: t.name):
