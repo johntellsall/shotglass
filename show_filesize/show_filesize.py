@@ -35,7 +35,8 @@ def is_interesting_path(path):
     return True
 
 
-def calc_stripe(tree):
+def find_sources(tree):
+    # "calc info about every file in tree"
     for item in tag.commit.tree.traverse():
         if item.type != 'blob':
             continue
@@ -48,10 +49,29 @@ def calc_stripe(tree):
         yield Source(path=item.path, lines=num_lines)
 
 
+def by_name(source):
+    return source.name
+
+
 repo = Repo(sys.argv[1])
-column = {}
+path_column = {}
 for tag in natsorted(repo.tags, key=lambda t: t.name):
-    print(Back.GREEN + Fore.BLACK + f'### {tag.name}' + Style.RESET_ALL)
-    stripe = calc_stripe(tag.commit.tree)
-    for source in stripe:
-        print(f'{source.lines:5} {source.path}')
+    tag_label = Back.GREEN + Fore.BLACK + f'{tag.name:6}' + Style.RESET_ALL
+    print(f'{tag_label}', end=' ')
+    sources = list(find_sources(tag.commit.tree))
+    # for source in sources:
+    #     print(f'{source.lines:5} {source.path}')
+    for source in sources:
+        if source.path not in path_column:
+            path_column[source.path] = len(path_column)
+    # TODO count columns better, set math?
+    row = [None]*len(path_column)
+    for source in sources:
+        row[path_column[source.path]] = source
+    dash = '-'
+    for item in row:
+        if item is None:
+            print(f'{dash:4}', end=' ')
+        else:
+            print(f'{item.lines:4}', end=' ')
+    print()
