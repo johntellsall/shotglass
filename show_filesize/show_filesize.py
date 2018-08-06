@@ -17,8 +17,8 @@ from natsort import natsorted
 Source = namedtuple('Source', 'path lines')
 
 
-def count_lines(path):
-    return sum(1 for line in open(path, newline=None))
+def count_lines(lines):
+    return sum(1 for line in lines)
 
 
 # TODO make configurable
@@ -43,8 +43,8 @@ def calc_stripe(tree):
             continue
         if not is_interesting_name(item.name):
             continue
-        import ipdb ; ipdb.set_trace()
-        num_lines = count_lines(item.path)
+        stream = item.data_stream.stream
+        num_lines = count_lines(stream.readlines())
         yield Source(path=item.path, lines=num_lines)
 
 
