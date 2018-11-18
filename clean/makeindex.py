@@ -8,8 +8,8 @@ import git
 #     out_text = subprocess.getoutput(cmd)
 #     return out_text.split(r"\n")
 
-TEST_DIR = "/Users/johnmitchell/src/SOURCE/flask"
 
-g = git.Git(TEST_DIR)
-rval = g.ls_files("*.py")
-print(rval)
+def main(project_dir):
+    g = git.Git(project_dir)
+    rval = g.ls_files("*.py", "*.c").split(r"\n")
+    return rval
