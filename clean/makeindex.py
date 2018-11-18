@@ -19,6 +19,7 @@ def list_source_files(project_dir):
 
 def make_index(source_paths):
     cmd = "ctags --languages=python,c,go --excmd=number".split()
+    cmd += ["-o", "-"]
     cmd += source_paths
     out = subprocess.run(cmd, check=True)
     print(out)

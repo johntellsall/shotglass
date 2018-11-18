@@ -7,13 +7,11 @@ SOURCE_DIR = Path("/Users/johnmitchell/src/SOURCE")
 
 def test_ls_files_py():
     out = makeindex.list_source_files(Path(".."))
-    print(out)
     assert type(out) is list and len(out) > 0
 
 
 def test_ls_files_c():
     out = makeindex.list_source_files(SOURCE_DIR / "redis")
-    print(out)
     assert type(out) is list and len(out) > 0
 
 
