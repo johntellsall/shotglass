@@ -1,6 +1,12 @@
 import subprocess
 from pathlib import Path
 
+# TODO: raise exception if command failed
+def system(cmd):
+    print(">>>", cmd)
+    out_text = subprocess.getoutput(cmd)
+    return out_text.split(r"\n")
+
 
 class Repos:
     def __init__(self, git_dir):
@@ -13,4 +19,4 @@ class Repos:
         return ["git", f"--git-dir={self.git_dir}"] + list(args)
 
     def ls_files(self):
-        return subprocess.getoutput(cmd=self.cmd(["ls-files"]))
+        return system(self.cmd(["ls-files"]))
