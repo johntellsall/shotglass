@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# make_ctags -- index source code, create summary database
+
 import logging
 import multiprocessing.pool as mpool
 import os

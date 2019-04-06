@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# make_squarify -- TBD
+
 import os
 import sys
 from collections import Counter
