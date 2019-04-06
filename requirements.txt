@@ -9,7 +9,7 @@ astroid==1.6.2
 attrs==17.4.0
 bokeh==0.12.14
 decorator==4.2.1
-Django==1.11.11
+Django>=1.11.19
 django-colorfield==0.1.14
 django-debug-toolbar==1.9.1
 django-extensions==2.0.6
@@ -45,7 +45,7 @@ pytest==3.5.0
 pytest-django==3.1.2
 python-dateutil==2.7.1
 pytz==2018.3
-PyYAML==3.12
+PyYAML>=4.2b1
 rectpack==0.2.1
 simplegeneric==0.8.1
 six==1.11.0

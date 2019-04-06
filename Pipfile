@@ -7,7 +7,7 @@ name = "pypi"
 
 [packages]
 
-Django = "==1.11.11"
+Django = ">=1.11.19"
 argparse = "*"
 django-extensions = "==2.0.6"
 Pillow = "==5.0.0"
