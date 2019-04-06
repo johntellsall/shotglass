@@ -8,12 +8,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import squarify
 
-# # If you have 2 lists
-# squarify.plot(sizes=[13, 22, 35, 5],
-# 	label=["group A", "group B", "group C", "group D"],
-# 	alpha=.7)
-# plt.axis('off')
-# plt.savefig('one.png')
 
 DULL_DIRECTORIES = set(['.git'])
 
@@ -43,6 +37,8 @@ df = pd.DataFrame({
     'paths': source_paths,
     'names': names})
 df['line_counts'] = line_counts
+# TODO zap items where line_count==0
+print(line_counts)
 
 squarify.plot(
     sizes=df['line_counts'],
