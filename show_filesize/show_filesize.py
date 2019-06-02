@@ -56,6 +56,7 @@ def adjust_columns(cols, sources):
     "add new files to the end of the row"
     for source in sources:
         if source.path not in cols:
+            print(f'+ {source.path}')
             cols[source.path] = len(cols)
 
 # TODO only count the N-largest files in the last tag tree
@@ -68,7 +69,6 @@ for tag in natsorted(repo.tags, key=by_name):
     print(f'{tag_label}', end=' ')
     sources = list(find_sources(tag.commit.tree))
     adjust_columns(path_column, sources)
-    # TODO count columns better, set math?
     row = [None]*len(path_column)
     for source in sources:
         row[path_column[source.path]] = source
