@@ -55,13 +55,18 @@ print(f'last: {releases[-1]} num_source_files: {num_last}')
 
 prev = set()
 for tag in natsorted(repo.tags, key=by_name):
-    tag_label = f'{tag.name:6}'
+    tag_label = f'{tag.name:10}'
     if 1:
         tag_label = Back.GREEN + Fore.BLACK + f'{tag.name:6}' + Style.RESET_ALL
+    # show release date
+    # TODO check first commit date is really the release date
+    if 1:
+        tag_label += ' ' + tag.commit.committed_datetime.strftime('%x')
     print(f'{tag_label}', end=' ')
     sources = set(map(by_name, find_sources(tag.commit.tree)))
     print(f'num_source_files: {len(sources)}')
     # TODO show adds and deletes
-    print(sources - prev)
+    if len(sources - prev):
+        print(f'new files: {sorted(sources - prev)}')
     prev = sources
 
