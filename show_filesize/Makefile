@@ -1,9 +1,14 @@
+SOURCE = ~/src/SOURCE/flask
+
 all:
 	@echo
 	@echo '######'
-	python ./show_filesize.py ../SOURCE/flask/
+	@make test
 	@echo '######'
 	@echo
+
+test:
+	./show_info.py ${SOURCE}
 
 testloop:
 	fswatch . | xargs -I{} make

@@ -48,7 +48,6 @@ def find_sources(tree):
         num_lines = count_lines(stream.readlines())
         yield Source(path=item.path, lines=num_lines)
 
-
 def by_name(source):
     return source.name
 
@@ -61,10 +60,15 @@ def adjust_columns(cols, sources):
 
 # TODO only count the N-largest files in the last tag tree
 repo = Repo(sys.argv[1])
+releases = natsorted(repo.tags, key=by_name)
+print(f'releases: {len(releases)}')
+print(f'first: {releases[0]}')
+print(f'last: {releases[-1]}')
+sys.exit(1)
 path_column = {}
 for tag in natsorted(repo.tags, key=by_name):
     tag_label = f'{tag.name:6}'
-    if 0:
+    if 1:
         tag_label = Back.GREEN + Fore.BLACK + f'{tag.name:6}' + Style.RESET_ALL
     print(f'{tag_label}', end=' ')
     sources = list(find_sources(tag.commit.tree))
