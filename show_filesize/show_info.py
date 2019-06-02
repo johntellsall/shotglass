@@ -21,7 +21,7 @@ def is_interesting_name(name):
 
 # TODO make configurable
 def is_interesting_path(path):
-    if re.compile(r'^(docs|examples|scripts|tests)/').match(path):
+    if re.compile(r'^(docs|examples|scripts|tests|__init)/').match(path):
         return False
     if re.compile('/testsuite/').search(path):
         return False
@@ -50,24 +50,18 @@ print(f'releases: {len(releases)}')
 
 num_first = count_release(releases[0])
 num_last = count_release(releases[-1])
-print(f'first: {releases[0]} num_files: {num_first}')
-print(f'last: {releases[-1]} num_files: {num_last}')
-sys.exit(1)
-path_column = {}
+print(f'first: {releases[0]} num_source_files: {num_first}')
+print(f'last: {releases[-1]} num_source_files: {num_last}')
+
+prev = set()
 for tag in natsorted(repo.tags, key=by_name):
     tag_label = f'{tag.name:6}'
     if 1:
         tag_label = Back.GREEN + Fore.BLACK + f'{tag.name:6}' + Style.RESET_ALL
     print(f'{tag_label}', end=' ')
-    sources = list(find_sources(tag.commit.tree))
-    adjust_columns(path_column, sources)
-    row = [None]*len(path_column)
-    for source in sources:
-        row[path_column[source.path]] = source
-    dash = '-'
-    for item in row:
-        if item is None:
-            print(f'{dash:4}', end=' ')
-        else:
-            print(f'{item.lines:4}', end=' ')
-    print()
+    sources = set(map(by_name, find_sources(tag.commit.tree)))
+    print(f'num_source_files: {len(sources)}')
+    # TODO show adds and deletes
+    print(sources - prev)
+    prev = sources
+
