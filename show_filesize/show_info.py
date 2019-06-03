@@ -7,8 +7,9 @@ show_info.py -- show source sizes over time
 import os
 import re
 import sys
-from collections import namedtuple
+from collections import Mapping, namedtuple
 
+import yaml
 from colorama import Back, Fore, Style
 from git import Repo
 from natsort import natsorted
@@ -20,7 +21,10 @@ class Project:
     def parse_yaml(self, obj):
         self.config = yaml.load(obj)
 
-    def compile(self):
+    def __init__(self, arg):
+        if not isinstance(arg, Mapping):
+            arg = yaml.load(arg)
+        self.config = arg
         dull_words = "|".join(self.config["dull_words"])
         self.dull_regex = re.compile(r"\b(" + dull_words + r")\b")
 
@@ -38,70 +42,32 @@ class Project:
         )
 
 
-# TODO make configurable
-def is_interesting_path(path):
-    if re.compile(r"^(docs|examples|scripts|tests|__init)/").match(path):
-        return False
-    if re.compile("/testsuite/").search(path):
-        return False
-    return True
-
-
-def is_interesting_item(item):
-    return (
-        item.type == "blob"
-        and is_interesting_path(item.path)
-        and is_interesting_name(item.name)
+def find_sources2(tree):
+    proj = Project(
+        dict(
+            dull_words=[
+                "docs",
+                "examples",
+                "scripts",
+                "testsuite",
+                "tests",
+                "__init__.py",
+            ],
+            source_extensions=[".c", ".py"],
+        )
     )
-
-
-# TODO make configurable
-def is_interesting_name(name):
-    return os.path.splitext(name)[-1] in [".c", ".py"]
-
-
-# TODO make configurable
-def is_interesting_path(path):
-    if re.compile(r"^(docs|examples|scripts|tests|__init)/").match(path):
-        return False
-    if re.compile("/testsuite/").search(path):
-        return False
-    return True
-
-
-def is_interesting_item(item):
-    return (
-        item.type == "blob"
-        and is_interesting_path(item.path)
-        and is_interesting_name(item.name)
-    )
+    return tree.traverse(predicate=lambda item, _: proj.is_interesting_item(item))
 
 
 def find_sources(tree):
-    source_items = tree.traverse(predicate=lambda item, _: is_interesting_item(item))
-    return source_items
-
-
-def find_sources2(tree):
-    proj = Project()
-    proj.config = dict(
-        dull_words=["docs", "examples", "scripts", "testsuite", "tests", "__init__.py"],
-        source_extensions=[".c", ".py"],
-    )
-    proj.compile()
-    source_items = tree.traverse(
-        predicate=lambda item, _: proj.is_interesting_item(item)
-    )
-    return source_items
+    proj = Project(open("flask.yaml"))
+    return tree.traverse(predicate=lambda item, _: proj.is_interesting_item(item))
 
 
 repo = Repo(sys.argv[1])
 tree = repo.tags["0.8"].commit.tree
 paths = set(x.path for x in find_sources(tree))
 print(paths)
-paths2 = set(x.path for x in find_sources2(tree))
-print(paths2)
-print("=>", len(set(paths) ^ set(paths2)))
 sys.exit(0)
 
 

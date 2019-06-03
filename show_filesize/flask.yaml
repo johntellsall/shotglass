@@ -1,0 +1,14 @@
+# flask.yaml -- Shotglass config for Flask
+---
+
+dull_words:
+    - docs
+    - examples
+    - scripts
+    - testsuite
+    - tests
+    - __init__.py
+
+source_extensions:
+    - .c
+    - .py
