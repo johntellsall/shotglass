@@ -25,7 +25,7 @@ class Project:
         if not isinstance(arg, Mapping):
             arg = yaml.load(arg)
         self.config = arg
-        dull_words = "|".join(self.config["dull_words"])
+        dull_words = "|".join(self.config.get("dull_words", ""))
         self.dull_regex = re.compile(r"\b(" + dull_words + r")\b")
 
     def is_interesting_item(self, item):
@@ -59,14 +59,22 @@ def find_sources2(tree):
     return tree.traverse(predicate=lambda item, _: proj.is_interesting_item(item))
 
 
-def find_sources(tree):
-    proj = Project(open("flask.yaml"))
+def find_sources(tree, proj):
+    # proj = Project(open("flask.yaml"))
     return tree.traverse(predicate=lambda item, _: proj.is_interesting_item(item))
 
 
-repo = Repo(sys.argv[1])
-tree = repo.tags["0.8"].commit.tree
-paths = set(x.path for x in find_sources(tree))
+repo_path = sys.argv[1]
+proj = Project(dict(source_extensions=[".c", ".py"]))
+proj_name = os.path.basename(repo_path) + ".yaml"
+if os.path.exists(proj_name):
+    proj = Project(open(proj_name))
+
+repo = Repo(repo_path)
+last = repo.tags[-1]
+print(last)
+tree = last.commit.tree
+paths = set(x.path for x in find_sources(tree, proj))
 print(paths)
 sys.exit(0)
 
