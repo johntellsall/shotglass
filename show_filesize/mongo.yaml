@@ -1,0 +1,12 @@
+# mongo.yaml -- Shotglass config
+---
+
+dull_words:
+  - test
+  - vendor
+
+source_extensions:
+  - .c
+  - .cpp
+  - .go
+  - .py
