@@ -2,12 +2,7 @@
 ---
 
 dull_words:
-  - docs
-  - examples
-  - scripts
-  - testsuite
-  - tests
-  - __init__.py
+  - deps
 
 source_extensions:
   - .c

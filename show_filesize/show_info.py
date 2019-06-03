@@ -26,14 +26,17 @@ class Project:
             arg = yaml.load(arg)
         self.config = arg
         dull_words = "|".join(self.config.get("dull_words", ""))
-        self.dull_regex = re.compile(r"\b(" + dull_words + r")\b")
+        if not dull_words:
+            self.dull_search = None
+        else:
+            self.dull_search = re.compile(r"\b(" + dull_words + r")\b").search
 
     def is_interesting_item(self, item):
         def is_interesting_name(name):
             return os.path.splitext(name)[-1] in self.config["source_extensions"]
 
         def is_interesting_path(path):
-            return not self.dull_regex.search(path)
+            return self.dull_search is None or not self.dull_search(path)
 
         return (
             item.type == "blob"
