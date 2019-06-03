@@ -25,6 +25,9 @@ class Project:
         if not isinstance(arg, Mapping):
             arg = yaml.load(arg)
         self.config = arg
+        import ipdb
+
+        ipdb.set_trace()
         dull_words = "|".join(self.config.get("dull_words", ""))
         if not dull_words:
             self.dull_search = None
@@ -51,7 +54,7 @@ def find_sources(tree, proj):
 
 repo_path = sys.argv[1]
 proj = Project(dict(source_extensions=[".c", ".py"]))
-proj_name = os.path.basename(repo_path) + ".yaml"
+proj_name = os.path.basename(os.path.dirname(repo_path)) + ".yaml"
 if os.path.exists(proj_name):
     proj = Project(open(proj_name))
 
