@@ -2,9 +2,8 @@ SOURCE = ~/src/SOURCE/flask
 
 all:
 	@echo
-	@echo '######'
+	@echo '################################################'
 	@make test
-	@echo '######'
 	@echo
 
 test:

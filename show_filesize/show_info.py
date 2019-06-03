@@ -13,7 +13,32 @@ from colorama import Back, Fore, Style
 from git import Repo
 from natsort import natsorted
 
+class Project:
+    config = None
+    def parse_yaml(self, obj):
+        self.config = yaml.load(obj)
 
+    def is_interesting_item(self, item):
+        def is_interesting_name(name):
+            return os.path.splitext(name)[-1] in ['.c', '.py']
+        return (item.type == 'blob' and
+        # is_interesting_path(item.path) and
+        is_interesting_name(item.name))
+
+
+
+# TODO make configurable
+def is_interesting_path(path):
+    if re.compile(r'^(docs|examples|scripts|tests|__init)/').match(path):
+        return False
+    if re.compile('/testsuite/').search(path):
+        return False
+    return True
+
+def is_interesting_item(item):
+    return (item.type == 'blob' and
+        is_interesting_path(item.path) and
+        is_interesting_name(item.name))
 # TODO make configurable
 def is_interesting_name(name):
     return os.path.splitext(name)[-1] in ['.c', '.py']
@@ -33,9 +58,23 @@ def is_interesting_item(item):
         is_interesting_name(item.name))
 
 def find_sources(tree):
-    # "calc info about every file in tree"
     source_items = tree.traverse(predicate=lambda item,_: is_interesting_item(item))
     return source_items
+
+def find_sources2(tree):
+    proj = Project()
+    proj.config = dict(path_extensions=['.c', '.py'])
+    source_items = tree.traverse(predicate=lambda item,_: proj.is_interesting_item(item))
+    return source_items
+
+repo = Repo(sys.argv[1])
+tree = repo.tags['0.8'].commit.tree
+paths = set(x.path for x in find_sources(tree))
+print(paths)
+paths2 = set(x.path for x in find_sources2(tree))
+print(paths2)
+print('=>', len(set(paths) ^ set(paths2)))
+sys.exit(0)
 
 def by_name(source):
     return source.name
