@@ -45,25 +45,7 @@ class Project:
         )
 
 
-def find_sources2(tree):
-    proj = Project(
-        dict(
-            dull_words=[
-                "docs",
-                "examples",
-                "scripts",
-                "testsuite",
-                "tests",
-                "__init__.py",
-            ],
-            source_extensions=[".c", ".py"],
-        )
-    )
-    return tree.traverse(predicate=lambda item, _: proj.is_interesting_item(item))
-
-
 def find_sources(tree, proj):
-    # proj = Project(open("flask.yaml"))
     return tree.traverse(predicate=lambda item, _: proj.is_interesting_item(item))
 
 
