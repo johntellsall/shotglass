@@ -11,3 +11,6 @@ test:
 
 testloop:
 	fswatch . | xargs -I{} make
+
+index:
+	ls -1 ~/src/SOURCE/ | xargs -n1 -I{} -t  ./show_info.py ~/src/SOURCE/{}

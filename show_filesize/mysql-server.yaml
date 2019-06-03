@@ -1,0 +1,11 @@
+# mysql-server.yaml -- Shotglass config
+# TODO: double-check: 30k files, only 3k source files?
+---
+
+dull_words:
+  - test
+
+source_extensions:
+  - .c
+  - .cc
+  - .py

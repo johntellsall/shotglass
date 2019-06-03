@@ -57,11 +57,6 @@ def count(release, findfunc):
     return len(list(findfunc(release.commit.tree)))
 
 
-# def count_sources(release):
-
-# def count_files(release):
-#     return len(list(files(release.commit.tree)))
-
 repo_path = sys.argv[1]
 proj = Project(dict(source_extensions=[".c", ".py"]))
 proj_name = os.path.basename(os.path.dirname(repo_path)) + ".yaml"
@@ -74,9 +69,9 @@ print(last)
 print(count(release=last, findfunc=find_files))
 print(count(release=last, findfunc=lambda tree: find_sources(tree, proj)))
 
-tree = last.commit.tree
-paths = set(x.path for x in find_sources(tree, proj))
-print(paths)
+# tree = last.commit.tree
+# paths = set(x.path for x in find_sources(tree, proj))
+# print(paths)
 sys.exit(0)
 
 

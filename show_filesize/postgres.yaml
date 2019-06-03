@@ -1,0 +1,11 @@
+# postgres.yaml -- Shotglass config
+---
+
+dull_words:
+  - test
+
+source_extensions:
+  - .c
+  - .cc
+  - .cpp
+  - .py
