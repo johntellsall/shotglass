@@ -1,0 +1,12 @@
+# django.yaml -- Shotglass config
+---
+
+dull_words:
+  - contrib
+  - docs
+  - tests
+  - __init__.py
+
+source_extensions:
+  - .c
+  - .py

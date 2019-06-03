@@ -1,0 +1,9 @@
+# sqlite.yaml -- Shotglass config
+---
+
+dull_words:
+  - test
+
+source_extensions:
+  - .c
+  - .py

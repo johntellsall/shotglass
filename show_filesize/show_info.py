@@ -25,9 +25,6 @@ class Project:
         if not isinstance(arg, Mapping):
             arg = yaml.load(arg)
         self.config = arg
-        import ipdb
-
-        ipdb.set_trace()
         dull_words = "|".join(self.config.get("dull_words", ""))
         if not dull_words:
             self.dull_search = None
@@ -52,6 +49,19 @@ def find_sources(tree, proj):
     return tree.traverse(predicate=lambda item, _: proj.is_interesting_item(item))
 
 
+def find_files(tree):
+    return tree.traverse(predicate=lambda item, _: item.type == "blob")
+
+
+def count(release, findfunc):
+    return len(list(findfunc(release.commit.tree)))
+
+
+# def count_sources(release):
+
+# def count_files(release):
+#     return len(list(files(release.commit.tree)))
+
 repo_path = sys.argv[1]
 proj = Project(dict(source_extensions=[".c", ".py"]))
 proj_name = os.path.basename(os.path.dirname(repo_path)) + ".yaml"
@@ -61,6 +71,9 @@ if os.path.exists(proj_name):
 repo = Repo(repo_path)
 last = repo.tags[-1]
 print(last)
+print(count(release=last, findfunc=find_files))
+print(count(release=last, findfunc=lambda tree: find_sources(tree, proj)))
+
 tree = last.commit.tree
 paths = set(x.path for x in find_sources(tree, proj))
 print(paths)
