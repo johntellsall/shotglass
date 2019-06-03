@@ -17,13 +17,18 @@ class Project:
     config = None
     def parse_yaml(self, obj):
         self.config = yaml.load(obj)
+    def compile(self):
+        dull_words = '|'.join(self.config['dull_words'])
+        self.dull_regex = re.compile(r'\b(' + dull_words + r')\b')
 
     def is_interesting_item(self, item):
         def is_interesting_name(name):
-            return os.path.splitext(name)[-1] in ['.c', '.py']
+            return os.path.splitext(name)[-1] in self.config['source_extensions']
+        def is_interesting_path(path):
+            return not self.dull_regex.search(path)
         return (item.type == 'blob' and
-        # is_interesting_path(item.path) and
-        is_interesting_name(item.name))
+            is_interesting_path(item.path) and
+            is_interesting_name(item.name))
 
 
 
@@ -63,7 +68,10 @@ def find_sources(tree):
 
 def find_sources2(tree):
     proj = Project()
-    proj.config = dict(path_extensions=['.c', '.py'])
+    proj.config = dict(
+        dull_words=['docs','examples', 'scripts', 'testsuite', 'tests', '__init__.py'],
+        source_extensions=['.c', '.py'])
+    proj.compile()
     source_items = tree.traverse(predicate=lambda item,_: proj.is_interesting_item(item))
     return source_items
 
