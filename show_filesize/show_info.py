@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-show_filesize.py -- show source sizes over time
+show_info.py -- show source sizes over time
 '''
 
 import os
