@@ -57,24 +57,6 @@ def count(release, findfunc):
     return len(list(findfunc(release.commit.tree)))
 
 
-repo_path = sys.argv[1]
-proj = Project(dict(source_extensions=[".c", ".py"]))
-proj_name = os.path.basename(os.path.dirname(repo_path)) + ".yaml"
-if os.path.exists(proj_name):
-    proj = Project(open(proj_name))
-
-repo = Repo(repo_path)
-last = repo.tags[-1]
-print(last)
-print(count(release=last, findfunc=find_files))
-print(count(release=last, findfunc=lambda tree: find_sources(tree, proj)))
-
-# tree = last.commit.tree
-# paths = set(x.path for x in find_sources(tree, proj))
-# print(paths)
-sys.exit(0)
-
-
 def by_name(source):
     return source.name
 
@@ -83,28 +65,54 @@ def count_release(release):
     return len(list(find_sources(release.commit.tree)))
 
 
-repo = Repo(sys.argv[1])
-releases = natsorted(repo.tags, key=by_name)
-print(f"releases: {len(releases)}")
+# def show_info(repo):
+#     releases = natsorted(repo.tags, key=by_name)
+#     print(f"releases: {len(releases)}")
 
-num_first = count_release(releases[0])
-num_last = count_release(releases[-1])
-print(f"first: {releases[0]} num_source_files: {num_first}")
-print(f"last: {releases[-1]} num_source_files: {num_last}")
+#     num_first = count_release(releases[0])
+#     num_last = count_release(releases[-1])
+#     print(f"first: {releases[0]} num_source_files: {num_first}")
+#     print(f"last: {releases[-1]} num_source_files: {num_last}")
 
-prev = set()
-for tag in natsorted(repo.tags, key=by_name):
-    tag_label = f"{tag.name:10}"
-    if 1:
-        tag_label = Back.GREEN + Fore.BLACK + f"{tag.name:6}" + Style.RESET_ALL
-    # show release date
-    # TODO check first commit date is really the release date
-    if 1:
-        tag_label += " " + tag.commit.committed_datetime.strftime("%x")
-    print(f"{tag_label}", end=" ")
-    sources = set(map(by_name, find_sources(tag.commit.tree)))
-    print(f"num_source_files: {len(sources)}")
-    # TODO show adds and deletes
-    if len(sources - prev):
-        print(f"new files: {sorted(sources - prev)}")
-    prev = sources
+#     prev = set()
+#     for tag in natsorted(repo.tags, key=by_name):
+#         tag_label = f"{tag.name:10}"
+#         if 1:
+#             tag_label = Back.GREEN + Fore.BLACK + f"{tag.name:6}" + Style.RESET_ALL
+#         # show release date
+#         # TODO check first commit date is really the release date
+#         if 1:
+#             tag_label += " " + tag.commit.committed_datetime.strftime("%x")
+#         print(f"{tag_label}", end=" ")
+#         sources = set(map(by_name, find_sources(tag.commit.tree)))
+#         print(f"num_source_files: {len(sources)}")
+#         # TODO show adds and deletes
+#         if len(sources - prev):
+#             print(f"new files: {sorted(sources - prev)}")
+#         prev = sources
+
+
+def show_info(repo_path):
+    proj = Project(dict(source_extensions=[".c", ".py"]))
+    proj_name = os.path.basename(os.path.dirname(repo_path)) + ".yaml"
+    if os.path.exists(proj_name):
+        proj = Project(open(proj_name))
+
+    import ipdb
+
+    ipdb.set_trace()
+    repo = Repo(repo_path)
+    last = repo.tags[-1]
+    print(last)
+    print(count(release=last, findfunc=find_files))
+    print(count(release=last, findfunc=lambda tree: find_sources(tree, proj)))
+
+
+def main():
+    for repo_path in sys.argv[1:]:
+        show_info(repo_path)
+        blam
+
+
+if __name__ == "__main__":
+    main()
