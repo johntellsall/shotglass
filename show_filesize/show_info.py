@@ -22,21 +22,30 @@ class Project:
         self.config = yaml.load(obj)
 
     def __init__(self, arg):
+        def compile_words(word_list):
+            if not word_list:
+                return None
+            words_pipes = "|".join(word_list)
+            return re.compile(r"\b(" + words_pipes + r")\b")
+
         if not isinstance(arg, Mapping):
             arg = yaml.load(arg)
         self.config = arg
-        dull_words = "|".join(self.config.get("dull_words", ""))
-        if not dull_words:
-            self.dull_search = None
-        else:
-            self.dull_search = re.compile(r"\b(" + dull_words + r")\b").search
+        self.dull_path_regex = compile_words(self.config.get("dull_words"))
+        self.dull_tag_regex = compile_words(self.config.get("dull_tag_patterns"))
+
+    def list_interesting_tags(self, repo):
+        tags = repo.tags
+        if not self.dull_tag_regex:
+            return tags
+        return [tag for tag in tags if not self.dull_tag_regex.search(tag.name)]
 
     def is_interesting_item(self, item):
         def is_interesting_name(name):
             return os.path.splitext(name)[-1] in self.config["source_extensions"]
 
         def is_interesting_path(path):
-            return self.dull_search is None or not self.dull_search(path)
+            return self.dull_path_regex is None or not self.dull_path_regex.search(path)
 
         return (
             item.type == "blob"
@@ -92,26 +101,33 @@ def count_release(release):
 #         prev = sources
 
 
+def get_last_tag(repo, proj):
+    tags = proj.list_interesting_tags(repo)
+    return tags[-1]
+
+
 def show_info(repo_path):
     proj = Project(dict(source_extensions=[".c", ".py"]))
-    proj_name = os.path.basename(os.path.dirname(repo_path)) + ".yaml"
-    if os.path.exists(proj_name):
-        proj = Project(open(proj_name))
+    proj_name = os.path.basename(repo_path)
+    if not proj_name:
+        proj_name = os.path.basename(os.path.dirname(repo_path))
+    proj_conf = proj_name + ".yaml"
+    if os.path.exists(proj_conf):
+        proj = Project(open(proj_conf))
+    else:
+        print(f"{proj_conf} - using default config")
 
-    import ipdb
-
-    ipdb.set_trace()
     repo = Repo(repo_path)
-    last = repo.tags[-1]
-    print(last)
-    print(count(release=last, findfunc=find_files))
-    print(count(release=last, findfunc=lambda tree: find_sources(tree, proj)))
+    last_tag = get_last_tag(repo=repo, proj=proj)
+    num_files = count(release=last_tag, findfunc=find_files)
+    num_source = count(release=last_tag, findfunc=lambda tree: find_sources(tree, proj))
+
+    print(f"{proj_name:12} {str(last_tag):12} {num_files:6} {num_source:6}")
 
 
 def main():
     for repo_path in sys.argv[1:]:
         show_info(repo_path)
-        blam
 
 
 if __name__ == "__main__":

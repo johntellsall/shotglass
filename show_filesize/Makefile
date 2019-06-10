@@ -14,5 +14,8 @@ testloop:
 
 # # xindex:
 # 	ls -1 ~/src/SOURCE/ | xargs -n1 -I{} -t  ./show_info.py ~/src/SOURCE/{}
-index:
+index-all:
 	./show_info.py ~/src/SOURCE/*
+# XX skip large Mongo repos
+index:
+	./show_info.py ~/src/SOURCE/[^m]*

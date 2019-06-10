@@ -1,6 +1,9 @@
 # postgres.yaml -- Shotglass config
 ---
 
+dull_versions:
+  - release
+  
 dull_words:
   - test
 

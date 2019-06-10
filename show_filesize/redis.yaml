@@ -1,5 +1,15 @@
-# flask.yaml -- Shotglass config for Flask
+# redis.yaml -- Shotglass config
 ---
+
+dull_tag_patterns:
+  # TODO - v, rc
+  - stable
+  - alpha
+  - beta
+  - twitter
+  - vm-playpen
+  - watch
+  - with-deprecated-diskstore
 
 dull_words:
   - deps
