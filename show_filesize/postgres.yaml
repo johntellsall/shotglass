@@ -1,8 +1,9 @@
 # postgres.yaml -- Shotglass config
 ---
 
-dull_versions:
-  - release
+dull_tag_patterns:
+  - "[rR]elease"
+  # TODO Release
   
 dull_words:
   - test

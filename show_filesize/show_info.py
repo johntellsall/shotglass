@@ -74,35 +74,9 @@ def count_release(release):
     return len(list(find_sources(release.commit.tree)))
 
 
-# def show_info(repo):
-#     releases = natsorted(repo.tags, key=by_name)
-#     print(f"releases: {len(releases)}")
-
-#     num_first = count_release(releases[0])
-#     num_last = count_release(releases[-1])
-#     print(f"first: {releases[0]} num_source_files: {num_first}")
-#     print(f"last: {releases[-1]} num_source_files: {num_last}")
-
-#     prev = set()
-#     for tag in natsorted(repo.tags, key=by_name):
-#         tag_label = f"{tag.name:10}"
-#         if 1:
-#             tag_label = Back.GREEN + Fore.BLACK + f"{tag.name:6}" + Style.RESET_ALL
-#         # show release date
-#         # TODO check first commit date is really the release date
-#         if 1:
-#             tag_label += " " + tag.commit.committed_datetime.strftime("%x")
-#         print(f"{tag_label}", end=" ")
-#         sources = set(map(by_name, find_sources(tag.commit.tree)))
-#         print(f"num_source_files: {len(sources)}")
-#         # TODO show adds and deletes
-#         if len(sources - prev):
-#             print(f"new files: {sorted(sources - prev)}")
-#         prev = sources
-
-
-def get_last_tag(repo, proj):
+def get_latest_tag(repo, proj):
     tags = proj.list_interesting_tags(repo)
+    tags = list(sorted(tags, key=lambda tag: tag.commit.committed_datetime))
     return tags[-1]
 
 
@@ -118,7 +92,7 @@ def show_info(repo_path):
         print(f"{proj_conf} - using default config")
 
     repo = Repo(repo_path)
-    last_tag = get_last_tag(repo=repo, proj=proj)
+    last_tag = get_latest_tag(repo=repo, proj=proj)
     num_files = count(release=last_tag, findfunc=find_files)
     num_source = count(release=last_tag, findfunc=lambda tree: find_sources(tree, proj))
 
