@@ -1,7 +1,7 @@
 all:
 
 build-all:
-	./make_index.py ~/jsrc/shotglass/SOURCE/[a-z]*
+	./make_ctags.py ~/jsrc/shotglass/SOURCE/*
 
 rebuild-all: zap-pickles build-all
 
