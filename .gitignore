@@ -69,8 +69,8 @@ GRTAGS
 GTAGS
 prof
 *.tags
-*.sublime*
 misc
 SOURCE
 .DS_Store
 *.html
+*.code-*
