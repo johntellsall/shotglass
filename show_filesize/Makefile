@@ -6,8 +6,10 @@ all:
 	@make test
 	@echo
 
-test:
+test-info:
 	./show_info.py ${SOURCE}
+test-filesize:
+	./show_filesize.py ${SOURCE}
 
 testloop:
 	fswatch . | xargs -I{} make
