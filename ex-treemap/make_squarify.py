@@ -6,6 +6,7 @@
 # make_squarify flask.pkl
 # -- outputs flask.png
 
+import argparse
 import os
 import sys
 from collections import Counter
@@ -62,5 +63,18 @@ def make_squarify(project_data_path):
     plt.savefig(out_path)
 
 
+def main():
+    parser = argparse.ArgumentParser(description="TODO")
+    parser.add_argument(
+        "data_paths", metavar="N", type=argparse.FileType("r"), nargs="+"
+    )
+    parser.add_argument("--dir", action="store_true")
+
+    args = parser.parse_args()
+    render = make_squarify if args.dir else make_squarify_files
+    for path in args.data_paths:
+        render(path)
+
+
 if __name__ == "__main__":
-    make_squarify(sys.argv[1])
+    main()
