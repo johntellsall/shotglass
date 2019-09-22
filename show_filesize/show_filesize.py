@@ -37,7 +37,7 @@ def is_interesting_path(path):
 
 def find_sources(tree):
     # "calc info about every file in tree"
-    for item in tag.commit.tree.traverse():
+    for item in tree.traverse():
         if item.type != 'blob':
             continue
         if not is_interesting_path(item.path):
