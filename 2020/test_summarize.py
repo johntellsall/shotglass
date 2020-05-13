@@ -74,12 +74,15 @@ def main():
         tag_list = parse_git_list(x)
         print(f'- {len(tag_list)} tags')
 
-        tags = sorted([dt['tag'] for dt in tag_list])
-        for tag in tags[:5]:
+        for info in tag_list:
+            tag = info['tag']
             proc = system(cmd_git_list_all_directories(project, tag))
             num_directories = len(proc.stdout.splitlines())
-            print(f'- {tag} {num_directories} directories')
-        if 0:
+            info['num_dirs'] = num_directories
+            proc = system(cmd_git_list_all_files(project, tag))
+            num_files = len(proc.stdout.splitlines())
+            info['num_files'] = num_files
+        if 1:
             print('\n'.join([str(x) for x in tag_list[:3]]))
             print('...')
             print('\n'.join([str(x) for x in tag_list[-3:]]))
