@@ -1,5 +1,8 @@
 import subprocess
 from pathlib import Path
+from colorama import Fore, Back, Style
+
+# colorama.init()
 
 def source(name):
     # return f'../SOURCE/{name}'
@@ -14,10 +17,12 @@ def cmd_git_list_date_tags(project_dir):
     'log', '--date-order', '--graph',
     '--tags', '--simplify-by-decoration', 
 	'--pretty=format:"%ai %d"']
+
 def main():
     projects = [source(n) for n in ['openssh-portable', 'dhcp']]
     for project in projects:
-        print(f'{project} :::::')
+        print(f'{Fore.YELLOW}{project} :::::')
+        print(Style.RESET_ALL)
         x = system(cmd_git_list_date_tags(project))
         lines = x.stdout.splitlines()
         print(f'{len(lines)} lines')
