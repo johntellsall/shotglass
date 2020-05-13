@@ -1,3 +1,4 @@
+import csv
 import glob
 import re
 import subprocess
@@ -33,17 +34,26 @@ def parse_git_list(proc):
     matches = map(date_tag_pat.search, lines)
     return [m.groupdict() for m in matches if m]
 
+def write_csv(info):
+    with open('projects.csv', 'w') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['project', 'date', 'raw_tag'])
+        for project,rows in info.items():
+            for row in rows:
+                writer.writerow([project, row['date'], row['tag']])
+
 def main():
     if 0:
         projects = [source(n) for n in ['openssh-portable', 'dhcp']]
     else:
-        projects = glob.glob(source('[a-z]*'))
-
+        projects = [Path(x) for x in glob.glob(source('[a-z]*'))]
+    projects.sort()
     print(f'{Fore.YELLOW}{len(projects)} PROJECTS :::::')
     print(Style.RESET_ALL)
 
-    for project in projects:
-        print(f'{Fore.YELLOW}{project} :::::{Style.RESET_ALL}')
+    info = {}
+    for project in projects[:2]:
+        print(f'{Fore.YELLOW}{project.name} :::::{Style.RESET_ALL}')
         try:
             x = system(cmd_git_list_date_tags(project))
         except ValueError:
@@ -58,6 +68,8 @@ def main():
             print('\n'.join([str(x) for x in tag_list[:3]]))
             print('...')
             print('\n'.join([str(x) for x in tag_list[-3:]]))
+        info[project.name] = tag_list
+    write_csv(info)
 
 def test_main():
     main()
