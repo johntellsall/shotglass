@@ -1,4 +1,5 @@
 import glob
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -23,6 +24,15 @@ def cmd_git_list_date_tags(project_dir):
     '--tags', '--simplify-by-decoration', 
 	'--pretty=format:"%ai %d"']
 
+def parse_git_list(proc):
+    date_tag_pat = re.compile(
+        r'[^0-9]* (?P<date>[0-9-]{10}) .+'
+        r' tag:. (?P<tag>[^,)]+)',
+        re.VERBOSE)
+    lines = proc.stdout.splitlines()
+    matches = map(date_tag_pat.search, lines)
+    return [m.groupdict() for m in matches if m]
+
 def main():
     if 0:
         projects = [source(n) for n in ['openssh-portable', 'dhcp']]
@@ -42,14 +52,12 @@ def main():
         except subprocess.CalledProcessError:
             print(f'{Fore.RED}{x.returncode}{Style.RESET_ALL}')
             continue
-          
-        lines = x.stdout.splitlines()
-        lines = [line for line in lines if 'tag:' in line]
-        print(f'{len(lines)} tag lines')
+        tag_list = parse_git_list(x)
+        print(f'{len(tag_list)} tags')
         if 1:
-            print('\n'.join(lines[:3]))
+            print('\n'.join([str(x) for x in tag_list[:3]]))
             print('...')
-            print('\n'.join(lines[-3:]))
+            print('\n'.join([str(x) for x in tag_list[-3:]]))
 
 def test_main():
     main()
