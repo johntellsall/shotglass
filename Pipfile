@@ -1,12 +1,9 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 Django = ">=1.11.19"
 argparse = "*"
 django-extensions = "==2.0.6"
@@ -60,12 +57,9 @@ traitlets = "==4.3.2"
 wcwidth = "==0.1.7"
 wrapt = "==1.10.11"
 natsort = "==5.2.0"
-
+pytest-watch = "*"
 
 [dev-packages]
 
-
-
 [requires]
-
 python_version = "3.6"
