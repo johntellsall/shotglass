@@ -46,10 +46,14 @@ def parse_git_list(proc):
 def write_csv(info):
     with open('projects.csv', 'w') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['project', 'date', 'raw_tag'])
+        first = True
         for project,rows in info.items():
+            # first row has column headers
+            if first:
+                first = False
+                writer.writerow(['project'] + list(rows[0].keys()))
             for row in rows:
-                writer.writerow([project, row['date'], row['tag']])
+                writer.writerow([project] + list(row.values()))
 
 def main():
     if 0:
@@ -60,8 +64,8 @@ def main():
     print(f'{Fore.YELLOW}{len(projects)} PROJECTS :::::')
     print(Style.RESET_ALL)
 
-    info = {}
-    for project in projects[:2]:
+    project_info = {}
+    for project in projects:
         print(f'{Fore.YELLOW}{project.name} :::::{Style.RESET_ALL}')
         try:
             x = system(cmd_git_list_date_tags(project))
@@ -82,13 +86,13 @@ def main():
             proc = system(cmd_git_list_all_files(project, tag))
             num_files = len(proc.stdout.splitlines())
             info['num_files'] = num_files
-        if 1:
+        if 0:
             print('\n'.join([str(x) for x in tag_list[:3]]))
             print('...')
             print('\n'.join([str(x) for x in tag_list[-3:]]))
-        info[project.name] = tag_list
-    if 0:
-        write_csv(info)
+        project_info[project.name] = tag_list
+    if 1:
+        write_csv(project_info)
 
 def test_main():
     main()
