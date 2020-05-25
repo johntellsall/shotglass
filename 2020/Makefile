@@ -4,7 +4,9 @@ PROJ := dnsmasq
 all:
 
 dev:
-	PYTEST_ADDOPTS='-sv' pipenv run ptw --clear --verbose
+	PYTEST_ADDOPTS='-sv changegrid.py' pipenv run ptw --clear --verbose
+# dev:
+# 	PYTEST_ADDOPTS='-sv' pipenv run ptw --clear --verbose
 	
 index:
 	du -sh $(SOURCE)/* | sort -n
