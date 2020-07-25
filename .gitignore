@@ -74,3 +74,4 @@ SOURCE
 .DS_Store
 *.html
 *.code-*
+.vscode
