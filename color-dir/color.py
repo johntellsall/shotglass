@@ -55,19 +55,4 @@ for i in range(len(suffixes)):
 for label in labels:
     draw.text([label["x"], label["y"]], label["text"], fill="white")
 
-
-# draw.rectangle(
-#     [cursor, 0, scale_x * stats["c"], img.height], fill="green"
-# )  # , outline="red", width=2)
-
-if 0:
-    draw.line((0, 0) + img.size, fill="red")
-    draw.line((0, img.size[1], img.size[0], 0), fill="blue")
-
-if 0:
-    draw.point((75, 50), fill="red")
-
-if 0:
-    draw.text([20, 50], "Beer", fill="black")
-
 img.save("z.png", "PNG")
