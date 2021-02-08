@@ -33,12 +33,8 @@ for name in sourcedb:
     sourcedb[name] = {"path": Path(gitproj.working_dir) / name}
 for name, info in sourcedb.items():
     sourcedb[name]["line_count"] = line_count(info["path"])
-print(sourcedb)
+
 total_lines = sum([info["line_count"] for info in sourcedb.values()])
-
-import ipdb
-
-ipdb.set_trace()
 
 img = Image.new("RGB", [1000] * 2, (88, 88, 88))
 
@@ -50,15 +46,18 @@ labels = []
 
 for i, name in enumerate(sourcedb):
     info = sourcedb[name]
+    width = scale_x * info["line_count"]
+    color = PALETTE[i % len(PALETTE)]
 
-    width = 0  # scale_x * stats[suffix]
-    # labels.append(dict(x=cursor + 3, y=20, text=suffix.upper()))
     draw.rectangle(
-        [cursor, 0, width, img.height], fill=PALETTE[i], outline="gainsboro", width=2
+        [cursor, 0, cursor + width, img.height],
+        fill=color,
+        outline="gainsboro",
+        width=2,
     )
     cursor += width
 
-for label in labels:
-    draw.text([label["x"], label["y"]], label["text"], fill="white")
+# for label in labels:
+#     draw.text([label["x"], label["y"]], label["text"], fill="white")
 
 img.save("z.png", "PNG")
