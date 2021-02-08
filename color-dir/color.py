@@ -1,16 +1,66 @@
+from git import Git, Repo
 from PIL import Image, ImageDraw
+
+# Bold Farmhouse https://www.color-hex.com/color-palette/104687
+PALETTE = ["#830015", "#000068", "#8fb178", "#f2e8cf", "#ae976d"]
+
+
+def line_count(path):
+    return sum(1 for _ in open(path))
+
+
+def ls_files(gitobj, pat):
+    return gitobj.ls_files(pat).split("\n")
+
+
+# TODO change to count index
+def count_project(project):
+    gitproj = Git(project)
+    return {
+        # "python": len(ls_files(gitproj, "*.py")),
+        "html": len(ls_files(gitproj, "*.html")),
+        "c": len(ls_files(gitproj, "*.[ch]")),
+        # "test": len(ls_files(gitproj, "test*")),
+        "total": len(ls_files(gitproj, "*")),
+    }
+
+
+project = "../SOURCE/redis/"
+
+
+stats = count_project(project)
+
+# import ipdb
+
+# ipdb.set_trace()
 
 img = Image.new("RGB", (100, 100), (88, 88, 88))
 
+scale_x = img.width / stats["total"]
 draw = ImageDraw.Draw(img)
+
+cursor = 0
+suffixes = ("c", "html")
+
+for i in range(len(suffixes)):
+    suffix = suffixes[i]
+    label = suffix.upper()
+    width = scale_x * stats[suffix]
+    draw.text([cursor + 20, 20], label, fill="white")
+    draw.rectangle(
+        [cursor, 0, width, img.height], fill=PALETTE[i], outline="gainsboro", width=2
+    )
+    cursor += width
+# draw.rectangle(
+#     [cursor, 0, scale_x * stats["c"], img.height], fill="green"
+# )  # , outline="red", width=2)
+
 if 0:
     draw.line((0, 0) + img.size, fill="red")
     draw.line((0, img.size[1], img.size[0], 0), fill="blue")
 
 if 0:
     draw.point((75, 50), fill="red")
-
-draw.rectangle([20, 50, 30, 65], fill="green", outline="red", width=2)
 
 if 0:
     draw.text([20, 50], "Beer", fill="black")
