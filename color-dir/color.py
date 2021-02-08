@@ -41,16 +41,21 @@ draw = ImageDraw.Draw(img)
 
 cursor = 0
 suffixes = ("c", "html")
+labels = []
 
 for i in range(len(suffixes)):
     suffix = suffixes[i]
-    label = suffix.upper()
     width = scale_x * stats[suffix]
-    draw.text([cursor + 20, 20], label, fill="white")
+    labels.append(dict(x=cursor + 3, y=20, text=suffix.upper()))
     draw.rectangle(
         [cursor, 0, width, img.height], fill=PALETTE[i], outline="gainsboro", width=2
     )
     cursor += width
+
+for label in labels:
+    draw.text([label["x"], label["y"]], label["text"], fill="white")
+
+
 # draw.rectangle(
 #     [cursor, 0, scale_x * stats["c"], img.height], fill="green"
 # )  # , outline="red", width=2)
