@@ -1,8 +1,10 @@
+NAME := sizes
+
 all:
 
 cycle:
-	python ./color.py
+	python ./${NAME}.py
 	./imgcat z.png
 
 auto-cycle:
-	ls -1 ./color.py | entr -c make cycle
+	ls -1 *.py | entr -c make cycle
