@@ -43,11 +43,15 @@ draw = ImageDraw.Draw(img)
 
 cursor = 0
 labels = []
+important_width = img.width * 0.04
 
 for i, name in enumerate(sourcedb):
     info = sourcedb[name]
     width = scale_x * info["line_count"]
     color = PALETTE[i % len(PALETTE)]
+
+    if width > important_width:
+        labels.append(dict(x=cursor + 3, y=20, text=name))
 
     draw.rectangle(
         [cursor, 0, cursor + width, img.height],
@@ -57,7 +61,7 @@ for i, name in enumerate(sourcedb):
     )
     cursor += width
 
-# for label in labels:
-#     draw.text([label["x"], label["y"]], label["text"], fill="white")
+for label in labels:
+    draw.text([label["x"], label["y"]], label["text"], fill="white")
 
 img.save("z.png", "PNG")
