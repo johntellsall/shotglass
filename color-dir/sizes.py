@@ -55,7 +55,45 @@ def calc_project(project):
     )
 
 
+def run(cmd):
+    import subprocess
+
+    if 1:
+        out = subprocess.run(cmd, capture_output=True, text=True)
+        return out.stdout.split("\n")
+    else:
+        return subprocess.getoutput(cmd).split("\n")
+
+
+def calc_year(project):
+    date_expr = "@{1 year ago}"
+    cmd = [
+        "git",
+        f"--git-dir={project}/.git",
+        "rev-list",
+        "-1",
+        f"--before='{date_expr}'",
+        "master",
+    ]
+    print(cmd)
+    year_out = run(cmd)
+    year_hash = year_out[0]
+
+    cmd = [
+        "git",
+        f"--git-dir={project}/.git",
+        "diff",
+        "--numstat",
+        "HEAD",
+        year_hash,
+        "*.[ch]",
+    ]
+    print(cmd)
+    print(run(cmd))
+
+
 def cmd_render(project):
+    calc_year(project)
 
     info = calc_project(project)
     sourcedb = info["sourcedb"]
