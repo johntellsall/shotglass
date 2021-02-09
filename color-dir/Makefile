@@ -1,9 +1,12 @@
 NAME := sizes
+PROJECT := ../SOURCE/nginx
 
 all:
 
 cycle:
-	python ./${NAME}.py ../SOURCE/nginx
+	python ./${NAME}.py --stat ${PROJECT}
+	@echo
+	python ./${NAME}.py ${PROJECT}
 	./imgcat z.png
 
 auto-cycle:

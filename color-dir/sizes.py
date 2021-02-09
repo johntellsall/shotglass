@@ -38,7 +38,7 @@ def cmd_stat(project):
     pprint.pprint(stat)
 
 
-def cmd_main(project):
+def calc_project(project):
     gitproj = Git(project)
     source_names = ls_files(gitproj, "*.[ch]")
     sourcedb = dict.fromkeys(source_names)
@@ -48,10 +48,21 @@ def cmd_main(project):
         sourcedb[name]["line_count"] = line_count(info["path"])
 
     total_lines = sum([info["line_count"] for info in sourcedb.values()])
+    return dict(
+        gitproj=gitproj,
+        sourcedb=sourcedb,
+        total_lines=total_lines,
+    )
+
+
+def cmd_render(project):
+
+    info = calc_project(project)
+    sourcedb = info["sourcedb"]
 
     img = Image.new("RGB", [1000] * 2, (88, 88, 88))
 
-    scale_x = img.width / total_lines
+    scale_x = img.width / info["total_lines"]
     draw = ImageDraw.Draw(img)
 
     cursor = 0
@@ -70,8 +81,8 @@ def cmd_main(project):
         draw.rectangle(
             [cursor, 0, cursor + width, img.height],
             fill=color,
-            outline="gainsboro",
-            width=2,
+            # outline="gainsboro",
+            # width=2,
         )
         cursor += width
 
@@ -88,7 +99,8 @@ def main():
         "projects", nargs="+", type=Path, help="Git directory for project"
     )
     args = parser.parse_args()
-    args.cmd(project=args.projects[0])
+    cmd = args.cmd or cmd_render
+    cmd(project=args.projects[0])
 
 
 if __name__ == "__main__":
