@@ -3,8 +3,8 @@ NAME := sizes
 all:
 
 cycle:
-	python ./${NAME}.py
+	python ./${NAME}.py ../SOURCE/nginx
 	./imgcat z.png
 
 auto-cycle:
-	ls -1 *.py | entr -c make cycle
+	ls -1 Makefile *.py | entr -c make cycle
