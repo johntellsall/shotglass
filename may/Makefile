@@ -15,3 +15,6 @@ test: lint
 # test: lint
 # 	python ./may.py \
 # 	../SOURCE/cpython/ setup.py
+ctags:
+	ctags --fields=+zK --excmd=number \
+	-o - ../SOURCE/pyramid/pyramid/settings.py

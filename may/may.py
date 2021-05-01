@@ -6,6 +6,9 @@ from pathlib import Path
 
 import git
 
+CTAGS_ARGS = "ctags --fields=+zK --excmd=number -o -".split()
+CTAGS_PAT = re.compile(r"(?P<name> \S+) .*? kind:(?P<kind> \S+)", re.VERBOSE)
+
 
 def setup(db):
     db.execute(
@@ -33,16 +36,13 @@ def db_demo():
 
 
 def run_ctags(path):
-    cmd = "ctags --fields=+zK -o -".split()
-    proc = subprocess.run(cmd + [path], capture_output=True, text=True)
+    cmd = CTAGS_ARGS + [path]
+    proc = subprocess.run(cmd, capture_output=True, text=True)
     return proc.stdout
 
 
 def parse_ctags(blob):
-    # "tests_require	..//setup.py	...	kind:variable"
-    tag_exp = r"(?P<name> \S+) .*? kind:(?P<kind> \S+)"
-    tag_pat = re.compile(tag_exp, re.VERBOSE)
-    tag_iter = tag_pat.finditer(blob)
+    tag_iter = CTAGS_PAT.finditer(blob)
     return tag_iter
 
 
@@ -86,7 +86,7 @@ def main():
         fullpath = project_dir / entry.path
         ctags_text = run_ctags(fullpath)
         tags = list(parse_ctags(ctags_text))
-        info["num_tags"] = len(tags)
+        info.update(format_summary(tags))
         print("{path} {num_bytes} {num_tags}".format(**info))
     print("DONE")
 
