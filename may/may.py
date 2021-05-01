@@ -1,3 +1,4 @@
+import re
 import subprocess
 import sqlite3
 import sys

@@ -1,2 +1,4 @@
 GitPython
 pdbpp
+black
+flake8
