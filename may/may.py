@@ -40,8 +40,11 @@ def run_ctags(path):
 
 def parse_ctags(blob):
     # "tests_require	..//setup.py	...	kind:variable"
-    var_pat = re.compile(r"^(?P<name> \S+) .* kind:(?P<kind> \S+)", re.VERBOSE)
-    return var_pat.finditer(blob)
+    tag_exp = r"^(?P<name> \S+) .*? kind:(?P<kind> \S+)"
+    tag_pat = re.compile(tag_exp, re.VERBOSE)
+    tag_iter = tag_pat.finditer(blob)
+    breakpoint()
+    tag_iter = tag_iter
 
 
 def list_paths(repo):
@@ -59,6 +62,16 @@ def is_interesting(path):
     return not re.search(r"(docs|tests)/", path)
 
 
+# def show_detail():
+#     for tag in parse_ctags(ctags_text):
+#         print(f"\t{tag.groupdict()}")
+
+
+def format_summary(tags):
+    breakpoint()
+    return f"{len(tags)} tags"
+
+
 def main():
     project_dir = Path(sys.argv[1])
     print(project_dir)
@@ -66,13 +79,18 @@ def main():
     tree = repo.heads.master.commit.tree
     source_paths = filter(is_source_path, list_paths(repo))
     source_paths = filter(is_interesting, source_paths)
-    for path in list(source_paths)[:100]:
+    for path in ["pyramid/view.py"]:  # list(source_paths)[:100]:
         entry = tree[path]
         print(f"{entry.path} {entry.size}")
         fullpath = project_dir / entry.path
         ctags_text = run_ctags(fullpath)
-        for tag in parse_ctags(ctags_text):
-            print(f"\t{tag.groupdict()}")
+        tags = list(parse_ctags(ctags_text))
+        if not tags:
+            print("?")
+        else:
+            print([tag["name"] for tag in tags])
+            print("woot")
+        # print(format_summary(tags))
     print("DONE")
 
 
