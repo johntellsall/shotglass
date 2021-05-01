@@ -44,13 +44,24 @@ def parse_ctags(blob):
     return var_pat.finditer(blob)
 
 
+# TODO make more general
+def list_source_paths(repos):
+    paths = repos.git.ls_files().split("\n")
+    return [path for path in paths if path.endswith(".py")]
+
+
+# TODO make more general
+def list_source_items(repos):
+    tree = repos.heads.master.commit.tree
+    return [item for item in tree if item.path.endswith(".py")]
+
+
 def main():
     project_dir = Path(sys.argv[1])
-    repos = git.Repo(project_dir)
-    tree = repos.heads.master.commit.tree
     print(project_dir)
-    source = [item for item in tree if item.path.endswith(".py")]
-    for entry in source:
+    repos = git.Repo(project_dir)
+    # paths = list_source_paths(repos)
+    for entry in list_source_items(repos):
         print(entry)
         print(f"{entry.path} {entry.size}")
         fullpath = project_dir / entry.path
