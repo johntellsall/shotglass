@@ -10,8 +10,8 @@ lint:
 	black .
 	flake8 ${SOURCE}
 
-test-p: lint
-	python ./may.py ../SOURCE/pyramid/
 test: lint
-	python ./may.py \
-	../SOURCE/cpython/ setup.py
+	python ./may.py ../SOURCE/pyramid/
+# test: lint
+# 	python ./may.py \
+# 	../SOURCE/cpython/ setup.py
