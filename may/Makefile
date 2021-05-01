@@ -5,4 +5,4 @@ list:
 	| egrep -v '(docs/|tests/)'
 
 test:
-	python ./may.py ../SOURCE/pyramid/view.py
+	python ./may.py ../SOURCE/pyramid/

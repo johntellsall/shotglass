@@ -2,6 +2,8 @@ import sqlite3
 import sys
 from pathlib import Path
 
+import git
+
 
 def setup(db):
     db.execute(
@@ -30,7 +32,10 @@ def db_demo():
 
 def main():
     project_dir = Path(sys.argv[1])
+    tree = git.Repo(project_dir).heads.master.commit.tree
     print(project_dir)
+    for entry in tree:
+        print(entry)
 
 
 if __name__ == "__main__":
