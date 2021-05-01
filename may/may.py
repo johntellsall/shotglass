@@ -48,7 +48,6 @@ def parse_ctags(blob):
 
 def list_paths(repo):
     return repo.git.ls_files().split("\n")
-    # return [path for path in paths if path.endswith(".py")]
 
 
 # TODO make more general
@@ -67,8 +66,7 @@ def is_interesting(path):
 
 
 def format_summary(tags):
-    breakpoint()
-    return f"{len(tags)} tags"
+    return {"num_tags": len(tags)}
 
 
 def main():
@@ -78,40 +76,19 @@ def main():
     tree = repo.heads.master.commit.tree
     source_paths = filter(is_source_path, list_paths(repo))
     source_paths = filter(is_interesting, source_paths)
-    for path in list(source_paths)[:100]:
+    source_paths = list(source_paths)
+    p_name = project_dir.name
+    num_source = len(source_paths)
+    print(f"PROJECT:{p_name} {num_source} source files")
+    for path in source_paths:
         entry = tree[path]
-        print(f"{entry.path} {entry.size}")
+        info = {"path": entry.path, "num_bytes": entry.size}
         fullpath = project_dir / entry.path
         ctags_text = run_ctags(fullpath)
         tags = list(parse_ctags(ctags_text))
-        if not tags:
-            print("?")
-        else:
-            print([tag["name"] for tag in tags])
-            print("woot")
-        # print(format_summary(tags))
+        info["num_tags"] = len(tags)
+        print("{path} {num_bytes} {num_tags}".format(**info))
     print("DONE")
-
-
-# def main():
-#     project_dir = sys.argv[1]
-#     repo = git.Repo(project_dir)
-#     tree = repo.heads.master.commit.tree
-
-#     source_path = sys.argv[2]
-#     for path in [source_path]:
-#         entry = tree[path]
-#         print(f"{entry.path} {entry.size}")
-#         fullpath = Path(project_dir) / entry.path
-#         ctags_text = run_ctags(fullpath)
-#         tags = list(parse_ctags(ctags_text))
-#         if not tags:
-#             print("?")
-#         else:
-#             print([tag["name"] for tag in tags])
-#             print("woot")
-#         # print(format_summary(tags))
-#     print("DONE")
 
 
 if __name__ == "__main__":
