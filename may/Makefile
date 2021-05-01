@@ -10,5 +10,5 @@ lint:
 	black .
 	flake8 ${SOURCE}
 
-test:
+test: # lint
 	python ./may.py ../SOURCE/pyramid/
