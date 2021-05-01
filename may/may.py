@@ -44,30 +44,45 @@ def parse_ctags(blob):
     return var_pat.finditer(blob)
 
 
-# TODO make more general
-def list_source_paths(repos):
-    paths = repos.git.ls_files().split("\n")
-    return [path for path in paths if path.endswith(".py")]
+def list_paths(repo):
+    return repo.git.ls_files().split("\n")
+    # return [path for path in paths if path.endswith(".py")]
 
 
 # TODO make more general
-def list_source_items(repos):
-    tree = repos.heads.master.commit.tree
-    return [item for item in tree if item.path.endswith(".py")]
+def is_source_path(path):
+    return path.endswith(".py")
+
+
+# def is_interesting(path):
+#     if path.startswith("docs/"):
+#         return False
+#     if "/scripts/" in path:
+#         return False
+#     # elif re.search(r"/(scripts|tests)/", path):
+#     #     return False
+#     return True
+
+
+# def list_source_items(repo):
+#     tree = repo.heads.master.commit.tree
+#     return [item for item in tree if item.path.endswith(".py")]
 
 
 def main():
     project_dir = Path(sys.argv[1])
     print(project_dir)
-    repos = git.Repo(project_dir)
-    # paths = list_source_paths(repos)
-    for entry in list_source_items(repos):
-        print(entry)
+    repo = git.Repo(project_dir)
+    tree = repo.heads.master.commit.tree
+    source_paths = filter(is_source_path, list_paths(repo))
+    # source_paths = filter(is_interesting, source_paths)
+    for path in list(source_paths)[:100]:
+        entry = tree[path]
         print(f"{entry.path} {entry.size}")
         fullpath = project_dir / entry.path
         ctags_text = run_ctags(fullpath)
         for tag in parse_ctags(ctags_text):
-            print(tag.groupdict())
+            print(f"\t{tag.groupdict()}")
     print("DONE")
 
 
