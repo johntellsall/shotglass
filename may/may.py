@@ -72,7 +72,7 @@ def format_summary(tags):
     return f"{len(tags)} tags"
 
 
-def main():
+def main_scan_project():
     project_dir = Path(sys.argv[1])
     print(project_dir)
     repo = git.Repo(project_dir)
@@ -83,6 +83,27 @@ def main():
         entry = tree[path]
         print(f"{entry.path} {entry.size}")
         fullpath = project_dir / entry.path
+        ctags_text = run_ctags(fullpath)
+        tags = list(parse_ctags(ctags_text))
+        if not tags:
+            print("?")
+        else:
+            print([tag["name"] for tag in tags])
+            print("woot")
+        # print(format_summary(tags))
+    print("DONE")
+
+
+def main():
+    project_dir = sys.argv[1]
+    repo = git.Repo(project_dir)
+    tree = repo.heads.master.commit.tree
+
+    source_path = sys.argv[2]
+    for path in [source_path]:
+        entry = tree[path]
+        print(f"{entry.path} {entry.size}")
+        fullpath = Path(project_dir) / entry.path
         ctags_text = run_ctags(fullpath)
         tags = list(parse_ctags(ctags_text))
         if not tags:
