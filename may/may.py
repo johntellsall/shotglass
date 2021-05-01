@@ -1,3 +1,4 @@
+import subprocess
 import sqlite3
 import sys
 from pathlib import Path
@@ -30,12 +31,27 @@ def db_demo():
     con.close()
 
 
+def run_ctags(path):
+    cmd = "ctags --fields=+zK -o -".split()
+    proc = subprocess.run(cmd + [path], capture_output=True, text=True)
+    return proc.stdout
+
+
 def main():
     project_dir = Path(sys.argv[1])
-    tree = git.Repo(project_dir).heads.master.commit.tree
+    repos = git.Repo(project_dir)
+    tree = repos.heads.master.commit.tree
     print(project_dir)
     for entry in tree:
+        if not entry.path.endswith(".py"):
+            continue
         print(entry)
+        print(f"{entry.path} {entry.size}")
+        fullpath = project_dir / entry.path
+        ctags = run_ctags(fullpath)
+        print(ctags)
+        blam
+        # breakpoint()
 
 
 if __name__ == "__main__":
