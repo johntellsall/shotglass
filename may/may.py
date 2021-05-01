@@ -54,19 +54,9 @@ def is_source_path(path):
     return path.endswith(".py")
 
 
-# def is_interesting(path):
-#     if path.startswith("docs/"):
-#         return False
-#     if "/scripts/" in path:
-#         return False
-#     # elif re.search(r"/(scripts|tests)/", path):
-#     #     return False
-#     return True
-
-
-# def list_source_items(repo):
-#     tree = repo.heads.master.commit.tree
-#     return [item for item in tree if item.path.endswith(".py")]
+# TODO make more general
+def is_interesting(path):
+    return not re.search(r"(docs|tests)/", path)
 
 
 def main():
@@ -75,7 +65,7 @@ def main():
     repo = git.Repo(project_dir)
     tree = repo.heads.master.commit.tree
     source_paths = filter(is_source_path, list_paths(repo))
-    # source_paths = filter(is_interesting, source_paths)
+    source_paths = filter(is_interesting, source_paths)
     for path in list(source_paths)[:100]:
         entry = tree[path]
         print(f"{entry.path} {entry.size}")
