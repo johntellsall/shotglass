@@ -12,7 +12,7 @@ lint:
 	pflake8 ${SOURCE}
 
 test: lint
-	pytest --exitfirst
+	pytest --exitfirst --cov=may test_may.py
 
 ctags:
 	ctags --fields=+zK --excmd=number \
