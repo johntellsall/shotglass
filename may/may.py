@@ -7,7 +7,10 @@ from pathlib import Path
 import git
 
 CTAGS_ARGS = "ctags --fields=+zK --excmd=number -o -".split()
-CTAGS_PAT = re.compile(r"(?P<name> \S+) .*? kind:(?P<kind> \S+)", re.VERBOSE)
+# Example: "asbool settings.py 6; kind:function"
+CTAGS_PAT = re.compile(
+    r"(?P<name> \S+) .*? " r"(?P<line_num> \d+) ;. " r"kind:(?P<kind> \S+)", re.VERBOSE
+)
 
 
 def setup(db):
@@ -87,8 +90,8 @@ def get_project(repo):
     return tree, paths
 
 
-def main():
-    project_dir = Path(sys.argv[1])
+def show_project(project_path):
+    project_dir = Path(project_path)
     print(project_dir)
     repo = git.Repo(project_dir)
     tree, source_paths = get_project(repo)
@@ -98,6 +101,10 @@ def main():
         file_info = info["file_info"]
         print("{path} {num_bytes} {num_tags}".format(**file_info))
     print("DONE")
+
+
+def main():
+    show_project(sys.argv[1])
 
 
 if __name__ == "__main__":
