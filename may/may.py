@@ -60,34 +60,43 @@ def is_interesting(path):
     return not re.search(r"(docs|tests)/", path)
 
 
-# def show_detail():
-#     for tag in parse_ctags(ctags_text):
-#         print(f"\t{tag.groupdict()}")
-
-
 def format_summary(tags):
     return {"num_tags": len(tags)}
+
+
+def parse_entry(entry, project_dir):
+    file_info = {"path": entry.path, "num_bytes": entry.size}
+    fullpath = project_dir / entry.path
+    ctags_text = run_ctags(fullpath)
+    tags = list(parse_ctags(ctags_text))
+    file_info.update(format_summary(tags))
+    return dict(file_info=file_info, tags=tags)
+
+
+def print_project(project_dir, source_paths):
+    p_name = project_dir.name
+    num_source = len(source_paths)
+    print(f"PROJECT:{p_name} {num_source} source files")
+
+
+def get_project(repo):
+    tree = repo.heads.master.commit.tree
+    paths = filter(is_source_path, list_paths(repo))
+    paths = filter(is_interesting, paths)
+    paths = list(paths)
+    return tree, paths
 
 
 def main():
     project_dir = Path(sys.argv[1])
     print(project_dir)
     repo = git.Repo(project_dir)
-    tree = repo.heads.master.commit.tree
-    source_paths = filter(is_source_path, list_paths(repo))
-    source_paths = filter(is_interesting, source_paths)
-    source_paths = list(source_paths)
-    p_name = project_dir.name
-    num_source = len(source_paths)
-    print(f"PROJECT:{p_name} {num_source} source files")
+    tree, source_paths = get_project(repo)
+    print_project(project_dir, source_paths)
     for path in source_paths:
-        entry = tree[path]
-        info = {"path": entry.path, "num_bytes": entry.size}
-        fullpath = project_dir / entry.path
-        ctags_text = run_ctags(fullpath)
-        tags = list(parse_ctags(ctags_text))
-        info.update(format_summary(tags))
-        print("{path} {num_bytes} {num_tags}".format(**info))
+        info = parse_entry(tree[path], project_dir)
+        file_info = info["file_info"]
+        print("{path} {num_bytes} {num_tags}".format(**file_info))
     print("DONE")
 
 
