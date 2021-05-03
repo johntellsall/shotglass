@@ -9,7 +9,7 @@ list:
 # NOTE: "pflake8" reads common pyproject.toml for config
 lint:
 	black .
-	pflake8 ${SOURCE}
+	pflake8 --max-complexity 10 ${SOURCE}
 
 test: lint
 	pytest --exitfirst --cov=may test_may.py

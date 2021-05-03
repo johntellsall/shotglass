@@ -5,3 +5,4 @@ flake8
 pytest
 pyproject-flake8
 pytest-cov
+mccabe
