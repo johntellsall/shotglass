@@ -9,7 +9,8 @@ import git
 CTAGS_ARGS = "ctags --fields=+zK --excmd=number -o -".split()
 # Example: "asbool settings.py 6; kind:function"
 CTAGS_PAT = re.compile(
-    r"(?P<name> \S+) .*? " r"(?P<line_num> \d+) ;. " r"kind:(?P<kind> \S+)", re.VERBOSE
+    r"(?P<name> \S+) .*? " + r"(?P<line_num> \d+) ;.+ " + r"kind:(?P<kind> \S+)",
+    re.VERBOSE,
 )
 
 

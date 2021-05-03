@@ -2,3 +2,5 @@ GitPython
 pdbpp
 black
 flake8
+pytest
+pyproject-flake8
