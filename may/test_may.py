@@ -1,3 +1,5 @@
+import git
+
 import may
 
 SAMPLE_PATH = "test_source/sample.py"
@@ -26,3 +28,11 @@ def test_parse_ctags2():
 
     tags_list = [match["name"] for match in tags_iter]
     assert tags_list == ["Whiskey", "beer", "sip"]
+
+
+def test_get_project():
+    repo = git.Repo("..")
+    tree, paths = may.get_project(repo)
+    assert type(tree) is git.objects.tree.Tree
+    assert len(paths) > 1
+    assert all((type(path) is str for path in paths))
