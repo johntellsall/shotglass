@@ -2,6 +2,7 @@ import re
 import subprocess
 import sqlite3
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import git
@@ -108,6 +109,10 @@ def show_project(project_path):
     print("DONE")
 
 
+def format_tstamp(ts):
+    return datetime.fromtimestamp(ts).strftime("%c")
+
+
 # TODO rename "show_releases"
 def show_tags(project_path):
     project_dir = Path(project_path)
@@ -117,25 +122,26 @@ def show_tags(project_path):
     def is_interesting_release(tag):
         return re.match(r"^[0-9.]+$", tag.name) is not None
 
-    tags = list(filter(is_interesting_release, repo.tags))
-    for tagref in tags:
-        # print(tagref.name, end=" ")
+    # tags = list(filter(is_interesting_release, repo.tags))
+    tags = repo.tags
+    # TODO sort semver
+    for tagref in list(tags)[:10]:
+        cool = is_interesting_release(tagref)
+        if not cool:
+            print("-", end=" ")
         summary = tagref.commit.summary
         tag_tree = tagref.commit.tree
-        com_count = sum(1 for c in tag_tree.traverse())
+        com_date = tagref.commit.committed_date
+        com_datestr = format_tstamp(com_date)
+        print(len(list(tag_tree.traverse())))
+        com_count = sum(1 for _ in tag_tree.traverse())
         com_size = sum(c.size for c in tag_tree.traverse())
-        source_list = [
-            x.path for x in tag_tree.traverse() if is_interesting_source(x.path)
-        ]
-        source_count = len(source_list)
-        print(f"{tagref.name} {source_count}")
+        file_list = [x.path for x in tag_tree.traverse()]
+        source_list = [path for path in file_list if is_interesting_source(path)]
+        print(f"{tagref.name} files={len(file_list)} source={len(source_list)}")
+        print(f"\t{com_datestr}")
         print(f"\t{com_count} {com_size} {summary}")
-        # breakpoint()
     print()
-    # print(sum(list_paths(tag))
-
-
-# c.list_items(repo, repo.head)
 
 
 def main():
