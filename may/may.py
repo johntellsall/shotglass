@@ -120,7 +120,7 @@ def show_tags(project_path):
         com_count = sum(1 for c in tag_tree.traverse())
         com_size = sum(c.size for c in tag_tree.traverse())
         print(f"{tagref.name} {com_count} {com_size} {summary}")
-        # breakpoint()
+        breakpoint()
     print()
     # print(sum(list_paths(tag))
 
