@@ -33,3 +33,6 @@ SRC := ../SOURCE/pyramid/pyramid/config/routes.py
 dot:
 	python -m mccabe --dot ${SRC}  > x.dot
 	dot -Tpng x.dot -ox.png
+
+run:
+	python -m may ../SOURCE/pyramid/

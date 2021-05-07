@@ -104,8 +104,30 @@ def show_project(project_path):
     print("DONE")
 
 
+def show_tags(project_path):
+    project_dir = Path(project_path)
+    print(project_dir)
+    repo = git.Repo(project_dir)
+
+    def is_interesting_release(tag):
+        return re.match(r"^[0-9.]+$", tag.name) is not None
+
+    tags = list(filter(is_interesting_release, repo.tags))
+    print(tags)
+    for tagref in tags:
+        print(tagref.name, end=" ")
+        breakpoint()
+        # print(sum(list_paths(tag))
+
+
+# c.list_items(repo, repo.head)
+
+
 def main():
-    show_project(sys.argv[1])
+    if 0:
+        show_project(sys.argv[1])
+    else:
+        show_tags(sys.argv[1])
 
 
 if __name__ == "__main__":
