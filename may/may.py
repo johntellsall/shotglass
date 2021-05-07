@@ -64,6 +64,10 @@ def is_interesting(path):
     return not re.search(r"(docs|tests)/", path)
 
 
+def is_interesting_source(path):
+    return is_source_path(path) and is_interesting(path)
+
+
 def format_summary(tags):
     return {"num_tags": len(tags)}
 
@@ -104,6 +108,7 @@ def show_project(project_path):
     print("DONE")
 
 
+# TODO rename "show_releases"
 def show_tags(project_path):
     project_dir = Path(project_path)
     print(project_dir)
@@ -119,8 +124,13 @@ def show_tags(project_path):
         tag_tree = tagref.commit.tree
         com_count = sum(1 for c in tag_tree.traverse())
         com_size = sum(c.size for c in tag_tree.traverse())
-        print(f"{tagref.name} {com_count} {com_size} {summary}")
-        breakpoint()
+        source_list = [
+            x.path for x in tag_tree.traverse() if is_interesting_source(x.path)
+        ]
+        source_count = len(source_list)
+        print(f"{tagref.name} {source_count}")
+        print(f"\t{com_count} {com_size} {summary}")
+        # breakpoint()
     print()
     # print(sum(list_paths(tag))
 
