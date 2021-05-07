@@ -113,11 +113,16 @@ def show_tags(project_path):
         return re.match(r"^[0-9.]+$", tag.name) is not None
 
     tags = list(filter(is_interesting_release, repo.tags))
-    print(tags)
     for tagref in tags:
-        print(tagref.name, end=" ")
-        breakpoint()
-        # print(sum(list_paths(tag))
+        # print(tagref.name, end=" ")
+        summary = tagref.commit.summary
+        tag_tree = tagref.commit.tree
+        com_count = sum(1 for c in tag_tree.traverse())
+        com_size = sum(c.size for c in tag_tree.traverse())
+        print(f"{tagref.name} {com_count} {com_size} {summary}")
+        # breakpoint()
+    print()
+    # print(sum(list_paths(tag))
 
 
 # c.list_items(repo, repo.head)
