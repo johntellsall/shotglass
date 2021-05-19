@@ -1,3 +1,4 @@
+import logging
 import re
 import subprocess
 import sqlite3
@@ -13,9 +14,10 @@ CTAGS_PAT = re.compile(
     r"(?P<name> \S+) .*? " + r"(?P<line_num> \d+) ;.+ " + r"kind:(?P<kind> \S+)",
     re.VERBOSE,
 )
+logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
 
-def show_info(db):
+def show_db_info(db):
     for row in db.execute("SELECT * FROM files ORDER BY 1"):
         print(row)
 
@@ -80,7 +82,7 @@ def setup_db(db):
     db.execute("DROP TABLE files")
     db.execute(
         """
-    CREATE TABLE files (path text, line_count int)
+    CREATE TABLE files (path text, byte_count int)
     """
     )
 
@@ -88,24 +90,33 @@ def setup_db(db):
 def index_project(project_path):
     project_dir = Path(project_path)
     print(project_dir)
-    # repo = git.Repo(project_dir)
-    # tree, source_paths = get_project(repo)
-    # for path in source_paths:
-    #     info = parse_entry(tree[path], project_dir)
-    #     file_info = info["file_info"]
-    #     print("{path} {num_bytes} {num_tags}".format(**file_info))
-    # print("DONE")
 
+    repo = git.Repo(project_dir)
+    tree, source_paths = get_project(repo)
     con = sqlite3.connect("may.db")
     cur = con.cursor()
 
     setup_db(cur)
-    cur.execute("INSERT INTO files VALUES (?, ?)", ("C", 49))
+
+    issues = []
+    for path in source_paths:
+        try:
+            info = parse_entry(tree[path], project_dir)
+        except KeyError as err:
+            issues.append((path, err))
+            continue
+        # print(info)
+        finfo = info["file_info"]
+        cur.execute(
+            "INSERT INTO files VALUES (?, ?)", (finfo["path"], finfo["num_bytes"])
+        )
 
     con.commit()
 
-    show_info(con)
+    show_db_info(con)
     con.close()
+    if issues:
+        print(f"NOTE: {len(issues)} issues found")
 
 
 def show_project(project_path):
