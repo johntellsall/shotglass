@@ -112,9 +112,8 @@ def index_project(project_path):
             continue
         # print(info)
         finfo = info["file_info"]
-        cur.execute(
-            "INSERT INTO files VALUES (?, ?)", (finfo["path"], finfo["num_bytes"])
-        )
+        values = (finfo["path"], finfo["num_bytes"])
+        cur.execute("INSERT INTO files VALUES (?, ?)", values)
 
     con.commit()
 
@@ -143,16 +142,39 @@ def show_project(project_path):
     print("DONE")
 
 
-def render_project(_):
-    WINSIZE = [500, 500]
+def render_project(project_path):
+    WIDTH, HEIGHT = [1000, 500]
+    NUM_PIXELS = WIDTH * HEIGHT
     WHITE = pg.Color("white")
 
     pg.display.init()
-    screen = pg.display.set_mode(size=WINSIZE)
+    screen = pg.display.set_mode(size=[WIDTH, HEIGHT])
     _, db = get_db()
-    for row in db.execute("SELECT * FROM files ORDER BY 1"):
-        print(row)
-        screen.set_at([int(50), int(80)], WHITE)
+
+    db.execute("SELECT SUM(byte_count) FROM files")
+    total = db.fetchone()[0]
+    print(f"TOTAL: {total}")
+
+    def num_to_xy(num):
+        # frac = num / NUM_PIXELS
+        y = int(num / WIDTH)
+        x = num % WIDTH
+        return x, y
+
+    num = 0
+    rows = db.execute("SELECT path, byte_count FROM files ORDER BY 1")
+    coords = []
+    for row in rows:
+        x, y = num_to_xy(num)
+        print(x, y, row)
+        coords.append((x, y))
+        num += row[1]
+    print(coords)
+    color = WHITE
+    for i in range(len(coords) - 1):
+        # screen.set_at([x, y], WHITE)
+        pg.draw.line(screen, color, coords[i], coords[i + 1])
+
     pg.image.save(screen, "may.png")
 
 
