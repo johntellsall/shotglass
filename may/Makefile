@@ -2,6 +2,9 @@ SOURCE := $(shell git ls-files '*.py')
 
 all:
 
+show-db:
+	sqlite3 may.db < show-db.sql
+
 list:
 	(cd ../SOURCE/pyramid/ ; git ls-files '*.py') \
 	| egrep -v '(docs/|tests/)'

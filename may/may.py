@@ -32,7 +32,7 @@ def db_demo():
     con = sqlite3.connect("may.db")
     cur = con.cursor()
 
-    cur.execute("insert into files values (?, ?)", ("C", 49))
+    cur.execute("INSERT INTO files VALUES (?, ?)", ("C", 49))
 
     con.commit()
 
