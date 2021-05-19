@@ -17,7 +17,12 @@ test: lint
 
 run:
 	python -m may ../SOURCE/pyramid/
-	
+
+IMGCAT:=~/.iterm2/imgcat	
+run2: run
+	$(IMGCAT) may.png
+	echo DONE
+
 setup:
 	pip install -qr ./requirements.txt
 

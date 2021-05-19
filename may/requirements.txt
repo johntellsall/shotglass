@@ -6,3 +6,4 @@ pytest
 pyproject-flake8
 pytest-cov
 mccabe
+pygame

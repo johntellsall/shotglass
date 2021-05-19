@@ -8,6 +8,12 @@ from pathlib import Path
 
 import git
 
+import os
+
+os.environ["SDL_VIDEODRIVER"] = "dummy"
+
+import pygame as pg
+
 CTAGS_ARGS = "ctags --fields=+zK --excmd=number -o -".split()
 # Example: "asbool settings.py 6; kind:function"
 CTAGS_PAT = re.compile(
@@ -93,8 +99,7 @@ def index_project(project_path):
 
     repo = git.Repo(project_dir)
     tree, source_paths = get_project(repo)
-    con = sqlite3.connect("may.db")
-    cur = con.cursor()
+    con, cur = get_db()
 
     setup_db(cur)
 
@@ -119,6 +124,12 @@ def index_project(project_path):
         print(f"NOTE: {len(issues)} issues found")
 
 
+def get_db():
+    con = sqlite3.connect("may.db")
+    cur = con.cursor()
+    return con, cur
+
+
 def show_project(project_path):
     project_dir = Path(project_path)
     print(project_dir)
@@ -130,6 +141,19 @@ def show_project(project_path):
         file_info = info["file_info"]
         print("{path} {num_bytes} {num_tags}".format(**file_info))
     print("DONE")
+
+
+def render_project(_):
+    WINSIZE = [500, 500]
+    WHITE = pg.Color("white")
+
+    pg.display.init()
+    screen = pg.display.set_mode(size=WINSIZE)
+    _, db = get_db()
+    for row in db.execute("SELECT * FROM files ORDER BY 1"):
+        print(row)
+        screen.set_at([int(50), int(80)], WHITE)
+    pg.image.save(screen, "may.png")
 
 
 def format_tstamp(ts):
@@ -172,6 +196,8 @@ def main():
         show_project(sys.argv[1])
     elif 0:
         show_tags(sys.argv[1])
+    elif 1:
+        render_project(sys.argv[1])
     else:
         index_project(sys.argv[1])
 
