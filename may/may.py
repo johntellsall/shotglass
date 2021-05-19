@@ -15,29 +15,9 @@ CTAGS_PAT = re.compile(
 )
 
 
-def setup(db):
-    db.execute(
-        """
-    CREATE TABLE files (path text, line_count int)
-    """
-    )
-
-
 def show_info(db):
     for row in db.execute("SELECT * FROM files ORDER BY 1"):
         print(row)
-
-
-def db_demo():
-    con = sqlite3.connect("may.db")
-    cur = con.cursor()
-
-    cur.execute("INSERT INTO files VALUES (?, ?)", ("C", 49))
-
-    con.commit()
-
-    show_info(con)
-    con.close()
 
 
 def run_ctags(path):
@@ -96,6 +76,38 @@ def get_project(repo):
     return tree, paths
 
 
+def setup_db(db):
+    db.execute("DROP TABLE files")
+    db.execute(
+        """
+    CREATE TABLE files (path text, line_count int)
+    """
+    )
+
+
+def index_project(project_path):
+    project_dir = Path(project_path)
+    print(project_dir)
+    # repo = git.Repo(project_dir)
+    # tree, source_paths = get_project(repo)
+    # for path in source_paths:
+    #     info = parse_entry(tree[path], project_dir)
+    #     file_info = info["file_info"]
+    #     print("{path} {num_bytes} {num_tags}".format(**file_info))
+    # print("DONE")
+
+    con = sqlite3.connect("may.db")
+    cur = con.cursor()
+
+    setup_db(cur)
+    cur.execute("INSERT INTO files VALUES (?, ?)", ("C", 49))
+
+    con.commit()
+
+    show_info(con)
+    con.close()
+
+
 def show_project(project_path):
     project_dir = Path(project_path)
     print(project_dir)
@@ -147,8 +159,10 @@ def show_tags(project_path):
 def main():
     if 0:
         show_project(sys.argv[1])
-    else:
+    elif 0:
         show_tags(sys.argv[1])
+    else:
+        index_project(sys.argv[1])
 
 
 if __name__ == "__main__":

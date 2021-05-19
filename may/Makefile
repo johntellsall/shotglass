@@ -5,10 +5,8 @@ all:
 show-db:
 	sqlite3 may.db < show-db.sql
 
-list:
-	(cd ../SOURCE/pyramid/ ; git ls-files '*.py') \
-	| egrep -v '(docs/|tests/)'
-
+# CODE
+#
 # NOTE: "pflake8" reads common pyproject.toml for config
 lint:
 	black .
@@ -17,12 +15,22 @@ lint:
 test: lint
 	pytest --exitfirst --cov=may test_may.py
 
+run:
+	python -m may ../SOURCE/pyramid/
+	
+setup:
+	pip install -qr ./requirements.txt
+
+# HELPERS
+#
+list:
+	(cd ../SOURCE/pyramid/ ; git ls-files '*.py') \
+	| egrep -v '(docs/|tests/)'
+
+
 ctags:
 	ctags --fields=+zK --excmd=number \
 	-o - ../SOURCE/pyramid/pyramid/settings.py
-
-setup:
-	pip install -qr ./requirements.txt
 
 mccabe:
 	python -m mccabe --min 0 may.py
@@ -37,5 +45,3 @@ dot:
 	python -m mccabe --dot ${SRC}  > x.dot
 	dot -Tpng x.dot -ox.png
 
-run:
-	python -m may ../SOURCE/pyramid/
