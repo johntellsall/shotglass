@@ -165,15 +165,16 @@ def render_project(project_path):
     rows = db.execute("SELECT path, byte_count FROM files ORDER BY 1")
     coords = []
     for row in rows:
-        x, y = num_to_xy(num)
-        print(x, y, row)
-        coords.append((x, y))
+        xy = num_to_xy(num)
+        print(xy, row)
+        coords.append(xy)
         num += row[1]
     print(coords)
     color = WHITE
     for i in range(len(coords) - 1):
-        # screen.set_at([x, y], WHITE)
-        pg.draw.line(screen, color, coords[i], coords[i + 1])
+        xy1, xy2 = coords[i], coords[i + 1]
+        rect = pg.Rect(*xy1, xy2[0] - xy1[0], xy2[1] - xy1[0])
+        pg.draw.rect(screen, color, rect)
 
     pg.image.save(screen, "may.png")
 
