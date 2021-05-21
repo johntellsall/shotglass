@@ -12,7 +12,7 @@ import os
 
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
-import pygame as pg
+import pygame as pg  # noqa: E402
 
 CTAGS_ARGS = "ctags --fields=+zK --excmd=number -o -".split()
 # Example: "asbool settings.py 6; kind:function"
@@ -144,7 +144,7 @@ def show_project(project_path):
 
 def render_project(project_path):
     WIDTH, HEIGHT = [1000, 500]
-    NUM_PIXELS = WIDTH * HEIGHT
+    # NUM_PIXELS = WIDTH * HEIGHT
     WHITE = pg.Color("white")
 
     pg.display.init()

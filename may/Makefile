@@ -16,7 +16,7 @@ lint:
 test: lint
 	pytest --exitfirst --cov=may test_may.py
 
-run:
+run: lint
 	python -m may ../SOURCE/pyramid/
 	$(IMGCAT) may.png
 	echo DONE
