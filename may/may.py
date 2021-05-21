@@ -142,10 +142,17 @@ def show_project(project_path):
     print("DONE")
 
 
+def iter_color():
+    while True:
+        for hue in range(0, 360, 60):
+            color = pg.Color("white")
+            color.hsva = (hue, 100, 100, 100)
+            yield color
+
+
 def render_project(project_path):
     WIDTH, HEIGHT = [1000, 500]
     # NUM_PIXELS = WIDTH * HEIGHT
-    WHITE = pg.Color("white")
 
     pg.display.init()
     screen = pg.display.set_mode(size=[WIDTH, HEIGHT])
@@ -170,8 +177,10 @@ def render_project(project_path):
         coords.append(xy)
         num += row[1]
     print(coords)
-    color = WHITE
+
+    colors = iter_color()
     for i in range(len(coords) - 1):
+        color = next(colors)
         xy1, xy2 = coords[i], coords[i + 1]
         rect = pg.Rect(*xy1, xy2[0] - xy1[0], xy2[1] - xy1[0])
         pg.draw.rect(screen, color, rect)
