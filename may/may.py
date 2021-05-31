@@ -143,11 +143,13 @@ def show_project(project_path):
 
 
 def iter_color():
+    hue = 0
     while True:
-        for hue in range(0, 360, 60):
-            color = pg.Color("white")
-            color.hsva = (hue, 100, 100, 100)
-            yield color
+        color = pg.Color("white")
+        color.hsva = (hue, 100, 100, 100)
+        yield color
+        hue += 15
+        hue %= 360
 
 
 def render_project(project_path):
@@ -177,13 +179,22 @@ def render_project(project_path):
         coords.append(xy)
         num += row[1]
     print(coords)
-
+    print()
+    white = pg.Color("white")
     colors = iter_color()
     for i in range(len(coords) - 1):
         color = next(colors)
         xy1, xy2 = coords[i], coords[i + 1]
-        rect = pg.Rect(*xy1, xy2[0] - xy1[0], xy2[1] - xy1[0])
+        width = xy2[0] - xy1[0]
+        height = xy2[1] - xy1[1]
+        print(f"{i}\t{xy1}\t{xy2}\tw={width}\th={height}\tc={color}")
+        rect = pg.Rect(xy1[0], xy1[1], width, height)
+        rect.normalize()
+        print(f"\t{rect}")
         pg.draw.rect(screen, color, rect)
+        if True:
+            rect.width = rect.height = 20
+            pg.draw.rect(screen, white, rect)
 
     pg.image.save(screen, "may.png")
 
