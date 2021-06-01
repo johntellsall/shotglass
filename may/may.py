@@ -154,24 +154,22 @@ def iter_color():
 
 def render_project(project_path):
     WIDTH, HEIGHT = [1000, 500]
-    # NUM_PIXELS = WIDTH * HEIGHT
 
     pg.display.init()
     screen = pg.display.set_mode(size=[WIDTH, HEIGHT])
     _, db = get_db()
 
-    db.execute("SELECT SUM(byte_count) FROM files")
+    db.execute("select sum(byte_count) from files")
     total = db.fetchone()[0]
     print(f"TOTAL: {total}")
 
     def num_to_xy(num):
-        # frac = num / NUM_PIXELS
         y = int(num / WIDTH)
         x = num % WIDTH
         return x, y
 
     num = 0
-    rows = db.execute("SELECT path, byte_count FROM files ORDER BY 1")
+    rows = db.execute("select path, byte_count from files order by 1")
     coords = []
     for row in rows:
         xy = num_to_xy(num)
@@ -190,9 +188,9 @@ def render_project(project_path):
         print(f"{i}\t{xy1}\t{xy2}\tw={width}\th={height}\tc={color}")
         rect = pg.Rect(xy1[0], xy1[1], width, height)
         rect.normalize()
-        print(f"\t{rect}")
         pg.draw.rect(screen, color, rect)
-        if True:
+        if False:
+            print(f"\t{rect}")
             rect.width = rect.height = 20
             pg.draw.rect(screen, white, rect)
 
