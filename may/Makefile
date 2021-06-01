@@ -16,6 +16,12 @@ lint:
 test: lint
 	pytest --exitfirst --cov=may test_may.py
 
+%.png: %.yaml
+	python -m may $(shell yq -r .shotglass.project_path < $<)
+	mv may.png $@
+	$(IMGCAT) $@
+	echo DONE
+
 run: lint
 	python -m may ../SOURCE/pyramid/
 	$(IMGCAT) may.png

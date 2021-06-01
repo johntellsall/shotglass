@@ -23,8 +23,8 @@ CTAGS_PAT = re.compile(
 logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
 
-def show_db_info(db):
-    for row in db.execute("SELECT * FROM files ORDER BY 1"):
+def show_details(db):
+    for row in db.execute("select * from files order by 1"):
         print(row)
 
 
@@ -110,14 +110,13 @@ def index_project(project_path):
         except KeyError as err:
             issues.append((path, err))
             continue
-        # print(info)
         finfo = info["file_info"]
         values = (finfo["path"], finfo["num_bytes"])
-        cur.execute("INSERT INTO files VALUES (?, ?)", values)
+        cur.execute("insert into files values (?, ?)", values)
 
     con.commit()
 
-    show_db_info(con)
+    show_details(con)
     con.close()
     if issues:
         print(f"NOTE: {len(issues)} issues found")
@@ -152,16 +151,20 @@ def iter_color():
         hue %= 360
 
 
+def select1(db, sql):
+    db.execute(sql)
+    return db.fetchone()[0]
+
 def render_project(project_path):
     WIDTH, HEIGHT = [1000, 500]
+    VERBOSE = False
 
     pg.display.init()
     screen = pg.display.set_mode(size=[WIDTH, HEIGHT])
     _, db = get_db()
 
-    db.execute("select sum(byte_count) from files")
-    total = db.fetchone()[0]
-    print(f"TOTAL: {total}")
+    total = select1(db, "select sum(byte_count) from files")
+    print(f"TOTAL: {total} bytes")
 
     def num_to_xy(num):
         y = int(num / WIDTH)
@@ -173,11 +176,10 @@ def render_project(project_path):
     coords = []
     for row in rows:
         xy = num_to_xy(num)
-        print(xy, row)
         coords.append(xy)
         num += row[1]
-    print(coords)
-    print()
+    # print(coords)
+    # print()
     white = pg.Color("white")
     colors = iter_color()
     for i in range(len(coords) - 1):
@@ -185,7 +187,8 @@ def render_project(project_path):
         xy1, xy2 = coords[i], coords[i + 1]
         width = xy2[0] - xy1[0]
         height = xy2[1] - xy1[1]
-        print(f"{i}\t{xy1}\t{xy2}\tw={width}\th={height}\tc={color}")
+        if VERBOSE:
+            print(f"{i}\t{xy1}\t{xy2}\tw={width}\th={height}\tc={color}")
         rect = pg.Rect(xy1[0], xy1[1], width, height)
         rect.normalize()
         pg.draw.rect(screen, color, rect)
@@ -233,14 +236,18 @@ def show_tags(project_path):
 
 
 def main():
-    if 0:
-        show_project(sys.argv[1])
-    elif 0:
-        show_tags(sys.argv[1])
-    elif 1:
-        render_project(sys.argv[1])
-    else:
-        index_project(sys.argv[1])
+    # if 0:
+    #     show_project(sys.argv[1])
+    # elif 0:
+    #     show_tags(sys.argv[1])
+
+    index_project(sys.argv[1])
+
+    _,db = get_db()
+    num_files = select1(db, "select count(*) from files")
+    print(f"NUM FILES: {num_files}")
+
+    render_project(sys.argv[1])
 
 
 if __name__ == "__main__":
