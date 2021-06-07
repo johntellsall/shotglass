@@ -155,6 +155,7 @@ def select1(db, sql):
     db.execute(sql)
     return db.fetchone()[0]
 
+
 def render_project(project_path):
     WIDTH, HEIGHT = [1000, 500]
     VERBOSE = False
@@ -243,7 +244,7 @@ def main():
 
     index_project(sys.argv[1])
 
-    _,db = get_db()
+    _, db = get_db()
     num_files = select1(db, "select count(*) from files")
     print(f"NUM FILES: {num_files}")
 

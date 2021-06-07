@@ -1,5 +1,5 @@
 SOURCE := $(shell git ls-files '*.py')
-IMGCAT:=~/.iterm2/imgcat	
+IMGCAT := ~/.iterm2/imgcat	
 
 all:
 
@@ -15,6 +15,8 @@ lint:
 
 test: lint
 	pytest --exitfirst --cov=may test_may.py
+
+all-images: $(patsubst %.yaml,%.png,$(shell git ls-files 's*.yaml'))
 
 %.png: %.yaml
 	python -m may $(shell yq -r .shotglass.project_path < $<)
@@ -48,9 +50,4 @@ mccabe-example:
 	rg --type=py --files ../SOURCE/pyramid/ \
 	| egrep -v '(docs|scaffolds|tests)/' \
 	| xargs -n1 -I{} sh -c 'echo {} ; python -m mccabe --min 10 {}'
-
-SRC := ../SOURCE/pyramid/pyramid/config/routes.py
-dot:
-	python -m mccabe --dot ${SRC}  > x.dot
-	dot -Tpng x.dot -ox.png
 
