@@ -85,10 +85,10 @@ def get_project(repo):
 
 
 def setup_db(db):
-    db.execute("DROP TABLE files")
+    db.execute("drop table if exists files")
     db.execute(
         """
-    CREATE TABLE files (path text, byte_count int)
+    create table files (path text, byte_count int)
     """
     )
 
@@ -123,7 +123,7 @@ def index_project(project_path):
 
 
 def get_db():
-    con = sqlite3.connect("may.db")
+    con = sqlite3.connect("main.db")
     cur = con.cursor()
     return con, cur
 
@@ -198,7 +198,7 @@ def render_project(project_path):
             rect.width = rect.height = 20
             pg.draw.rect(screen, white, rect)
 
-    pg.image.save(screen, "may.png")
+    pg.image.save(screen, "main.png")
 
 
 def format_tstamp(ts):

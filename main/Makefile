@@ -10,15 +10,15 @@ show-db:
 #
 lint:
 	black .
-	flake8 --max-complexity 10 ${SOURCE}
+	flake8 ${SOURCE}
 
 test: lint
-	pytest --exitfirst --cov=main test_main.py
+	pytest --exitfirst --cov=shotglass test_shotglass.py
 
 all-images: $(patsubst %.yaml,%.png,$(shell git ls-files 's*.yaml'))
 
 %.png: %.yaml
-	python -m main $(shell yq -r .shotglass.project_path < $<)
+	python -m shotglass $(shell yq -r .shotglass.project_path < $<)
 	mv main.png $@
 	$(IMGCAT) $@
 	echo DONE
