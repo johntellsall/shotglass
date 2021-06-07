@@ -4,33 +4,33 @@ IMGCAT := ~/.iterm2/imgcat
 all:
 
 show-db:
-	sqlite3 may.db < show-db.sql
+	sqlite3 main.db < show-db.sql
 
 # CODE
 #
-# NOTE: "pflake8" reads common pyproject.toml for config
 lint:
 	black .
-	pflake8 --max-complexity 10 ${SOURCE}
+	flake8 --max-complexity 10 ${SOURCE}
 
 test: lint
-	pytest --exitfirst --cov=may test_may.py
+	pytest --exitfirst --cov=main test_main.py
 
 all-images: $(patsubst %.yaml,%.png,$(shell git ls-files 's*.yaml'))
 
 %.png: %.yaml
-	python -m may $(shell yq -r .shotglass.project_path < $<)
-	mv may.png $@
+	python -m main $(shell yq -r .shotglass.project_path < $<)
+	mv main.png $@
 	$(IMGCAT) $@
 	echo DONE
 
 run: lint
-	python -m may ../SOURCE/pyramid/
-	$(IMGCAT) may.png
+	python -m main ../SOURCE/pyramid/
+	$(IMGCAT) main.png
 	echo DONE
 
 setup:
-	pip install -qr ./requirements.txt
+	test -d .venv || python3 -m venv .venv
+	.venv/bin/pip install -qr ./requirements.txt
 
 # HELPERS
 #
@@ -44,7 +44,7 @@ ctags:
 	-o - ../SOURCE/pyramid/pyramid/settings.py
 
 mccabe:
-	python -m mccabe --min 0 may.py
+	python -m mccabe --min 0 main.py
 
 mccabe-example:
 	rg --type=py --files ../SOURCE/pyramid/ \

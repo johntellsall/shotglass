@@ -1,0 +1,9 @@
+GitPython
+black
+flake8
+mccabe
+pdbpp
+pygame
+pyproject-flake8
+pytest
+pytest-cov
