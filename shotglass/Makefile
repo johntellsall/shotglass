@@ -24,3 +24,7 @@ show:
 	./manage.py show flask
 
 demo: index show
+
+# show Django checks, e.g. auto field
+check:
+	python -Wa manage.py test
