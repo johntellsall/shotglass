@@ -10,12 +10,12 @@ from app.models import SourceFile, Symbol
 
 def show_file_index(projects):
     FORMAT = "{name:20} {path:50} {num_lines:>5}"
-    print FORMAT.format(name="NAME", path="PATH", num_lines="LINES")
+    print(FORMAT.format(name="NAME", path="PATH", num_lines="LINES"))
     for project in projects:
         # pylint: disable=no-member
         files = SourceFile.objects.filter(project=project).order_by("path")
         for file_ in files:
-            print FORMAT.format(**vars(file_))
+            print(FORMAT.format(**vars(file_)))
 
 
 def show_dir_index(projects):
@@ -32,8 +32,8 @@ def show_dir_index(projects):
         for path, num_lines in data:
             count[os.path.dirname(path)] = num_lines
 
-        for dir_path, num_lines in sorted(count.iteritems()):
-            print FORMAT.format(**locals())
+        for dir_path, num_lines in sorted(count.items()):
+            print(FORMAT.format(**locals()))
 
 
 def show_symbol_index(projects):
@@ -47,9 +47,9 @@ def show_symbol_index(projects):
         proj_symbols = Symbol.objects.filter(source_file__project=project)
         fun_symbols = proj_symbols.exclude(label__startswith="_").order_by("label")
         for symbol in fun_symbols:
-            print FORMAT.format(
+            print(FORMAT.format(
                 symbol.label, symbol.source_file.path, symbol.line_number
-            )
+            ))
 
 
 def show_summary(projects):
@@ -65,16 +65,16 @@ def show_summary(projects):
         " {num_symbols:9,}"
     )
 
-    print HEADER
+    print(HEADER)
     for project in projects:
         proj_qs = SourceFile.objects.filter(project=project)
         num_files = proj_qs.count()
-        avg_length = int(proj_qs.aggregate(Avg("num_lines")).values()[0])
-        max_length = proj_qs.aggregate(Max("num_lines")).values()[0]
-        total_length = proj_qs.aggregate(Sum("num_lines")).values()[0]
+        avg_length = int(list(proj_qs.aggregate(Avg("num_lines")).values())[0])
+        max_length = list(proj_qs.aggregate(Max("num_lines")).values())[0]
+        total_length = list(proj_qs.aggregate(Sum("num_lines")).values())[0]
         proj_symbols = Symbol.objects.filter(source_file__project=project)
         num_symbols = proj_symbols.count()
-        print FORMAT.format(**locals())
+        print(FORMAT.format(**locals()))
 
 
 class Command(BaseCommand):
@@ -96,8 +96,7 @@ class Command(BaseCommand):
         all_projects = SourceFile.projects()
         projects = options["projects"]
         if not projects:
-            print ("PROJECTS: {}".format(", ".join(all_projects)))
-            print ('or "all"')
+            print(('PROJECTS: {} or "all"'.format(", ".join(all_projects))))
             return
         if projects == ["all"]:
             projects = all_projects

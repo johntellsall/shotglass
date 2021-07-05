@@ -75,6 +75,12 @@ def count_lines(project_dir, paths):
 
 # TODO speed up by processing mult files at once
 # TODO get more info from 'info' and/or more ctags options
+# Example symbol:
+
+# info={'kind': 'member', 'line': '288', 'language': 'Python', 'scope':
+# 'class:TaggedJSONSerializer', 'access': 'public', 'signature': '(self,
+# value)', 'roles': 'def', 'end': '298'}
+
 def get_symbols(file_obj, path):
     def parse_addr(symaddr):
         keyvals = symaddr.split(';"', 1)[-1].split("\t")
@@ -83,13 +89,12 @@ def get_symbols(file_obj, path):
 
     cmd = ["ctags", "--fields=*", "-f", "-"]
     cmd += [path]
-    lines = subprocess.check_output(cmd, universal_newlines=True).split("\n")
+    lines = subprocess.check_output(cmd, text=True).split("\n")
     for line in filter(None, lines):
         try:
             tagname, _, tagaddr = line.split("\t", 2)
         except ValueError:
-            print("?", line)
-            sys.exit(1)
+            sys.exit(f'Unknown line: {line}')
         info = parse_addr(tagaddr)
         yield Symbol(
             source_file=file_obj,

@@ -17,5 +17,10 @@ loop-index:
 	git ls-files '*.py' \
 	| entr -cs './manage.py make_index ../SOURCE/flask'
 
-zoot:
-	./manage.py make_index ../SOURCE/flask/
+index:
+	./manage.py make_index ../SOURCE/flask
+
+show:
+	./manage.py show flask
+
+demo: index show
