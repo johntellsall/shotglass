@@ -23,8 +23,12 @@ index:
 show:
 	./manage.py show flask
 
-demo: index show
+# demo: index show
 
 # show Django checks, e.g. auto field
 check:
 	python -Wa manage.py test
+
+demo:
+	pyflakes app/render.py
+	./manage.py render flask
