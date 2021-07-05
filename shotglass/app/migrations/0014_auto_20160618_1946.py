@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="progpmccabe",
             name="sourceline",
-            field=models.OneToOneField(null=True, blank=True, to="app.SourceLine"),
+            field=models.OneToOneField(null=True, blank=True, to="app.SourceLine", on_delete=models.CASCADE),
         ),
     ]
