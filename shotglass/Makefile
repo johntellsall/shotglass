@@ -12,3 +12,10 @@ loop-check:
 loop-migrate:
 	git ls-files '*.py' \
 	| entr -cs './manage.py migrate'
+
+loop-index:
+	git ls-files '*.py' \
+	| entr -cs './manage.py make_index ../SOURCE/flask'
+
+zoot:
+	./manage.py make_index ../SOURCE/flask/

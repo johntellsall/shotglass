@@ -4,8 +4,6 @@
 make_index -- compile data from tree of source files
 """
 
-# pylint: disable=bad-builtin
-
 from __future__ import print_function
 
 import logging
@@ -56,16 +54,18 @@ def walk_type(topdir, name_func):
 
 
 def count_lines(project_dir, paths):
+    """
+    list files in project, with line counts
+    """
     cmd = ["wc", "-l"]
     pat = re.compile(r"\s*(\d+)\s+(.+)")
 
-    def is_interesting(
-        (num_str, path),
-    ):
-        return num_str != "0" and path != "total"
+    def is_interesting(args):
+        (line_count, path) = args
+        return line_count != "0" and path != "total"
 
-    result = subprocess.check_output(cmd + paths)
-    lines = result.split("\n")[:-1]
+    result = subprocess.check_output(cmd + paths, text=True)
+    lines = result.split("\n")
     matches = (pat.match(line) for line in lines)
     info = filter(is_interesting, (m.groups() for m in matches if m))
     for num_str, path in info:
@@ -86,7 +86,7 @@ def get_symbols(file_obj, path):
     lines = subprocess.check_output(cmd, universal_newlines=True).split("\n")
     for line in filter(None, lines):
         try:
-            tagname, tagpath, tagaddr = line.split("\t", 2)
+            tagname, _, tagaddr = line.split("\t", 2)
         except ValueError:
             print("?", line)
             sys.exit(1)
