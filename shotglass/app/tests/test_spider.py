@@ -1,4 +1,4 @@
-# USAGE: pytest app/tests/test_spider.py 
+# USAGE: pytest app/tests/test_spider.py
 
 import os
 import sys
@@ -13,18 +13,19 @@ TEST_PATH = os.path.realpath(__file__)
 # TODO: write images to temp path
 # TODO: verify images
 
+
 def test_err_noargs():
     with pytest.raises(CommandError):
-        call_command('spider')
+        call_command("spider")
 
 
 def test_blocks():
     out = StringIO()
-    call_command('spider', TEST_PATH, style='blocks', stdout=out)
-    assert out.getvalue() == ''
+    call_command("spider", TEST_PATH, style="blocks", stdout=out)
+    assert out.getvalue() == ""
 
 
 def test_source():
     out = StringIO()
-    call_command('spider', TEST_PATH, style='source', stdout=out)
-    assert out.getvalue() == ''
+    call_command("spider", TEST_PATH, style="source", stdout=out)
+    assert out.getvalue() == ""

@@ -7,10 +7,11 @@ from app.models import SourceLine
 
 
 def calc_width(project):
-    lines_total = SourceLine.objects.filter( # pylint: disable=no-member
-        project=project).aggregate(Sum('length'))['length__sum']
+    lines_total = SourceLine.objects.filter(  # pylint: disable=no-member
+        project=project
+    ).aggregate(Sum("length"))["length__sum"]
     if not lines_total:
-        print 'WARNING: {} is empty'.format(project)
+        print "WARNING: {} is empty".format(project)
         return 0
     return int(math.sqrt(lines_total) + 1)
 
@@ -38,14 +39,15 @@ class Grid(object):
     def render(self, *args):
         pass
 
+
 class TextGrid(Grid):
     def __init__(self, width, height):
-        self.blank_row = ['.'] * width
+        self.blank_row = ["."] * width
         self.data = []
         super(TextGrid, self).__init__(width, height)
 
     def draw(self, xy, color):
-        x,y = xy
+        x, y = xy
         if y >= len(self.data):
             self.data.append(self.blank_row[:])
         try:
@@ -55,7 +57,7 @@ class TextGrid(Grid):
 
     def render(self, *args):
         for row in self.data:
-            print ''.join(row)
+            print "".join(row)
 
 
 class ImageGrid(Grid):
@@ -66,19 +68,19 @@ class ImageGrid(Grid):
         return cls(size, size)
 
     def __init__(self, width, height):
-        self.im = Image.new('RGB', (width, height))
+        self.im = Image.new("RGB", (width, height))
         self.im_draw = ImageDraw.Draw(self.im)
         self.last = (0, 0)
         super(ImageGrid, self).__init__(width, height)
 
     def moveto(self, xy):
-        self.last = (xy[0]*2, xy[1]*2)
+        self.last = (xy[0] * 2, xy[1] * 2)
 
     def draw(self, xy, pen):
-        self.im_draw.point((xy[0]*2, xy[1]*2), pen)
+        self.im_draw.point((xy[0] * 2, xy[1] * 2), pen)
 
     def drawto(self, xy, pen):
-        xy = (xy[0]*2, xy[1]*2)
+        xy = (xy[0] * 2, xy[1] * 2)
         if self.last:
             self.im_draw.line((self.last, xy), pen)
         self.last = xy
@@ -93,4 +95,3 @@ class ImageGrid(Grid):
 
     def render(self, path, *args):
         self.im.save(path)
-

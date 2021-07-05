@@ -4,7 +4,7 @@ from colorfield.fields import ColorField
 from django.db import models
 
 
-nullable = {'blank': True, 'null': True}
+nullable = {"blank": True, "null": True}
 
 
 class SourceFile(models.Model):
@@ -17,9 +17,12 @@ class SourceFile(models.Model):
     @classmethod
     def projects(cls):
         # pylint: disable=no-member
-        projects = cls.objects.values(
-            'project').distinct(
-        ).order_by('project').values_list('project', flat=True)
+        projects = (
+            cls.objects.values("project")
+            .distinct()
+            .order_by("project")
+            .values_list("project", flat=True)
+        )
         return list(projects)
 
 
@@ -27,8 +30,9 @@ class SourceFile(models.Model):
 # 'access': 'private', 'file': '', 'signature': '(x, y)',
 # 'scope': 'function:TestRoutes.invoke.create_app', 'line': '383'}
 
+
 class Symbol(models.Model):
-    source_file = models.ForeignKey(SourceFile)
+    source_file = models.ForeignKey(SourceFile, on_delete=models.CASCADE)
     label = models.CharField(max_length=200)
     line_number = models.IntegerField()
     # kind = models.CharField(max_length=12)
@@ -46,16 +50,16 @@ class SourceLine(models.Model):
     length = models.IntegerField()
 
     def __unicode__(self):
-        return '<{} {} {}:{}>'.format(
-            self.__class__.__name__, self.name,
-            self.path, self.line_number)
+        return "<{} {} {}:{}>".format(
+            self.__class__.__name__, self.name, self.path, self.line_number
+        )
 
     @classmethod
     def projects(cls):
         # pylint: disable=no-member
-        projects = cls.objects.values(
-            'project').distinct(
-        ).values_list('project', flat=True)
+        projects = (
+            cls.objects.values("project").distinct().values_list("project", flat=True)
+        )
         return sorted(filter(None, projects))
 
     @classmethod
@@ -63,23 +67,18 @@ class SourceLine(models.Model):
         # pylint: disable=no-member
         # X: sort?
         source = cls.objects.filter(project=project)
-        return source.values('path').distinct().values_list(
-            'path', flat=True)
+        return source.values("path").distinct().values_list("path", flat=True)
 
 
 class ProgRadon(models.Model):
-    sourceline = models.OneToOneField(
-        SourceLine, on_delete=models.CASCADE,
-        **nullable)
+    sourceline = models.OneToOneField(SourceLine, on_delete=models.CASCADE, **nullable)
 
     kind = models.CharField(max_length=1)
     complexity = models.IntegerField()
 
 
 class ProgPmccabe(models.Model):
-    sourceline = models.OneToOneField(
-        SourceLine, on_delete=models.CASCADE,
-        **nullable)
+    sourceline = models.OneToOneField(SourceLine, on_delete=models.CASCADE, **nullable)
 
     modified_mccabe = models.IntegerField()
     mccabe = models.IntegerField()
@@ -90,8 +89,7 @@ class ProgPmccabe(models.Model):
 
 
 class Skeleton(models.Model):
-    sourceline = models.ForeignKey(SourceLine, on_delete=models.CASCADE,
-        **nullable)
+    sourceline = models.ForeignKey(SourceLine, on_delete=models.CASCADE, **nullable)
 
     position = models.IntegerField()
     x = models.IntegerField()

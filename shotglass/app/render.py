@@ -23,7 +23,7 @@ def calc_sym_position(symbols):
         pos += 1
         if symbol.path != prev_path:
             if prev_path:
-                pos += 2        # add black smudge
+                pos += 2  # add black smudge
             prev_path = symbol.path
         pos += symbol.length - 1
 
@@ -34,7 +34,7 @@ def make_skeleton(symbols):
     """
     skeleton = calc_sym_position(symbols)
     for pos, symbol in skeleton:
-        x,y = get_xy(pos)
+        x, y = get_xy(pos)
         yield Skeleton(position=pos, x=x, y=y, sourceline=symbol)
 
 

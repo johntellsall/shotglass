@@ -1,4 +1,4 @@
-'''
+"""
 make_versions -- index many versions of a project
 
 
@@ -10,7 +10,7 @@ Ex: show each minor version of Django; just output tags. Hide RC, Alpha and micr
 ./SOURCE/django/ 
 
 ['1.0.1', '1.1', '1.1.1', ...  '1.10.1']
-'''
+"""
 
 import itertools
 import re
@@ -47,25 +47,27 @@ def make_project(proj, dryrun=False, limit=None):
     if limit:
         tags = tags[:limit]
 
-    proj_prefix = '{}-'.format(proj.name)
-    proj_versions = set(models.SourceLine.objects.filter(
-        project__startswith=proj_prefix).values_list('project', flat=True))
-    have_tags = set(projvers.split('-', 1)[1]
-        for projvers in proj_versions)
-    have_tags = set() # XX
+    proj_prefix = "{}-".format(proj.name)
+    proj_versions = set(
+        models.SourceLine.objects.filter(project__startswith=proj_prefix).values_list(
+            "project", flat=True
+        )
+    )
+    have_tags = set(projvers.split("-", 1)[1] for projvers in proj_versions)
+    have_tags = set()  # XX
 
-    checkout_cmd = 'cd {dir} ; git checkout {tag}'
-    index_cmd = './manage.py make_index --project={name}-{tag} {dir}'
+    checkout_cmd = "cd {dir} ; git checkout {tag}"
+    index_cmd = "./manage.py make_index --project={name}-{tag} {dir}"
     for tag in tags:
         if tag in have_tags:
-            print '(have {}, skipping)'.format(tag)
+            print "(have {}, skipping)".format(tag)
             continue
         cmd = checkout_cmd.format(dir=proj.proj_dir, tag=tag)
-        print '>>>', cmd
+        print ">>>", cmd
         if subprocess.call(cmd, shell=True):
             sys.exit(0)
         cmd = index_cmd.format(dir=proj.proj_dir, name=proj.name, tag=tag)
-        print '>>>', cmd
+        print ">>>", cmd
         if dryrun:
             continue
         out = subprocess.check_output(cmd, shell=True)
@@ -73,34 +75,35 @@ def make_project(proj, dryrun=False, limit=None):
 
 
 class Command(BaseCommand):
-    help = 'beer'
+    help = "beer"
 
     def add_arguments(self, parser):
-        parser.add_argument('projects', nargs=1)
-        parser.add_argument('--dryrun', action='store_true')
-        parser.add_argument('--info', action='store_true')
-        parser.add_argument('--include')
-        parser.add_argument('--exclude')
-        parser.add_argument('--limit', type=int)
-        parser.add_argument('--name')
+        parser.add_argument("projects", nargs=1)
+        parser.add_argument("--dryrun", action="store_true")
+        parser.add_argument("--info", action="store_true")
+        parser.add_argument("--include")
+        parser.add_argument("--exclude")
+        parser.add_argument("--limit", type=int)
+        parser.add_argument("--name")
 
     def handle(self, *args, **options):
-        assert len(options['projects']) == 1
-        assert options['name']
+        assert len(options["projects"]) == 1
+        assert options["name"]
 
-        projects = [Project(
-            name=options['name'],
-            proj_dir=options['projects'][0],
-            good_tag_pat=options['include'],
-            bad_tag_pat=options['exclude'])]
+        projects = [
+            Project(
+                name=options["name"],
+                proj_dir=options["projects"][0],
+                good_tag_pat=options["include"],
+                bad_tag_pat=options["exclude"],
+            )
+        ]
 
-        if options['info']:
+        if options["info"]:
             for proj in projects:
-                print proj, ':'
+                print proj, ":"
                 print proj.get_tags()
             return
 
         for proj in projects:
-            make_project(
-                proj, dryrun=options['dryrun'], limit=options['limit'])
-
+            make_project(proj, dryrun=options["dryrun"], limit=options["limit"])

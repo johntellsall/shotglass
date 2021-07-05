@@ -2,7 +2,7 @@
 
 import cProfile
 import pstats
- 
+
 import pytest
 from django.test import TestCase
 
@@ -14,12 +14,13 @@ from app import grid, models, render
 # TODO: disable this except when explicitly called
 @pytest.mark.skip(reason="performance test only")
 class ProfileDraw(TestCase):
-    fixtures = ['diagram-django']  # slow + useful
-    fixtures = ['diagram-min'] # minimal
+    fixtures = ["diagram-django"]  # slow + useful
+    fixtures = ["diagram-min"]  # minimal
 
     def setUp(self):
         stub = models.SourceLine.objects.create(
-            kind='k', length=3, line_number=2, name='name', path='path')
+            kind="k", length=3, line_number=2, name="name", path="path"
+        )
         models.DiagramSymbol.objects.update(sourceline=stub)
 
     def test_rawdraw(self):
@@ -28,12 +29,13 @@ class ProfileDraw(TestCase):
             mygrid = grid.Grid(None, None)
             diagram.draw(mygrid)
 
-        prof_name = 'rawdraw-{}.prof'.format(self.fixtures[0])
+        prof_name = "rawdraw-{}.prof".format(self.fixtures[0])
         cProfile.runctx(
             rawdraw.func_code,  # pylint: disable=no-member
-            globals=globals(), locals={},
-            filename=prof_name)
+            globals=globals(),
+            locals={},
+            filename=prof_name,
+        )
 
         p = pstats.Stats(prof_name)
-        p.strip_dirs().sort_stats('cumtime').print_stats(20)
-
+        p.strip_dirs().sort_stats("cumtime").print_stats(20)

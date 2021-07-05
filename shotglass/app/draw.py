@@ -13,15 +13,15 @@ from app.hilbert import int_to_Hilbert as get_xy
 from app.utils import make_step_iter
 
 
-COLOR_CC_UNKNOWN = 'gray'
+COLOR_CC_UNKNOWN = "gray"
 
 logger = logging.getLogger(__name__)
 
 
 # X RGB values are off by one
 def color_hsl_hex(hue, saturation, lightness):
-    r,g,b = colorsys.hls_to_rgb(hue/99., lightness/99., saturation/99.)
-    return '#%02x%02x%02x' % (int(r*255), int(g*255), int(b*255))
+    r, g, b = colorsys.hls_to_rgb(hue / 99.0, lightness / 99.0, saturation / 99.0)
+    return "#%02x%02x%02x" % (int(r * 255), int(g * 255), int(b * 255))
 
 
 # palette examples
@@ -42,8 +42,7 @@ def pal_add_color(skeleton):
 # X: speedup w/ queryset.select_related('progpmccabe')
 class Theme(object):
     def calc_sym_color(self, symbol):
-        return 'gray'
-
+        return "gray"
 
 
 class ThemeRainbow(Theme):
@@ -57,7 +56,7 @@ class ThemeRainbow(Theme):
         # prev_arg = None
 
         # for symbol, arg in skeleton:
-            # change color with new arg (file)
+        # change color with new arg (file)
         # if prev_arg != arg:
         #     hue = hue_iter.next()
         #     prev_arg = arg
@@ -73,13 +72,14 @@ class ThemeComplexity(Theme):
     give symbol a color based on code complexity
     Red=high complexity, blue=low.
     """
-    COLOR_CC_UNKNOWN = 'gray'
+
+    COLOR_CC_UNKNOWN = "gray"
 
     def __init__(self):
         # pylint: disable=no-member
-        colors = colorbrewer.diverging.RdBu_5_r.hex_colors 
-        self.colormap = dict(zip('ABCDE', colors))
-        self.colormap['F'] = self.colormap['E']
+        colors = colorbrewer.diverging.RdBu_5_r.hex_colors
+        self.colormap = dict(zip("ABCDE", colors))
+        self.colormap["F"] = self.colormap["E"]
 
     def calc_sym_color(self, symbol):
         def get_complexity(sym):
@@ -106,56 +106,56 @@ def draw_symbol(grid, skel, color):
     # draw white "grain of rice" at start of symbol
     pos = skel.position
     grid.moveto(get_xy(pos))
-    grid.drawto(get_xy(pos + 1), '#fff')
+    grid.drawto(get_xy(pos + 1), "#fff")
     for offset in xrange(length):
         grid.drawto(get_xy(pos + offset + 1), color)
 
 
 # X: unused
 def draw_highlight(grid, diagram):
-    folder_pos = [pos for pos, symbol, _, _ in diagram
-                  if symbol.path.endswith('/setup.py')]
+    folder_pos = [
+        pos for pos, symbol, _, _ in diagram if symbol.path.endswith("/setup.py")
+    ]
     folder_range = xrange(min(folder_pos), max(folder_pos))
-    grid.draw_many((get_xy(pos) for pos in folder_range),
-                   ImageColor.getrgb('white'))
+    grid.draw_many((get_xy(pos) for pos in folder_range), ImageColor.getrgb("white"))
 
 
 # X BUG: doesn't account for symbol length
-def draw_box(grid, dsymbols, outline='white', fill=None):
+def draw_box(grid, dsymbols, outline="white", fill=None):
     try:
         upleft_x = min(dsym.x for dsym in dsymbols)
         upleft_y = min(dsym.y for dsym in dsymbols)
         downright_x = max(dsym.x for dsym in dsymbols)
         downright_y = max(dsym.y for dsym in dsymbols)
     except ValueError:
-        logger.warning('empty box: no symbols')
+        logger.warning("empty box: no symbols")
         return
     # 2? XX
     grid.im_draw.rectangle(
-        [upleft_x*2, upleft_y*2, downright_x*2, downright_y*2],
-        fill=fill, outline=outline)
+        [upleft_x * 2, upleft_y * 2, downright_x * 2, downright_y * 2],
+        fill=fill,
+        outline=outline,
+    )
 
 
 class DrawStyle(object):
     """
     draw rendered project onto a grid (image)
     """
+
     draw_diagram = NotImplementedError
-    
+
     def draw(self, project, theme=None):
         grid = ImageGrid.FromProject(project)
         mytheme = theme or Theme()
         color_cb = mytheme.calc_sym_color
         skeletons = models.Skeleton.objects.filter(
-            sourceline__project=project).order_by(
-            'sourceline__path', 'sourceline__name')
+            sourceline__project=project
+        ).order_by("sourceline__path", "sourceline__name")
 
         for skeleton in skeletons:
             color = color_cb(skeleton)
-            draw_symbol(
-                grid,
-                skel=skeleton,
-                color=color)
+            draw_symbol(grid, skel=skeleton, color=color)
         grid.finalize()
         return grid
 
@@ -168,18 +168,17 @@ class SimpleDraw(DrawStyle):
 class BoundingBoxDraw(DrawStyle):
     def draw_diagram(self, grid, diagram):
         for path in set(dsym.sourceline.path for dsym in diagram):
-            syms = [dsym for dsym in diagram
-                    if dsym.sourceline.path == path]
+            syms = [dsym for dsym in diagram if dsym.sourceline.path == path]
             draw_box(grid, syms, fill=syms[0].color)
 
 
 if 0:
     DRAW_STYLES = dict(
-        ((name[:-len('Draw')], value)
-        for name, value in globals().iteritems()
-        if name.endswith('Draw') and issubclass(DrawStyle, value))
+        (
+            (name[: -len("Draw")], value)
+            for name, value in globals().iteritems()
+            if name.endswith("Draw") and issubclass(DrawStyle, value)
+        )
     )
 else:
-    DRAW_STYLES = {
-    'boundingbox': BoundingBoxDraw,
-    'simple': SimpleDraw}
+    DRAW_STYLES = {"boundingbox": BoundingBoxDraw, "simple": SimpleDraw}

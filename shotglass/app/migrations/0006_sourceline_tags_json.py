@@ -7,13 +7,13 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0005_sourceline_length'),
+        ("app", "0005_sourceline_length"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='sourceline',
-            name='tags_json',
+            model_name="sourceline",
+            name="tags_json",
             field=models.CharField(max_length=1000, null=True, blank=True),
         ),
     ]
