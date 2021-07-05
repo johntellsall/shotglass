@@ -55,8 +55,6 @@ class Command(BaseCommand):
         parser.add_argument("projects", nargs="*")
 
     def handle(self, *args, **options):
-        # project = 'flask'
-
         projects = options["projects"]
         # if not projects:
         #     print(('PROJECTS: {} or "all"'.format(", ".join(all_projects))))

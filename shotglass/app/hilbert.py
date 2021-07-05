@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-### hilbert.py -- Hilbert walk coordinate codec in multiple dimensions.
+# hilbert.py -- Hilbert walk coordinate codec in multiple dimensions.
 #    int_to_Hilbert( i, 3 ) ==> ( x, y, z )
 #        int_to_Hilbert( 0, nD ) ==> ( 0, 0, 0, ... 0 ) Start at origin.
 #        int_to_Hilbert( 1, nD ) ==> ( 1, 0, 0, ... 0 ) 1st step is along x.
@@ -10,7 +10,7 @@
 
 from math import log, ceil
 
-from functools import lru_cache
+from functools import lru_cache, reduce
 
 
 @lru_cache(maxsize=None)
@@ -56,11 +56,11 @@ def initial_start_end(nChunks, nD):
 # and output from int_to_Hilbert().
 
 
-## unpack_index( int index, nD ) --> list of index chunks.
+# unpack_index( int index, nD ) --> list of index chunks.
 #
 def unpack_index(i, nD):
     p = 2 ** nD  # Chunks are like digits in base 2**nD.
-    nChunks = max(1, int(ceil(log(i + 1, p))))  #   # of digits
+    nChunks = max(1, int(ceil(log(i + 1, p))))  # num of digits
     chunks = [0] * nChunks
     for j in range(nChunks - 1, -1, -1):
         chunks[j] = i % p
@@ -73,9 +73,8 @@ def pack_index(chunks, nD):
     return reduce(lambda n, chunk: n * p + chunk, chunks)
 
 
-## unpack_coords( list of nD coords ) --> list of coord chunks each nD bits.
+# unpack_coords( list of nD coords ) --> list of coord chunks each nD bits.
 def unpack_coords(coords):
-    nD = len(coords)
     biggest = reduce(max, coords)  # the max of all coords
     nChunks = max(1, int(ceil(log(biggest + 1, 2))))  # max # of bits
     return transpose_bits(coords, nChunks)
@@ -85,7 +84,7 @@ def pack_coords(chunks, nD):
     return transpose_bits(chunks, nD)
 
 
-## transpose_bits --
+# transpose_bits --
 #    Given nSrcs source ints each nDests bits long,
 #    return nDests ints each nSrcs bits long.
 #    Like a matrix transpose where ints are rows and bits are columns.
@@ -109,7 +108,7 @@ def transpose_bits(srcs, nDests):
 #
 def gray_encode(bn):
     assert bn >= 0
-    assert type(bn) in [int, long]
+    assert type(bn) is int
 
     return bn ^ (bn / 2)
 
@@ -125,7 +124,7 @@ def gray_decode(n):
         sh <<= 1
 
 
-## gray_encode_travel -- gray_encode given start and end using bit rotation.
+# gray_encode_travel -- gray_encode given start and end using bit rotation.
 #    Modified Gray code.  mask is 2**nbits - 1, the highest i value, so
 #        gray_encode_travel( start, end, mask, 0 )    == start
 #        gray_encode_travel( start, end, mask, mask ) == end
@@ -152,7 +151,7 @@ def gray_decode_travel(start, end, mask, g):
     return gray_decode((rg | (rg / modulus)) & mask)
 
 
-## child_start_end( parent_start, parent_end, mask, i ) -- Get start & end for child.
+# child_start_end( parent_start, parent_end, mask, i ) -- Get start & end for child.
 #    i is the parent's step number, between 0 and mask.
 #    Say that parent( i ) =
 #           gray_encode_travel( parent_start, parent_end, mask, i ).
