@@ -30,5 +30,5 @@ check:
 	python -Wa manage.py test
 
 demo:
-	pyflakes app/render.py
+	pyflakes app/management/commands/render.py
 	./manage.py render flask

@@ -10,7 +10,7 @@
 
 from math import log, ceil
 
-from functools32 import lru_cache
+from functools import lru_cache
 
 
 @lru_cache(maxsize=None)

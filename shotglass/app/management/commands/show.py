@@ -84,14 +84,6 @@ class Command(BaseCommand):
         parser.add_argument("projects", nargs="*")
         parser.add_argument("--style", default="summary")
 
-        # if 0: # XX V1
-        #     parser.add_argument('--index', action="store_true")
-        # else:
-        #     parser.add_argument('--dirindex',
-        #         action="store_true",
-        #         help="show source lines per directory")
-        #     parser.add_argument('--index', default=True)
-
     def handle(self, *args, **options):
         all_projects = SourceFile.projects()
         projects = options["projects"]
@@ -107,9 +99,3 @@ class Command(BaseCommand):
         except KeyError:
             sys.exit("{}: unknown style".format(options["style"]))
         infofunc(projects)
-        # if options['dirindex']:
-        #     show_dir_index(projects)
-        # elif options['index']:
-        #     show_file_index(projects)
-        # else:
-        #     show_summary(projects)
