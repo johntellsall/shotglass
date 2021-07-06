@@ -26,6 +26,6 @@ def test_add_color():
     assert list(draw.pal_add_color(diagram)) == [
         (0, 'x', 1, '#053061'), 
         (1, 'y', 2, '#2166AC')
-        # (0, "x", 1, "#864747"),
+        # (0, "x", 1, "#864747"), TODO check
         # (1, "y", 2, "#5dd3d7"),
     ]

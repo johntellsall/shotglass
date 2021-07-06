@@ -34,5 +34,5 @@ demo:
 	./manage.py render flask
 
 coverage:
-	pytest --cov=app app/tests/test_render.py
+	pytest --cov=app app/tests/test_{draw,render}.py
 # coverage report -m
