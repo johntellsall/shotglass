@@ -34,7 +34,7 @@ def pal_add_color(skeleton):
     for pos, symbol, arg in skeleton:
         # change color with new arg (file)
         if prev_arg != arg:
-            color = color_iter.next()
+            color = next(color_iter)
             prev_arg = arg
         yield pos, symbol, arg, color
 
@@ -63,7 +63,7 @@ class ThemeRainbow(Theme):
         #     highlight = highlight_iter.next() # X?
         # alternate symbols: different saturation
         hue, _, highlight = self.hue_sat_highlight
-        saturation = self.saturation_iter.next()
+        saturation = next(self.saturation_iter)
         return color_hsl_hex(hue, saturation, highlight)
 
 
@@ -78,7 +78,7 @@ class ThemeComplexity(Theme):
     def __init__(self):
         # pylint: disable=no-member
         colors = colorbrewer.diverging.RdBu_5_r.hex_colors
-        self.colormap = dict(zip("ABCDE", colors))
+        self.colormap = dict(list(zip("ABCDE", colors)))
         self.colormap["F"] = self.colormap["E"]
 
     def calc_sym_color(self, symbol):
@@ -107,17 +107,8 @@ def draw_symbol(grid, skel, color):
     pos = skel.position
     grid.moveto(get_xy(pos))
     grid.drawto(get_xy(pos + 1), "#fff")
-    for offset in xrange(length):
+    for offset in range(length):
         grid.drawto(get_xy(pos + offset + 1), color)
-
-
-# # X: unused
-# def draw_highlight(grid, diagram):
-#     folder_pos = [
-#         pos for pos, symbol, _, _ in diagram if symbol.path.endswith("/setup.py")
-#     ]
-#     folder_range = xrange(min(folder_pos), max(folder_pos))
-#     grid.draw_many((get_xy(pos) for pos in folder_range), ImageColor.getrgb("white"))
 
 
 # X BUG: doesn't account for symbol length
@@ -172,12 +163,4 @@ class BoundingBoxDraw(DrawStyle):
             draw_box(grid, syms, fill=syms[0].color)
 
 
-# if 0:
-    # DRAW_STYLES = dict(
-    #     (
-    #         (name[: -len("Draw")], value)
-    #         for name, value in globals().iteritems()
-    #         if name.endswith("Draw") and issubclass(DrawStyle, value)
-    #     )
-    # )
 DRAW_STYLES = {"boundingbox": BoundingBoxDraw, "simple": SimpleDraw}

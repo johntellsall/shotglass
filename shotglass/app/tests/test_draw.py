@@ -14,12 +14,11 @@ class TestDraw(TestCase):
         )
         models.Skeleton.objects.update(sourceline=stub)
 
-    @pytest.mark.skip("OLD")
     def test_simple(self):
         grid = draw.SimpleDraw().draw(None)
-        self.assertDictContainsSubset(
-            {"last": (0, 2), "height": 8, "width": 8}, actual=vars(grid)
-        )
+        assert grid.last == (0, 2)
+        assert grid.height == 8
+        assert grid.width == 8
 
 
 @pytest.mark.skip("OLD")

@@ -1,5 +1,4 @@
 import pytest
-from django.test import TestCase
 
 from app import render
 from app.models import SourceLine
