@@ -32,3 +32,7 @@ check:
 demo:
 	pyflakes app/management/commands/render.py
 	./manage.py render flask
+
+coverage:
+	pytest --cov=app app/tests/test_render.py
+# coverage report -m
