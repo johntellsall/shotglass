@@ -6,7 +6,7 @@ label.py --
 # list files in Git branch
 # git ls-tree --name-status --full-tree -r v4.0.0
 
-from __future__ import print_function
+
 import itertools
 import os
 import re
@@ -25,22 +25,23 @@ COL_GAP = 10
 def serpentine_iter(width):
     y = 0
     while True:
-        for x in xrange(width):
+        for x in range(width):
             yield x, y
-        for x in xrange(width):
+        for x in range(width):
             yield width - x - 1, y + 1
         y += 2
 
 
 def render_highlight(path):
-    output = subprocess.check_output(["source-highlight", "-i", path])
+    cmd = ["source-highlight", "-i", path]
+    output = subprocess.check_output(cmd, text=True)
     output = re.compile("^.+<pre><tt>", re.DOTALL).sub("", output)
     return output.split("\n")
 
 
 def get_colormap():
     cmap_obj = colorbrewer.qualitative.Set3_12
-    cmap_colors = map(tuple, cmap_obj.colors)
+    cmap_colors = list(map(tuple, cmap_obj.colors))
     return itertools.cycle(cmap_colors)
 
 
@@ -127,7 +128,7 @@ def render_blocks(image, paths):
     """
     if 1:
         CMAP_OBJ = colorbrewer.qualitative.Set3_12
-        CMAP_COLORS = map(tuple, CMAP_OBJ.colors)
+        CMAP_COLORS = list(map(tuple, CMAP_OBJ.colors))
         colormap = itertools.cycle(CMAP_COLORS)
         renderClass = RenderFile
         draw = ImageDraw.Draw(image)
@@ -139,7 +140,7 @@ def render_blocks(image, paths):
         text_args = dict(
             xy=(rend.x, rend.y), text=os.path.basename(path), font=fnt, fill=text_color
         )
-        rend.colors = [colormap.next()]
+        rend.colors = [next(colormap)]
         render_file(path, rend)
         draw.text(**text_args)
     return image
@@ -171,7 +172,7 @@ def render_diff(image, paths):
     y = 0
     for path in sorted(count_dict):
         next_y = y + count_dict[path] * scale
-        color = colormap_iter.next()
+        color = next(colormap_iter)
         draw.rectangle((0, y, COL_WIDTH - COL_GAP, next_y), fill=color, outline="black")
         y = next_y
 
