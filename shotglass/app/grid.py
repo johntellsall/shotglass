@@ -11,7 +11,7 @@ def calc_width(project):
         project=project
     ).aggregate(Sum("length"))["length__sum"]
     if not lines_total:
-        print "WARNING: {} is empty".format(project)
+        print("WARNING: {} is empty".format(project))
         return 0
     return int(math.sqrt(lines_total) + 1)
 
@@ -57,7 +57,7 @@ class TextGrid(Grid):
 
     def render(self, *args):
         for row in self.data:
-            print "".join(row)
+            print("".join(row))
 
 
 class ImageGrid(Grid):
@@ -86,7 +86,7 @@ class ImageGrid(Grid):
         self.last = xy
 
     def draw_many(self, xy_iter, pen):
-        self.moveto(xy_iter.next())
+        self.moveto(next(xy_iter))
         for xy in xy_iter:
             self.drawto(xy, pen)
 
