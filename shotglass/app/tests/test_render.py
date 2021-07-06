@@ -1,7 +1,7 @@
 import pytest
 from django.test import TestCase
 
-from app import grid, render
+from app import render
 from app.models import SourceLine
 
 
@@ -15,7 +15,7 @@ def is_subset(d1, obj):
     return set(d1.items()).issubset(set(d2.items()))
 
 
-@pytest.mark.skip("OLD")
+# @pytest.mark.skip("OLD")
 @pytest.mark.django_db
 def test_make_skeleton():
     symbols = [

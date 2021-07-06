@@ -111,13 +111,13 @@ def draw_symbol(grid, skel, color):
         grid.drawto(get_xy(pos + offset + 1), color)
 
 
-# X: unused
-def draw_highlight(grid, diagram):
-    folder_pos = [
-        pos for pos, symbol, _, _ in diagram if symbol.path.endswith("/setup.py")
-    ]
-    folder_range = xrange(min(folder_pos), max(folder_pos))
-    grid.draw_many((get_xy(pos) for pos in folder_range), ImageColor.getrgb("white"))
+# # X: unused
+# def draw_highlight(grid, diagram):
+#     folder_pos = [
+#         pos for pos, symbol, _, _ in diagram if symbol.path.endswith("/setup.py")
+#     ]
+#     folder_range = xrange(min(folder_pos), max(folder_pos))
+#     grid.draw_many((get_xy(pos) for pos in folder_range), ImageColor.getrgb("white"))
 
 
 # X BUG: doesn't account for symbol length
@@ -172,13 +172,12 @@ class BoundingBoxDraw(DrawStyle):
             draw_box(grid, syms, fill=syms[0].color)
 
 
-if 0:
-    DRAW_STYLES = dict(
-        (
-            (name[: -len("Draw")], value)
-            for name, value in globals().iteritems()
-            if name.endswith("Draw") and issubclass(DrawStyle, value)
-        )
-    )
-else:
-    DRAW_STYLES = {"boundingbox": BoundingBoxDraw, "simple": SimpleDraw}
+# if 0:
+    # DRAW_STYLES = dict(
+    #     (
+    #         (name[: -len("Draw")], value)
+    #         for name, value in globals().iteritems()
+    #         if name.endswith("Draw") and issubclass(DrawStyle, value)
+    #     )
+    # )
+DRAW_STYLES = {"boundingbox": BoundingBoxDraw, "simple": SimpleDraw}

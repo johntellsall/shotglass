@@ -99,7 +99,7 @@ def transpose_bits(srcs, nDests):
         dest = 0
         for ksrc in srcs:
             dest = dest * 2 + ksrc % 2
-        srcs = [val / 2 for val in srcs]
+        srcs = [int(val / 2) for val in srcs]
         dests[j] = dest
     return dests
 
@@ -110,10 +110,11 @@ def gray_encode(bn):
     assert bn >= 0
     assert type(bn) is int
 
-    return bn ^ (bn / 2)
+    return bn ^ int(bn / 2)
 
 
 def gray_decode(n):
+    assert type(n) is int
     sh = 1
     while True:
         div = n >> sh
@@ -133,22 +134,23 @@ def gray_decode(n):
 #    then xors ("^" in Python) with the start value.
 #
 def gray_encode_travel(start, end, mask, i):
+    i = int(i)
     travel_bit = start ^ end
     modulus = mask + 1  # == 2**nBits
     # travel_bit = 2**p, the bit we want to travel.
     # Canonical Gray code travels the top bit, 2**(nBits-1).
     # So we need to rotate by ( p - (nBits-1) ) == (p + 1) mod nBits.
     # We rotate by multiplying and dividing by powers of two:
-    gray_i = i ^ (i / 2)  # gray encode(i)
+    gray_i = i ^ int(i / 2)  # gray encode(i)
     g = gray_i * (travel_bit * 2)
-    return ((g | (g / modulus)) & mask) ^ start
+    return ((g | int(g / modulus)) & mask) ^ start
 
 
 def gray_decode_travel(start, end, mask, g):
     travel_bit = start ^ end
     modulus = mask + 1  # == 2**nBits
-    rg = (g ^ start) * (modulus / (travel_bit * 2))
-    return gray_decode((rg | (rg / modulus)) & mask)
+    rg = (g ^ start) * int(modulus / (travel_bit * 2))
+    return gray_decode((rg | int(rg / modulus)) & mask)
 
 
 # child_start_end( parent_start, parent_end, mask, i ) -- Get start & end for child.
@@ -195,6 +197,7 @@ def gray_decode_travel(start, end, mask, g):
 #
 @lru_cache(maxsize=None)
 def child_start_end(parent_start, parent_end, mask, i):
+    i = int(i)
     start_i = max(0, (i - 1) & ~1)  # next lower even number, or 0
     end_i = min(mask, (i + 1) | 1)  # next higher odd number, or mask
     child_start = gray_encode_travel(parent_start, parent_end, mask, start_i)

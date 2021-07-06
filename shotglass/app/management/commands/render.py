@@ -35,6 +35,7 @@ def make_skeleton(symbols):
     make skeleton, annotate X,Y position of each symbol
     """
     skeleton = calc_sym_position(symbols)
+    breakpoint()
     for pos, symbol in skeleton:
         x, y = get_xy(pos)
         yield Skeleton(position=pos, x=x, y=y, sourceline=symbol)
