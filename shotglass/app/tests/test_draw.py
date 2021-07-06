@@ -21,10 +21,11 @@ class TestDraw(TestCase):
         assert grid.width == 8
 
 
-@pytest.mark.skip("OLD")
 def test_add_color():
     diagram = [(0, "x", 1), (1, "y", 2)]
-    assert list(draw.jm_add_color(diagram)) == [
-        (0, "x", 1, "#864747"),
-        (1, "y", 2, "#5dd3d7"),
+    assert list(draw.pal_add_color(diagram)) == [
+        (0, 'x', 1, '#053061'), 
+        (1, 'y', 2, '#2166AC')
+        # (0, "x", 1, "#864747"),
+        # (1, "y", 2, "#5dd3d7"),
     ]
