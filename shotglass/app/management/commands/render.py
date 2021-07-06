@@ -1,4 +1,6 @@
-# app/render.py
+"""
+app/render.py
+"""
 
 import logging
 
