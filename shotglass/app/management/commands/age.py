@@ -21,7 +21,7 @@ from PIL import Image, ImageDraw
 BLACK = (0, 0, 0)
 CMAP_NAME = "PiYG_11"
 CMAP_OBJ = getattr(colorbrewer.diverging, CMAP_NAME)
-CMAP_COLORS = map(tuple, CMAP_OBJ.colors)
+CMAP_COLORS = list(map(tuple, CMAP_OBJ.colors))
 MAX_DAYS = 5 * 365
 CMAP_SCALE = (len(CMAP_COLORS) - 1) / math.log10(MAX_DAYS)
 
@@ -35,7 +35,7 @@ def get_tags(repo):
         for tag in repo.tags
         if tag.name.startswith("v3.") or tag.name == "v4.0.0"
     ]
-    tags.sort(key=lambda st: map(int, st.lstrip("v").split(".")))
+    tags.sort(key=lambda st: list(map(int, st.lstrip("v").split("."))))
     tags = [repo.tags["v" + version] for version in tags]
     return tags
 
@@ -45,7 +45,7 @@ def show_version_diffs(tags):
     old = tags.pop(0)
     for new in tags:
         diff_index = old.commit.diff(new)
-        print "{:7} - {:7}: {} commits".format(old.name, new.name, len(diff_index))
+        print("{:7} - {:7}: {} commits".format(old.name, new.name, len(diff_index)))
         old = new
 
 
@@ -114,8 +114,8 @@ def get_latest_datetime(repo, tag):
 
 
 def OLD_render_image(repo, matchfunc):
-    good_paths = filter(matchfunc, get_paths(repo))
-    print good_paths
+    good_paths = list(filter(matchfunc, get_paths(repo)))
+    print(good_paths)
     tags = get_tags(repo)
 
     good_index = dict((path, index) for index, path in enumerate(good_paths))
@@ -129,11 +129,11 @@ def OLD_render_image(repo, matchfunc):
         diff_index = old.commit.diff(new)
         diff_versions = "{}..{}".format(old.name, new.name)
         old = new
-        print "{:7}: {:3}".format(new.name, len(diff_index))
+        print("{:7}: {:3}".format(new.name, len(diff_index)))
         diff_paths = set(d.a_path for d in diff_index) & set(good_paths)
         if not diff_paths:
             # version has diffs, but not in the region of interest
-            print "- skip:", new
+            print("- skip:", new)
             continue
         diff_text = repo.git.diff(diff_versions, *diff_paths, stat=True)
         diff_path_changes = parse_diff_changes(diff_text)
@@ -141,12 +141,12 @@ def OLD_render_image(repo, matchfunc):
             try:
                 x = good_index[path]
             except IndexError:
-                print "?", path
+                print("?", path)
                 continue
             area = 6 * len(diff_count)
             symbols.append((x, y, area))
 
-    xs, ys, areas = zip(*symbols)
+    xs, ys, areas = list(zip(*symbols))
     plt.scatter(xs, ys, s=areas)
     plt.xlabel("file index")
     plt.ylabel("version index")
@@ -157,9 +157,9 @@ def OLD_render_image(repo, matchfunc):
 def serpentine_iter(width):
     y = 0
     while True:
-        for x in xrange(width):
+        for x in range(width):
             yield x, y
-        for x in xrange(width):
+        for x in range(width):
             yield width - x - 1, y + 1
         y += 2
 
@@ -172,7 +172,7 @@ def format_age(mycommit, mylatest):
     authored_dt = mycommit.authored_datetime.replace(tzinfo=None)
     delta_days = (mylatest - authored_dt).days
     if delta_days < -1:
-        print "UHOH:", delta_days
+        print("UHOH:", delta_days)
         return (255, 0, 0)  # bogus = hot red
     if delta_days > MAX_DAYS:
         return (50, 50, 50)  # old = dark grey
@@ -185,15 +185,15 @@ def format_age(mycommit, mylatest):
     try:
         return CMAP_COLORS[int(delta_index)]
     except IndexError:
-        print "UHOH:", delta_index
+        print("UHOH:", delta_index)
         return (40, 40, 40)
 
 
 def iter_source(repo, tag, tag_paths):
     latest = get_latest_datetime(repo, tag)
-    print "-", tag, latest
+    print("-", tag, latest)
     for tag_path in tag_paths:
-        print ".", tag_path
+        print(".", tag_path)
         blame = repo.blame(tag, tag_path)
         for commit, regions in blame:
             yield format_age(commit, latest), len(regions)
@@ -202,14 +202,14 @@ def iter_source(repo, tag, tag_paths):
 def render_image_tag(repo, matchfunc, tag):
     width = COL_WIDTH
     height = COL_HEIGHT
-    tag_paths = filter(matchfunc, get_tag_paths(repo, tag))
+    tag_paths = list(filter(matchfunc, get_tag_paths(repo, tag)))
 
     im = Image.new("RGB", (width, height))
     im_pixel = im.load()
     image_iter = serpentine_iter(width=width)
     for color, size in iter_source(repo, tag, tag_paths):
-        for _ in xrange(size):
-            im_pixel[image_iter.next()] = color
+        for _ in range(size):
+            im_pixel[next(image_iter)] = color
     return im
 
 
@@ -219,7 +219,7 @@ def render_image(repo, matchfunc, options):
     size = (COL_WIDTH + COL_GAP) * len(tags), COL_HEIGHT
     image = Image.new("RGB", size)
     for index, tag in enumerate(tags):
-        print tag, ":"
+        print(tag, ":")
         subimage = render_image_tag(repo, matchfunc, tag)
         image.paste(subimage, ((COL_WIDTH + COL_GAP) * index, 0))
     image = image.crop(image.getbbox())
@@ -239,7 +239,7 @@ def render_index(repo, matchfunc, options):
         ".", line_number=True, no_color=True, show_function=True, word_regexp=True
     )
     for match in func_re.finditer(grep_out):
-        print match.groups()
+        print(match.groups())
 
 
 ENTITY_HORIZONAL_BAR = "&#8213;"
@@ -284,7 +284,7 @@ def render_summary(repo, matchfunc, options):
     match_fields = (m.groups() for m in func_re.finditer(grep_out))
     if 0:
         for path, is_func, lineno, indent, line in match_fields:
-            print path, format_html(is_func, indent, line)
+            print(path, format_html(is_func, indent, line))
     else:
         im = Image.new("RGB", (width, height))
         im_pixel = im.load()
@@ -315,7 +315,7 @@ def render_text(repo, matchfunc, options):
             for commit, regions in blame:
                 yield format_age(commit, latest) * len(regions)
 
-        print path, ":", "".join(path_age())
+        print(path, ":", "".join(path_age()))
 
 
 # find . -name '*.c' | xargs dirname | sort -u

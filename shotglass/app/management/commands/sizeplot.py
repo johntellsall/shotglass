@@ -21,7 +21,7 @@ def natural_sort_key(s, _nsre=re.compile("([0-9]+)")):
 
 def get_stats(tag):
     symbols = models.SourceLine.objects.filter(project=tag)
-    length = symbols.aggregate(Sum("length")).values()[0]
+    length = list(symbols.aggregate(Sum("length")).values())[0]
     num_symbols = symbols.count()
     num_files = symbols.values_list("path", flat=True).distinct().count()
     return dict(length=length, num_files=num_files, num_symbols=num_symbols)
@@ -48,7 +48,7 @@ class Command(BaseCommand):
         tag_stats = {}
         for tag in tags:
             tag_stats[tag] = get_stats(tag)
-            print "{:<20} {}".format(tag, tag_stats[tag])
+            print("{:<20} {}".format(tag, tag_stats[tag]))
         if 0:
             for index, tag in enumerate(tags):
                 m = re.search(r"v(1.0|2.0.0.0-1)$", tag)
@@ -60,12 +60,12 @@ class Command(BaseCommand):
                 )
 
         plt.style.use("fivethirtyeight")  # see plt.style.available
-        stat_keys = tag_stats.values()[0]
+        stat_keys = list(tag_stats.values())[0]
         for stat_key in stat_keys:
             try:
                 values = [tag_stats[tag][stat_key] for tag in tags]
             except KeyError as err:
-                print "?", err
+                print("?", err)
                 continue
             plot_style = self.STYLES.get(stat_key, "ro")
             plt.plot(values, plot_style)

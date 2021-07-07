@@ -33,7 +33,7 @@ demo:
 	pyflakes app/management/commands/render.py
 	./manage.py render flask
 
-coverage:
+test-most:
 	ls -1 app/tests/*.py | egrep -v '_(age.py|sg2.py|sizeplot.py)$$' \
 	| xargs -t pytest --cov=app
 # app/tests/test_{draw,render,spider}.py
