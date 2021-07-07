@@ -29,6 +29,9 @@ show:
 check:
 	python -Wa manage.py test
 
+demo2:
+	./manage.py make_index ../SOURCE/flask/
+	
 demo:
 	pyflakes app/management/commands/render.py
 	./manage.py render flask

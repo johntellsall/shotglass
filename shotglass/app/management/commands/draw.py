@@ -20,7 +20,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         themeClass = draw.ThemeRainbow
         for project in self.get_projects(options["projects"]):
-            print "***", project
+            print("***", project)
             grid = draw.SimpleDraw().draw(project, theme=themeClass())
 
             depth = None
@@ -29,4 +29,4 @@ class Command(BaseCommand):
             argname2 = argname.split("_")[0]
             path = "{}_{}{}.png".format(project, argname2, detail)
             grid.render(path)
-            print path
+            print(path)

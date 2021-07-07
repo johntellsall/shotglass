@@ -63,6 +63,7 @@ class TextGrid(Grid):
 class ImageGrid(Grid):
     @classmethod
     def FromProject(cls, project):
+        import ipdb ; ipdb.set_trace()
         size = calc_width(project)
         size *= 4  # XX?
         return cls(size, size)
