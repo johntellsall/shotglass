@@ -1,23 +1,25 @@
 import sys
 
-import ctags
+# import ctags
 from django.core.management.base import BaseCommand, CommandError
 
 from app.models import SourceLine
 
 
 class Command(BaseCommand):
-    help = 'beer'
+    help = "beer"
 
     def add_arguments(self, parser):
-        parser.add_argument('--project')
+        parser.add_argument("--project")
         # parser.add_argument('--prefix', default='')
         # parser.add_argument('--verbose', action='store_true')
 
     def handle(self, *args, **options):
-        lines = SourceLine.objects.filter(project=options['project']).order_by('path')
+        project = options["project"]
+        lines = SourceLine.objects.filter(project=project).order_by("path")
+        print(f"LINES: {project=}")
         for line in lines:
-            print lines.__dict__
+            print(vars(lines))
         # prefix = options['prefix']
         # rows = []
         # while True:
@@ -38,4 +40,3 @@ class Command(BaseCommand):
         #     if not status:
         #         break
         # SourceLine.objects.bulk_create(rows)
-        

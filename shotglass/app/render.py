@@ -1,9 +1,14 @@
-# app/render.py
+"""
+app/render.py
+"""
+# XXXXX there are two! TODO resolve
 
 import logging
 
+# from django.core.management.base import BaseCommand
+
 from app import hilbert
-from .models import Skeleton
+from app.models import Skeleton
 
 
 logger = logging.getLogger(__name__)
@@ -23,7 +28,7 @@ def calc_sym_position(symbols):
         pos += 1
         if symbol.path != prev_path:
             if prev_path:
-                pos += 2        # add black smudge
+                pos += 2  # add black smudge
             prev_path = symbol.path
         pos += symbol.length - 1
 
@@ -34,15 +39,15 @@ def make_skeleton(symbols):
     """
     skeleton = calc_sym_position(symbols)
     for pos, symbol in skeleton:
-        x,y = get_xy(pos)
+        x, y = get_xy(pos)  # pylint: disable=invalid-name
         yield Skeleton(position=pos, x=x, y=y, sourceline=symbol)
 
 
-# pylint: disable=no-member
-def render(symbols):
-    """
-    render skeleton, store in database
-    """
-    # Skeleton.objects.all.delete() # XX
-    skel = make_skeleton(symbols)
-    Skeleton.objects.bulk_create(skel)
+# # pylint: disable=no-member
+# def render(symbols):
+#     """
+#     render skeleton, store in database
+#     """
+#     # Skeleton.objects.all.delete() # XX
+#     skel = make_skeleton(symbols)
+#     Skeleton.objects.bulk_create(skel)

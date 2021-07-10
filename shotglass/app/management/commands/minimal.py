@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
-'''
+"""
 make_index -- compile data from tree of source files
-'''
+"""
 
 # pylint: disable=bad-builtin
 
 import logging
+
 # import os
 # import re
 # import subprocess
@@ -22,8 +23,8 @@ from app import render
 logging.basicConfig(
     stream=sys.stderr,
     level=logging.DEBUG,
-    format='%(asctime)s %(levelname)s %(message)s',
-    datefmt='%H:%M:%S'
+    format="%(asctime)s %(levelname)s %(message)s",
+    datefmt="%H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
@@ -44,7 +45,7 @@ class Command(BaseCommand):
         #         logger.warning(
         #             '%s: project must be directory, skipping', project_dir)
         #         continue
-            
+
         #     # X: doesn't support multiple dirs
         #     project_name = (options.get('project')
         #         or format_project_name(project_dir))

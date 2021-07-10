@@ -7,13 +7,15 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0010_progpmccabe'),
+        ("app", "0010_progpmccabe"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='progpmccabe',
-            name='sourceline',
-            field=models.ForeignKey(blank=True, to='app.SourceLine', null=True),
+            model_name="progpmccabe",
+            name="sourceline",
+            field=models.ForeignKey(
+                blank=True, to="app.SourceLine", null=True, on_delete=models.CASCADE
+            ),
         ),
     ]

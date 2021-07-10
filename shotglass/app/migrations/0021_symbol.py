@@ -9,17 +9,30 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0020_auto_20170904_2250'),
+        ("app", "0020_auto_20170904_2250"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Symbol',
+            name="Symbol",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('label', models.CharField(max_length=200)),
-                ('line_number', models.IntegerField()),
-                ('source_file', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='app.SourceFile')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("label", models.CharField(max_length=200)),
+                ("line_number", models.IntegerField()),
+                (
+                    "source_file",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="app.SourceFile"
+                    ),
+                ),
             ],
         ),
     ]

@@ -7,27 +7,26 @@ from app.models import SourceLine
 
 
 class Command(BaseCommand):
-    help = 'beer'
+    help = "beer"
 
     def add_arguments(self, parser):
-        parser.add_argument('projects', nargs='+')
+        parser.add_argument("projects", nargs="+")
 
     def get_projects(self, projects):
-        if projects != ['all']:
+        if projects != ["all"]:
             return projects
         return SourceLine.projects()
 
     def handle(self, *args, **options):
         themeClass = draw.ThemeRainbow
-        for project in self.get_projects(options['projects']):
-            print '***', project
-            grid = draw.SimpleDraw().draw(
-                project, theme=themeClass())
+        for project in self.get_projects(options["projects"]):
+            print("***", project)
+            grid = draw.SimpleDraw().draw(project, theme=themeClass())
 
             depth = None
-            argname = 'path'
-            detail = '_{}'.format(depth) if depth else ''
-            argname2 = argname.split('_')[0]
-            path = '{}_{}{}.png'.format(project, argname2, detail)
+            argname = "path"
+            detail = "_{}".format(depth) if depth else ""
+            argname2 = argname.split("_")[0]
+            path = "{}_{}{}.png".format(project, argname2, detail)
             grid.render(path)
-            print path
+            print(path)

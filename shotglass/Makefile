@@ -1,79 +1,63 @@
-SRCDIR := ../../SOURCE
-VBIN := $(VIRTUAL_ENV)/bin
-# CTAGS := ctags --fields=afmikKlnsStz --totals
+all:
 
-all:	test
+lint:
+	black .
+	flake8 --exclude=app/management/commands,app/migrations,app/tests
 
-.PHONY: query.html
-query.html:
-	source-highlight -o $@ -i \
-	SOURCE/django/django/db/models/query.py
+update-packages:
+	pip3 list --outdated --format=freeze | \
+	grep -v '^\-e' | cut -d = -f 1 | \
+	xargs -n1 pip3 install -U 
 
-.PHONY: z.html
-z.html:
-	cat SOURCE/django/django/db/models/*.py > z.py
-	source-highlight -o $@ -i z.py
+loop-check:
+	git ls-files '*.py' \
+	| entr -cs 'black . && python manage.py check --fail-level=ERROR'
 
-.PHONY: source.lst
-source.lst:
-	find SOURCE/django/ -name '*.py' \
-	| egrep -v '/(bin|contrib|docs|examples|tests)/' \
-	> $@
-	xargs < source.lst wc -l | tail -1
+loop-migrate:
+	git ls-files '*.py' \
+	| entr -cs './manage.py migrate'
 
-server:
-		while true; do ./manage.py runserver; sleep 15; done
+loop-index:
+	git ls-files '*.py' \
+	| entr -cs './manage.py make_index ../SOURCE/flask'
 
-test:
-	py.test
+index:
+	./manage.py make_index ../SOURCE/flask
 
-clean:
-	-$(RM) $$(find . -name '*.pyc')
+show:
+	./manage.py show flask
 
-migrate:
-	./manage.py migrate
+# demo: index show
 
-# index1 -- index short C and Python projects
-index1: migrate
-	file $(SRCDIR)/* | awk -F: '/directory/ {print $$1}' \
-	| egrep '(redis|flask)' \
-	| xargs ./manage.py make_index
+# show Django checks, e.g. auto field
+check:
+	python -Wa manage.py test
 
-index-most: migrate
-	file $(SRCDIR)/* | awk -F: '/directory/ {print $$1}' \
-	| egrep -v linux \
-	| xargs ./manage.py make_index
+demo2:
+	./manage.py make_index ../SOURCE/flask/
+	
+	# pyflakes app/management/commands/render.py
+demo: lint
+	./manage.py render flask
 
-# apt-get source postgresql-9.3 python3.4 python3-flask mysql-common
-# apt-get source python2.7 python-django redis
-# wget https://github.com/guilleiguaran/xv6/archive/master.zip
+test-most:
+	ls -1 app/tests/*.py | egrep -v '_(age.py|sg2.py|sizeplot.py)$$' \
+	| xargs -t pytest --cov=app
+# app/tests/test_{draw,render,spider}.py
+# coverage report -m
 
-# xv6:
-# 	/bin/ls -1 $(SRCDIR)/xv6/*.c | egrep -v usertests.c \
-# 	| ctags -L - --fields=afmikKlnsStz
-# 	$(VBIN)/python ./manage.py make_index --project=xv6 --prefix=$(SRCDIR)/xv6
+test-all:
+	pytest --cov=app app/tests/
 
-# linux1:
-# 	$(CTAGS) -o $@.tags `find $(SRCDIR)/linux -name '*.c'`
-# 	$(VBIN)/python ./manage.py make_index \
-# 	--project=linux1 --prefix=$(SRCDIR)/linux --tags=$@.tags
-# 	$(VBIN)/python ./manage.py show $@
+# app/tests/test_age.py
+# app/tests/test_draw.py
+# app/tests/test_perf.py
+# app/tests/test_render.py
+# app/tests/test_sg2.py
+# app/tests/test_sizeplot.py
+# app/tests/test_spider.py
+# app/tests/test_views.py
 
-# linux3-most:
-# 	find $(SRCDIR)/linux-3* -name '*.c' | egrep -v '/(drivers|scripts)/' \
-# 	| egrep -v '/net/(appletalk|ax25|decnet|ipv6|irda|sctp)' \
-# 	| egrep -v '/fs/(ceph|xfs)' | egrep -v /codecs/ \
-# 	| egrep -v 'kernel/cpu/.+/' > $@.lst
-# 	$(CTAGS) -L $@.lst
-# 	$(VBIN)/python ./manage.py make_index \
-# 	--project=$@ --prefix=$(SRCDIR)/linux-3*
-# 	$(VBIN)/python ./manage.py show --project=$@
-
-# linux3:
-# 	find $(SRCDIR)/linux-3*/kernel -name '*.c' \
-# 	| egrep -v 'kernel/cpu/.+/' > $@.lst
-# 	$(CTAGS) -L $@.lst
-# 	$(VBIN)/python ./manage.py make_index \
-# 	--project=$@ --prefix=$(SRCDIR)/linux-3*
-# 	$(VBIN)/python ./manage show --project=$@
-
+# sniff -- find stinky code not useful for commit
+sniff:
+	rg --vimgrep '(ipdb|breakpoint)' | egrep -v "Makefile:"

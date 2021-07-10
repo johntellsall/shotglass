@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-'''
+"""
 sparklines -- XX
-'''
+"""
 
 # pylint: disable=bad-builtin
 
@@ -20,21 +20,22 @@ from app import render
 logging.basicConfig(
     stream=sys.stderr,
     level=logging.DEBUG,
-    format='%(asctime)s %(levelname)s %(message)s',
-    datefmt='%H:%M:%S'
+    format="%(asctime)s %(levelname)s %(message)s",
+    datefmt="%H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
 
 def plot(project):
     WIDTH = 20
-    query = SourceFile.objects.filter(project=project).order_by('-num_lines')
-    num_lines = query.values_list('num_lines', flat=True)
+    query = SourceFile.objects.filter(project=project).order_by("-num_lines")
+    num_lines = query.values_list("num_lines", flat=True)
     largest, num_files = num_lines.first(), num_lines.count()
-    print '{project}: {num_files} source files, largest = {largest} lines'.format(
-        **locals())
+    print "{project}: {num_files} source files, largest = {largest} lines".format(
+        **locals()
+    )
 
-    data = [num_lines[i] for i in range(0, num_files, num_files/WIDTH)]
+    data = [num_lines[i] for i in range(0, num_files, num_files / WIDTH)]
     print sparklines.sparklines(data)[0]
 
     print "Largest:"
@@ -42,18 +43,17 @@ def plot(project):
         print info.num_lines, info.path
 
 
-
 class Command(BaseCommand):
     help = __doc__
 
     def add_arguments(self, parser):
-        parser.add_argument('projects', nargs='+')
+        parser.add_argument("projects", nargs="+")
 
     def handle(self, *args, **options):
-        projects = options['projects']
-        if projects == ['all']:
+        projects = options["projects"]
+        if projects == ["all"]:
             projects = SourceFile.projects()
 
         for project in projects:
-            print 'PROJECT {}:'.format(project.upper())
+            print "PROJECT {}:".format(project.upper())
             plot(project)

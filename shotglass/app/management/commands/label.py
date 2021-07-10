@@ -36,7 +36,7 @@ def serpentine_iter(width):
 def render_funcs(funcs, color_gen):
     width = COL_WIDTH
     height = COL_HEIGHT
-    im = Image.new('RGB', (width, height))
+    im = Image.new("RGB", (width, height))
     im_pixel = im.load()
     im_draw = ImageDraw.Draw(im)
     image_iter = serpentine_iter(width=width)
@@ -56,16 +56,16 @@ def render_funcs(funcs, color_gen):
             im_pixel[image_iter.next()] = color
     print new_labels
     for func, label_pos in new_labels:
-        x,y = label_pos
-        rect = [x-1,y-1, x+2,y+2]
-        im_draw.rectangle(rect, fill='black')
+        x, y = label_pos
+        rect = [x - 1, y - 1, x + 2, y + 2]
+        im_draw.rectangle(rect, fill="black")
     return im
 
 
 def render_paths(funcs, color_gen):
     width = COL_WIDTH
     height = COL_HEIGHT
-    im = Image.new('RGB', (width, height))
+    im = Image.new("RGB", (width, height))
     im_pixel = im.load()
     im_draw = ImageDraw.Draw(im)
     image_iter = serpentine_iter(width=width)
@@ -75,9 +75,9 @@ def render_paths(funcs, color_gen):
         if func.path != prev_path:
             prev_path = func.path
             color = color_gen()
-            x,y = image_iter.next()
-            rect = [x-1,y-1, x+2,y+2]
-            im_draw.rectangle(rect, fill='black')
+            x, y = image_iter.next()
+            rect = [x - 1, y - 1, x + 2, y + 2]
+            im_draw.rectangle(rect, fill="black")
         for _ in xrange(func.length):
             im_pixel[image_iter.next()] = color
     return im
@@ -87,26 +87,26 @@ class Command(BaseCommand):
     help = __doc__
 
     def add_arguments(self, parser):
-        parser.add_argument('projects', nargs='+')
+        parser.add_argument("projects", nargs="+")
 
     def handle(self, *args, **options):
-        color_iter = itertools.cycle(
-            CMAP_COLORS + list(reversed(CMAP_COLORS)))
+        color_iter = itertools.cycle(CMAP_COLORS + list(reversed(CMAP_COLORS)))
         # color_iter = itertools.cycle(CMAP_COLORS)
 
-        for project in options['projects']:
+        for project in options["projects"]:
             p = SourceLine.objects.filter(project=project)
             print project
-            print 'all:', p.count()
-            funcs = p.exclude(path__startswith='tests/').exclude(
-                path__startswith='examples/')
-            print 'no tests:', funcs.count()
+            print "all:", p.count()
+            funcs = p.exclude(path__startswith="tests/").exclude(
+                path__startswith="examples/"
+            )
+            print "no tests:", funcs.count()
 
             if 0:
-                funcs = funcs.order_by('name')
+                funcs = funcs.order_by("name")
                 img = render_funcs(funcs, color_iter.next)
             else:
-                funcs = funcs.order_by('path')
+                funcs = funcs.order_by("path")
                 img = render_paths(funcs, color_iter.next)
 
-            img.save('{}.png'.format(project))
+            img.save("{}.png".format(project))

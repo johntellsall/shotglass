@@ -7,14 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0003_auto_20150705_0553'),
+        ("app", "0003_auto_20150705_0553"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='sourceline',
-            name='name',
-            field=models.CharField(default='na', max_length=200),
+            model_name="sourceline",
+            name="name",
+            field=models.CharField(default="na", max_length=200),
             preserve_default=False,
         ),
     ]

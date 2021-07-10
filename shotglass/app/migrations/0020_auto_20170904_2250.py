@@ -8,13 +8,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0019_add-sourcefile'),
+        ("app", "0019_add-sourcefile"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='sourcefile',
-            old_name='kind',
-            new_name='language',
+            model_name="sourcefile",
+            old_name="kind",
+            new_name="language",
         ),
     ]
