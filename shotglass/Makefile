@@ -1,3 +1,6 @@
+IMAGE_CAT:=/Users/johnmitchell/.iterm2/imgcat
+SQL:=sqlite3 db.sqlite3
+
 all:
 
 lint:
@@ -31,7 +34,13 @@ show:
 
 stats:
 	@echo "FLASK FILES"
-	sqlite3 db.sqlite3 'select count(*) from app_sourcefile where project="flask"'
+	$(SQL) 'select count(*) from app_sourcefile where project="flask"'
+	@echo "FLASK SOURCE-FILE"
+	$(SQL) '.mode line' 'select * from app_sourcefile where project="flask" limit 3'
+	$(SQL) '.mode line' \
+	'select * from app_skeleton limit 1'
+# skeletons = models.Skeleton.objects.filter
+# (symbol__source_file__project=project)
 # sqlite3 db.sqlite3 <<EOSQL
 # select count(*) from app_symbol
 # EOSQL
@@ -48,6 +57,7 @@ demo2:
 demo:
 	echo ./manage.py render flask
 	./manage.py draw flask
+	$(IMAGE_CAT) flask_path.png
 
 test-most:
 	ls -1 app/tests/*.py | egrep -v '_(age.py|sg2.py|sizeplot.py)$$' \

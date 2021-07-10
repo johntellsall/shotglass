@@ -152,12 +152,15 @@ class DrawStyle(object):
         mytheme = theme or Theme()
         color_cb = mytheme.calc_sym_color
         skeletons = models.Skeleton.objects.filter(symbol__source_file__project=project)
+        count = skeletons.count()
+        print(f'{project} skeletons: {count}')
         skeletons = skeletons.order_by(
             "symbol__source_file__path", "symbol__source_file__name"
         )
 
         for skeleton in skeletons:
-            color = color_cb(skeleton)
+            print(skeleton)
+            color = '#fff' # color_cb(skeleton)
             draw_symbol(grid, skel=skeleton, color=color)
         grid.finalize()
         return grid
