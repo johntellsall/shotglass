@@ -69,6 +69,9 @@ test-most:
 test-all:
 	pytest --cov=app app/tests/
 
+# management commands
+test-cmds:
+	pytest -vv --pyargs app/management/commands
 # app/tests/test_age.py
 # app/tests/test_draw.py
 # app/tests/test_perf.py
@@ -90,7 +93,3 @@ test-ctags:
 	@echo
 	@echo JSON FIELDS
 	ctags --output-format=json --list-fields
-
-# management commands
-test2:
-	pytest -vv --pyargs app/management/commands

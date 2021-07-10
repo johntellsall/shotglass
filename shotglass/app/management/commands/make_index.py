@@ -89,30 +89,52 @@ CTAGS_COMMAND = [
 
 
 def get_ctags_info(path):
+    def not_pseudo_tag(item):
+        return item['_type'] != 'ptag'
+
     cmd = CTAGS_COMMAND + [path]
     lines = subprocess.check_output(cmd, text=True).split("\n")
-    return [json.loads(line) for line in filter(None, lines)]
+    items = [json.loads(line) for line in filter(None, lines)]
+    items = filter(not_pseudo_tag, items)
+    return items
+
+# {
+# '_type': 'tag', 'name': 'clone', 'path': 'xx',
+# 'access': 'public', 'language': 'Python', 
+# 'line': 28,
+# 'signature': '(url)', 'kind': 'function', 'roles': 'def', 'end': 34}
 
 
 def get_symbols(file_obj, path):
-    def parse_addr(symaddr):
-        keyvals = symaddr.split(';"', 1)[-1].split("\t")
-        keyvals.pop(0)
-        return dict(item.split(":", 1) for item in keyvals)
-
-    cmd = CTAGS_COMMAND + [path]
-    lines = subprocess.check_output(cmd, text=True).split("\n")
-    for line in filter(None, lines):
+    for item in get_ctags_info(path):
         try:
-            tagname, _, tagaddr = line.split("\t", 2)
-        except ValueError:
-            sys.exit(f"Unknown line: {line}")
-        info = parse_addr(tagaddr)
-        yield Symbol(
-            source_file=file_obj,
-            label=tagname,
-            line_number=info.get("line"),
-        )
+            yield Symbol(
+                source_file=file_obj,
+                label=item['name'],
+                line_number=item["line"],
+                length = 1
+            )
+        except KeyError:
+            print(f'?: {item}')
+
+    # def parse_addr(symaddr):
+    #     keyvals = symaddr.split(';"', 1)[-1].split("\t")
+    #     keyvals.pop(0)
+    #     return dict(item.split(":", 1) for item in keyvals)
+
+    # cmd = CTAGS_COMMAND + [path]
+    # lines = subprocess.check_output(cmd, text=True).split("\n")
+    # for line in filter(None, lines):
+    #     try:
+    #         tagname, _, tagaddr = line.split("\t", 2)
+    #     except ValueError:
+    #         sys.exit(f"Unknown line: {line}")
+    #     info = parse_addr(tagaddr)
+    #     yield Symbol(
+    #         source_file=file_obj,
+    #         label=tagname,
+    #         line_number=info.get("line"),
+    #     )
 
 
 def index_files(project, project_dir, paths):

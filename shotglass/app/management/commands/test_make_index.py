@@ -18,3 +18,4 @@ def test_get_ctags_info():
     funcs = [item for item in tags if item['kind'] == 'function']
     funcs[0]['path'] = 'xx'
     assert funcs[0] == FIRST_FUNC
+    assert 3 == len(funcs)
