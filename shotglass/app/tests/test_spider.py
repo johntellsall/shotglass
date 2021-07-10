@@ -5,6 +5,7 @@ from io import StringIO
 
 import pytest
 from django.core.management import call_command, CommandError
+
 # from django.utils.six import StringIO
 
 
@@ -19,7 +20,7 @@ def test_err_noargs():
         call_command("spider")
 
 
-@pytest.mark.xfail(reason='not ported yet')
+@pytest.mark.xfail(reason="not ported yet")
 def test_blocks():
     out = StringIO()
     call_command("spider", TEST_PATH, style="blocks", stdout=out)

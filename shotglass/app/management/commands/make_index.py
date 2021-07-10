@@ -81,6 +81,7 @@ def count_lines(project_dir, paths):
 # 'class:TaggedJSONSerializer', 'access': 'public', 'signature': '(self,
 # value)', 'roles': 'def', 'end': '298'}
 
+
 def get_symbols(file_obj, path):
     def parse_addr(symaddr):
         keyvals = symaddr.split(';"', 1)[-1].split("\t")
@@ -94,7 +95,7 @@ def get_symbols(file_obj, path):
         try:
             tagname, _, tagaddr = line.split("\t", 2)
         except ValueError:
-            sys.exit(f'Unknown line: {line}')
+            sys.exit(f"Unknown line: {line}")
         info = parse_addr(tagaddr)
         yield Symbol(
             source_file=file_obj,

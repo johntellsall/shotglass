@@ -50,6 +50,7 @@ class ThemeRainbow(Theme):
     """
     draw symbols in color with different saturation
     """
+
     def __init__(self):
         self.hue_iter = make_step_iter(50, 360)
         self.saturation_iter = itertools.cycle([30, 60, 80])
@@ -165,6 +166,7 @@ class SimpleDraw(DrawStyle):
     """
     draw a pixel or several for each symbol
     """
+
     def draw_diagram(self, grid, diagram):
         diagram.draw(grid)
 
@@ -173,6 +175,7 @@ class BoundingBoxDraw(DrawStyle):
     """
     draw bounding box around each source file
     """
+
     def draw_diagram(self, grid, diagram):
         for path in set(dsym.sourceline.path for dsym in diagram):
             syms = [dsym for dsym in diagram if dsym.sourceline.path == path]

@@ -1,6 +1,7 @@
 all:
 
 lint:
+	black .
 	flake8 --exclude=app/management/commands,app/migrations,app/tests
 
 update-packages:
@@ -35,8 +36,8 @@ check:
 demo2:
 	./manage.py make_index ../SOURCE/flask/
 	
-demo:
-	pyflakes app/management/commands/render.py
+	# pyflakes app/management/commands/render.py
+demo: lint
 	./manage.py render flask
 
 test-most:

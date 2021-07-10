@@ -28,7 +28,10 @@ class Migration(migrations.Migration):
                 ("x", models.IntegerField()),
                 ("y", models.IntegerField()),
                 ("pen", colorfield.fields.ColorField(max_length=10)),
-                ("sourceline", models.ForeignKey(to="app.SourceLine", on_delete=models.CASCADE)),
+                (
+                    "sourceline",
+                    models.ForeignKey(to="app.SourceLine", on_delete=models.CASCADE),
+                ),
             ],
         ),
     ]

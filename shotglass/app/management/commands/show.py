@@ -47,9 +47,9 @@ def show_symbol_index(projects):
         proj_symbols = Symbol.objects.filter(source_file__project=project)
         fun_symbols = proj_symbols.exclude(label__startswith="_").order_by("label")
         for symbol in fun_symbols:
-            print(FORMAT.format(
-                symbol.label, symbol.source_file.path, symbol.line_number
-            ))
+            print(
+                FORMAT.format(symbol.label, symbol.source_file.path, symbol.line_number)
+            )
 
 
 def show_summary(projects):

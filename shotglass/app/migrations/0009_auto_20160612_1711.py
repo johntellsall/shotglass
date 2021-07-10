@@ -14,6 +14,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="diagramsymbol",
             name="sourceline",
-            field=models.ForeignKey(blank=True, to="app.SourceLine", null=True, on_delete=models.CASCADE),
+            field=models.ForeignKey(
+                blank=True, to="app.SourceLine", null=True, on_delete=models.CASCADE
+            ),
         ),
     ]

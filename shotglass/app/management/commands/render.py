@@ -29,7 +29,7 @@ def calc_sym_position(symbols):
         #     if prev_path:
         #         pos += 2  # add black smudge
         #     prev_path = symbol.path
-        if False: # TODO re-add symbol length support
+        if False:  # TODO re-add symbol length support
             pos += symbol.length - 1
         else:
             pos += 3
@@ -43,7 +43,7 @@ def make_skeleton(symbols):
     for num, (pos, symbol) in enumerate(skeleton):
         x, y = get_xy(pos)
         if num <= 5:
-            print(f'position={pos}, x={x}, y={y}, {symbol=}')
+            print(f"position={pos}, x={x}, y={y}, {symbol=}")
 
         yield Skeleton(position=pos, x=x, y=y, symbol=symbol)
 
@@ -68,18 +68,17 @@ class Command(BaseCommand):
         #     print(('PROJECTS: {} or "all"'.format(", ".join(all_projects))))
         #     return
         if projects == ["all"]:
-            raise NotImplementedError('all: tbd')
+            raise NotImplementedError("all: tbd")
             # projects = all_projects
 
         for project in projects:
             proj_symbols = Symbol.objects.filter(source_file__project=project)
             num_symbols = proj_symbols.count()
-            print('render')
-            print(f'{args=}')
-            print(f'{options=}')
-            print(f'{project}: {num_symbols} symbols')
+            print("render")
+            print(f"{args=}")
+            print(f"{options=}")
+            print(f"{project}: {num_symbols} symbols")
             render(proj_symbols)
 
             count = Skeleton.objects.count()
             print(f"Skeleton: {count=}")
-

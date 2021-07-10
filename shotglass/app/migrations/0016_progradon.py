@@ -27,7 +27,12 @@ class Migration(migrations.Migration):
                 ("complexity", models.IntegerField()),
                 (
                     "sourceline",
-                    models.OneToOneField(null=True, blank=True, to="app.SourceLine", on_delete=models.CASCADE),
+                    models.OneToOneField(
+                        null=True,
+                        blank=True,
+                        to="app.SourceLine",
+                        on_delete=models.CASCADE,
+                    ),
                 ),
             ],
         ),

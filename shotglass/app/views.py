@@ -11,7 +11,9 @@ from app.models import SourceLine
 
 def list_projects(request):
     projects = SourceLine.projects()
-    return shortcuts.render(request, "list_projects.html", {"projects": projects})  # noqa: E501
+    return shortcuts.render(
+        request, "list_projects.html", {"projects": projects}
+    )  # noqa: E501
 
 
 def list_symbols(request, project):

@@ -30,7 +30,12 @@ class Migration(migrations.Migration):
                 ("color", colorfield.fields.ColorField(max_length=10)),
                 (
                     "sourceline",
-                    models.ForeignKey(blank=True, to="app.SourceLine", null=True, on_delete=models.CASCADE),
+                    models.ForeignKey(
+                        blank=True,
+                        to="app.SourceLine",
+                        null=True,
+                        on_delete=models.CASCADE,
+                    ),
                 ),
             ],
         ),

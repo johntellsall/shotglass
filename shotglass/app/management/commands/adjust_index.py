@@ -17,7 +17,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         project = options["project"]
         lines = SourceLine.objects.filter(project=project).order_by("path")
-        print(f'LINES: {project=}')
+        print(f"LINES: {project=}")
         for line in lines:
             print(vars(lines))
         # prefix = options['prefix']

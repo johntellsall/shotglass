@@ -80,7 +80,9 @@ class SourceLine(models.Model):
 
 # TODO: flesh out/remove
 class ProgRadon(models.Model):
-    sourceline = models.OneToOneField(SourceLine, on_delete=models.CASCADE, **nullable)  # noqa: E501
+    sourceline = models.OneToOneField(
+        SourceLine, on_delete=models.CASCADE, **nullable
+    )  # noqa: E501
 
     kind = models.CharField(max_length=1)
     complexity = models.IntegerField()
@@ -88,7 +90,9 @@ class ProgRadon(models.Model):
 
 # TODO: flesh out/remove
 class ProgPmccabe(models.Model):
-    sourceline = models.OneToOneField(SourceLine, on_delete=models.CASCADE, **nullable)  # noqa: E501
+    sourceline = models.OneToOneField(
+        SourceLine, on_delete=models.CASCADE, **nullable
+    )  # noqa: E501
 
     modified_mccabe = models.IntegerField()
     mccabe = models.IntegerField()
