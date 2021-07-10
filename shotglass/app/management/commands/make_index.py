@@ -81,15 +81,21 @@ def count_lines(project_dir, paths):
 # 'class:TaggedJSONSerializer', 'access': 'public', 'signature': '(self,
 # value)', 'roles': 'def', 'end': '298'}
 
+CTAGS_COMMAND = ["ctags", "--fields=*-P", "--extras=*", "-f", "-",
+"--output-format=json"]
 
+def get_ctags_info(path):
+    cmd = CTAGS_COMMAND + [path]
+    lines = subprocess.check_output(cmd, text=True).split("\n")
+    return lines
+    
 def get_symbols(file_obj, path):
     def parse_addr(symaddr):
         keyvals = symaddr.split(';"', 1)[-1].split("\t")
         keyvals.pop(0)
         return dict(item.split(":", 1) for item in keyvals)
 
-    cmd = ["ctags", "--fields=*", "-f", "-"]
-    cmd += [path]
+    cmd = CTAGS_COMMAND + [path]
     lines = subprocess.check_output(cmd, text=True).split("\n")
     for line in filter(None, lines):
         try:

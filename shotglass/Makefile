@@ -81,7 +81,7 @@ test-all:
 # sniff -- find stinky code not useful for commit
 sniff:
 	rg --vimgrep '(ipdb|breakpoint)' | egrep -v "Makefile:"
-# -fields=-P,extras,end,line
+
 test-ctags:
 	ctags --output-format=json \
 	--fields=*-P --extras=* \
