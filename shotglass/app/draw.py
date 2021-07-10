@@ -108,7 +108,7 @@ def draw_symbol(grid, skel, color):
     """
     draw single symbol into grid (image)
     """
-    if False: # TODO update
+    if True:  # TODO update
         length = skel.sourceline.length
         if length < 1:
             return
@@ -154,7 +154,7 @@ class DrawStyle(object):
         grid = ImageGrid.FromProject(project)
         mytheme = theme or Theme()
         color_cb = mytheme.calc_sym_color
-        skeletons = models.Skeleton.objects.filter(symbol__source_file__project=project)
+        skeletons = models.Skeleton.objects.filter(symbol__source_file__project=project)  # noqa: E501
         count = skeletons.count()
         print(f'{project} skeletons: {count}')
         skeletons = skeletons.order_by(

@@ -30,7 +30,6 @@ index:
 show:
 	./manage.py show flask
 
-# demo: index show
 SQL_LINE:=$(SQL) '.mode line'
 stats:
 	@echo "FLASK FILES"
@@ -40,22 +39,22 @@ stats:
 	@echo 'FLASK SKELETON (after render)'
 	$(SQL_LINE) 'select * from app_skeleton limit 1'
 	$(SQL_LINE) 'select count(*) from app_skeleton'
-# skeletons = models.Skeleton.objects.filter
-# (symbol__source_file__project=project)
-# sqlite3 db.sqlite3 <<EOSQL
-# select count(*) from app_symbol
-# EOSQL
+
 	
-# show Django checks, e.g. auto field
+# check -- show Django checks, e.g. auto field
 check:
 	python -Wa manage.py test
 
 demo2:
 	./manage.py make_index ../SOURCE/flask/
+
+nuke-reset-db:
+	-$(RM) db.sqlite3
+	./manage.py migrate
 	
-	# pyflakes app/management/commands/render.py
 # demo: lint
 demo:
+	./manage.py make_index ../SOURCE/flask
 	./manage.py render flask
 	./manage.py draw flask
 	convert flask_path.png -scale '300%'  zoot.png
@@ -82,3 +81,12 @@ test-all:
 # sniff -- find stinky code not useful for commit
 sniff:
 	rg --vimgrep '(ipdb|breakpoint)' | egrep -v "Makefile:"
+# -fields=-P,extras,end,line
+test-ctags:
+	ctags --output-format=json \
+	--fields=*-P --extras=* \
+	fetch.py \
+	| egrep -v ptag
+	@echo
+	@echo JSON FIELDS
+	ctags --output-format=json --list-fields

@@ -1,9 +1,12 @@
 # INSTALL
 
-NEW
+NEW [2021]
 ```
     xcode-select --install
-    brew install pipenv
+    brew install universal-ctags
+
+    ctags --version
+# Universal Ctags 5.9.0
 ```
 
 OLD
@@ -14,6 +17,10 @@ OLD
     pip install -r ./requirements.txt
     cd ./shotglass
     ./manage.py migrate
+
+?
+    brew install pipenv
+
 ```
 
 ## Install 2, using Docker

@@ -41,7 +41,7 @@ class Symbol(models.Model):
     label = models.CharField(max_length=200)
     line_number = models.IntegerField()
     # kind = models.CharField(max_length=12)
-    # length = models.IntegerField()
+    length = models.IntegerField()
 
     def __repr__(self):
         cname = self.__class__.__name__
