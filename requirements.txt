@@ -35,7 +35,7 @@ Pillow==5.0.0
 pluggy==0.6.0
 prompt-toolkit==1.0.15
 ptyprocess==0.5.2
-py==1.5.3
+py==1.10.0
 Pygments==2.2.0
 pylint==1.8.3
 pylint-django==0.9.4
