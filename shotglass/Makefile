@@ -56,9 +56,10 @@ demo2:
 	# pyflakes app/management/commands/render.py
 # demo: lint
 demo:
-	echo ./manage.py render flask
+	./manage.py render flask
 	./manage.py draw flask
-	$(IMAGE_CAT) flask_path.png
+	convert flask_path.png -scale '300%'  zoot.png
+	$(IMAGE_CAT) zoot.png
 
 test-most:
 	ls -1 app/tests/*.py | egrep -v '_(age.py|sg2.py|sizeplot.py)$$' \

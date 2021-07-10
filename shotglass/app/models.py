@@ -112,8 +112,8 @@ class Skeleton(models.Model):
     position = models.IntegerField()
     x = models.IntegerField()
     y = models.IntegerField()
-    color = ColorField()
+    color = ColorField()  # TODO deprecated
 
     def __str__(self):
         cls_name = self.__class__.__name__
-        return f"<{cls_name} pos={self.position} {self.color}>"
+        return f"<{cls_name} pos={self.position}>"

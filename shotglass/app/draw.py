@@ -163,7 +163,8 @@ class DrawStyle(object):
 
         for skeleton in skeletons:
             print(f'skel: {skeleton}')
-            color = '#fff'  # color_cb(skeleton)
+            color = color_cb(skeleton)
+            print(f'{color=}')
             draw_symbol(grid, skel=skeleton, color=color)
         grid.finalize()
         return grid
