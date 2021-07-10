@@ -113,3 +113,7 @@ class Skeleton(models.Model):
     x = models.IntegerField()
     y = models.IntegerField()
     color = ColorField()
+
+    def __str__(self):
+        cls_name = self.__class__.__name__
+        return f"<{cls_name} pos={self.position} {self.color}>"
