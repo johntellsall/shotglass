@@ -31,14 +31,15 @@ show:
 	./manage.py show flask
 
 # demo: index show
-
+SQL_LINE:=$(SQL) '.mode line'
 stats:
 	@echo "FLASK FILES"
 	$(SQL) 'select count(*) from app_sourcefile where project="flask"'
 	@echo "FLASK SOURCE-FILE"
-	$(SQL) '.mode line' 'select * from app_sourcefile where project="flask" limit 3'
-	$(SQL) '.mode line' \
-	'select * from app_skeleton limit 1'
+	$(SQL_LINE) 'select * from app_sourcefile where project="flask" limit 1'
+	@echo 'FLASK SKELETON (after render)'
+	$(SQL_LINE) 'select * from app_skeleton limit 1'
+	$(SQL_LINE) 'select count(*) from app_skeleton'
 # skeletons = models.Skeleton.objects.filter
 # (symbol__source_file__project=project)
 # sqlite3 db.sqlite3 <<EOSQL

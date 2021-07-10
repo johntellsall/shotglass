@@ -108,9 +108,12 @@ def draw_symbol(grid, skel, color):
     """
     draw single symbol into grid (image)
     """
-    length = skel.sourceline.length
-    if length < 1:
-        return
+    if False: # TODO update
+        length = skel.sourceline.length
+        if length < 1:
+            return
+    else:
+        length = 3
     # draw white "grain of rice" at start of symbol
     pos = skel.position
     grid.moveto(get_xy(pos))
@@ -160,7 +163,7 @@ class DrawStyle(object):
 
         for skeleton in skeletons:
             print(skeleton)
-            color = '#fff' # color_cb(skeleton)
+            color = '#fff'  # color_cb(skeleton)
             draw_symbol(grid, skel=skeleton, color=color)
         grid.finalize()
         return grid
