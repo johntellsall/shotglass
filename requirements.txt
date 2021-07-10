@@ -36,7 +36,7 @@ pluggy==0.6.0
 prompt-toolkit==1.0.15
 ptyprocess==0.5.2
 py==1.5.3
-Pygments==2.2.0
+Pygments==2.7.4
 pylint==1.8.3
 pylint-django==0.9.4
 pylint-plugin-utils==0.2.6
