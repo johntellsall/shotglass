@@ -42,9 +42,8 @@ def make_skeleton(symbols):
     skeleton = calc_sym_position(symbols)
     for num, (pos, symbol) in enumerate(skeleton):
         x, y = get_xy(pos)
-        print(f'position={pos}, x={x}, y={y}, {symbol=}')
-        if num > 5:
-            break
+        if num <= 5:
+            print(f'position={pos}, x={x}, y={y}, {symbol=}')
 
         yield Skeleton(position=pos, x=x, y=y, symbol=symbol)
 

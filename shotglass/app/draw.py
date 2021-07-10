@@ -113,6 +113,9 @@ def draw_symbol(grid, skel, color):
 
 # X BUG: doesn't account for symbol length
 def draw_box(grid, dsymbols, outline="white", fill=None):
+    """
+    draw box containing all given symbols
+    """
     try:
         upleft_x = min(dsym.x for dsym in dsymbols)
         upleft_y = min(dsym.y for dsym in dsymbols)
@@ -121,7 +124,7 @@ def draw_box(grid, dsymbols, outline="white", fill=None):
     except ValueError:
         logger.warning("empty box: no symbols")
         return
-    # 2? XX
+    # 2? XX TODO
     grid.im_draw.rectangle(
         [upleft_x * 2, upleft_y * 2, downright_x * 2, downright_y * 2],
         fill=fill,
@@ -152,11 +155,17 @@ class DrawStyle(object):
 
 
 class SimpleDraw(DrawStyle):
+    """
+    draw a pixel or several for each symbol
+    """
     def draw_diagram(self, grid, diagram):
         diagram.draw(grid)
 
 
 class BoundingBoxDraw(DrawStyle):
+    """
+    draw bounding box around each source file
+    """
     def draw_diagram(self, grid, diagram):
         for path in set(dsym.sourceline.path for dsym in diagram):
             syms = [dsym for dsym in diagram if dsym.sourceline.path == path]
