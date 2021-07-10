@@ -11,7 +11,7 @@ bokeh==0.12.14
 decorator==4.2.1
 Django>=1.11.19
 django-colorfield==0.1.14
-django-debug-toolbar==1.9.1
+django-debug-toolbar==1.11.1
 django-extensions==2.0.6
 ipdb==0.11
 ipython==6.2.1
