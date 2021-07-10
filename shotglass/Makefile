@@ -56,4 +56,4 @@ test-all:
 
 # sniff -- find stinky code not useful for commit
 sniff:
-	rg --vimgrep ipdb | egrep -v "Makefile:"
+	rg --vimgrep '(ipdb|breakpoint)' | egrep -v "Makefile:"

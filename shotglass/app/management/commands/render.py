@@ -20,16 +20,19 @@ def calc_sym_position(symbols):
     """
     calculate position of each symbol
     """
-    prev_path = None
+    # prev_path = None
     pos = 0
     for symbol in symbols:
         yield pos, symbol
         pos += 1
-        if symbol.path != prev_path:
-            if prev_path:
-                pos += 2  # add black smudge
-            prev_path = symbol.path
-        pos += symbol.length - 1
+        # if symbol.path != prev_path:
+        #     if prev_path:
+        #         pos += 2  # add black smudge
+        #     prev_path = symbol.path
+        if False: # TODO re-add symbol length support
+            pos += symbol.length - 1
+        else:
+            pos += 3
 
 
 def make_skeleton(symbols):
@@ -37,10 +40,14 @@ def make_skeleton(symbols):
     make skeleton, annotate X,Y position of each symbol
     """
     skeleton = calc_sym_position(symbols)
-    breakpoint()
-    for pos, symbol in skeleton:
+    # breakpoint()
+    for num, (pos, symbol) in enumerate(skeleton):
         x, y = get_xy(pos)
-        yield Skeleton(position=pos, x=x, y=y, sourceline=symbol)
+        print(f'position={pos}, x={x}, y={y}, {symbol=}')
+        if num > 5:
+            break
+
+        # yield Skeleton(position=pos, x=x, y=y, sourceline=symbol)
 
 
 # pylint: disable=no-member
@@ -73,3 +80,4 @@ class Command(BaseCommand):
             print(f'{args=}')
             print(f'{options=}')
             print(f'{project}: {num_symbols} symbols')
+            render(proj_symbols)
