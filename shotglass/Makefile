@@ -90,3 +90,7 @@ test-ctags:
 	@echo
 	@echo JSON FIELDS
 	ctags --output-format=json --list-fields
+
+# management commands
+test2:
+	pytest -vv --pyargs app/management/commands

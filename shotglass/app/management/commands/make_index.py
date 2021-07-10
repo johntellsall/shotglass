@@ -6,6 +6,7 @@ make_index -- compile data from tree of source files
 
 from __future__ import print_function
 
+import json
 import logging
 import os
 import re
@@ -81,14 +82,18 @@ def count_lines(project_dir, paths):
 # 'class:TaggedJSONSerializer', 'access': 'public', 'signature': '(self,
 # value)', 'roles': 'def', 'end': '298'}
 
-CTAGS_COMMAND = ["ctags", "--fields=*-P", "--extras=*", "-f", "-",
-"--output-format=json"]
+CTAGS_COMMAND = [
+    "ctags", "--fields=*-P",
+    "--extras=*", "-f", "-",
+    "--output-format=json"]
+
 
 def get_ctags_info(path):
     cmd = CTAGS_COMMAND + [path]
     lines = subprocess.check_output(cmd, text=True).split("\n")
-    return lines
-    
+    return [json.loads(line) for line in filter(None, lines)]
+
+
 def get_symbols(file_obj, path):
     def parse_addr(symaddr):
         keyvals = symaddr.split(';"', 1)[-1].split("\t")
