@@ -153,7 +153,8 @@ def gray_decode_travel(start, end, mask, g):
     return gray_decode((rg | int(rg / modulus)) & mask)
 
 
-# child_start_end( parent_start, parent_end, mask, i ) -- Get start & end for child.
+# child_start_end( parent_start, parent_end, mask, i )
+# e -- Get start & end for child.
 #    i is the parent's step number, between 0 and mask.
 #    Say that parent( i ) =
 #           gray_encode_travel( parent_start, parent_end, mask, i ).

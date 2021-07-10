@@ -21,7 +21,6 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "app",
     "django_extensions",
-    # 'debug_toolbar',
 )
 
 MIDDLEWARE = [
@@ -84,12 +83,6 @@ DATABASES = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     },
-    # 'postgres': {
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': 'shotglass',
-    #     'USER': 'shotglass',
-    #     'PASSWORD': 'beer',
-    # }
 }
 
 if "test" in sys.argv:
@@ -107,7 +100,7 @@ LOGGING = {
     "disable_existing_loggers": True,
     "formatters": {
         "verbose": {
-            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"
+            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"  # noqa: E501
         },
         "simple": {"format": "%(asctime)s %(levelname)s %(message)s"},
     },

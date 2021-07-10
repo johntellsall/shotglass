@@ -20,7 +20,8 @@ logger = logging.getLogger(__name__)
 
 # X RGB values are off by one
 def color_hsl_hex(hue, saturation, lightness):
-    r, g, b = colorsys.hls_to_rgb(hue / 99.0, lightness / 99.0, saturation / 99.0)
+    hsl = hue / 99.0, lightness / 99.0, saturation / 99.0
+    r, g, b = colorsys.hls_to_rgb(*hsl)
     return "#%02x%02x%02x" % (int(r * 255), int(g * 255), int(b * 255))
 
 
@@ -46,6 +47,9 @@ class Theme(object):
 
 
 class ThemeRainbow(Theme):
+    """
+    draw symbols in color with different saturation
+    """
     def __init__(self):
         self.hue_iter = make_step_iter(50, 360)
         self.saturation_iter = itertools.cycle([30, 60, 80])
@@ -100,6 +104,9 @@ class ThemeComplexity(Theme):
 
 
 def draw_symbol(grid, skel, color):
+    """
+    draw single symbol into grid (image)
+    """
     length = skel.sourceline.length
     if length < 1:
         return

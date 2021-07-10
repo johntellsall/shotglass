@@ -26,16 +26,16 @@ tags = [
     if tag.name.startswith("v") and not bad_tag_re.search(tag.name)
 ]
 tags = natsorted(tags)
-print tags
+print(tags)
 
 checkout_cmd = "cd {dir} ; git checkout {tag}"
 index_cmd = "./manage.py make_index --project={name}-{tag} {dir}"
 for tag in tags:
     cmd = checkout_cmd.format(dir=PROJ_DIR, tag=tag)
-    print ">>>", cmd
+    print(">>>", cmd)
     if subprocess.call(cmd, shell=True):
         sys.exit(0)
     cmd = index_cmd.format(dir=PROJ_DIR, name=PROJECT, tag=tag)
-    print ">>>", cmd
+    print(">>>", cmd)
     out = subprocess.check_output(cmd, shell=True)
-    print out
+    print(out)

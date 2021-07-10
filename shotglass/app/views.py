@@ -1,4 +1,4 @@
-# import StringIO
+from io import StringIO
 
 from django import shortcuts
 
@@ -11,7 +11,7 @@ from app.models import SourceLine
 
 def list_projects(request):
     projects = SourceLine.projects()
-    return shortcuts.render(request, "list_projects.html", {"projects": projects})
+    return shortcuts.render(request, "list_projects.html", {"projects": projects})  # noqa: E501
 
 
 def list_symbols(request, project):
@@ -32,15 +32,16 @@ def list_symbols(request, project):
     )
 
 
-# TODO: probably broken!
+# TODO: broken!
 def render(request, project):
     app.render.render(project)  # XX
-    return shortcuts.redirect(
-        "{}?{}".format(
-            urlresolvers.reverse("draw", kwargs={"project": project}),
-            request.META["QUERY_STRING"],
-        )
-    )
+    # return shortcuts.redirect(
+    #     "{}?{}".format(
+    #         urlresolvers.reverse("draw", kwargs={"project": project}),
+    #         request.META["QUERY_STRING"],
+    #     )
+    # )
+
 
 # TODO: probably broken!
 def draw(request, project):  # XX
@@ -48,7 +49,7 @@ def draw(request, project):  # XX
     draw rendered project into an image
     """
     zoom = float(request.GET.get("zoom", 0.0))
-    style = request.GET.get("style")
+    # style = request.GET.get("style")
 
     draw_class = app.draw.SimpleDraw
     # shotglass_render.DRAW_STYLES.get(
@@ -67,13 +68,15 @@ def draw(request, project):  # XX
     return HttpResponse(content=output, content_type="image/png")
 
 
+# TODO: broken!
 def index_symbols(request, project):  # X
+    pass
     # pylint: disable=no-member
-    symbols = (
-        DiagramSymbol.objects.exclude(sourceline__name__startswith="_")
-        .exclude(sourceline__kind__in=["variable"])
-        .order_by("sourceline__name")
-    )
-    return shortcuts.render(
-        request, "index_symbols.html", dict(project=project, symbols=symbols)
-    )
+    # symbols = (
+    #     DiagramSymbol.objects.exclude(sourceline__name__startswith="_")
+    #     .exclude(sourceline__kind__in=["variable"])
+    #     .order_by("sourceline__name")
+    # )
+    # return shortcuts.render(
+    #     request, "index_symbols.html", dict(project=project, symbols=symbols)
+    # )

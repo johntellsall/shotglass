@@ -1,5 +1,8 @@
 all:
 
+lint:
+	flake8 --exclude=app/management/commands,app/migrations,app/tests
+
 update-packages:
 	pip3 list --outdated --format=freeze | \
 	grep -v '^\-e' | cut -d = -f 1 | \

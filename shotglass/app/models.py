@@ -11,6 +11,7 @@ class SourceFile(models.Model):
     """
     file containing source code -- symbols
     """
+
     project = models.CharField(max_length=200, **nullable)
     name = models.CharField(max_length=200)
     path = models.CharField(max_length=200)
@@ -44,7 +45,7 @@ class Symbol(models.Model):
 
     def __repr__(self):
         cname = self.__class__.__name__
-        return f'<{cname}: {self.label} line={self.line_number}>'
+        return f"<{cname}: {self.label} line={self.line_number}>"
 
 
 # DEPRECATED:
@@ -65,9 +66,8 @@ class SourceLine(models.Model):
     @classmethod
     def projects(cls):
         # pylint: disable=no-member
-        projects = (
-            cls.objects.values("project").distinct().values_list("project", flat=True)
-        )
+        projects = cls.objects.values("project").distinct()
+        projects = projects.values_list("project", flat=True)
         return sorted(filter(None, projects))
 
     @classmethod
@@ -80,7 +80,7 @@ class SourceLine(models.Model):
 
 # TODO: flesh out/remove
 class ProgRadon(models.Model):
-    sourceline = models.OneToOneField(SourceLine, on_delete=models.CASCADE, **nullable)
+    sourceline = models.OneToOneField(SourceLine, on_delete=models.CASCADE, **nullable)  # noqa: E501
 
     kind = models.CharField(max_length=1)
     complexity = models.IntegerField()
@@ -88,7 +88,7 @@ class ProgRadon(models.Model):
 
 # TODO: flesh out/remove
 class ProgPmccabe(models.Model):
-    sourceline = models.OneToOneField(SourceLine, on_delete=models.CASCADE, **nullable)
+    sourceline = models.OneToOneField(SourceLine, on_delete=models.CASCADE, **nullable)  # noqa: E501
 
     modified_mccabe = models.IntegerField()
     mccabe = models.IntegerField()
@@ -102,6 +102,7 @@ class Skeleton(models.Model):
     """
     rendering of a symbol: position and color
     """
+
     symbol = models.ForeignKey(Symbol, on_delete=models.CASCADE, **nullable)
 
     position = models.IntegerField()

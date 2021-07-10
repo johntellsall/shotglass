@@ -27,10 +27,10 @@ checkout_cmd = "cd {name} ; git checkout {tag}"
 index_cmd = "./manage.py make_index --project={name}-{tag} {name}"
 for tag in tags:
     cmd = checkout_cmd.format(name=NAME, tag=tag)
-    print ">>>", cmd
+    print(">>>", cmd)
     if subprocess.call(cmd, shell=True):
         sys.exit(0)
     cmd = index_cmd.format(name=NAME, tag=tag)
-    print ">>>", cmd
+    print(">>>", cmd)
     out = subprocess.check_output(cmd, shell=True)
-    print out
+    print(out)
