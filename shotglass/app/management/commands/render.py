@@ -40,14 +40,13 @@ def make_skeleton(symbols):
     make skeleton, annotate X,Y position of each symbol
     """
     skeleton = calc_sym_position(symbols)
-    # breakpoint()
     for num, (pos, symbol) in enumerate(skeleton):
         x, y = get_xy(pos)
         print(f'position={pos}, x={x}, y={y}, {symbol=}')
         if num > 5:
             break
 
-        # yield Skeleton(position=pos, x=x, y=y, sourceline=symbol)
+        yield Skeleton(position=pos, x=x, y=y, symbol=symbol)
 
 
 # pylint: disable=no-member
@@ -81,3 +80,7 @@ class Command(BaseCommand):
             print(f'{options=}')
             print(f'{project}: {num_symbols} symbols')
             render(proj_symbols)
+
+            count = Skeleton.objects.count()
+            print(f"Skeleton: {count=}")
+

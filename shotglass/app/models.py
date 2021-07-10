@@ -8,12 +8,16 @@ nullable = {"blank": True, "null": True}
 
 
 class SourceFile(models.Model):
+    """
+    file containing source code -- symbols
+    """
     project = models.CharField(max_length=200, **nullable)
     name = models.CharField(max_length=200)
     path = models.CharField(max_length=200)
     language = models.CharField(max_length=12)
     num_lines = models.IntegerField()
 
+    # TODO: flesh out/remove
     @classmethod
     def projects(cls):
         # pylint: disable=no-member
@@ -30,7 +34,7 @@ class SourceFile(models.Model):
 # 'access': 'private', 'file': '', 'signature': '(x, y)',
 # 'scope': 'function:TestRoutes.invoke.create_app', 'line': '383'}
 
-
+# REPLACEMENT for SourceLine
 class Symbol(models.Model):
     source_file = models.ForeignKey(SourceFile, on_delete=models.CASCADE)
     label = models.CharField(max_length=200)
@@ -74,6 +78,7 @@ class SourceLine(models.Model):
         return source.values("path").distinct().values_list("path", flat=True)
 
 
+# TODO: flesh out/remove
 class ProgRadon(models.Model):
     sourceline = models.OneToOneField(SourceLine, on_delete=models.CASCADE, **nullable)
 
@@ -81,6 +86,7 @@ class ProgRadon(models.Model):
     complexity = models.IntegerField()
 
 
+# TODO: flesh out/remove
 class ProgPmccabe(models.Model):
     sourceline = models.OneToOneField(SourceLine, on_delete=models.CASCADE, **nullable)
 
@@ -93,7 +99,10 @@ class ProgPmccabe(models.Model):
 
 
 class Skeleton(models.Model):
-    sourceline = models.ForeignKey(SourceLine, on_delete=models.CASCADE, **nullable)
+    """
+    rendering of a symbol: position and color
+    """
+    symbol = models.ForeignKey(Symbol, on_delete=models.CASCADE, **nullable)
 
     position = models.IntegerField()
     x = models.IntegerField()
