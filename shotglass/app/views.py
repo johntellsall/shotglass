@@ -32,10 +32,8 @@ def list_symbols(request, project):
     )
 
 
+# TODO: probably broken!
 def render(request, project):
-    import ipdb
-
-    ipdb.set_trace()
     app.render.render(project)  # XX
     return shortcuts.redirect(
         "{}?{}".format(
@@ -44,7 +42,7 @@ def render(request, project):
         )
     )
 
-
+# TODO: probably broken!
 def draw(request, project):  # XX
     """
     draw rendered project into an image

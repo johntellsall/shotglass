@@ -53,3 +53,7 @@ test-all:
 # app/tests/test_sizeplot.py
 # app/tests/test_spider.py
 # app/tests/test_views.py
+
+# sniff -- find stinky code not useful for commit
+sniff:
+	rg --vimgrep ipdb | egrep -v "Makefile:"
