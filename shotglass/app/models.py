@@ -38,6 +38,10 @@ class Symbol(models.Model):
     # kind = models.CharField(max_length=12)
     # length = models.IntegerField()
 
+    def __repr__(self):
+        cname = self.__class__.__name__
+        return f'<{cname}: {self.label} line={self.line_number}>'
+
 
 # DEPRECATED:
 class SourceLine(models.Model):
