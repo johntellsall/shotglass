@@ -48,7 +48,7 @@ def render(symbols):
     """
     render skeleton, store in database
     """
-    Skeleton.objects.all().delete() # XX
+    Skeleton.objects.all().delete()  # XX
     skel = make_skeleton(symbols)
     Skeleton.objects.bulk_create(skel)
 
@@ -70,6 +70,6 @@ class Command(BaseCommand):
             proj_symbols = Symbol.objects.filter(source_file__project=project)
             num_symbols = proj_symbols.count()
             print('render')
-            print(f'{args=}') 
+            print(f'{args=}')
             print(f'{options=}')
             print(f'{project}: {num_symbols} symbols')
