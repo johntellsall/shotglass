@@ -29,6 +29,13 @@ show:
 
 # demo: index show
 
+stats:
+	@echo "FLASK FILES"
+	sqlite3 db.sqlite3 'select count(*) from app_sourcefile where project="flask"'
+# sqlite3 db.sqlite3 <<EOSQL
+# select count(*) from app_symbol
+# EOSQL
+	
 # show Django checks, e.g. auto field
 check:
 	python -Wa manage.py test
@@ -37,8 +44,10 @@ demo2:
 	./manage.py make_index ../SOURCE/flask/
 	
 	# pyflakes app/management/commands/render.py
-demo: lint
-	./manage.py render flask
+# demo: lint
+demo:
+	echo ./manage.py render flask
+	./manage.py draw flask
 
 test-most:
 	ls -1 app/tests/*.py | egrep -v '_(age.py|sg2.py|sizeplot.py)$$' \

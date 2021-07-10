@@ -151,9 +151,10 @@ class DrawStyle(object):
         grid = ImageGrid.FromProject(project)
         mytheme = theme or Theme()
         color_cb = mytheme.calc_sym_color
-        skeletons = models.Skeleton.objects.filter(
-            sourceline__project=project
-        ).order_by("sourceline__path", "sourceline__name")
+        skeletons = models.Skeleton.objects.filter(symbol__source_file__project=project)
+        skeletons = skeletons.order_by(
+            "symbol__source_file__path", "symbol__source_file__name"
+        )
 
         for skeleton in skeletons:
             color = color_cb(skeleton)

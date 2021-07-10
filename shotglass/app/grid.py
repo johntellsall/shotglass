@@ -1,4 +1,5 @@
 import math
+import sys
 
 from django.db.models import Sum
 from PIL import Image, ImageDraw
@@ -7,12 +8,13 @@ from app.models import SourceLine
 
 
 def calc_width(project):
+    # breakpoint()
+    return 100 # TODO XXXXXX
     lines_total = SourceLine.objects.filter(  # pylint: disable=no-member
         project=project
     ).aggregate(Sum("length"))["length__sum"]
     if not lines_total:
-        print("WARNING: {} is empty".format(project))
-        return 0
+        sys.exit(f"WARNING: {project} is empty")
     return int(math.sqrt(lines_total) + 1)
 
 
