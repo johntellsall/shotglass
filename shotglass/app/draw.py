@@ -108,12 +108,10 @@ def draw_symbol(grid, skel, color):
     """
     draw single symbol into grid (image)
     """
-    if True:  # TODO update
-        length = skel.sourceline.length
-        if length < 1:
-            return
-    else:
-        length = 3
+    length = skel.symbol.length
+    print(f'{length=}')
+    if length < 1:
+        return
     # draw white "grain of rice" at start of symbol
     pos = skel.position
     grid.moveto(get_xy(pos))

@@ -104,7 +104,7 @@ class ProgPmccabe(models.Model):
 
 class Skeleton(models.Model):
     """
-    rendering of a symbol: position and color
+    rendering of a symbol: position
     """
 
     symbol = models.ForeignKey(Symbol, on_delete=models.CASCADE, **nullable)

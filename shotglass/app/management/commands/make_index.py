@@ -112,7 +112,7 @@ def get_symbols(file_obj, path):
                 source_file=file_obj,
                 label=item['name'],
                 line_number=item["line"],
-                length = 1
+                length=item['end'] - item["line"] + 1,
             )
         except KeyError:
             print(f'?: {item}')
