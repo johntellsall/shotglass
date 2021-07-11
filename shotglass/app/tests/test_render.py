@@ -14,7 +14,7 @@ def is_subset(d1, obj):
     return set(d1.items()).issubset(set(d2.items()))
 
 
-# @pytest.mark.skip("OLD")
+@pytest.mark.skip("OLD: uses SourceLine")
 @pytest.mark.django_db
 def test_make_skeleton():
     symbols = [

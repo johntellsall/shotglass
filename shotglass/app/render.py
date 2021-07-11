@@ -5,8 +5,6 @@ app/render.py
 
 import logging
 
-# from django.core.management.base import BaseCommand
-
 from app import hilbert
 from app.models import Skeleton
 
@@ -40,7 +38,7 @@ def make_skeleton(symbols):
     skeleton = calc_sym_position(symbols)
     for pos, symbol in skeleton:
         x, y = get_xy(pos)  # pylint: disable=invalid-name
-        yield Skeleton(position=pos, x=x, y=y, sourceline=symbol)
+        yield Skeleton(position=pos, x=x, y=y, symbol=symbol)
 
 
 # # pylint: disable=no-member

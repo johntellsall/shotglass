@@ -68,10 +68,8 @@ test-most:
 
 test-all:
 	pytest --cov=app app/tests/
-
-# management commands
-test-cmds:
-	pytest -vv --pyargs app/management/commands
+test-all-nocov:
+	pytest app/tests/
 # app/tests/test_age.py
 # app/tests/test_draw.py
 # app/tests/test_perf.py
@@ -80,6 +78,10 @@ test-cmds:
 # app/tests/test_sizeplot.py
 # app/tests/test_spider.py
 # app/tests/test_views.py
+
+# management commands
+test-cmds:
+	pytest -vv --pyargs app/management/commands
 
 # sniff -- find stinky code not useful for commit
 sniff:

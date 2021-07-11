@@ -62,8 +62,8 @@ class ThemeRainbow(Theme):
     def __init__(self):
         self.hue_iter = make_step_iter(50, 360)
         self.saturation_iter = itertools.cycle([30, 60, 80])
-        self.highlight_iter = itertools.cycle([40, 60])
-        self.hue_sat_highlight = 0, 0, 40
+        self.lightness_iter = itertools.cycle([40, 60])
+        self.hue_sat_lightness = 0, 0, 40
 
     def calc_sym_color(self, symbol):
         # prev_arg = None
@@ -73,11 +73,11 @@ class ThemeRainbow(Theme):
         # if prev_arg != arg:
         #     hue = hue_iter.next()
         #     prev_arg = arg
-        #     highlight = highlight_iter.next() # X?
+        #     lightness = lightness_iter.next() # X?
         # alternate symbols: different saturation
-        hue, _, highlight = self.hue_sat_highlight
+        hue, _, lightness = self.hue_sat_lightness
         saturation = next(self.saturation_iter)
-        return color_hsl_hex(hue, saturation, highlight)
+        return color_hsl_hex(hue, saturation, lightness)
 
 
 class ThemeComplexity(Theme):

@@ -14,6 +14,7 @@ class TestDraw(TestCase):
         )
         models.Skeleton.objects.update(sourceline=stub)
 
+    @pytest.mark.skip("OLD: uses SourceLine")
     def test_simple(self):
         grid = draw.SimpleDraw().draw(None)
         assert grid.last == (0, 2)
@@ -21,6 +22,7 @@ class TestDraw(TestCase):
         assert grid.width == 8
 
 
+@pytest.mark.skip("OLD: uses SourceLine")
 def test_add_color():
     diagram = [(0, "x", 1), (1, "y", 2)]
     assert list(draw.pal_add_color(diagram)) == [
