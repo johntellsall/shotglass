@@ -19,6 +19,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         themeClass = draw.ThemeRainbow
+        themeClass = draw.ThemeZebra
         for project in self.get_projects(options["projects"]):
             print("***", project)
             grid = draw.SimpleDraw().draw(project, theme=themeClass())

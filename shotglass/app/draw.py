@@ -46,6 +46,14 @@ class Theme(object):
         return "gray"
 
 
+class ThemeZebra(Theme):
+    def __init__(self):
+        self.color_iter = itertools.cycle(['#66c', '#fff'])
+
+    def calc_sym_color(self, symbol):
+        return next(self.color_iter)
+
+
 class ThemeRainbow(Theme):
     """
     draw symbols in color with different saturation
