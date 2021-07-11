@@ -115,26 +115,9 @@ def get_symbols(file_obj, path):
                 length=item['end'] - item["line"] + 1,
             )
         except KeyError:
-            print(f'?: {item}')
-
-    # def parse_addr(symaddr):
-    #     keyvals = symaddr.split(';"', 1)[-1].split("\t")
-    #     keyvals.pop(0)
-    #     return dict(item.split(":", 1) for item in keyvals)
-
-    # cmd = CTAGS_COMMAND + [path]
-    # lines = subprocess.check_output(cmd, text=True).split("\n")
-    # for line in filter(None, lines):
-    #     try:
-    #         tagname, _, tagaddr = line.split("\t", 2)
-    #     except ValueError:
-    #         sys.exit(f"Unknown line: {line}")
-    #     info = parse_addr(tagaddr)
-    #     yield Symbol(
-    #         source_file=file_obj,
-    #         label=tagname,
-    #         line_number=info.get("line"),
-    #     )
+            # TODO: ensure we're not missing good stuff
+            # TODO: ensure non-Python emits everything
+            pass
 
 
 def index_files(project, project_dir, paths):
