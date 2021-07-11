@@ -9,6 +9,9 @@ from app.models import SourceFile, Symbol
 
 
 def show_file_index(projects):
+    """
+    for each file, show its name, path, and number of lines
+    """
     FORMAT = "{name:20} {path:50} {num_lines:>5}"
     print(FORMAT.format(name="NAME", path="PATH", num_lines="LINES"))
     for project in projects:
@@ -38,9 +41,6 @@ def show_dir_index(projects):
 
 def show_symbol_index(projects):
     FORMAT = "{0:30} {1}:{2}"
-
-    def fun_symbol(sym):
-        return sym.name[0] != "_"
 
     for project in projects:
         # pylint: disable=no-member

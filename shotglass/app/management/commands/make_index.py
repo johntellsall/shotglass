@@ -26,7 +26,7 @@ LANGUAGE_TYPES = {
     ".h": "c",
     ".py": "python",
 }
-BORING_DIRS = (".pc",)  # TODO: make configurable
+BORING_DIRS = (".pc", 'tests', 'examples')  # TODO: make configurable
 
 logging.basicConfig(
     stream=sys.stderr,
