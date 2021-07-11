@@ -45,8 +45,8 @@ stats:
 check:
 	python -Wa manage.py test
 
-demo2:
-	./manage.py make_index ../SOURCE/flask/
+# demo2:
+# 	./manage.py make_index ../SOURCE/flask/
 
 nuke-reset-db:
 	-$(RM) db.sqlite3
@@ -54,6 +54,13 @@ nuke-reset-db:
 	
 # demo: lint
 demo:
+	./manage.py make_index ../SOURCE/flask
+	./manage.py render flask
+	./manage.py draw flask
+	convert flask_path.png -scale '300%'  zoot.png
+	$(IMAGE_CAT) zoot.png
+
+demo2:
 	./manage.py make_index ../SOURCE/flask
 	./manage.py render flask
 	./manage.py draw flask

@@ -20,19 +20,18 @@ def calc_sym_position(symbols):
     """
     calculate position of each symbol
     """
-    # prev_path = None
+    prev_path = None
     pos = 0
     for symbol in symbols:
         yield pos, symbol
         pos += 1
-        # if symbol.path != prev_path:
-        #     if prev_path:
-        #         pos += 2  # add black smudge
-        #     prev_path = symbol.path
-        if False:  # TODO re-add symbol length support
-            pos += symbol.length - 1
-        else:
-            pos += 3
+        new_path = symbol.source_file.path
+        if new_path != prev_path:
+            if prev_path:
+                print(f'{pos} {new_path}')
+                pos += 5  # add black smudge TODO ??
+            prev_path = new_path
+        pos += symbol.length - 1
 
 
 def make_skeleton(symbols):
