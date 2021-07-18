@@ -1,3 +1,6 @@
+"""
+draw: plot codebase into an image
+"""
 # pylint: disable=no-member
 
 from django.core.management.base import BaseCommand
@@ -7,7 +10,7 @@ from app.models import SourceLine
 
 
 class Command(BaseCommand):
-    help = "beer"
+    help = __doc__
 
     def add_arguments(self, parser):
         parser.add_argument("projects", nargs="+")

@@ -3,6 +3,7 @@
 import colorsys
 import itertools
 import logging
+from pathlib import Path
 
 from palettable import colorbrewer
 from radon.complexity import cc_rank
@@ -45,13 +46,42 @@ class Theme(object):
     def calc_sym_color(self, symbol):
         return "gray"
 
+# TODO provide "next symbol" vs "next file" vs "next directory"
+# Observer pattern?
 
 class ThemeZebra(Theme):
+    """
+    alternate between dark blue and white; by file
+    """
     def __init__(self):
         self.color_iter = itertools.cycle(['#66c', '#fff'])
+        self.prev_group = None
+        self.color = None
 
-    def calc_sym_color(self, symbol):
-        return next(self.color_iter)
+    def calc_sym_color(self, skel):
+        # if skel.symbol.source_file == self.prev_group:
+        #     return self.color
+        # self.prev_group = skel.symbol.source_file
+        value = Path(skel.symbol.source_file.path).parent  # directory
+        if value == self.prev_group:
+            return self.color
+        print(f'VALUE: {value}')
+        self.prev_group = value
+        self.color = next(self.color_iter)
+        return self.color
+
+
+def get_skel_directory(skel):
+    return Path(skel.symbol.source_file.path).parent
+
+
+def is_diff_directory(skel):
+    prev_value = None
+    value = Path(skel.symbol.source_file.path).parent
+    if value == prev_value:
+        return False
+    prev_value = value
+    return True
 
 
 class ThemeRainbow(Theme):

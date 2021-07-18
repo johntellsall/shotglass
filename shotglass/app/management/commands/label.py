@@ -17,7 +17,7 @@ from app.models import SourceLine
 
 BLACK = (0, 0, 0)
 CMAP_OBJ = colorbrewer.qualitative.Set3_12
-CMAP_COLORS = map(tuple, CMAP_OBJ.colors)
+CMAP_COLORS = list(map(tuple, CMAP_OBJ.colors))
 
 COL_WIDTH, COL_HEIGHT = 100, 2000
 COL_GAP = 10
@@ -26,9 +26,9 @@ COL_GAP = 10
 def serpentine_iter(width):
     y = 0
     while True:
-        for x in xrange(width):
+        for x in range(width):
             yield x, y
-        for x in xrange(width):
+        for x in range(width):
             yield width - x - 1, y + 1
         y += 2
 
@@ -48,13 +48,13 @@ def render_funcs(funcs, color_gen):
         if name[0] != first_ch:
             new_label = True
             first_ch = name[0]
-            print func.name
+            print(func.name)
         if new_label:
-            new_labels.append([func, image_iter.next()])
+            new_labels.append([func, next(image_iter)])
         color = color_gen()
-        for _ in xrange(func.length):
-            im_pixel[image_iter.next()] = color
-    print new_labels
+        for _ in range(func.length):
+            im_pixel[next(image_iter)] = color
+    print(new_labels)
     for func, label_pos in new_labels:
         x, y = label_pos
         rect = [x - 1, y - 1, x + 2, y + 2]
@@ -75,11 +75,11 @@ def render_paths(funcs, color_gen):
         if func.path != prev_path:
             prev_path = func.path
             color = color_gen()
-            x, y = image_iter.next()
+            x, y = next(image_iter)
             rect = [x - 1, y - 1, x + 2, y + 2]
             im_draw.rectangle(rect, fill="black")
-        for _ in xrange(func.length):
-            im_pixel[image_iter.next()] = color
+        for _ in range(func.length):
+            im_pixel[next(image_iter)] = color
     return im
 
 
@@ -95,18 +95,18 @@ class Command(BaseCommand):
 
         for project in options["projects"]:
             p = SourceLine.objects.filter(project=project)
-            print project
-            print "all:", p.count()
+            print(project)
+            print("all:", p.count())
             funcs = p.exclude(path__startswith="tests/").exclude(
                 path__startswith="examples/"
             )
-            print "no tests:", funcs.count()
+            print("no tests:", funcs.count())
 
             if 0:
                 funcs = funcs.order_by("name")
-                img = render_funcs(funcs, color_iter.next)
+                img = render_funcs(funcs, color_iter.__next__)
             else:
                 funcs = funcs.order_by("path")
-                img = render_paths(funcs, color_iter.next)
+                img = render_paths(funcs, color_iter.__next__)
 
             img.save("{}.png".format(project))
