@@ -6,18 +6,15 @@ pack --
 
 import json
 import logging
-import operator
 import math
 import os
 import sys
 
-import django.db
 import rectpack
-from bokeh.plotting import figure, output_file
+from bokeh.plotting import figure, output_file, show
 from django.core.management.base import BaseCommand
 
 from app.models import SourceFile
-from app import render
 
 
 logging.basicConfig(
@@ -34,21 +31,13 @@ def box_dimensions(lines):
     return [dim, dim]
 
 
-# (b, x, y, w, h, rid)
-
-
 def render(rectangles):
-    # import ipdb ; ipdb.set_trace()
-    # colormap = {'setosa': 'red', 'versicolor': 'green', 'virginica': 'blue'}
-    # colors = [colormap[x] for x in flowers['species']]
-
     p = figure(title="Beer Morphology")
     p.xaxis.axis_label = "Petal Length"
     p.yaxis.axis_label = "Petal Width"
 
-    for (_, x, y, w, h, path) in rectangles:
+    for (_, x, y, w, h, _) in rectangles:
         p.rect(x, y, width=w, height=h)
-        # color=colors, fill_alpha=0.2, size=10)
 
     output_file("zoot.html", title="example")
 
@@ -85,8 +74,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("projects", nargs="+")
-        # parser.add_argument('--project')
-        # # parser.add_argument('--tags')
 
     def handle(self, *args, **options):
         projects = options["projects"]
