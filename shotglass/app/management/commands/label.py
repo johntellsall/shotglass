@@ -1,6 +1,8 @@
 """
 label.py -- 
 """
+# XXXXX BROKEN
+
 # pylint: disable=W0640
 
 # list files in Git branch
@@ -48,7 +50,7 @@ def render_funcs(funcs, color_gen):
         if name[0] != first_ch:
             new_label = True
             first_ch = name[0]
-            print(func.name)
+            print(name)
         if new_label:
             new_labels.append([func, next(image_iter)])
         color = color_gen()
@@ -91,9 +93,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         color_iter = itertools.cycle(CMAP_COLORS + list(reversed(CMAP_COLORS)))
-        # color_iter = itertools.cycle(CMAP_COLORS)
 
         for project in options["projects"]:
+            breakpoint()
             p = SourceLine.objects.filter(project=project)
             print(project)
             print("all:", p.count())
