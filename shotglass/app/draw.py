@@ -147,9 +147,9 @@ def draw_symbol(grid, skel, color):
     draw single symbol into grid (image)
     """
     length = skel.symbol.length
-    # print(f'{length=}')
     if length < 1:
         return
+    print(f'{skel=}')
     # draw white "grain of rice" at start of symbol
     pos = skel.position
     grid.moveto(get_xy(pos))
@@ -184,7 +184,7 @@ class DrawStyle(object):
     draw rendered project onto a grid (image)
     """
 
-    draw_diagram = NotImplementedError
+    # draw_diagram = NotImplementedError
 
     def draw(self, project, theme=None):
         grid = ImageGrid.FromProject(project)
@@ -209,19 +209,21 @@ class SimpleDraw(DrawStyle):
     draw a pixel or several for each symbol
     """
 
-    def draw_diagram(self, grid, diagram):
-        diagram.draw(grid)
+    # def draw_diagram(self, grid, diagram):
+    #     diagram.draw(grid)
 
 
-class BoundingBoxDraw(DrawStyle):
-    """
-    draw bounding box around each source file
-    """
+# class BoundingBoxDraw(DrawStyle):
+#     """
+#     draw bounding box around each source file
+#     """
 
-    def draw_diagram(self, grid, diagram):
-        for path in set(dsym.sourceline.path for dsym in diagram):
-            syms = [dsym for dsym in diagram if dsym.sourceline.path == path]
-            draw_box(grid, syms, fill=syms[0].color)
+#     def draw_diagram(self, grid, diagram):
+#         BLAM
+#         for path in set(dsym.sourceline.path for dsym in diagram):
+#             syms = [dsym for dsym in diagram if dsym.sourceline.path == path]
+#             draw_box(grid, syms, fill=syms[0].color)
 
 
-DRAW_STYLES = {"boundingbox": BoundingBoxDraw, "simple": SimpleDraw}
+# DRAW_STYLES = {"boundingbox": BoundingBoxDraw, "simple": SimpleDraw}
+DRAW_STYLES = {"simple": SimpleDraw}

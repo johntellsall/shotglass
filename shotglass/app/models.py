@@ -114,6 +114,9 @@ class Skeleton(models.Model):
     y = models.IntegerField()
     color = ColorField()  # TODO deprecated
 
-    def __str__(self):
+    def __repr__(self):
         cls_name = self.__class__.__name__
-        return f"<{cls_name} pos={self.position}>"
+        label = self.symbol.label
+        return f"<{cls_name} pos={self.position} {label=}>"
+        # path = self.symbol.source_file.path
+        # return f"<{cls_name} pos={self.position} {label=} {path=}>"
