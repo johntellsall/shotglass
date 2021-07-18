@@ -13,6 +13,14 @@ class Command(BaseCommand):
     help = __doc__
 
     def add_arguments(self, parser):
+        parser.add_argument(
+            '--draw',
+            default='simple',
+            help='Set drawing style',
+        )
+        # DRAW_STYLES.keys()
+        #  = {"boundingbox": BoundingBoxDraw, "simple": SimpleDraw}
+
         parser.add_argument("projects", nargs="+")
 
     def get_projects(self, projects):
@@ -23,9 +31,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         themeClass = draw.ThemeRainbow
         themeClass = draw.ThemeZebra
+        drawClass = draw.DRAW_STYLES[options['draw']]
+        drawFunc = drawClass().draw
+
         for project in self.get_projects(options["projects"]):
             print("***", project)
-            grid = draw.SimpleDraw().draw(project, theme=themeClass())
+            print(f"- draw style: {options['draw']}")
+            # grid = draw.SimpleDraw().draw(project, theme=themeClass())
+            grid = drawFunc(project, theme=themeClass())
 
             depth = None
             argname = "path"

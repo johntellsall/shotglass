@@ -108,9 +108,7 @@ demo3:
 	./manage.py make_index ../SOURCE/flask ../SOURCE/requests
 	./manage.py show all
 
-demo4:
-	echo ./manage.py make_index ../SOURCE/flask
-	echo ./manage.py render flask
-	./manage.py draw flask
+demo-draw:
+	./manage.py draw --draw=simple flask
 	convert flask_path.png -scale '300%'  zoot.png
 	$(IMAGE_CAT) zoot.png
