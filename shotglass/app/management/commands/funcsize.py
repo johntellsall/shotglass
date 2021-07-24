@@ -1,6 +1,5 @@
 import itertools
 import operator
-import numpy as np
 
 import matplotlib.pyplot as plt
 from django.core.management.base import BaseCommand
@@ -15,7 +14,7 @@ class Command(BaseCommand):
         parser.add_argument("projects", nargs="+")
 
     def handle(self, *args, **options):
-        fs = 10  # fontsize
+        # fs = 10  # fontsize
 
         versions = (
             models.SourceLine.objects.filter(project__startswith="django-")

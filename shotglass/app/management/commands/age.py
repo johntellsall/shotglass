@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from django.core.management.base import BaseCommand
 from git import Repo
 from palettable import colorbrewer
-from PIL import Image, ImageDraw
+from PIL import Image
 
 
 BLACK = (0, 0, 0)

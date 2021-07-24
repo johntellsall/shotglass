@@ -1,9 +1,7 @@
-import sys
-
 import pygments.lexers
 from pygments.token import Name, Punctuation
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -11,7 +9,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("paths", nargs="+")
-        # parser.add_argument('--index', action="store_true")
 
     def handle(self, *args, **options):
         for path in options["paths"]:
@@ -23,5 +20,3 @@ class Command(BaseCommand):
                 elif tokentype is Punctuation and value == "(":
                     print("NAME", name)
                     name = None
-
-            # import ipdb ; ipdb.set_trace()

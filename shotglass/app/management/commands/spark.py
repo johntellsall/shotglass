@@ -9,12 +9,10 @@ sparklines -- XX
 import logging
 import sys
 
-import django.db
 import sparklines
 from django.core.management.base import BaseCommand
 
 from app.models import SourceFile
-from app import render
 
 
 logging.basicConfig(

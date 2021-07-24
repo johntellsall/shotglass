@@ -13,11 +13,7 @@ import logging
 # import subprocess
 import sys
 
-import django.db
 from django.core.management.base import BaseCommand
-
-from app.models import SourceFile
-from app import render
 
 
 logging.basicConfig(

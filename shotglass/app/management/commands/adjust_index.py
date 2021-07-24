@@ -1,7 +1,4 @@
-import sys
-
-# import ctags
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from app.models import SourceLine
 

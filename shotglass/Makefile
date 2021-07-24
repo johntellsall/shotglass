@@ -3,6 +3,9 @@ SQL:=sqlite3 db.sqlite3
 
 all:
 
+linger:
+	flake8 --max-line-length=100 app/management/commands
+
 lint:
 	black .
 	flake8 --exclude=app/management/commands,app/migrations,app/tests
