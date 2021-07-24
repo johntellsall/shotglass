@@ -255,6 +255,8 @@ def calc_indent(indent_str):
 
 
 def render_summary(repo, matchfunc, options):
+    # TODO BROKEN
+
     # def format_text(fis_func, findent, fline):
     #     if fis_func == "=":
     #         return findent + fline
@@ -297,6 +299,7 @@ def render_summary(repo, matchfunc, options):
             # code_color = (200, 200, 200) if is_func else (30, 100, 10)
             indent_width, line_width = format_pixels()
             # XXXXX im.line(0, y,
+del render_summary
 
 
 def render_text(repo, matchfunc, options):
@@ -310,7 +313,7 @@ def render_text(repo, matchfunc, options):
         delta_num = len(str(delta.days))
         return "?*+-."[delta_num]
 
-    tag = "v4.0.0"
+    tag = "v4.0"  # TODO turn into option
     latest = get_latest_datetime(repo, tag)
     for path in filter(matchfunc, get_tag_paths(repo, tag)):
         blame = repo.blame(tag, path)
@@ -320,9 +323,6 @@ def render_text(repo, matchfunc, options):
                 yield format_age(commit, latest) * len(regions)
 
         print(path, ":", "".join(path_age()))
-
-
-# find . -name '*.c' | xargs dirname | sort -u
 
 
 class Command(BaseCommand):

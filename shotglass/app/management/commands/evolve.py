@@ -132,7 +132,7 @@ def render_text(repo, matchfunc):
     old = tags.pop(0)
     for new in tags:
         diff_index = old.commit.diff(new)
-        print("{:7}: {:3}".format(new.name, len(diff_index)), end=' ')
+        print("{:7}: {:3}".format(new.name, len(diff_index)), end=" ")
         diff_paths = set(paths) & set(path_index)
         diff_text = repo.git.diff(
             "{}..{}".format(old.name, new.name), *diff_paths, stat=True

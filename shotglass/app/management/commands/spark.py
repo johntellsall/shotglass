@@ -29,11 +29,14 @@ def plot(project):
     query = SourceFile.objects.filter(project=project).order_by("-num_lines")
     num_lines = query.values_list("num_lines", flat=True)
     largest, num_files = num_lines.first(), num_lines.count()
-    print("{project}: {num_files} source files, largest = {largest} lines".format(
-        **locals()
-    ))
 
-    data = [num_lines[i] for i in range(0, num_files, num_files / WIDTH)]
+    print(
+        "{project}: {num_files} source files, largest = {largest} lines".format(
+            **locals()
+        )
+    )
+
+    data = [num_lines[i] for i in range(0, num_files, int(num_files / WIDTH))]
     print(sparklines.sparklines(data)[0])
 
     print("Largest:")

@@ -38,9 +38,11 @@ def s_color(project):
     color = TBD
     hover = TBD
     """
-    TOOLS = ("crosshair,pan,wheel_zoom,zoom_in,zoom_out"
-             ",box_zoom,undo,redo,reset,tap,save,box_select"
-             ",poly_select,lasso_select,")
+    TOOLS = (
+        "crosshair,pan,wheel_zoom,zoom_in,zoom_out"
+        ",box_zoom,undo,redo,reset,tap,save,box_select"
+        ",poly_select,lasso_select,"
+    )
 
     query = SourceFile.objects.filter(project=project).order_by("path")
     size_max = query.all().aggregate(Max("num_lines")).get("num_lines__max")
@@ -123,9 +125,11 @@ def s_spark(project):
     query = SourceFile.objects.filter(project=project).order_by("-num_lines")
     num_lines = query.values_list("num_lines", flat=True)
     largest, num_files = num_lines.first(), num_lines.count()
-    print("{project}: {num_files} source files, largest = {largest} lines".format(
-        **locals()
-    ))
+    print(
+        "{project}: {num_files} source files, largest = {largest} lines".format(
+            **locals()
+        )
+    )
 
     data = [num_lines[i] for i in range(0, num_files, num_files / WIDTH)]
     print(sparklines.sparklines(data)[0])
