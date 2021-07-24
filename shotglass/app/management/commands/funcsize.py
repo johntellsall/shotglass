@@ -25,8 +25,8 @@ class Command(BaseCommand):
         for vers, complexity_iter in itertools.groupby(
             versions, key=operator.itemgetter(1)
         ):
-            print vers, ":"
-            print "-", ", ".join(str(x) for x in complexity_iter)
+            print(vers, ":")
+            print("-", ", ".join(str(x) for x in complexity_iter))
         data = models.SourceLine.objects.filter(project="django-1.0.1").values_list(
             "progradon__complexity", flat=True
         )

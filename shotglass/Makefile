@@ -2,11 +2,10 @@ IMAGE_CAT:=/Users/johnmitchell/.iterm2/imgcat
 SQL:=sqlite3 db.sqlite3
 
 all:
-	# flake8 --exclude=app/management/commands,app/migrations,app/tests
 
 lint:
 	black .
-	flake8 --exclude=app/migrations,app/tests
+	flake8 --exclude=app/management/commands,app/migrations,app/tests
 	@echo DONE
 
 update-packages:
@@ -102,7 +101,6 @@ reindex:
 rerender: 
 	echo flask | xargs -I{} -n1 \
 		./manage.py render {}
-# ./manage.py make_index ../SOURCE/flask ../SOURCE/requests
 
 demo-draw:
 	./manage.py draw --draw=simple flask

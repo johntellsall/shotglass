@@ -19,7 +19,7 @@ class Command(BaseCommand):
         lines = SourceLine.objects.filter(project=project).order_by("path")
         print(f"LINES: {project=}")
         for line in lines:
-            print(vars(lines))
+            print((vars(lines)))
         # prefix = options['prefix']
         # rows = []
         # while True:

@@ -45,14 +45,14 @@ def s_color(project):
     sizes = query.values_list("path", "num_lines")
 
     num_files = len(sizes)
-    print "num files: {}, max num lines: {}".format(num_files, size_max)
+    print("num files: {}, max num lines: {}".format(num_files, size_max))
     hover = HoverTool(
         tooltips=[
             ("name", "@name"),
             ("lines", "@num_lines"),
         ]
     )
-    x = range(num_files)
+    x = list(range(num_files))
     y = [size for _path, size in sizes]
     source = ColumnDataSource(
         data=dict(
@@ -108,7 +108,7 @@ def s_plot(project):
     )
 
     y = num_lines
-    x = range(y.count())
+    x = list(range(y.count()))
 
     # add a line renderer with legend and line thickness
     p.line(x, y, legend="", line_width=2)
@@ -121,16 +121,16 @@ def s_spark(project):
     query = SourceFile.objects.filter(project=project).order_by("-num_lines")
     num_lines = query.values_list("num_lines", flat=True)
     largest, num_files = num_lines.first(), num_lines.count()
-    print "{project}: {num_files} source files, largest = {largest} lines".format(
+    print("{project}: {num_files} source files, largest = {largest} lines".format(
         **locals()
-    )
+    ))
 
     data = [num_lines[i] for i in range(0, num_files, num_files / WIDTH)]
-    print sparklines.sparklines(data)[0]
+    print(sparklines.sparklines(data)[0])
 
-    print "Largest:"
+    print("Largest:")
     for info in query[:10]:
-        print info.num_lines, info.path
+        print(info.num_lines, info.path)
 
 
 class Command(BaseCommand):
@@ -152,5 +152,5 @@ class Command(BaseCommand):
             sys.exit("{}: unknown style".format(options["style"]))
 
         for project in projects:
-            print "PROJECT {}:".format(project.upper())
+            print("PROJECT {}:".format(project.upper()))
             plotfunc(project)

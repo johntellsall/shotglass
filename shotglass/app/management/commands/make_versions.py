@@ -35,9 +35,9 @@ class Project(object):
         repos = git.Repo(self.proj_dir)
         tags = (tag.name for tag in repos.tags)
         if self.good_tag_re:
-            tags = filter(self.good_tag_re.search, tags)
+            tags = list(filter(self.good_tag_re.search, tags))
         if self.bad_tag_re:
-            tags = itertools.ifilterfalse(self.bad_tag_re.search, tags)
+            tags = itertools.filterfalse(self.bad_tag_re.search, tags)
         tags = natsorted(tags)
         return tags
 
@@ -60,18 +60,18 @@ def make_project(proj, dryrun=False, limit=None):
     index_cmd = "./manage.py make_index --project={name}-{tag} {dir}"
     for tag in tags:
         if tag in have_tags:
-            print "(have {}, skipping)".format(tag)
+            print("(have {}, skipping)".format(tag))
             continue
         cmd = checkout_cmd.format(dir=proj.proj_dir, tag=tag)
-        print ">>>", cmd
+        print(">>>", cmd)
         if subprocess.call(cmd, shell=True):
             sys.exit(0)
         cmd = index_cmd.format(dir=proj.proj_dir, name=proj.name, tag=tag)
-        print ">>>", cmd
+        print(">>>", cmd)
         if dryrun:
             continue
         out = subprocess.check_output(cmd, shell=True)
-        print out
+        print(out)
 
 
 class Command(BaseCommand):
@@ -101,8 +101,8 @@ class Command(BaseCommand):
 
         if options["info"]:
             for proj in projects:
-                print proj, ":"
-                print proj.get_tags()
+                print(proj, ":")
+                print(proj.get_tags())
             return
 
         for proj in projects:

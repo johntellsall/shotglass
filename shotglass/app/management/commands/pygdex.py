@@ -21,7 +21,7 @@ class Command(BaseCommand):
                 if tokentype is Name:
                     name = value
                 elif tokentype is Punctuation and value == "(":
-                    print "NAME", name
+                    print("NAME", name)
                     name = None
 
             # import ipdb ; ipdb.set_trace()

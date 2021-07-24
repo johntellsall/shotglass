@@ -15,10 +15,10 @@ class Command(BaseCommand):
         call_pat = re.compile(r"(\w+)\(")
         for path in options["paths"]:
             for lineno, line in enumerate(open(path).readlines()):
-                print "\t", lineno, line.rstrip()
+                print("\t", lineno, line.rstrip())
                 call = call_pat.search(line)
             if not call:
-                print "?", line.rstrip()
+                print("?", line.rstrip())
                 continue
             use_type = "CALL" if "def" not in line else "DEF"
-            print path, lineno, line, use_type, call.group(1)
+            print(path, lineno, line, use_type, call.group(1))

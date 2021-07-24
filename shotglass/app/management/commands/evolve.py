@@ -16,7 +16,7 @@ def get_tags(repo):
         for tag in repo.tags
         if tag.name.startswith("v3.") or tag.name == "v4.0.0"
     ]
-    tags.sort(key=lambda st: map(int, st.lstrip("v").split(".")))
+    tags.sort(key=lambda st: list(map(int, st.lstrip("v").split("."))))
     tags = [repo.tags["v" + version] for version in tags]
     return tags
 
@@ -26,7 +26,7 @@ def show_version_diffs(tags):
     old = tags.pop(0)
     for new in tags:
         diff_index = old.commit.diff(new)
-        print "{:7} - {:7}: {} commits".format(old.name, new.name, len(diff_index))
+        print("{:7} - {:7}: {} commits".format(old.name, new.name, len(diff_index)))
         old = new
 
 
@@ -82,8 +82,8 @@ def get_paths(repo):
 
 
 def render_image(repo, matchfunc):
-    good_paths = filter(matchfunc, get_paths(repo))
-    print good_paths
+    good_paths = list(filter(matchfunc, get_paths(repo)))
+    print(good_paths)
     tags = get_tags(repo)
 
     good_index = dict((path, index) for index, path in enumerate(good_paths))
@@ -97,11 +97,11 @@ def render_image(repo, matchfunc):
         diff_index = old.commit.diff(new)
         diff_versions = "{}..{}".format(old.name, new.name)
         old = new
-        print "{:7}: {:3}".format(new.name, len(diff_index))
+        print("{:7}: {:3}".format(new.name, len(diff_index)))
         diff_paths = set(d.a_path for d in diff_index) & set(good_paths)
         if not diff_paths:
             # version has diffs, but not in the region of interest
-            print "- skip:", new
+            print("- skip:", new)
             continue
         diff_text = repo.git.diff(diff_versions, *diff_paths, stat=True)
         diff_path_changes = parse_diff_changes(diff_text)
@@ -109,12 +109,12 @@ def render_image(repo, matchfunc):
             try:
                 x = good_index[path]
             except IndexError:
-                print "?", path
+                print("?", path)
                 continue
             area = 6 * len(diff_count)
             symbols.append((x, y, area))
 
-    xs, ys, areas = zip(*symbols)
+    xs, ys, areas = list(zip(*symbols))
     plt.scatter(xs, ys, s=areas)
     plt.xlabel("file index")
     plt.ylabel("version index")
@@ -123,22 +123,22 @@ def render_image(repo, matchfunc):
 
 
 def render_text(repo, matchfunc):
-    paths = filter(matchfunc, get_paths(repo))
+    paths = list(filter(matchfunc, get_paths(repo)))
 
-    print len(paths), "files"
+    print(len(paths), "files")
     path_index = dict((path, index) for index, path in enumerate(paths))
 
     tags = get_tags(repo)
     old = tags.pop(0)
     for new in tags:
         diff_index = old.commit.diff(new)
-        print "{:7}: {:3}".format(new.name, len(diff_index)),
+        print("{:7}: {:3}".format(new.name, len(diff_index)), end=' ')
         diff_paths = set(paths) & set(path_index)
         diff_text = repo.git.diff(
             "{}..{}".format(old.name, new.name), *diff_paths, stat=True
         )
         diff_path_changes = parse_diff_changes(diff_text)
-        print format_path_changes(paths, diff_path_changes)
+        print(format_path_changes(paths, diff_path_changes))
         old = new
 
 
