@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-sparklines -- XX
+sparklines -- show sparkline in terminal on file sizes
 """
 
 # pylint: disable=bad-builtin
@@ -31,9 +31,7 @@ def plot(project):
     largest, num_files = num_lines.first(), num_lines.count()
 
     print(
-        "{project}: {num_files} source files, largest = {largest} lines".format(
-            **locals()
-        )
+        f"{project}: {num_files} source files, largest = {largest} lines"
     )
 
     data = [num_lines[i] for i in range(0, num_files, int(num_files / WIDTH))]
