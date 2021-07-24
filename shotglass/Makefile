@@ -67,24 +67,10 @@ demo2:
 	convert flask_path.png -scale '300%'  zoot.png
 	$(IMAGE_CAT) zoot.png
 
-test-most:
-	ls -1 app/tests/*.py | egrep -v '_(age.py|sg2.py|sizeplot.py)$$' \
-	| xargs -t pytest --cov=app
-# app/tests/test_{draw,render,spider}.py
-# coverage report -m
-
-test-all:
+test test-all:
 	pytest --cov=app app/tests/
 test-all-nocov:
 	pytest app/tests/
-# app/tests/test_age.py
-# app/tests/test_draw.py
-# app/tests/test_perf.py
-# app/tests/test_render.py
-# app/tests/test_sg2.py
-# app/tests/test_sizeplot.py
-# app/tests/test_spider.py
-# app/tests/test_views.py
 
 # management commands
 test-cmds:

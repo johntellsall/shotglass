@@ -1,7 +1,8 @@
 import pytest
 
-from app import render
-from app.models import SourceLine
+# TODO: re-enable
+# from app import render
+# from app.models import SourceLine
 
 
 class AttrDict(dict):
