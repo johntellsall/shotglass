@@ -1,5 +1,5 @@
 """
-label.py -- 
+label.py --
 """
 # pylint: disable=W0640
 

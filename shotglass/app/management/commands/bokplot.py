@@ -38,7 +38,9 @@ def s_color(project):
     color = TBD
     hover = TBD
     """
-    TOOLS = "crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,"
+    TOOLS = ("crosshair,pan,wheel_zoom,zoom_in,zoom_out"
+             ",box_zoom,undo,redo,reset,tap,save,box_select"
+             ",poly_select,lasso_select,")
 
     query = SourceFile.objects.filter(project=project).order_by("path")
     size_max = query.all().aggregate(Max("num_lines")).get("num_lines__max")
@@ -113,7 +115,7 @@ def s_plot(project):
     # add a line renderer with legend and line thickness
     p.line(x, y, legend="", line_width=2)
     bplot.show(p)
-    print (outpath)
+    print(outpath)
 
 
 def s_spark(project):

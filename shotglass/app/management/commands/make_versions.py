@@ -6,8 +6,8 @@ USAGE:
 * list project's tags that match patterns:
 
 Ex: show each minor version of Django; just output tags. Hide RC, Alpha and micro-change versions:
-./manage.py make_versions --info --exclude='([abc])' --include='\.1$' \
-./SOURCE/django/ 
+./manage.py make_versions --info --exclude='([abc])' --include='.1$'
+./SOURCE/django/
 
 ['1.0.1', '1.1', '1.1.1', ...  '1.10.1']
 """
