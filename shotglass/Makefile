@@ -89,10 +89,13 @@ test-ctags:
 	@echo JSON FIELDS
 	ctags --output-format=json --list-fields
 
-DIRS := sqlalchemy requests pyramid flask django
-demo3:
-	./manage.py make_index ../SOURCE/flask ../SOURCE/requests
-	./manage.py show all
+# in size order:
+DIRS := requests flask pyramid sqlalchemy django
+reindex:
+	echo $(DIRS) | xargs -I{} -n1 \
+		./manage.py make_index ../SOURCE/{}
+# ./manage.py make_index ../SOURCE/flask ../SOURCE/requests
+# ./manage.py show all
 
 demo-draw:
 	./manage.py draw --draw=simple flask
