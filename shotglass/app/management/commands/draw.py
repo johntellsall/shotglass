@@ -14,9 +14,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--draw',
-            default='simple',
-            help='Set drawing style',
+            "--draw",
+            default="simple",
+            help="Set drawing style",
         )
         # DRAW_STYLES.keys()
         #  = {"boundingbox": BoundingBoxDraw, "simple": SimpleDraw}
@@ -31,7 +31,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         themeClass = draw.ThemeRainbow
         themeClass = draw.ThemeZebra
-        drawClass = draw.DRAW_STYLES[options['draw']]
+        drawClass = draw.DRAW_STYLES[options["draw"]]
         drawFunc = drawClass().draw
 
         for project in self.get_projects(options["projects"]):

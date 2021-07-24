@@ -9,7 +9,7 @@ from app.models import SourceLine
 
 def calc_width(project):
     # breakpoint()
-    return 100 # TODO XXXXXX
+    return 100  # TODO XXXXXX
     lines_total = SourceLine.objects.filter(  # pylint: disable=no-member
         project=project
     ).aggregate(Sum("length"))["length__sum"]

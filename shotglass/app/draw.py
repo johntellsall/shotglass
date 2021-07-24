@@ -46,15 +46,18 @@ class Theme(object):
     def calc_sym_color(self, symbol):
         return "gray"
 
+
 # TODO provide "next symbol" vs "next file" vs "next directory"
 # Observer pattern?
+
 
 class ThemeZebra(Theme):
     """
     alternate between dark blue and white; by file
     """
+
     def __init__(self):
-        self.color_iter = itertools.cycle(['#66c', '#fff'])
+        self.color_iter = itertools.cycle(["#66c", "#fff"])
         self.prev_group = None
         self.color = None
 
@@ -65,7 +68,7 @@ class ThemeZebra(Theme):
         value = Path(skel.symbol.source_file.path).parent  # directory
         if value == self.prev_group:
             return self.color
-        print(f'VALUE: {value}')
+        print(f"VALUE: {value}")
         self.prev_group = value
         self.color = next(self.color_iter)
         return self.color
@@ -149,7 +152,7 @@ def draw_symbol(grid, skel, color):
     length = skel.symbol.length
     if length < 1:
         return
-    print(f'{skel=}')
+    print(f"{skel=}")
     # draw white "grain of rice" at start of symbol
     pos = skel.position
     grid.moveto(get_xy(pos))
@@ -190,9 +193,11 @@ class DrawStyle(object):
         grid = ImageGrid.FromProject(project)
         mytheme = theme or Theme()
         color_cb = mytheme.calc_sym_color
-        skeletons = models.Skeleton.objects.filter(symbol__source_file__project=project)  # noqa: E501
+        skeletons = models.Skeleton.objects.filter(
+            symbol__source_file__project=project
+        )  # noqa: E501
         count = skeletons.count()
-        print(f'{project} skeletons: {count}')
+        print(f"{project} skeletons: {count}")
         skeletons = skeletons.order_by(
             "symbol__source_file__path", "symbol__source_file__name"
         )

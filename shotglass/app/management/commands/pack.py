@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-pack -- 
+pack -- draw files as rectangles, pack them on display
 """
 
 import json

@@ -2,10 +2,12 @@ IMAGE_CAT:=/Users/johnmitchell/.iterm2/imgcat
 SQL:=sqlite3 db.sqlite3
 
 all:
+	# flake8 --exclude=app/management/commands,app/migrations,app/tests
 
 lint:
 	black .
-	flake8 --exclude=app/management/commands,app/migrations,app/tests
+	flake8 --exclude=app/migrations,app/tests
+	@echo DONE
 
 update-packages:
 	pip3 list --outdated --format=freeze | \
@@ -78,7 +80,7 @@ test-cmds:
 
 # sniff -- find stinky code not useful for commit
 sniff:
-	rg --vimgrep '(ipdb|breakpoint)' | egrep -v "Makefile:"
+	rg --vimgrep --glob '*.py' '(ipdb|breakpoint)'
 
 test-ctags:
 	ctags --output-format=json \
@@ -89,13 +91,18 @@ test-ctags:
 	@echo JSON FIELDS
 	ctags --output-format=json --list-fields
 
+# PERFORMANCE: mac ~ 40 files per second
 # in size order:
 DIRS := requests flask pyramid sqlalchemy django
 reindex:
 	echo $(DIRS) | xargs -I{} -n1 \
 		./manage.py make_index ../SOURCE/{}
+	./manage.py show all
+
+rerender: 
+	echo flask | xargs -I{} -n1 \
+		./manage.py render {}
 # ./manage.py make_index ../SOURCE/flask ../SOURCE/requests
-# ./manage.py show all
 
 demo-draw:
 	./manage.py draw --draw=simple flask

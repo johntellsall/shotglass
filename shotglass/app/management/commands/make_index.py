@@ -26,7 +26,7 @@ LANGUAGE_TYPES = {
     ".h": "c",
     ".py": "python",
 }
-BORING_DIRS = (".pc", 'tests', 'examples')  # TODO: make configurable
+BORING_DIRS = (".pc", "tests", "examples")  # TODO: make configurable
 
 logging.basicConfig(
     stream=sys.stderr,
@@ -83,14 +83,18 @@ def count_lines(project_dir, paths):
 # value)', 'roles': 'def', 'end': '298'}
 
 CTAGS_COMMAND = [
-    "ctags", "--fields=*-P",
-    "--extras=*", "-f", "-",
-    "--output-format=json"]
+    "ctags",
+    "--fields=*-P",
+    "--extras=*",
+    "-f",
+    "-",
+    "--output-format=json",
+]
 
 
 def get_ctags_info(path):
     def not_pseudo_tag(item):
-        return item['_type'] != 'ptag'
+        return item["_type"] != "ptag"
 
     cmd = CTAGS_COMMAND + [path]
     lines = subprocess.check_output(cmd, text=True).split("\n")
@@ -98,9 +102,10 @@ def get_ctags_info(path):
     items = filter(not_pseudo_tag, items)
     return items
 
+
 # {
 # '_type': 'tag', 'name': 'clone', 'path': 'xx',
-# 'access': 'public', 'language': 'Python', 
+# 'access': 'public', 'language': 'Python',
 # 'line': 28,
 # 'signature': '(url)', 'kind': 'function', 'roles': 'def', 'end': 34}
 
@@ -110,9 +115,9 @@ def get_symbols(file_obj, path):
         try:
             yield Symbol(
                 source_file=file_obj,
-                label=item['name'],
+                label=item["name"],
                 line_number=item["line"],
-                length=item['end'] - item["line"] + 1,
+                length=item["end"] - item["line"] + 1,
             )
         except KeyError:
             # TODO: ensure we're not missing good stuff
