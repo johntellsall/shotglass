@@ -3,10 +3,14 @@
 import colorsys
 import itertools
 import logging
+import warnings
 from pathlib import Path
 
 from palettable import colorbrewer
-from radon.complexity import cc_rank
+try:
+    from radon.complexity import cc_rank
+except ImportError:
+    warnings.warn('Radon module missing')
 
 from app import models
 from app.grid import ImageGrid

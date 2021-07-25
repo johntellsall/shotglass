@@ -73,7 +73,7 @@ def render_project(project):
 
     zap_skeleton(project)
 
-    render(project, proj_symbols)
+    render(proj_symbols)
 
     count = Skeleton.objects.count()
     print(f"{project}: Skeleton.{count=}")
