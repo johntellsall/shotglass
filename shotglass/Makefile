@@ -64,7 +64,7 @@ demo:
 	convert flask_path.png -scale '300%'  zoot.png
 	$(IMAGE_CAT) zoot.png
 
-demo2:
+demo2: fastlint
 	./manage.py make_index ../SOURCE/flask
 	./manage.py render flask
 	./manage.py draw flask

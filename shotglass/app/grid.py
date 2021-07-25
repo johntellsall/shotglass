@@ -19,6 +19,10 @@ def calc_width(project):
 
 
 class Grid(object):
+    """
+    abstract grid/image
+    """
+
     def __init__(self, width, height):
         self.width = width
         self.height = height
@@ -43,6 +47,10 @@ class Grid(object):
 
 
 class TextGrid(Grid):
+    """
+    text grid/image -- for testing
+    """
+
     def __init__(self, width, height):
         self.blank_row = ["."] * width
         self.data = []
@@ -67,10 +75,11 @@ class ImageGrid(Grid):
     @classmethod
     def FromProject(cls, project):
         size = calc_width(project)
-        size *= 4  # XX?
+        size *= 4  # TODO what is this?
         return cls(size, size)
 
     def __init__(self, width, height):
+        "create image with given dimensions"
         self.im = Image.new("RGB", (width, height))
         self.im_draw = ImageDraw.Draw(self.im)
         self.last = (0, 0)
@@ -80,9 +89,12 @@ class ImageGrid(Grid):
         self.last = (xy[0] * 2, xy[1] * 2)
 
     def draw(self, xy, pen):
+        "move to position, draw point"
         self.im_draw.point((xy[0] * 2, xy[1] * 2), pen)
 
     def drawto(self, xy, pen):
+        "draw line from old point to given point"
+        # TODO: why *2?
         xy = (xy[0] * 2, xy[1] * 2)
         if self.last:
             self.im_draw.line((self.last, xy), pen)
@@ -94,7 +106,11 @@ class ImageGrid(Grid):
             self.drawto(xy, pen)
 
     def finalize(self):
+        """
+        modify image after symbols have been rendered
+        """
         self.im = self.im.crop(self.im.getbbox())
 
     def render(self, path, *args):
+        "write image out to storage"
         self.im.save(path)

@@ -7,10 +7,11 @@ import warnings
 from pathlib import Path
 
 from palettable import colorbrewer
+
 try:
     from radon.complexity import cc_rank
 except ImportError:
-    warnings.warn('Radon module missing')
+    warnings.warn("Radon module missing")
 
 from app import models
 from app.grid import ImageGrid
@@ -66,10 +67,8 @@ class ThemeZebra(Theme):
         self.color = None
 
     def calc_sym_color(self, skel):
-        # if skel.symbol.source_file == self.prev_group:
-        #     return self.color
-        # self.prev_group = skel.symbol.source_file
-        value = Path(skel.symbol.source_file.path).parent  # directory
+        # value = get_skel_directory(skel)
+        value = get_skel_path(skel)
         if value == self.prev_group:
             return self.color
         print(f"VALUE: {value}")
@@ -80,6 +79,10 @@ class ThemeZebra(Theme):
 
 def get_skel_directory(skel):
     return Path(skel.symbol.source_file.path).parent
+
+
+def get_skel_path(skel):
+    return skel.symbol.source_file.path
 
 
 def is_diff_directory(skel):
@@ -93,6 +96,46 @@ def is_diff_directory(skel):
 
 class ThemeRainbow(Theme):
     """
+    draw symbols in different colors (hues)
+    """
+
+    def __init__(self):
+        self.hue_iter = make_step_iter(50, 360)
+        self.saturation_iter = itertools.cycle([30, 60, 80])
+        self.lightness_iter = itertools.cycle([40, 60])
+        self.hue_sat_lightness = 0, 80, 40
+        self.prev_group = None  # symbol's file path
+        self.prev_color = None
+
+    def calc_sym_color(self, skel):
+        value = get_skel_path(skel)
+        if value == self.prev_group:
+            return self.prev_color
+        # new file => new hue
+        _, saturation, lightness = self.hue_sat_lightness
+        hue = next(self.hue_iter)
+        color = color_hsl_hex(hue, saturation, lightness)
+        self.prev_color = color
+        self.prev_group = value
+        return color
+
+    # def calc_sym_color(self, skel):
+    #     value = get_skel_path(skel)
+    #     if value == self.prev_group:
+    #         # same file, alternate symbols: different saturation
+    #         hue, _, lightness = self.hue_sat_lightness
+    #         saturation = next(self.saturation_iter)
+    #     else:
+    #         # different files = different colors/hues
+    #         _, saturation, lightness = self.hue_sat_lightness
+    #         hue = next(self.hue_iter)
+    #         self.prev_group = value
+    #     print(f"{skel=} {hue}, {saturation}, {lightness}")
+    #     return color_hsl_hex(hue, saturation, lightness)
+
+
+class ThemeRedRainbow(Theme):
+    """
     draw symbols in color with different saturation
     """
 
@@ -103,14 +146,6 @@ class ThemeRainbow(Theme):
         self.hue_sat_lightness = 0, 0, 40
 
     def calc_sym_color(self, symbol):
-        # prev_arg = None
-
-        # for symbol, arg in skeleton:
-        # change color with new arg (file)
-        # if prev_arg != arg:
-        #     hue = hue_iter.next()
-        #     prev_arg = arg
-        #     lightness = lightness_iter.next() # X?
         # alternate symbols: different saturation
         hue, _, lightness = self.hue_sat_lightness
         saturation = next(self.saturation_iter)
@@ -156,7 +191,6 @@ def draw_symbol(grid, skel, color):
     length = skel.symbol.length
     if length < 1:
         return
-    print(f"{skel=}")
     # draw white "grain of rice" at start of symbol
     pos = skel.position
     grid.moveto(get_xy(pos))
@@ -194,21 +228,26 @@ class DrawStyle(object):
     # draw_diagram = NotImplementedError
 
     def draw(self, project, theme=None):
+        """
+        draw project's symbols into grid (image)
+        """
         grid = ImageGrid.FromProject(project)
         mytheme = theme or Theme()
         color_cb = mytheme.calc_sym_color
+
         skeletons = models.Skeleton.objects.filter(
             symbol__source_file__project=project
         )  # noqa: E501
         count = skeletons.count()
         print(f"{project} skeletons: {count}")
-        skeletons = skeletons.order_by(
-            "symbol__source_file__path", "symbol__source_file__name"
-        )
+        skeletons = skeletons.order_by("symbol__source_file__path")
 
-        for skeleton in skeletons:
+        for num, skeleton in enumerate(skeletons):
             color = color_cb(skeleton)
             draw_symbol(grid, skel=skeleton, color=color)
+            if num < 20:
+                print(f"{skeleton=}")
+
         grid.finalize()
         return grid
 
@@ -222,17 +261,17 @@ class SimpleDraw(DrawStyle):
     #     diagram.draw(grid)
 
 
-# class BoundingBoxDraw(DrawStyle):
-#     """
-#     draw bounding box around each source file
-#     """
+class BoundingBoxDraw(DrawStyle):
+    """
+    draw bounding box around each source file
+    """
 
-#     def draw_diagram(self, grid, diagram):
-#         BLAM
-#         for path in set(dsym.sourceline.path for dsym in diagram):
-#             syms = [dsym for dsym in diagram if dsym.sourceline.path == path]
-#             draw_box(grid, syms, fill=syms[0].color)
+    def draw_diagram(self, grid, diagram):
+        breakpoint()
+        for path in set(dsym.sourceline.path for dsym in diagram):
+            syms = [dsym for dsym in diagram if dsym.sourceline.path == path]
+            draw_box(grid, syms, fill=syms[0].color)
 
 
-# DRAW_STYLES = {"boundingbox": BoundingBoxDraw, "simple": SimpleDraw}
-DRAW_STYLES = {"simple": SimpleDraw}
+DRAW_STYLES = {"boundingbox": BoundingBoxDraw, "simple": SimpleDraw}
+# DRAW_STYLES = {"simple": SimpleDraw}

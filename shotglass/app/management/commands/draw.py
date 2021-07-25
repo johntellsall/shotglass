@@ -30,13 +30,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         themeClass = draw.ThemeRainbow
-        themeClass = draw.ThemeZebra
+        # themeClass = draw.ThemeZebra
         drawClass = draw.DRAW_STYLES[options["draw"]]
         drawFunc = drawClass().draw
 
         for project in self.get_projects(options["projects"]):
             print("***", project)
             print(f"- draw style: {options['draw']}")
+            print(f"- theme: {themeClass}")
             # grid = draw.SimpleDraw().draw(project, theme=themeClass())
             grid = drawFunc(project, theme=themeClass())
 
