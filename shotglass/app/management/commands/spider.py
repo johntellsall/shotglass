@@ -46,7 +46,8 @@ def get_colormap():
 
 
 def get_count(paths):
-    output = subprocess.check_output(["wc", "--lines"] + paths)
+    output = subprocess.check_output(["wc", "-l"] + paths, text=True)
+    assert 0, output
     wordcount_re = re.compile(
         r"^\s*  ([0-9]+)" r"\s+   (.+)    $", re.MULTILINE | re.VERBOSE
     )
@@ -134,7 +135,8 @@ def render_blocks(image, paths):
         draw = ImageDraw.Draw(image)
         rend = renderClass(draw=draw, x=0, y=0)
         # X: size in points, not pixels
-        fnt = ImageFont.truetype("Umpush-Light.ttf", size=14)
+        # fnt = ImageFont.truetype("Umpush-Light.ttf", size=14)
+        fnt = None
     text_color = (0, 0, 0, 128)
     for path in paths:
         text_args = dict(
@@ -175,6 +177,7 @@ def render_diff(image, paths):
         color = next(colormap_iter)
         draw.rectangle((0, y, COL_WIDTH - COL_GAP, next_y), fill=color, outline="black")
         y = next_y
+del render_diff  # TODO restore
 
 
 class Command(BaseCommand):
@@ -190,7 +193,9 @@ class Command(BaseCommand):
         render = render_source
         if options["style"] == "blocks":
             render = render_blocks
-        elif options["style"] == "diff":
-            render = render_diff
+        # elif options["style"] == "diff":
+        #     render = render_diff
         render(image=im, paths=options["paths"])
         im.save(options["output"])
+        print(f'{options["output"]}: image written')
+
