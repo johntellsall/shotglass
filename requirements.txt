@@ -32,7 +32,6 @@ py
 Pygments
 pylint
 pylint-django
-pylint-django
 pylint-plugin-utils
 pyparsing
 pytest
@@ -45,7 +44,6 @@ rectpack
 simplegeneric
 six
 sqlparse
-# tornado
 traceback2
 traitlets
 unittest2
