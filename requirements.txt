@@ -57,3 +57,4 @@ unittest2==1.1.0
 wcwidth==0.1.7
 wrapt==1.10.11
 natsort==5.2.0
+pylint-django

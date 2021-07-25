@@ -30,9 +30,7 @@ def plot(project):
     num_lines = query.values_list("num_lines", flat=True)
     largest, num_files = num_lines.first(), num_lines.count()
 
-    print(
-        f"{project}: {num_files} source files, largest = {largest} lines"
-    )
+    print(f"{project}: {num_files} source files, largest = {largest} lines")
 
     data = [num_lines[i] for i in range(0, num_files, int(num_files / WIDTH))]
     print(sparklines.sparklines(data)[0])

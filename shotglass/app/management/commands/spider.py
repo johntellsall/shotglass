@@ -177,6 +177,8 @@ def render_diff(image, paths):
         color = next(colormap_iter)
         draw.rectangle((0, y, COL_WIDTH - COL_GAP, next_y), fill=color, outline="black")
         y = next_y
+
+
 del render_diff  # TODO restore
 
 
@@ -198,4 +200,3 @@ class Command(BaseCommand):
         render(image=im, paths=options["paths"])
         im.save(options["output"])
         print(f'{options["output"]}: image written')
-

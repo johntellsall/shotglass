@@ -3,10 +3,13 @@ SQL:=sqlite3 db.sqlite3
 
 all:
 
-lint:
+fastlint:
 	black .
 	flake8 --exclude=app/management/commands,app/migrations,app/tests
 	@echo DONE
+
+lint:
+	pylint --errors-only --persistent=y $$(git ls-files '*.py')
 
 update-packages:
 	pip3 list --outdated --format=freeze | \
@@ -103,6 +106,8 @@ rerender:
 		./manage.py render {}
 
 demo-draw:
+	./manage.py make_index ../SOURCE/flask
+	./manage.py render flask
 	./manage.py draw --draw=simple flask
 	convert flask_path.png -scale '300%'  zoot.png
 	$(IMAGE_CAT) zoot.png
