@@ -49,3 +49,4 @@ traitlets
 unittest2
 wcwidth
 wrapt
+GitPython

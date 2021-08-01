@@ -12,7 +12,8 @@ fastlint:
 	@echo DONE
 
 lint:
-	pylint --errors-only --persistent=y $$(git ls-files '*.py')
+	pylint --errors-only --persistent=y --ignore=app/tests \
+	$$(git ls-files '*.py')
 
 update-packages:
 	pip3 list --outdated --format=freeze | \
