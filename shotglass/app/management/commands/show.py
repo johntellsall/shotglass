@@ -77,6 +77,16 @@ def show_summary(projects):
         print(FORMAT.format(**locals()))
 
 
+def list_styles():
+    styles = [name for name in globals() if name.startswith('show_')]
+    styles = [name.split('_', 1)[1] for name in styles]
+    return sorted(styles)
+
+
+def comma_join(mylist):
+    return ", ".join(mylist)
+
+
 class Command(BaseCommand):
     help = "beer"
 
@@ -88,7 +98,8 @@ class Command(BaseCommand):
         all_projects = SourceFile.projects()
         projects = options["projects"]
         if not projects:
-            print(('PROJECTS: {} or "all"'.format(", ".join(all_projects))))
+            print('PROJECTS: {} or "all"'.format(comma_join(all_projects)))
+            print(f"STYLES: {comma_join(list_styles())}")
             return
         if projects == ["all"]:
             projects = all_projects
