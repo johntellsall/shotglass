@@ -12,6 +12,7 @@ fastlint:
 	@echo DONE
 
 lint:
+	DJANGO_SETTINGS_MODULE=shotglass.settings \
 	pylint --errors-only --persistent=y --ignore=app/tests \
 	$$(git ls-files '*.py')
 
