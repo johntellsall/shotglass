@@ -81,7 +81,11 @@ def print_project(project_dir, source_paths):
 
 
 def get_project(repo):
-    tree = repo.heads.master.commit.tree
+    try:
+        tree = repo.heads.master.commit.tree
+    except AttributeError as err:
+        attrs = [attr for attr in dir(repo.heads) if not attr.startswith("_")]
+        sys.exit(f"tags?? {attrs}\n{err}")
     paths = filter(is_source_path, list_paths(repo))
     paths = filter(is_interesting, paths)
     paths = list(paths)
@@ -135,7 +139,6 @@ def cmd_show(project_path):
     for path in source_paths:
         info = parse_entry(tree[path], project_dir)
         info = info["file_info"]
-        # print(f"{path}\t{info['num_bytes']}B {info['num_tags']} tags")
         print(f"{path:50}\t{info['num_bytes']}\t{info['num_tags']}")
     print("DONE")
 
