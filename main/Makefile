@@ -3,9 +3,6 @@ IMGCAT := ~/.iterm2/imgcat
 
 all:
 
-show-db:
-	sqlite3 main.db < show-db.sql
-
 # CODE
 #
 lint:
@@ -14,6 +11,13 @@ lint:
 
 test: lint
 	pytest --exitfirst --cov=shotglass test_shotglass.py
+
+
+
+
+show-db:
+	sqlite3 main.db < show-db.sql
+
 
 all-images: $(patsubst %.yaml,%.png,$(shell git ls-files 's*.yaml'))
 

@@ -1,3 +1,7 @@
+"""
+USAGE
+"""
+
 import logging
 import re
 import subprocess
@@ -93,7 +97,48 @@ def setup_db(db):
     )
 
 
-def index_project(project_path):
+def get_db():
+    con = sqlite3.connect("main.db")
+    cur = con.cursor()
+    return con, cur
+
+
+def iter_color():
+    hue = 0
+    while True:
+        color = pg.Color("white")
+        color.hsva = (hue, 100, 100, 100)
+        yield color
+        hue += 15
+        hue %= 360
+
+
+def select1(db, sql):
+    db.execute(sql)
+    return db.fetchone()[0]
+
+
+def format_tstamp(ts):
+    return datetime.fromtimestamp(ts).strftime("%c")
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+def cmd_show(project_path):
+    project_dir = Path(project_path)
+    print(project_dir)
+    repo = git.Repo(project_dir)
+    tree, source_paths = get_project(repo)
+    print_project(project_dir, source_paths)
+    for path in source_paths:
+        info = parse_entry(tree[path], project_dir)
+        file_info = info["file_info"]
+        print("{path} {num_bytes} {num_tags}".format(**file_info))
+    print("DONE")
+
+
+def cmd_index(project_path):
     project_dir = Path(project_path)
     print(project_dir)
 
@@ -122,41 +167,7 @@ def index_project(project_path):
         print(f"NOTE: {len(issues)} issues found")
 
 
-def get_db():
-    con = sqlite3.connect("main.db")
-    cur = con.cursor()
-    return con, cur
-
-
-def show_project(project_path):
-    project_dir = Path(project_path)
-    print(project_dir)
-    repo = git.Repo(project_dir)
-    tree, source_paths = get_project(repo)
-    print_project(project_dir, source_paths)
-    for path in source_paths:
-        info = parse_entry(tree[path], project_dir)
-        file_info = info["file_info"]
-        print("{path} {num_bytes} {num_tags}".format(**file_info))
-    print("DONE")
-
-
-def iter_color():
-    hue = 0
-    while True:
-        color = pg.Color("white")
-        color.hsva = (hue, 100, 100, 100)
-        yield color
-        hue += 15
-        hue %= 360
-
-
-def select1(db, sql):
-    db.execute(sql)
-    return db.fetchone()[0]
-
-
-def render_project(project_path):
+def cmd_render(project_path):
     WIDTH, HEIGHT = [1000, 500]
     VERBOSE = False
 
@@ -179,8 +190,7 @@ def render_project(project_path):
         xy = num_to_xy(num)
         coords.append(xy)
         num += row[1]
-    # print(coords)
-    # print()
+
     white = pg.Color("white")
     colors = iter_color()
     for i in range(len(coords) - 1):
@@ -201,12 +211,7 @@ def render_project(project_path):
     pg.image.save(screen, "main.png")
 
 
-def format_tstamp(ts):
-    return datetime.fromtimestamp(ts).strftime("%c")
-
-
-# TODO rename "show_releases"
-def show_tags(project_path):
+def cmd_releases(project_path):
     project_dir = Path(project_path)
     print(project_dir)
     repo = git.Repo(project_dir)
@@ -214,8 +219,11 @@ def show_tags(project_path):
     def is_interesting_release(tag):
         return re.match(r"^[0-9.]+$", tag.name) is not None
 
-    # tags = list(filter(is_interesting_release, repo.tags))
-    tags = repo.tags
+    if False:
+        tags = filter(is_interesting_release, repo.tags)
+    else:
+        tags = repo.tags
+
     # TODO sort semver
     for tagref in list(tags)[:10]:
         cool = is_interesting_release(tagref)
@@ -237,18 +245,29 @@ def show_tags(project_path):
 
 
 def main():
+
+    try:
+        cmd = sys.argv[1]
+        project = sys.argv[2]
+        cmd_func = globals()[f"cmd_{cmd}"]
+    except KeyError:
+        cmd_list = [name for name in globals() if name.startswith("cmd_")]
+        sys.exit(f"Commands: {cmd_list}")
+    except IndexError:
+        sys.exit(__doc__)
+    # cmd_funcs = dict(globals())
     # if 0:
-    #     show_project(sys.argv[1])
+    #     cmd_show(sys.argv[1])
     # elif 0:
-    #     show_tags(sys.argv[1])
+    #     cmd_releases(sys.argv[1])
 
-    index_project(sys.argv[1])
+    cmd_func(project)
 
-    _, db = get_db()
-    num_files = select1(db, "select count(*) from files")
-    print(f"NUM FILES: {num_files}")
+    # _, db = get_db()
+    # num_files = select1(db, "select count(*) from files")
+    # print(f"NUM FILES: {num_files}")
 
-    render_project(sys.argv[1])
+    # cmd_render(sys.argv[1])
 
 
 if __name__ == "__main__":
