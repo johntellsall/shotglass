@@ -54,7 +54,7 @@ def is_source_path(path):
 
 # TODO make more general
 def is_interesting(path):
-    return not re.search(r"(docs|tests)/", path)
+    return not re.search(r"(docs|migrations|tests)/", path)
 
 
 def is_interesting_source(path):
@@ -131,10 +131,12 @@ def cmd_show(project_path):
     repo = git.Repo(project_dir)
     tree, source_paths = get_project(repo)
     print_project(project_dir, source_paths)
+    print(f"{'PATH':50}\tBYTES\tTAGS")
     for path in source_paths:
         info = parse_entry(tree[path], project_dir)
-        file_info = info["file_info"]
-        print("{path} {num_bytes} {num_tags}".format(**file_info))
+        info = info["file_info"]
+        # print(f"{path}\t{info['num_bytes']}B {info['num_tags']} tags")
+        print(f"{path:50}\t{info['num_bytes']}\t{info['num_tags']}")
     print("DONE")
 
 
