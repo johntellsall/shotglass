@@ -1,5 +1,7 @@
 """
 USAGE
+
+shotglass.py <command> <project path>
 """
 
 import logging
@@ -172,6 +174,12 @@ def cmd_index(project_path):
         print(f"NOTE: {len(issues)} issues found")
 
 
+def cmd_info(project_path):
+    _, db = get_db()
+    num_files = select1(db, "select count(*) from files")
+    print(f"NUM FILES: {num_files}")
+
+
 def cmd_render(project_path):
     WIDTH, HEIGHT = [1000, 500]
     VERBOSE = False
@@ -249,17 +257,20 @@ def cmd_releases(project_path):
     print()
 
 
+def get_usage():
+    cmd_list = [name for name in globals() if name.startswith("cmd_")]
+    usage = [__doc__, f"Commands: {cmd_list}"]
+    return "\n".join(usage)
+
+
 def main():
 
     try:
         cmd = sys.argv[1]
         project = sys.argv[2]
         cmd_func = globals()[f"cmd_{cmd}"]
-    except KeyError:
-        cmd_list = [name for name in globals() if name.startswith("cmd_")]
-        sys.exit(f"Commands: {cmd_list}")
-    except IndexError:
-        sys.exit(__doc__)
+    except (KeyError, IndexError):
+        sys.exit(get_usage())
     # cmd_funcs = dict(globals())
     # if 0:
     #     cmd_show(sys.argv[1])
@@ -267,10 +278,6 @@ def main():
     #     cmd_releases(sys.argv[1])
 
     cmd_func(project)
-
-    # _, db = get_db()
-    # num_files = select1(db, "select count(*) from files")
-    # print(f"NUM FILES: {num_files}")
 
     # cmd_render(sys.argv[1])
 
