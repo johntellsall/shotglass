@@ -94,6 +94,12 @@ def get_project(repo):
     return tree, paths
 
 
+def get_usage():
+    cmd_list = [name for name in globals() if name.startswith("cmd_")]
+    usage = [__doc__, f"Commands: {cmd_list}"]
+    return "\n".join(usage)
+
+
 def setup_db(db):
     db.execute("drop table if exists files")
     db.execute(
@@ -129,20 +135,6 @@ def format_tstamp(ts):
 
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-
-def cmd_show(project_path):
-    project_dir = Path(project_path)
-    print(project_dir)
-    repo = git.Repo(project_dir)
-    tree, source_paths = get_project(repo)
-    print_project(project_dir, source_paths)
-    print(f"{'PATH':50}\tBYTES\tTAGS")
-    for path in source_paths:
-        info = parse_entry(tree[path], project_dir)
-        info = info["file_info"]
-        print(f"{path:50}\t{info['num_bytes']}\t{info['num_tags']}")
-    print("DONE")
 
 
 def cmd_index(project_path):
@@ -238,7 +230,7 @@ def cmd_releases(project_path):
         tags = repo.tags
 
     # TODO sort semver
-    for tagref in list(tags)[:10]:
+    for tagref in list(tags):
         cool = is_interesting_release(tagref)
         if not cool:
             print("-", end=" ")
@@ -246,21 +238,32 @@ def cmd_releases(project_path):
         tag_tree = tagref.commit.tree
         com_date = tagref.commit.committed_date
         com_datestr = format_tstamp(com_date)
-        print(len(list(tag_tree.traverse())))
+        total_files = len(list(tag_tree.traverse()))
         com_count = sum(1 for _ in tag_tree.traverse())
         com_size = sum(c.size for c in tag_tree.traverse())
         file_list = [x.path for x in tag_tree.traverse()]
         source_list = [path for path in file_list if is_interesting_source(path)]
         print(f"{tagref.name} files={len(file_list)} source={len(source_list)}")
         print(f"\t{com_datestr}")
-        print(f"\t{com_count} {com_size} {summary}")
+        print(f"\t{com_count} commits, {com_size} size")
+        print(f"\t{summary}")
+        print(f"\t{total_files} total files")
+
     print()
 
 
-def get_usage():
-    cmd_list = [name for name in globals() if name.startswith("cmd_")]
-    usage = [__doc__, f"Commands: {cmd_list}"]
-    return "\n".join(usage)
+def cmd_show(project_path):
+    project_dir = Path(project_path)
+    print(project_dir)
+    repo = git.Repo(project_dir)
+    tree, source_paths = get_project(repo)
+    print_project(project_dir, source_paths)
+    print(f"{'PATH':50}\tBYTES\tTAGS")
+    for path in source_paths:
+        info = parse_entry(tree[path], project_dir)
+        info = info["file_info"]
+        print(f"{path:50}\t{info['num_bytes']}\t{info['num_tags']}")
+    print("DONE")
 
 
 def main():
