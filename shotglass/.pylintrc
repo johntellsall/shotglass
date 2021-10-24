@@ -1,0 +1,12 @@
+[MASTER]
+
+load-plugins=pylint_django
+django-settings-modules=shotglass.settings
+
+# Pickle collected data for later comparisons.
+persistent=yes
+
+
+[MESSAGES CONTROL]
+
+disable=no-member
