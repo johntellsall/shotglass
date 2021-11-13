@@ -7,3 +7,5 @@ venv
 coverage/
 .DS_Store
 .vscode
+*.code-*
+tags
