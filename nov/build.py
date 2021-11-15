@@ -62,13 +62,15 @@ def format_summary(tags):
     return {"num_tags": len(tags)}
 
 
-def parse_entry(entry, project_dir):
-    file_info = {"path": entry.path, "num_bytes": entry.size}
-    fullpath = project_dir / entry.path
-    ctags_text = run_ctags(fullpath)
-    tags = list(parse_ctags(ctags_text))
-    file_info.update(format_summary(tags))
-    return dict(file_info=file_info, tags=tags)
+def make_file_info(entry, project_dir):
+    return {"path": entry.path, "num_bytes": entry.size}
+    # if False:
+    #     fullpath = project_dir / entry.path
+    #     ctags_text = run_ctags(fullpath)
+    #     tags = list(parse_ctags(ctags_text))
+    #     file_info.update(format_summary(tags))
+    # # return dict(file_info=file_info, tags=tags)
+    # return dict(file_info=file_info)
 
 
 def print_project(project_dir, source_paths):
@@ -106,9 +108,14 @@ def setup_db(db):
     db.execute("drop table if exists files")
     db.execute(
         """
-    create table files (path text, byte_count int)
-    """
+        create table files (path text, byte_count int);
+        """
     )
+    # db.execute("drop table if exists tags")
+    # db.execute("""
+    #     create table tags (file_id int, name text,
+    #     foreign key (file_id) references files(rowid));
+    #     """)
 
 
 def get_db():
@@ -144,13 +151,12 @@ def cmd_index(project_path):
     issues = []
     for path in source_paths:
         try:
-            info = parse_entry(tree[path], project_dir)
+            info = make_file_info(tree[path], project_dir)
+            values = (info["path"], info["num_bytes"])
+            cur.execute("insert into files values (?, ?)", values)
         except KeyError as err:
             issues.append((path, err))
             continue
-        finfo = info["file_info"]
-        values = (finfo["path"], finfo["num_bytes"])
-        cur.execute("insert into files values (?, ?)", values)
 
     con.commit()
 
@@ -214,7 +220,7 @@ def cmd_show(project_path):
     print_project(project_dir, source_paths)
     print(f"{'PATH':50}\tBYTES\tTAGS")
     for path in source_paths:
-        info = parse_entry(tree[path], project_dir)
+        info = make_file_info(tree[path], project_dir)
         info = info["file_info"]
         print(f"{path:50}\t{info['num_bytes']}\t{info['num_tags']}")
     print("DONE")
