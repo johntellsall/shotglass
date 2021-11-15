@@ -25,7 +25,8 @@ logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
 
 def show_details(db):
-    for row in db.execute("select * from files order by 1"):
+    print("DETAILS:")
+    for row in db.execute("select * from files order by 1 limit 3"):
         print(row)
 
 
@@ -64,13 +65,13 @@ def format_summary(tags):
 
 def make_file_info(entry, project_dir):
     return {"path": entry.path, "num_bytes": entry.size}
-    # if False:
-    #     fullpath = project_dir / entry.path
-    #     ctags_text = run_ctags(fullpath)
-    #     tags = list(parse_ctags(ctags_text))
-    #     file_info.update(format_summary(tags))
-    # # return dict(file_info=file_info, tags=tags)
-    # return dict(file_info=file_info)
+
+
+def make_tags_info(entry, project_dir):
+    fullpath = project_dir / entry.path
+    ctags_text = run_ctags(fullpath)
+    tags = list(parse_ctags(ctags_text))
+    return format_summary(tags)
 
 
 def print_project(project_dir, source_paths):
@@ -111,11 +112,13 @@ def setup_db(db):
         create table files (path text, byte_count int);
         """
     )
-    # db.execute("drop table if exists tags")
-    # db.execute("""
-    #     create table tags (file_id int, name text,
-    #     foreign key (file_id) references files(rowid));
-    #     """)
+    db.execute("drop table if exists tags")
+    db.execute(
+        """
+        create table tags (file_id int, name text,
+        foreign key (file_id) references files(rowid));
+        """
+    )
 
 
 def get_db():
@@ -146,18 +149,20 @@ def cmd_index(project_path):
         sys.exit("No source paths")
     con, cur = get_db()
 
+    con.execute("PRAGMA synchronous=OFF")
     setup_db(cur)
 
     issues = []
+    values = []
     for path in source_paths:
         try:
-            info = make_file_info(tree[path], project_dir)
-            values = (info["path"], info["num_bytes"])
-            cur.execute("insert into files values (?, ?)", values)
+            item = make_file_info(tree[path], project_dir)
+            values.append((item["path"], item["num_bytes"]))
         except KeyError as err:
             issues.append((path, err))
             continue
 
+    cur.executemany("insert into files values (?, ?)", values)
     con.commit()
 
     show_details(con)
