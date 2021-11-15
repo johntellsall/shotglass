@@ -13,7 +13,7 @@ build-db:
 # sqlite3 shotglass.db -cmd '.fullschema'
 
 nov: lint
-	python3 ./build.py nov ${TEST_REPO_DIR}
+	python3 ./build.py index ${TEST_REPO_DIR}
 	python3 ./build.py info .
 
 # python3 ./build.py ${TEST_REPOS_DIR}

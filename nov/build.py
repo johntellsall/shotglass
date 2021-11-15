@@ -46,7 +46,7 @@ def list_paths(repo):
 
 # TODO make more general
 def is_source_path(path):
-    return path.endswith(".py")
+    return Path(path).suffix in (".py", ".c")
 
 
 # TODO make more general
@@ -83,10 +83,17 @@ def get_project(repo):
     except AttributeError as err:
         attrs = [attr for attr in dir(repo.heads) if not attr.startswith("_")]
         sys.exit(f"tags?? {attrs}\n{err}")
-    paths = filter(is_source_path, list_paths(repo))
+    paths = list_paths(repo)
+    assert len(paths) > 0, "No source"
+    # paths = filter(is_interesting_source, paths)
+    paths = filter(is_source_path, paths)
+    paths = list(paths)
+    assert len(paths) > 0, "No interesting source"
+    return tree, paths
+    paths = filter(is_source_path, paths)
     paths = filter(is_interesting, paths)
     paths = list(paths)
-    return tree, paths
+    paths = list(paths)
 
 
 def get_usage():
@@ -128,6 +135,8 @@ def cmd_index(project_path):
 
     repo = git.Repo(project_dir)
     tree, source_paths = get_project(repo)
+    if not source_paths:
+        sys.exit("No source paths")
     con, cur = get_db()
 
     setup_db(cur)
@@ -157,48 +166,21 @@ def cmd_info(project_path):
     print(f"NUM FILES: {num_files}")
 
 
-# def cmd_render(project_path):
-#     WIDTH, HEIGHT = [1000, 500]
-#     VERBOSE = False
-
-#     pg.display.init()
-#     screen = pg.display.set_mode(size=[WIDTH, HEIGHT])
-#     _, db = get_db()
-
-#     total = select1(db, "select sum(byte_count) from files")
-#     print(f"TOTAL: {total} bytes")
-
-#     def num_to_xy(num):
-#         y = int(num / WIDTH)
-#         x = num % WIDTH
-#         return x, y
-
-#     num = 0
-#     rows = db.execute("select path, byte_count from files order by 1")
-#     coords = []
-#     for row in rows:
-#         xy = num_to_xy(num)
-#         coords.append(xy)
-#         num += row[1]
-
-#     white = pg.Color("white")
-#     colors = iter_color()
-#     for i in range(len(coords) - 1):
-#         color = next(colors)
-#         xy1, xy2 = coords[i], coords[i + 1]
-#         width = xy2[0] - xy1[0]
-#         height = xy2[1] - xy1[1]
-#         if VERBOSE:
-#             print(f"{i}\t{xy1}\t{xy2}\tw={width}\th={height}\tc={color}")
-#         rect = pg.Rect(xy1[0], xy1[1], width, height)
-#         rect.normalize()
-#         pg.draw.rect(screen, color, rect)
-#         if False:
-#             print(f"\t{rect}")
-#             rect.width = rect.height = 20
-#             pg.draw.rect(screen, white, rect)
-
-#     pg.image.save(screen, "main.png")
+def print_release(tagref):
+    summary = tagref.commit.summary
+    tag_tree = tagref.commit.tree
+    com_date = tagref.commit.committed_date
+    com_datestr = format_tstamp(com_date)
+    total_files = len(list(tag_tree.traverse()))
+    com_count = sum(1 for _ in tag_tree.traverse())
+    com_size = sum(c.size for c in tag_tree.traverse())
+    file_list = [x.path for x in tag_tree.traverse()]
+    source_list = [path for path in file_list if is_interesting_source(path)]
+    print(f"{tagref.name} files={len(file_list)} source={len(source_list)}")
+    print(f"\t{com_datestr}")
+    print(f"\t{com_count} commits, {com_size} size")
+    print(f"\t{summary}")
+    print(f"\t{total_files} total files")
 
 
 def cmd_releases(project_path):
@@ -219,20 +201,7 @@ def cmd_releases(project_path):
         cool = is_interesting_release(tagref)
         if not cool:
             print("-", end=" ")
-        summary = tagref.commit.summary
-        tag_tree = tagref.commit.tree
-        com_date = tagref.commit.committed_date
-        com_datestr = format_tstamp(com_date)
-        total_files = len(list(tag_tree.traverse()))
-        com_count = sum(1 for _ in tag_tree.traverse())
-        com_size = sum(c.size for c in tag_tree.traverse())
-        file_list = [x.path for x in tag_tree.traverse()]
-        source_list = [path for path in file_list if is_interesting_source(path)]
-        print(f"{tagref.name} files={len(file_list)} source={len(source_list)}")
-        print(f"\t{com_datestr}")
-        print(f"\t{com_count} commits, {com_size} size")
-        print(f"\t{summary}")
-        print(f"\t{total_files} total files")
+        print_release(tagref)
 
     print()
 
