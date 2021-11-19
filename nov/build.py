@@ -125,6 +125,7 @@ def setup_db(db):
             file_id int,
             name text,
             line_num int,
+            kind text,
             foreign key (file_id) references files(id));
         """
     )
@@ -192,15 +193,16 @@ def cmd_index(project_path):
         values = []
         fullpath = project_dir / path
         for tag in make_tags_info(fullpath):
-            values.append((path, tag["name"], tag["line_num"]))
+            values.append((path, tag["name"], tag["line_num"], tag["kind"]))
 
         # TODO: optimize
         cur.executemany(
             """
-        insert into symbols (file_id, name, line_num) values (
+        insert into symbols (file_id, name, line_num, kind) values (
             (select id from files where path=?),
             ?, -- name
-            ? -- line_num
+            ?, -- line_num
+            ? -- kind
             )
         """,
             values,
