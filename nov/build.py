@@ -37,8 +37,7 @@ def run_ctags(path):
 
 
 def parse_ctags(blob):
-    tag_iter = CTAGS_PAT.finditer(blob)
-    return tag_iter
+    return CTAGS_PAT.finditer(blob)
 
 
 def list_paths(repo):
@@ -72,8 +71,8 @@ def make_tags_info(fullpath):
     find info about all tags/symbols in a single source file
     """
     ctags_text = run_ctags(fullpath)
-    tags = list(parse_ctags(ctags_text))
-    return format_summary(tags)
+    for match in parse_ctags(ctags_text):
+        yield match.groupdict()
 
 
 def print_project(project_dir, source_paths):
@@ -188,11 +187,17 @@ def cmd_index(project_path):
     print(f"NUM FILES: {num_files}")
 
     values = []
-    path = source_paths[0]
-    fullpath = project_dir / path
-    item = make_tags_info(fullpath)
-    # file_id int, name
-    values.append((path, "beer"))
+    if False:
+        path = source_paths[0]
+        fullpath = project_dir / path
+        item = make_tags_info(fullpath)
+        # file_id int, name
+        values.append((path, "beer"))
+    else:
+        for path in [source_paths[10]]:
+            fullpath = project_dir / path
+            for tag in make_tags_info(fullpath):
+                values.append((path, tag["name"]))
     cur.executemany(
         """
     insert into symbols (file_id, name) values (
