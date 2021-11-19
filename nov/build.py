@@ -67,8 +67,10 @@ def make_file_info(entry, project_dir):
     return {"path": entry.path, "num_bytes": entry.size}
 
 
-def make_tags_info(entry, project_dir):
-    fullpath = project_dir / entry.path
+def make_tags_info(fullpath):
+    """
+    find info about all tags/symbols in a single source file
+    """
     ctags_text = run_ctags(fullpath)
     tags = list(parse_ctags(ctags_text))
     return format_summary(tags)
@@ -109,14 +111,20 @@ def setup_db(db):
     db.execute("drop table if exists files")
     db.execute(
         """
-        create table files (path text, byte_count int);
+        create table files (
+            id integer primary key, -- TODO rowid?
+            path text,
+            byte_count int
+            );
         """
     )
     db.execute("drop table if exists symbols")
     db.execute(
         """
-        create table symbols (file_id int, name text,
-        foreign key (file_id) references files(rowid));
+        create table symbols (
+            file_id int,
+            name text,
+            foreign key (file_id) references files(id));
         """
     )
 
@@ -168,7 +176,31 @@ def cmd_index(project_path):
             issues.append((path, err))
             continue
 
-    cur.executemany("insert into files values (?, ?)", values)
+    cur.executemany(
+        """
+    insert into files (path, byte_count) values (?, ?)
+    """,
+        values,
+    )
+    con.commit()
+
+    num_files = select1(cur, "select count(*) from files")
+    print(f"NUM FILES: {num_files}")
+
+    values = []
+    fullpath = project_dir / source_paths[0]
+    item = make_tags_info(fullpath)
+    # file_id int, name
+    values.append(("beer",))
+    # --(select rowid from files where path=?),
+    cur.executemany(
+        """
+    insert into symbols (file_id, name) values (
+        1,
+        ?)
+    """,
+        values,
+    )
     con.commit()
 
     show_details(con)
