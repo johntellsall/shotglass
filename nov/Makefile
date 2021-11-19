@@ -14,6 +14,7 @@ build-db:
 
 nov: lint
 	python3 ./build.py index ${TEST_REPO_DIR}
+	@echo
 	python3 ./build.py info .
 
 # python3 ./build.py ${TEST_REPOS_DIR}

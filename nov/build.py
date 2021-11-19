@@ -112,10 +112,10 @@ def setup_db(db):
         create table files (path text, byte_count int);
         """
     )
-    db.execute("drop table if exists tags")
+    db.execute("drop table if exists symbols")
     db.execute(
         """
-        create table tags (file_id int, name text,
+        create table symbols (file_id int, name text,
         foreign key (file_id) references files(rowid));
         """
     )
@@ -130,6 +130,11 @@ def get_db():
 def select1(db, sql):
     db.execute(sql)
     return db.fetchone()[0]
+
+
+def selectall(db, sql):
+    db.execute(sql)
+    return db.fetchall()
 
 
 def format_tstamp(ts):
@@ -150,6 +155,7 @@ def cmd_index(project_path):
     con, cur = get_db()
 
     con.execute("PRAGMA synchronous=OFF")
+    con.execute("PRAGMA foreign_keys=ON")
     setup_db(cur)
 
     issues = []
@@ -173,8 +179,16 @@ def cmd_index(project_path):
 
 def cmd_info(project_path):
     _, db = get_db()
+
     num_files = select1(db, "select count(*) from files")
     print(f"NUM FILES: {num_files}")
+    file_info = selectall(db, "select * from files limit 3")
+    print(f"FILES: {file_info}")
+
+    num_symbols = select1(db, "select count(*) from symbols")
+    print(f"NUM SYMBOLS: {num_symbols}")
+    sym_info = selectall(db, "select * from symbols limit 3")
+    print(f"SYMBOLS: {sym_info}")
 
 
 def print_release(tagref):
