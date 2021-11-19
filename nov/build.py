@@ -28,6 +28,8 @@ def show_details(db):
     print("DETAILS:")
     for row in db.execute("select * from files order by 1 limit 3"):
         print(row)
+    for row in db.execute("select * from symbols order by 1 limit 3"):
+        print(row)
 
 
 def run_ctags(path):
@@ -189,7 +191,7 @@ def cmd_index(project_path):
     num_files = select1(cur, "select count(*) from files")
     print(f"NUM FILES: {num_files}")
 
-    for path in source_paths[:3]:
+    for path in source_paths:
         values = []
         fullpath = project_dir / path
         for tag in make_tags_info(fullpath):
