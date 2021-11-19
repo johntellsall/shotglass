@@ -188,15 +188,15 @@ def cmd_index(project_path):
     print(f"NUM FILES: {num_files}")
 
     values = []
-    fullpath = project_dir / source_paths[0]
+    path = source_paths[0]
+    fullpath = project_dir / path
     item = make_tags_info(fullpath)
     # file_id int, name
-    values.append(("beer",))
-    # --(select rowid from files where path=?),
+    values.append((path, "beer"))
     cur.executemany(
         """
     insert into symbols (file_id, name) values (
-        1,
+        (select id from files where path=?),
         ?)
     """,
         values,
