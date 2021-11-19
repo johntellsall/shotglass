@@ -117,12 +117,14 @@ def setup_db(db):
             );
         """
     )
+    # r"(?P<name> \S+) ?P<line_num> kind:(?P<kind> \S+)",
     db.execute("drop table if exists symbols")
     db.execute(
         """
         create table symbols (
             file_id int,
             name text,
+            line_num int,
             foreign key (file_id) references files(id));
         """
     )
@@ -186,27 +188,24 @@ def cmd_index(project_path):
     num_files = select1(cur, "select count(*) from files")
     print(f"NUM FILES: {num_files}")
 
-    values = []
-    if False:
-        path = source_paths[0]
+    for path in source_paths[:3]:
+        values = []
         fullpath = project_dir / path
-        item = make_tags_info(fullpath)
-        # file_id int, name
-        values.append((path, "beer"))
-    else:
-        for path in [source_paths[10]]:
-            fullpath = project_dir / path
-            for tag in make_tags_info(fullpath):
-                values.append((path, tag["name"]))
-    cur.executemany(
-        """
-    insert into symbols (file_id, name) values (
-        (select id from files where path=?),
-        ?)
-    """,
-        values,
-    )
-    con.commit()
+        for tag in make_tags_info(fullpath):
+            values.append((path, tag["name"], tag["line_num"]))
+
+        # TODO: optimize
+        cur.executemany(
+            """
+        insert into symbols (file_id, name, line_num) values (
+            (select id from files where path=?),
+            ?, -- name
+            ? -- line_num
+            )
+        """,
+            values,
+        )
+        con.commit()
 
     show_details(con)
     con.close()
