@@ -17,12 +17,8 @@ import git
 
 
 # Universal Ctags
-CTAGS_ARGS = "ctags --output-format=json --fields=+zK --excmd=number -o -".split()
-# Example: "asbool settings.py 6; kind:function"
-# CTAGS_PAT = re.compile(
-#     r"(?P<name> \S+) .*? " + r"(?P<line_num> \d+) ;.+ " + r"kind:(?P<kind> \S+)",
-#     re.VERBOSE,
-# )
+CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()
+
 logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
 
@@ -36,30 +32,18 @@ def show_details(db):
         print(row)
 
 
-def run_ctags(path):
+def run_ctags(path, verbose=False):
     "return fulltext of Ctags command output"
     cmd = CTAGS_ARGS + [path]
     proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    print(f"-- RAW\n{proc.stdout[:300]}\n-- ENDRAW")
+    if verbose:
+        print(f"-- RAW\n{proc.stdout[:300]}\n-- ENDRAW")
     return proc.stdout
 
 
 def parse_ctags(blob):
     "parse Ctags-JSON output into iter of dictionaries"
-
-    def safe_loads(line):
-        if not line:
-            return None
-        try:
-            return json.loads(line)
-        except json.decoder.JSONDecodeError:
-            print(f"?? {line[:30]}")
-            return None
-
-    return filter(None, map(safe_loads, blob.split("\n")))
-    # line = whole.next()
-    breakpoint()
-    return map(json.loads, blob.split("\n"))
+    return map(json.loads, filter(None, blob.split("\n")))
 
 
 def list_paths(repo):
@@ -84,7 +68,8 @@ def format_summary(tags):
     return {"num_tags": len(tags)}
 
 
-def make_file_info(entry, project_dir):
+def make_file_info(entry):
+    "return dict of information for single source file"
     return {"path": entry.path, "num_bytes": entry.size}
 
 
@@ -94,8 +79,6 @@ def make_tags_info(fullpath):
     Return: iter of dictionaries, one per symbol
     """
     return parse_ctags(run_ctags(fullpath))
-    # for match in parse_ctags(ctags_text):
-    #     yield match.groupdict()
 
 
 def print_project(project_dir, source_paths):
@@ -201,7 +184,7 @@ def cmd_index(project_path):
     values = []
     for path in source_paths:
         try:
-            item = make_file_info(tree[path], project_dir)
+            item = make_file_info(tree[path])
             values.append((item["path"], item["num_bytes"]))
         except KeyError as err:
             issues.append((path, err))
@@ -222,7 +205,7 @@ def cmd_index(project_path):
         values = []
         fullpath = project_dir / path
         for tag in make_tags_info(fullpath):
-            values.append((path, tag["name"], tag["line_num"], tag["kind"]))
+            values.append((path, tag["name"], tag["line"], tag["kind"]))
 
         # TODO: optimize
         cur.executemany(
