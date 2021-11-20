@@ -4,6 +4,7 @@ USAGE
 shotglass.py <command> <project path>
 """
 
+import json
 import logging
 import re
 import subprocess
@@ -16,13 +17,12 @@ import git
 
 
 # Universal Ctags
-# TODO: convert to JSON output
-CTAGS_ARGS = "ctags --fields=+zK --excmd=number -o -".split()
+CTAGS_ARGS = "ctags --output-format=json --fields=+zK --excmd=number -o -".split()
 # Example: "asbool settings.py 6; kind:function"
-CTAGS_PAT = re.compile(
-    r"(?P<name> \S+) .*? " + r"(?P<line_num> \d+) ;.+ " + r"kind:(?P<kind> \S+)",
-    re.VERBOSE,
-)
+# CTAGS_PAT = re.compile(
+#     r"(?P<name> \S+) .*? " + r"(?P<line_num> \d+) ;.+ " + r"kind:(?P<kind> \S+)",
+#     re.VERBOSE,
+# )
 logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
 
@@ -37,6 +37,7 @@ def show_details(db):
 
 
 def run_ctags(path):
+    "return fulltext of Ctags command output"
     cmd = CTAGS_ARGS + [path]
     proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
     print(f"-- RAW\n{proc.stdout[:300]}\n-- ENDRAW")
@@ -44,7 +45,21 @@ def run_ctags(path):
 
 
 def parse_ctags(blob):
-    return CTAGS_PAT.finditer(blob)
+    "parse Ctags-JSON output into iter of dictionaries"
+
+    def safe_loads(line):
+        if not line:
+            return None
+        try:
+            return json.loads(line)
+        except json.decoder.JSONDecodeError:
+            print(f"?? {line[:30]}")
+            return None
+
+    return filter(None, map(safe_loads, blob.split("\n")))
+    # line = whole.next()
+    breakpoint()
+    return map(json.loads, blob.split("\n"))
 
 
 def list_paths(repo):
@@ -78,9 +93,9 @@ def make_tags_info(fullpath):
     find info about all tags/symbols in a single source file
     Return: iter of dictionaries, one per symbol
     """
-    ctags_text = run_ctags(fullpath)
-    for match in parse_ctags(ctags_text):
-        yield match.groupdict()
+    return parse_ctags(run_ctags(fullpath))
+    # for match in parse_ctags(ctags_text):
+    #     yield match.groupdict()
 
 
 def print_project(project_dir, source_paths):
