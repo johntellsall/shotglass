@@ -15,6 +15,8 @@ from pathlib import Path
 import git
 
 
+# Universal Ctags
+# TODO: convert to JSON output
 CTAGS_ARGS = "ctags --fields=+zK --excmd=number -o -".split()
 # Example: "asbool settings.py 6; kind:function"
 CTAGS_PAT = re.compile(
@@ -26,15 +28,18 @@ logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
 def show_details(db):
     print("DETAILS:")
+    print("-- files")
     for row in db.execute("select * from files order by 1 limit 3"):
         print(row)
+    print("-- symbols")
     for row in db.execute("select * from symbols order by 1 limit 3"):
         print(row)
 
 
 def run_ctags(path):
     cmd = CTAGS_ARGS + [path]
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    print(f"-- RAW\n{proc.stdout[:300]}\n-- ENDRAW")
     return proc.stdout
 
 
@@ -71,6 +76,7 @@ def make_file_info(entry, project_dir):
 def make_tags_info(fullpath):
     """
     find info about all tags/symbols in a single source file
+    Return: iter of dictionaries, one per symbol
     """
     ctags_text = run_ctags(fullpath)
     for match in parse_ctags(ctags_text):
@@ -91,8 +97,8 @@ def get_project(repo):
         sys.exit(f"tags?? {attrs}\n{err}")
     paths = list_paths(repo)
     assert len(paths) > 0, "No source"
-    # paths = filter(is_interesting_source, paths)
-    paths = filter(is_source_path, paths)
+    paths = filter(is_interesting_source, paths)
+    # paths = filter(is_source_path, paths)
     paths = list(paths)
     assert len(paths) > 0, "No interesting source"
     return tree, paths
@@ -154,6 +160,12 @@ def format_tstamp(ts):
 
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+def cmd_ctags(file_path):
+    print(f"== {file_path}")
+    for tag_info in make_tags_info(file_path):
+        print(tag_info)
 
 
 def cmd_index(project_path):
@@ -261,7 +273,7 @@ def cmd_releases(project_path):
     else:
         tags = repo.tags
 
-    # TODO sort semver
+    # TODO: sort semver
     for tagref in list(tags):
         cool = is_interesting_release(tagref)
         if not cool:

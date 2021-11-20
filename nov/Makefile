@@ -18,4 +18,6 @@ nov: lint
 	@echo
 	python3 ./build.py info .
 
+nov2:
+	python3 ./build.py ctags ${TEST_REPO_DIR}/gl/lib/cl-strtod.c
 # python3 ./build.py ${TEST_REPOS_DIR}
