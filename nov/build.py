@@ -57,7 +57,7 @@ def is_source_path(path):
 
 # TODO make more general
 def is_interesting(path):
-    return not re.search(r"(docs|migrations|tests)/", path)
+    return not re.search(r"(docs|examples|migrations|tests)/", path)
 
 
 def is_interesting_source(path):
@@ -87,12 +87,19 @@ def print_project(project_dir, source_paths):
     print(f"PROJECT:{p_name} {num_source} source files")
 
 
-def get_project(repo):
+def get_main_tree(git_repo):
+    heads = git_repo.heads
+    if hasattr(heads, "master"):
+        return heads.master.commit.tree
     try:
-        tree = repo.heads.master.commit.tree
+        return git_repo.heads.main.commit.tree
     except AttributeError as err:
-        attrs = [attr for attr in dir(repo.heads) if not attr.startswith("_")]
+        attrs = [attr for attr in dir(heads) if not attr.startswith("_")]
         sys.exit(f"tags?? {attrs}\n{err}")
+
+
+def get_project(repo):
+    tree = get_main_tree(repo)
     paths = list_paths(repo)
     assert len(paths) > 0, "No source"
     paths = filter(is_interesting_source, paths)
@@ -137,8 +144,9 @@ def setup_db(db):
     )
 
 
-def get_db():
-    con = sqlite3.connect("main.db")
+def get_db(temporary=True):
+    path = ":memory:"  # "main.db"
+    con = sqlite3.connect(path)
     cur = con.cursor()
     return con, cur
 
