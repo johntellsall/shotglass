@@ -25,7 +25,9 @@ nov: lint
 
 nov2:
 	python3 ./build.py ctags ${TEST_REPO_DIR}/gl/lib/cl-strtod.c
-# python3 ./build.py ${TEST_REPOS_DIR}
+
+info:
+	python3 ./build.py info .
 
 faststats:
 	python3 ./stats.py ${SOURCE_DIR}/{dhcp,flask}

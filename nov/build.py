@@ -166,6 +166,10 @@ def format_tstamp(ts):
     return datetime.fromtimestamp(ts).strftime("%c")
 
 
+def format_lines(objs):
+    return "\n".join(map(str, objs))
+
+
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -243,12 +247,23 @@ def cmd_info(project_path):
     num_files = select1(db, "select count(*) from files")
     print(f"NUM FILES: {num_files}")
     file_info = selectall(db, "select * from files limit 3")
-    print(f"FILES: {file_info}")
+    print(f"FILES: {format_lines(file_info)}")
 
     num_symbols = select1(db, "select count(*) from symbols")
     print(f"NUM SYMBOLS: {num_symbols}")
     sym_info = selectall(db, "select * from symbols limit 3")
-    print(f"SYMBOLS: {sym_info}")
+    print(f"SYMBOLS: {format_lines(sym_info)}")
+
+    size = selectall(
+        db,
+        """
+    select *, end_line-start_line as size from symbols
+    where size = (
+        select max(end_line-start_line) as size from symbols
+    )
+    """,
+    )
+    print(f"LARGEST: {size}")
 
 
 def print_release(tagref):
