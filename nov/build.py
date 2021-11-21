@@ -130,22 +130,23 @@ def setup_db(db):
             );
         """
     )
-    # r"(?P<name> \S+) ?P<line_num> kind:(?P<kind> \S+)",
+    # r"(?P<name> \S+) ?P<start_line> kind:(?P<kind> \S+)",
     db.execute("drop table if exists symbols")
     db.execute(
         """
         create table symbols (
             file_id int,
             name text,
-            line_num int,
+            start_line int,
+            end_line int,
             kind text,
             foreign key (file_id) references files(id));
         """
     )
 
 
-def get_db(temporary=True):
-    path = ":memory:"  # "main.db"
+def get_db(temporary=False):
+    path = ":memory:" if temporary else "main.db"
     con = sqlite3.connect(path)
     cur = con.cursor()
     return con, cur
@@ -213,15 +214,16 @@ def cmd_index(project_path):
         values = []
         fullpath = project_dir / path
         for tag in make_tags_info(fullpath):
-            values.append((path, tag["name"], tag["line"], tag["kind"]))
+            values.append((path, tag["name"], tag["line"], tag.get("end"), tag["kind"]))
 
         # TODO: optimize
         cur.executemany(
             """
-        insert into symbols (file_id, name, line_num, kind) values (
+        insert into symbols (file_id, name, start_line, end_line, kind) values (
             (select id from files where path=?),
             ?, -- name
-            ?, -- line_num
+            ?, -- start_line
+            ?, -- end_line
             ? -- kind
             )
         """,
