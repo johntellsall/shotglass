@@ -1,14 +1,21 @@
+import pytest
+
 import build
 
 
-# TODO: match something on command's output
-def test_cmd_index():
-    assert 0, build.cmd_index(project_path="..", temporary=True)
+def test_cmd_index(capfd):
+    build.cmd_index(project_path="..", temporary=True)
+
+    captured = capfd.readouterr()
+    assert "CTAGS_ARGS", captured.out
 
 
 # TODO: match something on command's output
-def test_cmd_info():
-    assert 0, build.cmd_info(project_path="..")
+def test_cmd_info(capfd):
+    build.cmd_info(project_path="..")
+
+    captured = capfd.readouterr()
+    assert "NUM FILES:" in captured.out
 
 
 # def cmd_ctags(file_path):
