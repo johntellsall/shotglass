@@ -1,5 +1,7 @@
 import subprocess
 
+import pytest
+
 import build
 
 
@@ -19,12 +21,19 @@ def test_cmd_info(capfd):
 
 # def cmd_ctags(file_path):
 # def cmd_releases(project_path):
-# def cmd_show(project_path):
 # def cmd_nov(project_path):
 
 
-def test_commandline(capfd):
-    subprocess.run("python3 ./build.py", shell=True, check=True)
+@pytest.mark.xfail
+def test_cmd_show(capfd):
+    build.cmd_show(project_path="..")
 
     captured = capfd.readouterr()
-    assert "USAGE" in captured.err
+    assert "NUM FILES:" in captured.out
+
+
+def test_commandline(capfd):
+    import pytest
+
+    with pytest.raises(subprocess.CalledProcessError):
+        subprocess.run("python3 ./build.py", shell=True, check=True)

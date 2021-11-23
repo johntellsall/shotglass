@@ -121,6 +121,7 @@ def cmd_releases(project_path):
     print()
 
 
+# TODO: fix
 def cmd_show(project_path):
     project_dir = Path(project_path)
     print(project_dir)
@@ -130,8 +131,7 @@ def cmd_show(project_path):
     print(f"{'PATH':50}\tBYTES\tTAGS")
     for path in source_paths:
         info = make_file_info(tree[path])
-        info = info["file_info"]
-        print(f"{path:50}\t{info['num_bytes']}\t{info['num_tags']}")
+        print(f"{path:50}\t{info['num_bytes']}")
     print("DONE")
 
 
