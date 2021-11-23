@@ -12,7 +12,7 @@ from pathlib import Path
 
 import git
 
-from cmd_index import cmd_index
+from cmd_index import cmd_index  # pylint: disable=unused-import
 from shotlib import (
     get_db,
     get_project,
@@ -28,63 +28,8 @@ CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()
 logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
 
-# def show_details(db):
-#     print("DETAILS:")
-#     print("-- files")
-#     for row in db.execute("select * from files order by 1 limit 3"):
-#         print(row)
-#     print("-- symbols")
-#     for row in db.execute("select * from symbols order by 1 limit 3"):
-#         print(row)
-
-
-# def run_ctags(path, verbose=False):
-#     "return fulltext of Ctags command output"
-#     cmd = CTAGS_ARGS + [path]
-#     proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
-#     if verbose:
-#         print(f"-- RAW\n{proc.stdout[:300]}\n-- ENDRAW")
-#     return proc.stdout
-
-
-# def parse_ctags(blob):
-#     "parse Ctags-JSON output into iter of dictionaries"
-#     return map(json.loads, filter(None, blob.split("\n")))
-
-
-# def list_paths(repo):
-#     return repo.git.ls_files().split("\n")
-
-
-# # TODO make more general
-# def is_source_path(path):
-#     return Path(path).suffix in (".py", ".c")
-
-
-# # TODO make more general
-# def is_interesting(path):
-#     return not re.search(r"(docs|examples|migrations|tests)/", path)
-
-
-# def is_interesting_source(path):
-#     return is_source_path(path) and is_interesting(path)
-
-
 def format_summary(tags):
     return {"num_tags": len(tags)}
-
-
-# def make_file_info(entry):
-#     "return dict of information for single source file"
-#     return {"path": entry.path, "num_bytes": entry.size}
-
-
-# def make_tags_info(fullpath):
-#     """
-#     find info about all tags/symbols in a single source file
-#     Return: iter of dictionaries, one per symbol
-#     """
-#     return parse_ctags(run_ctags(fullpath))
 
 
 def print_project(project_dir, source_paths):
@@ -184,7 +129,7 @@ def cmd_show(project_path):
     print_project(project_dir, source_paths)
     print(f"{'PATH':50}\tBYTES\tTAGS")
     for path in source_paths:
-        info = make_file_info(tree[path], project_dir)
+        info = make_file_info(tree[path])
         info = info["file_info"]
         print(f"{path:50}\t{info['num_bytes']}\t{info['num_tags']}")
     print("DONE")
