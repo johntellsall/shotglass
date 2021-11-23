@@ -13,8 +13,12 @@ test:
 test2:
 	pytest list_releases.py
 
+fastlint:
+	flake8 --ignore=F401 ${SHOT_SOURCE}
+	@echo DONE
 lint:
-	flake8 ${SHOT_SOURCE}
+	pylint ${SHOT_SOURCE}
+	@echo DONE
 
 # build-db:
 # 	sqlite3 shotglass.db < db.sql
