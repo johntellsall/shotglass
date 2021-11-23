@@ -16,7 +16,7 @@ from pathlib import Path
 import git
 
 from cmd_index import cmd_index
-
+from shotlib import get_db, select1, selectall
 
 # Universal Ctags
 CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()
@@ -119,49 +119,6 @@ def get_usage():
     cmd_list = [name for name in globals() if name.startswith("cmd_")]
     usage = [__doc__, f"Commands: {cmd_list}"]
     return "\n".join(usage)
-
-
-def setup_db(db):
-    db.execute("drop table if exists files")
-    db.execute(
-        """
-        create table files (
-            id integer primary key, -- TODO rowid?
-            path text,
-            byte_count int
-            );
-        """
-    )
-    # r"(?P<name> \S+) ?P<start_line> kind:(?P<kind> \S+)",
-    db.execute("drop table if exists symbols")
-    db.execute(
-        """
-        create table symbols (
-            file_id int,
-            name text,
-            start_line int,
-            end_line int,
-            kind text,
-            foreign key (file_id) references files(id));
-        """
-    )
-
-
-def get_db(temporary=False):
-    path = ":memory:" if temporary else "main.db"
-    con = sqlite3.connect(path)
-    cur = con.cursor()
-    return con, cur
-
-
-def select1(db, sql):
-    db.execute(sql)
-    return db.fetchone()[0]
-
-
-def selectall(db, sql):
-    db.execute(sql)
-    return db.fetchall()
 
 
 def format_tstamp(ts):
