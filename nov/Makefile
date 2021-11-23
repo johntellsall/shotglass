@@ -17,7 +17,7 @@ fastlint:
 	flake8 --ignore=F401 ${SHOT_SOURCE}
 	@echo DONE
 lint:
-	pylint ${SHOT_SOURCE}
+	pylint --disable=W0511,C build.py # ${SHOT_SOURCE}
 	@echo DONE
 
 # build-db:

@@ -1,8 +1,4 @@
-"""
-USAGE
-
-shotglass.py <command> <project path>
-"""
+# cmd_index.py
 
 import json
 import logging
@@ -41,25 +37,6 @@ def list_paths(repo):
     return repo.git.ls_files().split("\n")
 
 
-# TODO make more general
-def is_source_path(path):
-    return Path(path).suffix in (".py", ".c")
-
-
-# TODO make more general
-def is_interesting(path):
-    return not re.search(r"(docs|examples|migrations|tests)/", path)
-
-
-def is_interesting_source(path):
-    return is_source_path(path) and is_interesting(path)
-
-
-def make_file_info(entry):
-    "return dict of information for single source file"
-    return {"path": entry.path, "num_bytes": entry.size}
-
-
 def make_tags_info(fullpath):
     """
     find info about all tags/symbols in a single source file
@@ -91,32 +68,6 @@ def setup_db(db):
             foreign key (file_id) references files(id));
         """
     )
-
-
-def get_main_tree(git_repo):
-    heads = git_repo.heads
-    if hasattr(heads, "master"):
-        return heads.master.commit.tree
-    try:
-        return git_repo.heads.main.commit.tree
-    except AttributeError as err:
-        attrs = [attr for attr in dir(heads) if not attr.startswith("_")]
-        sys.exit(f"tags?? {attrs}\n{err}")
-
-
-def get_project(repo):
-    tree = get_main_tree(repo)
-    paths = list_paths(repo)
-    assert len(paths) > 0, "No source"
-    paths = filter(is_interesting_source, paths)
-    # paths = filter(is_source_path, paths)
-    paths = list(paths)
-    assert len(paths) > 0, "No interesting source"
-    return tree, paths
-    paths = filter(is_source_path, paths)
-    paths = filter(is_interesting, paths)
-    paths = list(paths)
-    paths = list(paths)
 
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -182,3 +133,9 @@ def cmd_index(project_path, temporary=False):
     con.close()
     if issues:
         print(f"NOTE: {len(issues)} issues found")
+
+
+def cmd_ctags(file_path):
+    print(f"== {file_path}")
+    for tag_info in make_tags_info(file_path):
+        print(tag_info)

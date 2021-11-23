@@ -4,11 +4,8 @@ USAGE
 shotglass.py <command> <project path>
 """
 
-import json
 import logging
 import re
-import subprocess
-import sqlite3
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -16,7 +13,14 @@ from pathlib import Path
 import git
 
 from cmd_index import cmd_index
-from shotlib import get_db, select1, selectall
+from shotlib import (
+    get_db,
+    get_project,
+    make_file_info,
+    select1,
+    selectall,
+    is_interesting_source,
+)
 
 # Universal Ctags
 CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()
@@ -24,95 +28,69 @@ CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()
 logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
 
-def show_details(db):
-    print("DETAILS:")
-    print("-- files")
-    for row in db.execute("select * from files order by 1 limit 3"):
-        print(row)
-    print("-- symbols")
-    for row in db.execute("select * from symbols order by 1 limit 3"):
-        print(row)
+# def show_details(db):
+#     print("DETAILS:")
+#     print("-- files")
+#     for row in db.execute("select * from files order by 1 limit 3"):
+#         print(row)
+#     print("-- symbols")
+#     for row in db.execute("select * from symbols order by 1 limit 3"):
+#         print(row)
 
 
-def run_ctags(path, verbose=False):
-    "return fulltext of Ctags command output"
-    cmd = CTAGS_ARGS + [path]
-    proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    if verbose:
-        print(f"-- RAW\n{proc.stdout[:300]}\n-- ENDRAW")
-    return proc.stdout
+# def run_ctags(path, verbose=False):
+#     "return fulltext of Ctags command output"
+#     cmd = CTAGS_ARGS + [path]
+#     proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+#     if verbose:
+#         print(f"-- RAW\n{proc.stdout[:300]}\n-- ENDRAW")
+#     return proc.stdout
 
 
-def parse_ctags(blob):
-    "parse Ctags-JSON output into iter of dictionaries"
-    return map(json.loads, filter(None, blob.split("\n")))
+# def parse_ctags(blob):
+#     "parse Ctags-JSON output into iter of dictionaries"
+#     return map(json.loads, filter(None, blob.split("\n")))
 
 
-def list_paths(repo):
-    return repo.git.ls_files().split("\n")
+# def list_paths(repo):
+#     return repo.git.ls_files().split("\n")
 
 
-# TODO make more general
-def is_source_path(path):
-    return Path(path).suffix in (".py", ".c")
+# # TODO make more general
+# def is_source_path(path):
+#     return Path(path).suffix in (".py", ".c")
 
 
-# TODO make more general
-def is_interesting(path):
-    return not re.search(r"(docs|examples|migrations|tests)/", path)
+# # TODO make more general
+# def is_interesting(path):
+#     return not re.search(r"(docs|examples|migrations|tests)/", path)
 
 
-def is_interesting_source(path):
-    return is_source_path(path) and is_interesting(path)
+# def is_interesting_source(path):
+#     return is_source_path(path) and is_interesting(path)
 
 
 def format_summary(tags):
     return {"num_tags": len(tags)}
 
 
-def make_file_info(entry):
-    "return dict of information for single source file"
-    return {"path": entry.path, "num_bytes": entry.size}
+# def make_file_info(entry):
+#     "return dict of information for single source file"
+#     return {"path": entry.path, "num_bytes": entry.size}
 
 
-def make_tags_info(fullpath):
-    """
-    find info about all tags/symbols in a single source file
-    Return: iter of dictionaries, one per symbol
-    """
-    return parse_ctags(run_ctags(fullpath))
+# def make_tags_info(fullpath):
+#     """
+#     find info about all tags/symbols in a single source file
+#     Return: iter of dictionaries, one per symbol
+#     """
+#     return parse_ctags(run_ctags(fullpath))
 
 
 def print_project(project_dir, source_paths):
     p_name = project_dir.name
     num_source = len(source_paths)
     print(f"PROJECT:{p_name} {num_source} source files")
-
-
-def get_main_tree(git_repo):
-    heads = git_repo.heads
-    if hasattr(heads, "master"):
-        return heads.master.commit.tree
-    try:
-        return git_repo.heads.main.commit.tree
-    except AttributeError as err:
-        attrs = [attr for attr in dir(heads) if not attr.startswith("_")]
-        sys.exit(f"tags?? {attrs}\n{err}")
-
-
-def get_project(repo):
-    tree = get_main_tree(repo)
-    paths = list_paths(repo)
-    assert len(paths) > 0, "No source"
-    paths = filter(is_interesting_source, paths)
-    # paths = filter(is_source_path, paths)
-    paths = list(paths)
-    assert len(paths) > 0, "No interesting source"
-    return tree, paths
-    paths = filter(is_source_path, paths)
-    paths = filter(is_interesting, paths)
-    paths = list(paths)
-    paths = list(paths)
 
 
 def get_usage():
@@ -132,13 +110,7 @@ def format_lines(objs):
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-def cmd_ctags(file_path):
-    print(f"== {file_path}")
-    for tag_info in make_tags_info(file_path):
-        print(tag_info)
-
-
-def cmd_info(project_path):
+def cmd_info(project_path):  # pylint: disable=unused-argument
     _, db = get_db()
 
     num_files = select1(db, "select count(*) from files")
@@ -188,6 +160,7 @@ def cmd_releases(project_path):
     def is_interesting_release(tag):
         return re.match(r"^[0-9.]+$", tag.name) is not None
 
+    # pylint: disable=using-constant-test
     if False:
         tags = filter(is_interesting_release, repo.tags)
     else:
