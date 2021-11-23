@@ -3,6 +3,7 @@ import subprocess
 import pytest
 
 import build
+import cmd_index
 
 
 def test_cmd_index(capfd):
@@ -19,7 +20,13 @@ def test_cmd_info(capfd):
     assert "NUM FILES:" in captured.out
 
 
-# def cmd_ctags(file_path):
+def test_cmd_ctags(capfd):
+    cmd_index.cmd_ctags("shotlib.py")
+
+    captured = capfd.readouterr()
+    assert "'signature': '(temporary=False)'" in captured.out
+
+
 # def cmd_releases(project_path):
 # def cmd_nov(project_path):
 
