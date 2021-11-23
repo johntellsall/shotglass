@@ -27,7 +27,14 @@ def test_cmd_ctags(capfd):
     assert "'signature': '(temporary=False)'" in captured.out
 
 
-# def cmd_releases(project_path):
+def test_cmd_releases(capfd):
+    build.cmd_releases("../SOURCE/flask/")
+
+    captured = capfd.readouterr()
+    assert "total files" in captured.out
+
+
+# def cmd_releases('../SOURCE/flask/')
 # def cmd_nov(project_path):
 
 
@@ -39,8 +46,6 @@ def test_cmd_show(capfd):
     assert "NUM FILES:" in captured.out
 
 
-def test_commandline(capfd):
-    import pytest
-
+def test_commandline():
     with pytest.raises(subprocess.CalledProcessError):
         subprocess.run("python3 ./build.py", shell=True, check=True)
