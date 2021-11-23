@@ -1,5 +1,6 @@
 SOURCE_DIR = "/Users/johnmitchell/jsrc/shotglass/SOURCE"
 TEST_REPO_DIR = "/Users/johnmitchell/jsrc/shotglass/SOURCE/coreutils"
+SHOT_SOURCE := $(shell git ls-files '*.py')
 
 all:
 
@@ -10,7 +11,7 @@ test:
 	pytest list_releases.py
 
 lint:
-	flake8
+	flake8 ${SHOT_SOURCE}
 
 # build-db:
 # 	sqlite3 shotglass.db < db.sql
