@@ -31,7 +31,7 @@ def is_interesting_source(path):
 
 def get_db(temporary=False):
     path = ":memory:" if temporary else "main.db"
-    con = sqlite3.connect(path)
+    con = sqlite3.connect(path)  # pylint: disable=no-member
     cur = con.cursor()
     return con, cur
 
@@ -56,10 +56,15 @@ def get_project(repo):
     paths = list(paths)
     assert len(paths) > 0, "No interesting source"
     return tree, paths
+    # pylint: disable=unreachable
     paths = filter(is_source_path, paths)
     paths = filter(is_interesting, paths)
     paths = list(paths)
     paths = list(paths)
+
+
+def list_paths(repo):
+    return repo.git.ls_files().split("\n")
 
 
 def make_file_info(entry):

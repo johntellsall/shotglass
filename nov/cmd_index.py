@@ -30,10 +30,6 @@ def parse_ctags(blob):
     return map(json.loads, filter(None, blob.split("\n")))
 
 
-def list_paths(repo):
-    return repo.git.ls_files().split("\n")
-
-
 def make_tags_info(fullpath):
     """
     find info about all tags/symbols in a single source file
