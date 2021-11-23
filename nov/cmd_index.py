@@ -2,11 +2,8 @@
 
 import json
 import logging
-import re
 import subprocess
-import sqlite3
 import sys
-from datetime import datetime
 from pathlib import Path
 
 import git
@@ -73,12 +70,13 @@ def setup_db(db):
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
+# TODO: pylint: disable=too-many-locals
 def cmd_index(project_path, temporary=False):
     project_dir = Path(project_path)
     print(project_dir)
 
     repo = git.Repo(project_dir)
-    tree, source_paths = get_project(repo)
+    tree, source_paths = shotlib.get_project(repo)
     if not source_paths:
         sys.exit("No source paths")
     con, cur = shotlib.get_db(temporary=temporary)
@@ -91,7 +89,7 @@ def cmd_index(project_path, temporary=False):
     values = []
     for path in source_paths:
         try:
-            item = make_file_info(tree[path])
+            item = shotlib.make_file_info(tree[path])
             values.append((item["path"], item["num_bytes"]))
         except KeyError as err:
             issues.append((path, err))
