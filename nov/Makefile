@@ -8,6 +8,9 @@ fmt:
 	black .
 
 test:
+	python3 -m pytest
+
+test2:
 	pytest list_releases.py
 
 lint:
