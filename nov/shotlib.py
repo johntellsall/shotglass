@@ -1,18 +1,9 @@
 # shotlib.py
 
-
-# import json
-# import logging
 import re
-
-# import subprocess
 import sqlite3
 import sys
-
-# from datetime import datetime
 from pathlib import Path
-
-# import git
 
 
 # TODO make more general

@@ -1,6 +1,7 @@
 SOURCE_DIR = "/Users/johnmitchell/jsrc/shotglass/SOURCE"
 TEST_REPO_DIR = "/Users/johnmitchell/jsrc/shotglass/SOURCE/coreutils"
 SHOT_SOURCE := $(shell git ls-files '*.py')
+PYLINT := pylint --disable=W0511,C
 
 all:
 
@@ -10,14 +11,19 @@ fmt:
 test:
 	python3 -m pytest
 
+ftest:
+	${PYLINT} cmd_releases.py
+	make test
+
 test2:
 	pytest list_releases.py
 
 fastlint:
 	flake8 --ignore=F401 ${SHOT_SOURCE}
 	@echo DONE
+
 lint:
-	pylint --disable=W0511,C ${SHOT_SOURCE}
+	${PYLINT} ${SHOT_SOURCE}
 	@echo DONE
 
 # build-db:

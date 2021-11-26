@@ -34,10 +34,6 @@ def test_cmd_releases(capfd):
     assert "total files" in captured.out
 
 
-# def cmd_releases('../SOURCE/flask/')
-# def cmd_nov(project_path):
-
-
 @pytest.mark.xfail
 def test_cmd_show(capfd):
     build.cmd_show(project_path="..")
