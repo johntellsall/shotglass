@@ -78,13 +78,14 @@ def setup_db(db):
     )
 
 
-def make_releases_info():
+def make_releases_info(project_dir):
     """
     get info for releases (Git tags)
     """
+    git_dir = Path(project_dir) / ".git"
     cmd = (
         "git",
-        "--git-dir=../SOURCE/flask/.git",  # <== TODO
+        f"--git-dir={git_dir}",
         "for-each-ref",
         "--format=%(refname:short),%(creatordate)",
         "refs/tags/*",
@@ -167,7 +168,7 @@ def cmd_index(project_path, temporary=False):
     )
     con.commit()
 
-    values = make_releases_info()
+    values = make_releases_info(project_dir)
     print(values)
     cur.executemany(
         """
