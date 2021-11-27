@@ -98,3 +98,13 @@ def show_details(db):
     """
     ):
         print(row)
+
+    print("-- releases")
+    for row in db.execute(
+        """
+    select *
+    from releases
+    order by 1 limit 3
+    """
+    ):
+        print(row)

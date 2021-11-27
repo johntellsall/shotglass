@@ -33,7 +33,8 @@ lint:
 # 	sqlite3 shotglass.db < db.sql
 # sqlite3 shotglass.db -cmd '.fullschema'
 
-nov: fastlint
+# nov: fastlint
+nov:
 	-$(RM) main.db
 	python3 ./build.py index ${TEST_REPO_DIR}
 	ls -l main.db

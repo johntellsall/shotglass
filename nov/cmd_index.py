@@ -65,7 +65,7 @@ def setup_db(db):
         """
     )
     #
-    # TAGS
+    # RELEASES
     #
     db.execute("drop table if exists releases")
     db.execute(
@@ -78,21 +78,22 @@ def setup_db(db):
     )
 
 
-# FORMAT:=%(refname:short),%(creatordate),%(taggerdate)
-# tag-date test2:
-# 	git for-each-ref \
-# 	--format="${FORMAT}" "refs/tags/*"
-
-
 def make_releases_info():
     """
     get info for releases (Git tags)
     """
-    format = "%(refname:short),%(creatordate),%(taggerdate)"
-    cmd = f'git for-each-ref --format="${format}" "refs/tags/*"'
-    assert 0, cmd
+    cmd = (
+        "git",
+        "--git-dir=../SOURCE/flask/.git",  # <== TODO
+        "for-each-ref",
+        "--format=%(refname:short),%(creatordate)",
+        "refs/tags/*",
+    )
+    print(" ".join(cmd))
     proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    assert 0, proc.stdout
+    # TODO: simplify
+    lines = filter(None, proc.stdout.split("\n"))
+    return [line.split(",") for line in lines]
 
 
 def make_tags_info_paths(project_dir, source_paths):
@@ -136,44 +137,26 @@ def cmd_index(project_path, temporary=False):
     con.execute("PRAGMA foreign_keys=ON")
     setup_db(cur)
 
-    if False:
-        issues, values = make_file_info_paths(tree, source_paths)
+    issues, values = make_file_info_paths(tree, source_paths)
 
-        cur.executemany(
-            """
-        insert into files (path, byte_count) values (?, ?)
-        """,
-            values,
-        )
-        con.commit()
+    cur.executemany(
+        """
+    insert into files (path, byte_count) values (?, ?)
+    """,
+        values,
+    )
+    con.commit()
 
     num_files = shotlib.select1(cur, "select count(*) from files")
     print(f"NUM FILES: {num_files}")
 
-    if False:
-        values = make_tags_info_paths(project_dir, source_paths)
-
-        # TODO: optimize
-        cur.executemany(
-            """
-        insert into symbols (file_id, name, start_line, end_line, kind) values (
-            (select id from files where path=?),
-            ?, -- name
-            ?, -- start_line
-            ?, -- end_line
-            ? -- kind
-            )
-        """,
-            values,
-        )
-        con.commit()
-
-    values = make_releases_info()
+    values = make_tags_info_paths(project_dir, source_paths)
 
     # TODO: optimize
     cur.executemany(
         """
-    insert into releases (file_id, name, start_line, end_line, kind) values (
+    insert into symbols (file_id, name, start_line, end_line, kind) values (
+        (select id from files where path=?),
         ?, -- name
         ?, -- start_line
         ?, -- end_line
@@ -183,6 +166,17 @@ def cmd_index(project_path, temporary=False):
         values,
     )
     con.commit()
+
+    values = make_releases_info()
+    print(values)
+    cur.executemany(
+        """
+    insert into releases (tag, creator_dt) values (?, ?)
+    """,
+        values,
+    )
+    con.commit()
+    print("RELEASES: ", shotlib.select1(cur, "select count(*) from releases"))
 
     shotlib.show_details(con)
     con.close()
