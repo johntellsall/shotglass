@@ -5,7 +5,6 @@ shotglass.py <command> <project path>
 """
 
 import logging
-import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -21,7 +20,6 @@ from shotlib import (
     make_file_info,
     select1,
     selectall,
-    is_interesting_source,
 )
 
 # Universal Ctags
@@ -70,16 +68,17 @@ def cmd_info(project_path):  # pylint: disable=unused-argument
     sym_info = selectall(db, "select * from symbols limit 3")
     print(f"SYMBOLS: {format_lines(sym_info)}")
 
-    size = selectall(
-        db,
-        """
-    select *, end_line-start_line as size from symbols
-    where size = (
-        select max(end_line-start_line) as size from symbols
-    )
-    """,
-    )
-    print(f"LARGEST: {size}")
+    if False:
+        size = selectall(
+            db,
+            """
+        select *, end_line-start_line as size from symbols
+        where size = (
+            select max(end_line-start_line) as size from symbols
+        )
+        """,
+        )
+        print(f"LARGEST: {size}")
 
 
 # TODO: fix

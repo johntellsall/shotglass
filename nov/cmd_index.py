@@ -63,6 +63,32 @@ def setup_db(db):
     )
 
 
+# FORMAT:=%(refname:short),%(creatordate),%(taggerdate)
+# tag-date test2:
+# 	git for-each-ref \
+# 	--format="${FORMAT}" "refs/tags/*"
+
+
+def make_tags_info_paths(project_dir, source_paths):
+    values = []
+    for path in source_paths:
+        fullpath = project_dir / path
+        for tag in make_tags_info(fullpath):
+            values.append((path, tag["name"], tag["line"], tag.get("end"), tag["kind"]))
+    return values
+
+
+def make_file_info_paths(tree, source_paths):
+    issues, values = [], []
+    for path in source_paths:
+        try:
+            item = shotlib.make_file_info(tree[path])
+            values.append((item["path"], item["num_bytes"]))
+        except KeyError as err:
+            issues.append((path, err))
+    return issues, values
+
+
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -81,15 +107,7 @@ def cmd_index(project_path, temporary=False):
     con.execute("PRAGMA foreign_keys=ON")
     setup_db(cur)
 
-    issues = []
-    values = []
-    for path in source_paths:
-        try:
-            item = shotlib.make_file_info(tree[path])
-            values.append((item["path"], item["num_bytes"]))
-        except KeyError as err:
-            issues.append((path, err))
-            continue
+    issues, values = make_file_info_paths(tree, source_paths)
 
     cur.executemany(
         """
@@ -102,26 +120,22 @@ def cmd_index(project_path, temporary=False):
     num_files = shotlib.select1(cur, "select count(*) from files")
     print(f"NUM FILES: {num_files}")
 
-    for path in source_paths:
-        values = []
-        fullpath = project_dir / path
-        for tag in make_tags_info(fullpath):
-            values.append((path, tag["name"], tag["line"], tag.get("end"), tag["kind"]))
+    values = make_tags_info_paths(project_dir, source_paths)
 
-        # TODO: optimize
-        cur.executemany(
-            """
-        insert into symbols (file_id, name, start_line, end_line, kind) values (
-            (select id from files where path=?),
-            ?, -- name
-            ?, -- start_line
-            ?, -- end_line
-            ? -- kind
-            )
-        """,
-            values,
+    # TODO: optimize
+    cur.executemany(
+        """
+    insert into symbols (file_id, name, start_line, end_line, kind) values (
+        (select id from files where path=?),
+        ?, -- name
+        ?, -- start_line
+        ?, -- end_line
+        ? -- kind
         )
-        con.commit()
+    """,
+        values,
+    )
+    con.commit()
 
     shotlib.show_details(con)
     con.close()

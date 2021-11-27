@@ -79,5 +79,22 @@ def show_details(db):
     for row in db.execute("select * from files order by 1 limit 3"):
         print(row)
     print("-- symbols")
-    for row in db.execute("select * from symbols order by 1 limit 3"):
+    for row in db.execute(
+        """
+    select * -- s.name, s.start_line
+    from symbols s
+    order by 1 limit 3
+    """
+    ):
+        print(row)
+
+    print("-- symbols2")
+    for row in db.execute(
+        """
+    select f.id, f.path, s.name, s.start_line
+    from files as f, symbols as s
+    inner join files on f.id = s.file_id
+    order by 1 limit 30
+    """
+    ):
         print(row)
