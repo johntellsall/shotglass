@@ -49,6 +49,9 @@ def setup_db(db):
             );
         """
     )
+    #
+    # SYMBOLS
+    #
     db.execute("drop table if exists symbols")
     db.execute(
         """
@@ -61,6 +64,18 @@ def setup_db(db):
             foreign key (file_id) references files(id));
         """
     )
+    #
+    # TAGS
+    #
+    db.execute("drop table if exists releases")
+    db.execute(
+        """
+        create table releases (
+            tag text,
+            creator_dt text -- ISO8601
+        )
+        """
+    )
 
 
 # FORMAT:=%(refname:short),%(creatordate),%(taggerdate)
@@ -69,7 +84,21 @@ def setup_db(db):
 # 	--format="${FORMAT}" "refs/tags/*"
 
 
+def make_releases_info():
+    """
+    get info for releases (Git tags)
+    """
+    format = "%(refname:short),%(creatordate),%(taggerdate)"
+    cmd = f'git for-each-ref --format="${format}" "refs/tags/*"'
+    assert 0, cmd
+    proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    assert 0, proc.stdout
+
+
 def make_tags_info_paths(project_dir, source_paths):
+    """
+    calc info for source code tags/symbols
+    """
     values = []
     for path in source_paths:
         fullpath = project_dir / path
@@ -107,26 +136,44 @@ def cmd_index(project_path, temporary=False):
     con.execute("PRAGMA foreign_keys=ON")
     setup_db(cur)
 
-    issues, values = make_file_info_paths(tree, source_paths)
+    if False:
+        issues, values = make_file_info_paths(tree, source_paths)
 
-    cur.executemany(
-        """
-    insert into files (path, byte_count) values (?, ?)
-    """,
-        values,
-    )
-    con.commit()
+        cur.executemany(
+            """
+        insert into files (path, byte_count) values (?, ?)
+        """,
+            values,
+        )
+        con.commit()
 
     num_files = shotlib.select1(cur, "select count(*) from files")
     print(f"NUM FILES: {num_files}")
 
-    values = make_tags_info_paths(project_dir, source_paths)
+    if False:
+        values = make_tags_info_paths(project_dir, source_paths)
+
+        # TODO: optimize
+        cur.executemany(
+            """
+        insert into symbols (file_id, name, start_line, end_line, kind) values (
+            (select id from files where path=?),
+            ?, -- name
+            ?, -- start_line
+            ?, -- end_line
+            ? -- kind
+            )
+        """,
+            values,
+        )
+        con.commit()
+
+    values = make_releases_info()
 
     # TODO: optimize
     cur.executemany(
         """
-    insert into symbols (file_id, name, start_line, end_line, kind) values (
-        (select id from files where path=?),
+    insert into releases (file_id, name, start_line, end_line, kind) values (
         ?, -- name
         ?, -- start_line
         ?, -- end_line
