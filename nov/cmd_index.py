@@ -78,7 +78,7 @@ def setup_db(db):
     )
 
 
-def make_releases_info(project_dir):
+def make_releases_info(project_dir, verbose=False):
     """
     get info for releases (Git tags)
     """
@@ -90,7 +90,8 @@ def make_releases_info(project_dir):
         "--format=%(refname:short),%(creatordate)",
         "refs/tags/*",
     )
-    print(" ".join(cmd))
+    if verbose:
+        print(" ".join(cmd))
     proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
     # TODO: simplify
     lines = filter(None, proc.stdout.split("\n"))
@@ -168,6 +169,9 @@ def cmd_index(project_path, temporary=False):
     )
     con.commit()
 
+    num_symbols = shotlib.select1(cur, "select count(*) from symbols")
+    print(f"NUM SYMBOLS: {num_symbols}")
+
     values = make_releases_info(project_dir)
     print(values)
     cur.executemany(
@@ -177,7 +181,9 @@ def cmd_index(project_path, temporary=False):
         values,
     )
     con.commit()
-    print("RELEASES: ", shotlib.select1(cur, "select count(*) from releases"))
+
+    num_releases = shotlib.select1(cur, "select count(*) from releases")
+    print(f"NUM RELEASES: {num_releases}")
 
     shotlib.show_details(con)
     con.close()

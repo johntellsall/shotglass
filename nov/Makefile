@@ -41,6 +41,13 @@ nov:
 	@echo
 	python3 ./build.py info .
 
+nov3:
+	-$(RM) main.db
+	python3 ./build.py index ${TEST_REPO_DIR}
+	ls -l main.db
+	@echo
+	python3 ./build.py info .
+
 nov2:
 	python3 ./build.py ctags ${TEST_REPO_DIR}/gl/lib/cl-strtod.c
 
@@ -52,3 +59,30 @@ faststats:
 fullstats:
 	python3 ./stats.py ${SOURCE_DIR}/flask ${SOURCE_DIR}/*
 # python3 ./stats.py ${SOURCE_DIR}/flask ${SOURCE_DIR}/*
+
+list:
+	du -sh ../SOURCE/*| sort -h
+
+prof:
+	@echo "Flask: 11M Python"
+	./test-build.sh flask
+
+med-prof:
+	./test-build.sh flask
+	./test-build.sh cpython
+
+full-prof:
+	@echo "Flask: 11M Python / Dnsmasq: 16M C"
+	./test-build.sh flask
+	./test-build.sh dnsmasq
+	@echo "SQLAlchemy 97M Python / CPython: 198M C"
+	./test-build.sh sqlalchemy
+	./test-build.sh cpython
+	@echo "Node 526M Javascript / Postgres 557M C"
+	./test-build.sh node
+	./test-build.sh postgres
+	@echo "Mongo 812M C"
+	./test-build.sh mongo
+
+# TODO: ./test-build.sh redis
+# TODO: MySQL 3.0G C./test-build.sh mysql-server
