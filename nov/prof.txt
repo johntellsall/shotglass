@@ -1,0 +1,35 @@
+=== flask
+real	0m0.500s
+40K main.db
+NUM FILES: 22
+NUM SYMBOLS: 614
+=== dnsmasq
+real	0m0.808s
+76K main.db
+NUM FILES: 43
+NUM SYMBOLS: 1264
+=== sqlalchemy
+real	0m9.115s
+2.1M main.db
+NUM FILES: 514
+NUM SYMBOLS: 39298
+=== cpython
+real	0m41.541s
+4.1M main.db
+NUM FILES: 2237
+NUM SYMBOLS: 101815
+=== node
+real	0m34.784s
+4.1M main.db
+NUM FILES: 1955
+NUM SYMBOLS: 78305
+=== postgres
+real	11m16.266s
+2.1M main.db
+NUM FILES: 1249
+NUM SYMBOLS: 40500
+=== mongo
+real	0m29.754s
+2.1M main.db
+NUM FILES: 1703
+NUM SYMBOLS: 41452
