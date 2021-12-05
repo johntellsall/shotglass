@@ -11,6 +11,8 @@ setup:
 	
 # index:
 # 	python3 ./build.py index ${TEST_REPO_DIR}
+dec:
+	python3 ./build.py dec ${TEST_REPO_DIR}
 
 fmt:
 	black .

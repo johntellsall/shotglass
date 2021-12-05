@@ -98,7 +98,7 @@ def cmd_show(project_path):
     print("DONE")
 
 
-def cmd_nov(project_path):
+def cmd_dec(project_path):
     def is_release(tag):
         return tag.name.startswith("v")
 
