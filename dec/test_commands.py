@@ -6,12 +6,11 @@ import build
 import cmd_index
 
 
-@pytest.mark.xfail
 def test_cmd_index(capfd):
     build.cmd_index(project_path="..", temporary=True)
 
     captured = capfd.readouterr()
-    assert "CTAGS_ARGS" in captured.out
+    assert "NUM SYMBOLS:" in captured.out
 
 
 def test_cmd_info(capfd):
@@ -35,7 +34,7 @@ def test_cmd_releases(capfd):
     assert "total files" in captured.out
 
 
-@pytest.mark.xfail
+# @pytest.mark.xfail
 def test_cmd_show(capfd):
     build.cmd_show(project_path="..")
 
