@@ -1,0 +1,4 @@
+release_url: http://git.savannah.gnu.org/gitweb/?p=coreutils.git
+release:
+    tag: v9.0
+    
