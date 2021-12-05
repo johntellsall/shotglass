@@ -1,0 +1,7 @@
+jupyter
+matplotlib
+seaborn
+pytest
+GitPython
+flake8
+black
