@@ -34,12 +34,11 @@ def test_cmd_releases(capfd):
     assert "total files" in captured.out
 
 
-# @pytest.mark.xfail
 def test_cmd_show(capfd):
     build.cmd_show(project_path="..")
 
     captured = capfd.readouterr()
-    assert "NUM FILES:" in captured.out
+    assert "source files" in captured.out
 
 
 def test_commandline():
