@@ -17,7 +17,7 @@ def test_cmd_info(capfd):
     build.cmd_info(project_path="..")
 
     captured = capfd.readouterr()
-    assert "NUM FILES:" in captured.out
+    assert "NUM RELEASES:" in captured.out
 
 
 def test_cmd_ctags(capfd):

@@ -33,12 +33,17 @@ def cmd_info(project_path):  # pylint: disable=unused-argument
     num_files = select1(db, "select count(*) from files")
     print(f"NUM FILES: {num_files}")
     file_info = selectall(db, "select * from files limit 3")
-    print(f"FILES: {format_lines(file_info)}")
+    print(f"FILES:\n{format_lines(file_info)}")
 
     num_symbols = select1(db, "select count(*) from symbols")
     print(f"NUM SYMBOLS: {num_symbols}")
     sym_info = selectall(db, "select * from symbols limit 3")
-    print(f"SYMBOLS: {format_lines(sym_info)}")
+    print(f"SYMBOLS:\n{format_lines(sym_info)}")
+
+    num_releases = select1(db, "select count(*) from releases")
+    print(f"NUM RELEASES: {num_releases}")
+    release_info = selectall(db, "select * from releases limit 3")
+    print(f"RELEASES:\n{format_lines(release_info)}")
 
     if False:
         size = selectall(

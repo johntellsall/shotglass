@@ -124,6 +124,7 @@ def make_file_info_paths(tree, source_paths):
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
+# TODO: merge with cmd_info?
 # TODO: pylint: disable=too-many-locals
 def cmd_index(project_path, temporary=False):
     project_dir = Path(project_path)

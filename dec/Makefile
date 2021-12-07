@@ -8,13 +8,8 @@ all:
 setup:
 	python3 -m venv .venv
 	.venv/bin/pip install -r ./requirements.txt
-	
-# index:
-# 	python3 ./build.py index ${TEST_REPO_DIR}
-dec:
-	python3 ./build.py dec ${TEST_REPO_DIR}
 
-# nov: fastlint
+
 dec:
 	-$(RM) main.db
 	python3 ./build.py index ${TEST_REPO_DIR}
@@ -22,8 +17,21 @@ dec:
 	@echo
 	python3 ./build.py info .
 
-dec2:
-	python3 ./build.py ctags ${TEST_REPO_DIR}/gl/lib/cl-strtod.c
+# # index:
+# # 	python3 ./build.py index ${TEST_REPO_DIR}
+# dec:
+# 	python3 ./build.py dec ${TEST_REPO_DIR}
+
+# # nov: fastlint
+# dec:
+# 	-$(RM) main.db
+# 	python3 ./build.py index ${TEST_REPO_DIR}
+# 	ls -l main.db
+# 	@echo
+# 	python3 ./build.py info .
+
+# dec2:
+# 	python3 ./build.py ctags ${TEST_REPO_DIR}/gl/lib/cl-strtod.c
 
 fmt:
 	black .
@@ -50,13 +58,6 @@ lint:
 # build-db:
 # 	sqlite3 shotglass.db < db.sql
 # sqlite3 shotglass.db -cmd '.fullschema'
-
-# nov3:
-# 	-$(RM) main.db
-# 	python3 ./build.py index ${TEST_REPO_DIR}
-# 	ls -l main.db
-# 	@echo
-# 	python3 ./build.py info .
 
 info:
 	python3 ./build.py info .
