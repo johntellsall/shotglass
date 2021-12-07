@@ -5,6 +5,9 @@ PYLINT := pylint --disable=W0511,C
 
 all:
 
+test-sql:
+	sqlite3 main.db < test.sql
+
 setup:
 	python3 -m venv .venv
 	.venv/bin/pip install -r ./requirements.txt
