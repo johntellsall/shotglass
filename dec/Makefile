@@ -14,11 +14,23 @@ setup:
 dec:
 	python3 ./build.py dec ${TEST_REPO_DIR}
 
+# nov: fastlint
+dec:
+	-$(RM) main.db
+	python3 ./build.py index ${TEST_REPO_DIR}
+	ls -l main.db
+	@echo
+	python3 ./build.py info .
+
+dec2:
+	python3 ./build.py ctags ${TEST_REPO_DIR}/gl/lib/cl-strtod.c
+
 fmt:
 	black .
 
+TEST ?= .
 test:
-	python3 -m pytest
+	python3 -m pytest -k $(TEST)
 
 ftest:
 	${PYLINT} cmd_releases.py
@@ -38,17 +50,6 @@ lint:
 # build-db:
 # 	sqlite3 shotglass.db < db.sql
 # sqlite3 shotglass.db -cmd '.fullschema'
-
-# nov: fastlint
-dec:
-	-$(RM) main.db
-	python3 ./build.py index ${TEST_REPO_DIR}
-	ls -l main.db
-	@echo
-	python3 ./build.py info .
-
-dec2:
-	python3 ./build.py ctags ${TEST_REPO_DIR}/gl/lib/cl-strtod.c
 
 # nov3:
 # 	-$(RM) main.db
