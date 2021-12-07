@@ -5,6 +5,9 @@ PYLINT := pylint --disable=W0511,C
 
 all:
 
+index: nuke-database
+	python3 ./build.py index ${TEST_REPO_DIR}
+
 test-sql:
 	sqlite3 main.db < test.sql
 
@@ -12,16 +15,15 @@ setup:
 	python3 -m venv .venv
 	.venv/bin/pip install -r ./requirements.txt
 
-
-dec:
+nuke-database:
 	-$(RM) main.db
+
+dec: nuke-database
 	python3 ./build.py index ${TEST_REPO_DIR}
 	ls -l main.db
 	@echo
 	python3 ./build.py info .
 
-# # index:
-# # 	python3 ./build.py index ${TEST_REPO_DIR}
 # dec:
 # 	python3 ./build.py dec ${TEST_REPO_DIR}
 
