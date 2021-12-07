@@ -1,6 +1,23 @@
 select tag, creator_dt from releases limit 3;
 select '';
+
 select tag, date(creator_dt) from releases limit 3;
+select '';
+
+select tag, date(creator_dt) from releases;
+
+-- select strftime('%m', creator_dt) as month,
+-- count(*) as num_releases,
+-- strftime('%Y', creator_dt) as year
+-- from releases
+-- where year >= 2000
+-- group by 1
+
+-- select strftime('%Y', creator_dt) as year,
+-- count(*) as yearly_releases
+-- from releases
+-- group by 1
+
 
 -- create table releases (
 --     tag text,

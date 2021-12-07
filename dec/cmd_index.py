@@ -87,7 +87,7 @@ def make_releases_info(project_dir, verbose=False):
         "git",
         f"--git-dir={git_dir}",
         "for-each-ref",
-        "--format=%(refname:short),%(creatordate:iso)",
+        "--format=%(refname:short),%(creatordate:iso-strict)",
         "refs/tags/*",
     )
     if verbose:
