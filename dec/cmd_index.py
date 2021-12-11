@@ -39,20 +39,34 @@ def make_tags_info(fullpath):
 
 
 def setup_db(db):
-    db.execute("drop table if exists files")
+    #
+    # PROJECTS
+    #
+    # db.execute("drop table if exists projects")
+    db.execute(
+        """
+        create table projects (
+            id integer primary key,
+            name text
+            );
+        """
+    )
+    # db.execute("drop table if exists projects")
     db.execute(
         """
         create table files (
-            id integer primary key, -- TODO rowid?
+            id integer primary key,
             path text,
-            byte_count int
+            byte_count int,
+            project_id int,
+            foreign key (project_id) references projects(id)
             );
         """
     )
     #
     # SYMBOLS
-    #
-    db.execute("drop table if exists symbols")
+    # TODO: add id? use rowid?
+    # db.execute("drop table if exists symbols")
     db.execute(
         """
         create table symbols (
@@ -67,7 +81,7 @@ def setup_db(db):
     #
     # RELEASES
     #
-    db.execute("drop table if exists releases")
+    # db.execute("drop table if exists releases")
     db.execute(
         """
         create table releases (
