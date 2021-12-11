@@ -1,10 +1,22 @@
+select distinct(name) from projects;
+select '';
+
+select name, path
+from projects join files on projects.id = files.project_id
+limit 3;
+select '';
+
+select 'TODO: for each project, file count';
+select name, count(*) from projects
+limit 3;
+select '';
+
 select tag, creator_dt from releases limit 3;
 select '';
 
 select tag, date(creator_dt) from releases limit 3;
 select '';
 
-select tag, date(creator_dt) from releases;
 
 -- select strftime('%m', creator_dt) as month,
 -- count(*) as num_releases,

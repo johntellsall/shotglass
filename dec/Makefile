@@ -5,6 +5,13 @@ PYLINT := pylint --disable=W0511,C
 
 all:
 
+# index2 -- import two small C projects
+index2: nuke-database
+	python3 ./build.py setup .
+	@echo
+	python3 ./build.py index ${SOURCE_DIR}/memcached
+	python3 ./build.py index ${SOURCE_DIR}/dnsmasq
+
 index: nuke-database
 	python3 ./build.py index ${TEST_REPO_DIR}
 

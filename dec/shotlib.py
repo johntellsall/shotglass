@@ -93,8 +93,8 @@ def show_details(db):
         """
     select f.id, f.path, s.name, s.start_line
     from files as f, symbols as s
-    inner join files on f.id = s.file_id
-    order by 1 limit 30
+    join files on f.id = s.file_id
+    order by 1 limit 10
     """
     ):
         print(row)

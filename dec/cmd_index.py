@@ -42,7 +42,6 @@ def setup_db(db):
     #
     # PROJECTS
     #
-    # db.execute("drop table if exists projects")
     db.execute(
         """
         create table projects (
@@ -51,7 +50,6 @@ def setup_db(db):
             );
         """
     )
-    # db.execute("drop table if exists projects")
     db.execute(
         """
         create table files (
@@ -66,7 +64,6 @@ def setup_db(db):
     #
     # SYMBOLS
     # TODO: add id? use rowid?
-    # db.execute("drop table if exists symbols")
     db.execute(
         """
         create table symbols (
@@ -81,7 +78,6 @@ def setup_db(db):
     #
     # RELEASES
     #
-    # db.execute("drop table if exists releases")
     db.execute(
         """
         create table releases (
@@ -135,7 +131,19 @@ def make_file_info_paths(tree, source_paths):
     return issues, values
 
 
+def make_project_info(project_dir):
+    return project_dir.name
+
+
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+def cmd_setup(project_path):
+    con, cur = shotlib.get_db()
+    setup_db(cur)
+
+    num_projects = shotlib.select1(cur, "select count(*) from projects")
+    print(f"NUM PROJECTS: {num_projects}")
 
 
 # TODO: merge with cmd_info?
@@ -152,13 +160,20 @@ def cmd_index(project_path, temporary=False):
 
     con.execute("PRAGMA synchronous=OFF")
     con.execute("PRAGMA foreign_keys=ON")
-    setup_db(cur)
+
+    name = make_project_info(project_dir)
+    cur.executemany("insert into projects (name) values (?)", [(name,)])
+
+    proj_id = shotlib.select1(cur, f"select id from projects where name = '{name}'")
+    assert proj_id
 
     issues, values = make_file_info_paths(tree, source_paths)
+    # TODO: simplify
+    values = [(*row, proj_id) for row in values]
 
     cur.executemany(
         """
-    insert into files (path, byte_count) values (?, ?)
+    insert into files (path, byte_count, project_id) values (?, ?, ?)
     """,
         values,
     )
@@ -188,7 +203,6 @@ def cmd_index(project_path, temporary=False):
     print(f"NUM SYMBOLS: {num_symbols}")
 
     values = make_releases_info(project_dir)
-    print(values)
     cur.executemany(
         """
     insert into releases (tag, creator_dt) values (?, ?)

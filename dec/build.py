@@ -11,7 +11,7 @@ from pathlib import Path
 
 import git
 
-from cmd_index import cmd_ctags, cmd_index  # pylint: disable=unused-import
+from cmd_index import cmd_ctags, cmd_index, cmd_setup  # pylint: disable=unused-import
 from cmd_releases import cmd_releases  # pylint: disable=unused-import
 from cmd_info_show import cmd_info, cmd_show
 
