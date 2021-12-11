@@ -5,6 +5,17 @@ PYLINT := pylint --disable=W0511,C
 
 all:
 
+proj_summary:
+	echo 'drop table proj_summary' | sqlite3 main.db
+	echo '.import proj_summary.csv proj_summary' | sqlite3 -csv main.db 
+	echo 'select count(*) from proj_summary' | sqlite3 main.db
+	echo 'select * from proj_summary limit 3' | sqlite3 main.db
+	echo 'select name from proj_summary order by 1 limit 3' | sqlite3 main.db
+
+# XXXX: lists "cpython" < 20 but it's 198!
+show-small:
+	echo 'select name from proj_summary where language="C" and size_mb < 20' | sqlite3 main.db
+
 # index2 -- import two small C projects
 index2: nuke-database
 	python3 ./build.py setup .
@@ -12,13 +23,21 @@ index2: nuke-database
 	python3 ./build.py index ${SOURCE_DIR}/memcached
 	python3 ./build.py index ${SOURCE_DIR}/dnsmasq
 
+index3:
+	echo flask requests django | xargs -t -n1 -I{} \
+		python3 ./build.py index ${SOURCE_DIR}/{}
+	python3 ./build.py info .
+
 index: nuke-database
 	python3 ./build.py index ${TEST_REPO_DIR}
 
 test-sql:
 	sqlite3 main.db < test.sql
 
-setup:
+setup-db:
+	python3 ./build.py setup .
+
+setup-venv:
 	python3 -m venv .venv
 	.venv/bin/pip install -r ./requirements.txt
 
