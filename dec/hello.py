@@ -1,6 +1,8 @@
 # %%
 import pandas as pd
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 data = pd.read_csv("data.csv")
 
@@ -10,8 +12,6 @@ data.replace("?", np.nan, inplace=True)
 data = data.astype({"age": np.float64, "fare": np.float64})
 
 # %%
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 fig, axs = plt.subplots(ncols=5, figsize=(30, 5))
 sns.violinplot(x="survived", y="age", hue="sex", data=data, ax=axs[0])
