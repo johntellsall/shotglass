@@ -31,8 +31,8 @@ index2: nuke-database
 
 index3:
 	echo flask requests django | xargs -t -n1 -I{} \
-		python3 ./build.py index ${SOURCE_DIR}/{}
-	python3 ./build.py info .
+		./index-verbose.sh {}
+# python3 ./build.py info .
 
 index: nuke-database
 	python3 ./build.py index ${TEST_REPO_DIR}

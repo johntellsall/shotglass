@@ -3,6 +3,7 @@
 import json
 import logging
 import subprocess
+import sqlite3
 import sys
 from pathlib import Path
 
@@ -163,7 +164,11 @@ def cmd_index(project_path, temporary=False):
     con.execute("PRAGMA foreign_keys=ON")
 
     name = make_project_info(project_dir)
-    cur.executemany("insert into projects (name) values (?)", [(name,)])
+    try:
+        cur.executemany("insert into projects (name) values (?)", [(name,)])
+    except sqlite3.IntegrityError:
+        print(f"{name}: already exists, skipping")
+        return
 
     proj_id = shotlib.select1(cur, f"select id from projects where name = '{name}'")
     assert proj_id
