@@ -5,6 +5,9 @@ PYLINT := pylint --disable=W0511,C
 
 all:
 
+sql:
+	sqlite3 main.db
+	
 proj_summary:
 	echo 'drop table if exists proj_summary' | sqlite3 main.db
 	echo '.import proj_summary.csv proj_summary' | sqlite3 -csv main.db 

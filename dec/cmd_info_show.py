@@ -26,6 +26,33 @@ def print_project(project_dir, source_paths):
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
+# TODO: add quoting
+def cmd_pinfo(project):  # pylint: disable=unused-argument
+    _, db = get_db()
+
+    proj_id = select1(db, f"select id from projects where name='{project}'")
+    print(f"NAME: {project} NUM: {proj_id}")
+
+    num_files = select1(db, f"select count(*) from files where project_id={proj_id}")
+    print(f"NUM FILES: {num_files}")
+    file_info = selectall(db, f"select * from files where project_id={proj_id} limit 3")
+    print(f"FILES:\n{format_lines(file_info)}")
+
+    # num_symbols = select1(
+    #     db, f"select count(*) from symbols where project_id={proj_id}"
+    # )
+    # print(f"NUM SYMBOLS: {num_symbols}")
+    # sym_info = selectall(
+    #     db, f"select * from symbols where project_id={proj_id} limit 3"
+    # )
+    # print(f"SYMBOLS:\n{format_lines(sym_info)}")
+
+    # num_releases = select1(db, "select count(*) from releases")
+    # print(f"NUM RELEASES: {num_releases}")
+    # release_info = selectall(db, "select * from releases limit 3")
+    # print(f"RELEASES:\n{format_lines(release_info)}")
+
+
 def cmd_info(project_path):  # pylint: disable=unused-argument
     _, db = get_db()
 

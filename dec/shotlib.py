@@ -73,11 +73,13 @@ def selectall(db, sql):
     return db.fetchall()
 
 
-def show_details(db):
+def show_all_details(db):
     print("DETAILS:")
+
     print("-- files")
     for row in db.execute("select * from files order by 1 limit 3"):
         print(row)
+
     print("-- symbols")
     for row in db.execute(
         """
@@ -88,16 +90,57 @@ def show_details(db):
     ):
         print(row)
 
-    print("-- symbols2")
+    if False:
+        print("-- symbols2")
+        for row in db.execute(
+            """
+        select f.id, f.path, s.name, s.start_line
+        from files as f, symbols as s
+        join files on f.id = s.file_id
+        order by 1 limit 10
+        """
+        ):
+            print(row)
+
+    print("-- releases")
     for row in db.execute(
         """
-    select f.id, f.path, s.name, s.start_line
-    from files as f, symbols as s
-    join files on f.id = s.file_id
-    order by 1 limit 10
+    select *
+    from releases
+    order by 1 limit 3
     """
     ):
         print(row)
+
+
+def show_project_details(db, project):
+    print(f"DETAILS for {project}:")
+
+    print("-- files")
+    for row in db.execute("select * from files order by 1 limit 3"):
+        print(row)
+
+    print("-- symbols")
+    for row in db.execute(
+        """
+    select * -- s.name, s.start_line
+    from symbols s
+    order by 1 limit 3
+    """
+    ):
+        print(row)
+
+    if False:
+        print("-- symbols2")
+        for row in db.execute(
+            """
+        select f.id, f.path, s.name, s.start_line
+        from files as f, symbols as s
+        join files on f.id = s.file_id
+        order by 1 limit 10
+        """
+        ):
+            print(row)
 
     print("-- releases")
     for row in db.execute(
