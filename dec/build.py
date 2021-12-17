@@ -7,21 +7,12 @@ shotglass.py <command> <project path>
 import logging
 import sys
 from datetime import datetime
-from pathlib import Path
 
 import git
 
 from cmd_index import cmd_ctags, cmd_index, cmd_setup  # pylint: disable=unused-import
 from cmd_releases import cmd_releases  # pylint: disable=unused-import
-from cmd_info_show import cmd_info, cmd_show
 
-from shotlib import (
-    get_db,
-    get_project,
-    make_file_info,
-    select1,
-    selectall,
-)
 
 # Universal Ctags
 CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()

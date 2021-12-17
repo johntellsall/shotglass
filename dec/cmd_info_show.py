@@ -1,6 +1,5 @@
-# import logging
-# import sys
-# from datetime import datetime
+# cmd_info_show.py
+#
 from pathlib import Path
 
 import git
@@ -45,7 +44,7 @@ def cmd_info(project_path):  # pylint: disable=unused-argument
     release_info = selectall(db, "select * from releases limit 3")
     print(f"RELEASES:\n{format_lines(release_info)}")
 
-    if False:
+    if False:  # pylint: disable=using-constant-test
         size = selectall(
             db,
             """

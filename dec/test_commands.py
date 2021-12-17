@@ -1,12 +1,20 @@
+# test_commands.py
+#
 import subprocess
 
 import pytest
 
 import build
 import cmd_index
+import cmd_info_show
 
 
+@pytest.mark.xfail
 def test_cmd_index(capfd):
+    build.cmd_setup(project_path="..")
+    captured = capfd.readouterr()
+    assert 0, captured.out
+
     build.cmd_index(project_path="..", temporary=True)
 
     captured = capfd.readouterr()
@@ -14,7 +22,7 @@ def test_cmd_index(capfd):
 
 
 def test_cmd_info(capfd):
-    build.cmd_info(project_path="..")
+    cmd_info_show.cmd_info(project_path="..")
 
     captured = capfd.readouterr()
     assert "NUM RELEASES:" in captured.out
@@ -35,7 +43,7 @@ def test_cmd_releases(capfd):
 
 
 def test_cmd_show(capfd):
-    build.cmd_show(project_path="..")
+    cmd_info_show.cmd_show(project_path="..")
 
     captured = capfd.readouterr()
     assert "source files" in captured.out

@@ -138,8 +138,8 @@ def make_project_info(project_dir):
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-def cmd_setup(project_path):
-    con, cur = shotlib.get_db()
+def cmd_setup(project_path):  # pylint: disable=unused-argument
+    _, cur = shotlib.get_db()
     setup_db(cur)
 
     num_projects = shotlib.select1(cur, "select count(*) from projects")

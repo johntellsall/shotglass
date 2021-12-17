@@ -5,3 +5,7 @@ pytest
 GitPython
 flake8
 black
+pandas
+numpy
+GitPython
+pylint

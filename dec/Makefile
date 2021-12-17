@@ -1,6 +1,6 @@
 SOURCE_DIR = "/Users/johnmitchell/jsrc/shotglass/SOURCE"
 TEST_REPO_DIR = "/Users/johnmitchell/jsrc/shotglass/SOURCE/coreutils"
-SHOT_SOURCE := $(shell git ls-files '*.py')
+SHOT_SOURCE ?= $(shell git ls-files '*.py')
 PYLINT := pylint --disable=W0511,C
 
 all:
@@ -83,7 +83,7 @@ fastlint:
 	@echo DONE
 
 lint:
-	${PYLINT} ${SHOT_SOURCE}
+	${PYLINT} --disable=R ${SHOT_SOURCE}
 	@echo DONE
 
 # build-db:
