@@ -46,7 +46,7 @@ def setup_db(db):
         """
         create table projects (
             id integer primary key,
-            name text
+            name text unique
             );
         """
     )
@@ -215,7 +215,7 @@ def cmd_index(project_path, temporary=False):
     num_releases = shotlib.select1(cur, "select count(*) from releases")
     print(f"NUM RELEASES: {num_releases}")
 
-    shotlib.show_details(con)
+    shotlib.show_project_details(con, name)
     con.close()
     if issues:
         print(f"NOTE: {len(issues)} issues found")

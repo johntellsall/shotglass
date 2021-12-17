@@ -7,7 +7,7 @@ all:
 
 sql:
 	sqlite3 main.db
-	
+
 proj_summary:
 	echo 'drop table if exists proj_summary' | sqlite3 main.db
 	echo '.import proj_summary.csv proj_summary' | sqlite3 -csv main.db 
@@ -19,12 +19,15 @@ proj_summary:
 show-small:
 	echo 'select name from proj_summary where language="C" and size_mb < 20' | sqlite3 main.db
 
-# index2 -- import two small C projects
+# index2 -- import two small projects
 index2: nuke-database
 	python3 ./build.py setup .
 	@echo
 	python3 ./build.py index ${SOURCE_DIR}/memcached
-	python3 ./build.py index ${SOURCE_DIR}/dnsmasq
+	python3 ./build.py index ${SOURCE_DIR}/flask
+	python3 ./build.py pinfo memcached
+	python3 ./build.py pinfo flask
+
 
 index3:
 	echo flask requests django | xargs -t -n1 -I{} \
