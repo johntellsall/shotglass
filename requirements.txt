@@ -50,3 +50,4 @@ unittest2
 wcwidth
 wrapt
 GitPython
+flake8

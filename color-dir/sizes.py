@@ -1,8 +1,10 @@
+# sizes.py
+#
 import argparse
 import pprint
 from pathlib import Path
 
-from git import Git, Repo
+from git import Git
 from PIL import Image, ImageDraw
 
 

@@ -17,7 +17,6 @@ proj_summary:
 	echo 'select * from proj_summary limit 3' | sqlite3 main.db
 	echo 'select name from proj_summary order by 1 limit 3' | sqlite3 main.db
 
-# XXXX: lists "cpython" < 20 but it's 198!
 show-small:
 	echo 'select name from proj_summary where language="C" and size_mb < 20' | sqlite3 main.db
 
@@ -32,9 +31,10 @@ index2: nuke-database
 
 
 index3:
-	echo flask requests django | xargs -t -n1 -I{} \
-		./index-verbose.sh {}
-# python3 ./build.py info .
+	echo 'select name from proj_summary order by size_mb' | sqlite3 main.db | tee .$@
+	cat .$@ | xargs -t -n1 ./index-verbose.sh
+	@echo
+	python3 ./build.py info .
 
 index: nuke-database
 	python3 ./build.py index ${TEST_REPO_DIR}

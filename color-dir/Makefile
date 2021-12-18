@@ -3,6 +3,9 @@ PROJECT := ../SOURCE/nginx
 
 all:
 
+fastlint:
+	flake8 ./${NAME}.py
+	
 cycle:
 	python ./${NAME}.py --stat ${PROJECT}
 	@echo
