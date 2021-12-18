@@ -7,7 +7,7 @@ IMGCAT := ~/.iterm2/imgcat
 all:
 
 render:
-	python3 ./build.py render .
+	python3 ./build.py render flask
 	$(IMGCAT) main.png
 
 sql:
