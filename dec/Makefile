@@ -10,6 +10,8 @@ sql:
 
 proj_summary:
 	echo 'drop table if exists proj_summary' | sqlite3 main.db
+	echo 'create table proj_summary(size_mb int, name text, language text)' | sqlite3 main.db
+
 	echo '.import proj_summary.csv proj_summary' | sqlite3 -csv main.db 
 	echo 'select count(*) from proj_summary' | sqlite3 main.db
 	echo 'select * from proj_summary limit 3' | sqlite3 main.db
