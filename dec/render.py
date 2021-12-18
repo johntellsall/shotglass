@@ -1,18 +1,22 @@
-"""
-USAGE
+# render.py
+#
+#
 
-shotglass.py <command> <project path>
-"""
+from shotlib import (
+    get_db,
+    select1,
+    selectall,
+)
 
-import logging
-import re
-import subprocess
-import sqlite3
-import sys
-from datetime import datetime
-from pathlib import Path
+# import logging
+# import re
+# import subprocess
+# import sqlite3
+# import sys
+# from datetime import datetime
+# from pathlib import Path
 
-import git
+# import git
 
 import os
 
@@ -115,14 +119,14 @@ import pygame as pg  # noqa: E402
 #     return con, cur
 
 
-# def iter_color():
-#     hue = 0
-#     while True:
-#         color = pg.Color("white")
-#         color.hsva = (hue, 100, 100, 100)
-#         yield color
-#         hue += 15
-#         hue %= 360
+def iter_color():
+    hue = 0
+    while True:
+        color = pg.Color("white")
+        color.hsva = (hue, 100, 100, 100)
+        yield color
+        hue += 15
+        hue %= 360
 
 
 # def select1(db, sql):
@@ -172,7 +176,7 @@ import pygame as pg  # noqa: E402
 #     print(f"NUM FILES: {num_files}")
 
 
-def cmd_render(project_path):
+def cmd_render():
     WIDTH, HEIGHT = [1000, 500]
     VERBOSE = False
 

@@ -4,4 +4,4 @@ import render
 
 
 def test_render():
-    render.beer()
+    render.cmd_render()
