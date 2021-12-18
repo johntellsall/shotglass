@@ -2,8 +2,13 @@ SOURCE_DIR = "/Users/johnmitchell/jsrc/shotglass/SOURCE"
 TEST_REPO_DIR = "/Users/johnmitchell/jsrc/shotglass/SOURCE/coreutils"
 SHOT_SOURCE ?= $(shell git ls-files '*.py')
 PYLINT := pylint --disable=W0511,C
+IMGCAT := ~/.iterm2/imgcat
 
 all:
+
+render:
+	python3 ./build.py render .
+	$(IMGCAT) main.png
 
 sql:
 	sqlite3 main.db

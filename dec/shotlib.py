@@ -27,6 +27,11 @@ def get_db(temporary=False):
     return con, cur
 
 
+def get_db2(temporary=False):
+    path = ":memory:" if temporary else "main.db"
+    return sqlite3.connect(path)  # pylint: disable=no-member
+
+
 def get_main_tree(git_repo):
     heads = git_repo.heads
     if hasattr(heads, "master"):
@@ -64,8 +69,8 @@ def make_file_info(entry):
 
 
 def select1(db, sql):
-    db.execute(sql)
-    return db.fetchone()[0]
+    curs = db.execute(sql)
+    return curs.fetchone()[0]
 
 
 def selectall(db, sql):
@@ -151,3 +156,10 @@ def show_project_details(db, project):
     """
     ):
         print(row)
+
+
+# # TODO: do proper SQL quote
+# def get_project_id(db, name):
+#     proj_id = select1(db, f"select id from projects where name = '{name}'")
+#     assert proj_id
+#     return proj_id

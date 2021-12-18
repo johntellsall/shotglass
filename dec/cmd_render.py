@@ -2,9 +2,9 @@
 #
 
 from shotlib import (
-    get_db,
-    select1,
-    selectall,
+    get_db2,
+    # select1,
+    # get_project_id,
 )
 
 
@@ -25,15 +25,37 @@ def iter_color():
         hue %= 360
 
 
-def cmd_render(verbose=True):
+# TODO: do proper SQL quote
+def get_project_id(db, name):
+    assert db and name
+    breakpoint()
+    proj_id = select1(db, f"select id from projects where name = '{name}'")
+    if not proj_id:
+        raise KeyError(f"{name}: project not found")
+    assert proj_id
+    return proj_id
+
+
+def select1(db, sql):
+    curs = db.execute(sql)
+    row = curs.fetchone()
+    return row[0] if row else None
+    # if row:
+    #     return row[0]
+    # raise ValueError("no value returned")
+
+
+def cmd_render(project, verbose=True):
     WIDTH, HEIGHT = [1000, 500]
 
     pg.display.init()
     screen = pg.display.set_mode(size=[WIDTH, HEIGHT])
-    _, db = get_db()
-    breakpoint()
+    db = get_db2()
+    proj_id = get_project_id(db, project)
+    assert 0, proj_id
     total = select1(db, "select sum(byte_count) from files")
     print(f"TOTAL: {total} bytes")
+    return
 
     def num_to_xy(num):
         y = int(num / WIDTH)
