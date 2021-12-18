@@ -6,6 +6,13 @@ IMGCAT := ~/.iterm2/imgcat
 
 all:
 
+%.csv: %.sql
+	@echo SQL:
+	cat $<
+	@echo
+	@echo RESULT:
+	@cat $< | sqlite3 main.db
+
 %.png: %.py
 	python3 $<
 	$(IMGCAT) $@
