@@ -49,9 +49,9 @@ def cmd_render(project, verbose=True):
     db = get_db2()
     proj_id = get_project_id(db, project)
 
-    total = select1(db, "select sum(byte_count) from files")
+    total_sql = f"select sum(byte_count) from files where project_id={proj_id}"
+    total = select1(db, total_sql)
     print(f"TOTAL: {total} bytes")
-    return
 
     def num_to_xy(num):
         y = int(num / WIDTH)
@@ -59,12 +59,16 @@ def cmd_render(project, verbose=True):
         return x, y
 
     num = 0
-    rows = db.execute("select path, byte_count from files order by 1")
+    count_sql = (
+        f"select path, byte_count from files where project_id={proj_id} order by 1"
+    )
+
+    items = db.execute(count_sql)
     coords = []
-    for row in rows:
+    for path, path_count in items:
         xy = num_to_xy(num)
         coords.append(xy)
-        num += row[1]
+        num += path_count
 
     white = pg.Color("white")
     colors = iter_color()
