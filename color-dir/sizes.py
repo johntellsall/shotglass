@@ -111,6 +111,7 @@ def cmd_render(project):
 
     for i, name in enumerate(sourcedb):
         info = sourcedb[name]
+        print(name, info["line_count"])
         width = scale_x * info["line_count"]
         color = PALETTE[i % len(PALETTE)]
 
