@@ -9,3 +9,4 @@ pandas
 numpy
 GitPython
 pylint
+pygame
