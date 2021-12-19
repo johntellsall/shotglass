@@ -1,12 +1,28 @@
 -- .schema files
 
 select 'Project File Sizes';
+select name,size_mb,language from proj_summary
+where size_mb < 200 order by 2;
+
+select '';
+select '== Small C Projects';
 
 select projects.name as project_name, path, byte_count
-from files, projects
+from files, projects, proj_summary psum
 on files.project_id = projects.id
-where project_id in (1,2)
-limit 10;
+and projects.name = psum.name
+where language='C' and size_mb < 200
+limit 5;
+
+select '';
+select '== Python Projects';
+
+select projects.name as project_name, path, byte_count
+from files, projects, proj_summary psum
+on files.project_id = projects.id
+and projects.name = psum.name
+where language='Python' and size_mb < 200
+limit 5;
 
 select '';
 select 'Projects';
