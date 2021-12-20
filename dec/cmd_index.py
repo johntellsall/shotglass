@@ -34,12 +34,15 @@ def parse_ctags(blob):
 def make_tags_info(fullpath):
     """
     find info about all tags/symbols in a single source file
-    Return: iter of dictionaries, one per symbol
+    Return: iter of dictionaries, one dict per symbol
     """
     return parse_ctags(run_ctags(fullpath))
 
 
 def setup_db(db):
+    """
+    create db tables
+    """
     #
     # PROJECTS
     #
@@ -84,7 +87,9 @@ def setup_db(db):
         """
         create table releases (
             tag text,
-            creator_dt text -- ISO8601
+            creator_dt text, -- ISO8601
+            project_id int,
+            foreign key (project_id) references projects(id)
         )
         """
     )
@@ -209,9 +214,12 @@ def cmd_index(project_path, temporary=False):
     print(f"NUM SYMBOLS: {num_symbols}")
 
     values = make_releases_info(project_dir)
+    # TODO: simplify
+    values = [(*row, proj_id) for row in values]
+
     cur.executemany(
         """
-    insert into releases (tag, creator_dt) values (?, ?)
+    insert into releases (tag, creator_dt, project_id) values (?, ?, ?)
     """,
         values,
     )
