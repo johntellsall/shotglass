@@ -11,12 +11,12 @@ select name, count(*) from projects
 limit 3;
 select '';
 
-select tag, creator_dt from releases limit 3;
+select '== all releases for one project';
+select name, tag, date(creator_dt)
+from projects join releases on projects.id = releases.project_id
+where name = 'flask'
+limit 5;
 select '';
-
-select tag, date(creator_dt) from releases limit 3;
-select '';
-
 
 -- select strftime('%m', creator_dt) as month,
 -- count(*) as num_releases,
