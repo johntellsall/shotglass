@@ -56,6 +56,9 @@ def cmd_pinfo(project):  # pylint: disable=unused-argument
 def cmd_info(project_path):  # pylint: disable=unused-argument
     _, db = get_db()
 
+    proj_info = selectall(db, "select * from projects")
+    print(f"PROJECTS:\n{format_lines(proj_info)}")
+
     num_files = select1(db, "select count(*) from files")
     print(f"NUM FILES: {num_files}")
     file_info = selectall(db, "select * from files limit 3")

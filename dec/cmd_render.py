@@ -3,14 +3,13 @@
 
 from shotlib import (
     get_db2,
-    # select1,
-    # get_project_id,
 )
 
 
 import os
 
 os.environ["SDL_VIDEODRIVER"] = "dummy"
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 
 import pygame as pg  # noqa: E402
 
