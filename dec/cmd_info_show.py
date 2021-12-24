@@ -47,9 +47,11 @@ def cmd_pinfo(project):  # pylint: disable=unused-argument
     # )
     # print(f"SYMBOLS:\n{format_lines(sym_info)}")
 
-    # num_releases = select1(db, "select count(*) from releases")
+    # num_releases = select1(db, "select count(*) from releases, projects  where name='{project}'")
     # print(f"NUM RELEASES: {num_releases}")
-    # release_info = selectall(db, "select * from releases limit 3")
+    # release_info = selectall(
+    #     db, "select * from releases where name='{project}' limit 3"
+    # )
     # print(f"RELEASES:\n{format_lines(release_info)}")
 
 
