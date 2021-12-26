@@ -24,6 +24,9 @@ render:
 sql:
 	sqlite3 main.db
 
+.PHONY: sum
+sum: sum.csv
+
 proj_summary:
 	echo 'drop table if exists proj_summary' | sqlite3 main.db
 	echo 'create table proj_summary(size_mb int, name text, language text)' | sqlite3 main.db
@@ -49,7 +52,7 @@ index2: nuke-database
 	python3 ./build.py index ${SOURCE_DIR}/memcached
 	python3 ./build.py index ${SOURCE_DIR}/flask
 	@echo
-	echo python3 ./build.py pinfo memcached
+	python3 ./build.py pinfo memcached
 	python3 ./build.py pinfo flask
 
 index3:
