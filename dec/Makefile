@@ -55,7 +55,7 @@ index2: nuke-database
 	python3 ./build.py pinfo memcached
 	python3 ./build.py pinfo flask
 
-index3:
+index-all:
 	echo 'select name from proj_summary order by size_mb' | sqlite3 main.db | tee .$@
 	cat .$@ | xargs -t -n1 ./index-verbose.sh
 	@echo

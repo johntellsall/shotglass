@@ -1,5 +1,12 @@
 # NOTES
 
+## 12/26
+
+- Redis didn't import
+- Mysql didn't import
+- "NUM RELEASES" bogus, keeps going up, e.g. 4k for Postgres
+- proj_summary imported header row! "name" as a name :)
+
 ## number of symbols per file
 
     select path from files
