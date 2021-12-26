@@ -5,16 +5,14 @@ from pathlib import Path
 import git
 
 from shotlib import (
+    format_lines,
     get_db,
     get_project,
     make_file_info,
     select1,
     selectall,
+    show_project_details,
 )
-
-
-def format_lines(objs):
-    return "\n".join(map(str, objs))
 
 
 def print_project(project_dir, source_paths):
@@ -28,15 +26,16 @@ def print_project(project_dir, source_paths):
 
 # TODO: add quoting
 def cmd_pinfo(project):  # pylint: disable=unused-argument
-    _, db = get_db()
+    con, cur = get_db()
 
-    proj_id = select1(db, f"select id from projects where name='{project}'")
-    print(f"NAME: {project} NUM: {proj_id}")
+    show_project_details(db=cur, project=project)
+    # proj_id = select1(db, f"select id from projects where name='{project}'")
+    # print(f"NAME: {project} NUM: {proj_id}")
 
-    num_files = select1(db, f"select count(*) from files where project_id={proj_id}")
-    print(f"NUM FILES: {num_files}")
-    file_info = selectall(db, f"select * from files where project_id={proj_id} limit 3")
-    print(f"FILES:\n{format_lines(file_info)}")
+    # num_files = select1(db, f"select count(*) from files where project_id={proj_id}")
+    # print(f"NUM FILES: {num_files}")
+    # file_info = selectall(db, f"select * from files where project_id={proj_id} limit 3")
+    # print(f"FILES:\n{format_lines(file_info)}")
 
     # num_symbols = select1(
     #     db, f"select count(*) from symbols where project_id={proj_id}"

@@ -48,7 +48,8 @@ index2: nuke-database
 	@echo
 	python3 ./build.py index ${SOURCE_DIR}/memcached
 	python3 ./build.py index ${SOURCE_DIR}/flask
-	python3 ./build.py pinfo memcached
+	@echo
+	echo python3 ./build.py pinfo memcached
 	python3 ./build.py pinfo flask
 
 index3:

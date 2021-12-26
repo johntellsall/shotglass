@@ -6,6 +6,10 @@ import sys
 from pathlib import Path
 
 
+def format_lines(objs):
+    return "\n".join(map(str, objs))
+
+
 # TODO make more general
 def is_source_path(path):
     return Path(path).suffix in (".py", ".c")
@@ -121,45 +125,10 @@ def show_all_details(db):
 def show_project_details(db, project):
     print(f"DETAILS for {project}:")
 
-    print("-- files")
-    for row in db.execute("select * from files order by 1 limit 3"):
-        print(row)
+    proj_id = select1(db, f"select id from projects where name='{project}'")
+    print(f"NAME: {project} NUM: {proj_id}")
 
-    print("-- symbols")
-    for row in db.execute(
-        """
-    select * -- s.name, s.start_line
-    from symbols s
-    order by 1 limit 3
-    """
-    ):
-        print(row)
-
-    if False:
-        print("-- symbols2")
-        for row in db.execute(
-            """
-        select f.id, f.path, s.name, s.start_line
-        from files as f, symbols as s
-        join files on f.id = s.file_id
-        order by 1 limit 10
-        """
-        ):
-            print(row)
-
-    print("-- releases")
-    for row in db.execute(
-        """
-    select *
-    from releases
-    order by 1 limit 3
-    """
-    ):
-        print(row)
-
-
-# # TODO: do proper SQL quote
-# def get_project_id(db, name):
-#     proj_id = select1(db, f"select id from projects where name = '{name}'")
-#     assert proj_id
-#     return proj_id
+    num_files = select1(db, f"select count(*) from files where project_id={proj_id}")
+    print(f"NUM FILES: {num_files}")
+    file_info = selectall(db, f"select * from files where project_id={proj_id} limit 3")
+    print(f"FILES:\n{format_lines(file_info)}")

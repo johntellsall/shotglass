@@ -228,7 +228,7 @@ def cmd_index(project_path, temporary=False):
     num_releases = shotlib.select1(cur, "select count(*) from releases")
     print(f"NUM RELEASES: {num_releases}")
 
-    shotlib.show_project_details(con, name)
+    shotlib.show_project_details(cur, name)
     con.close()
     if issues:
         print(f"NOTE: {len(issues)} issues found")
