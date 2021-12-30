@@ -24,13 +24,15 @@ render:
 sql:
 	sqlite3 main.db
 
-index-redis:
-	python3 ./build.py index ${SOURCE_DIR}/redis
-	python3 ./build.py pinfo redis
+# index-test:
+# 	python3 ./build.py index ${SOURCE_DIR}/mysql
+# 	python3 ./build.py pinfo mysql
 
 .PHONY: sum
 sum: sum.csv
 
+# TODO: move to Python
+# TODO: don't import "name" :)
 proj_summary:
 	echo 'drop table if exists proj_summary' | sqlite3 main.db
 	echo 'create table proj_summary(size_mb int, name text, language text)' | sqlite3 main.db
