@@ -8,6 +8,8 @@ and tag not like 'release%'
 and tag not like '%ALPHA%'
 and tag not like '%beta%'
 and tag not like '%RC%'
-limit 1000;
+limit 2;
 
 select '';
+
+select '== projects';

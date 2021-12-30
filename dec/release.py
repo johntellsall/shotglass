@@ -40,4 +40,5 @@ def count_release_files(path, release):
     git_dir = path / ".git"
     cmd = ["git", "-C", git_dir, "ls-tree", "-r", "--name-only", release]
     proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
-    assert 0, proc.stdout
+    # TODO: check, might be off by one
+    return len(proc.stdout.split("\n"))
