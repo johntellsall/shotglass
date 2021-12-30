@@ -24,6 +24,10 @@ render:
 sql:
 	sqlite3 main.db
 
+index-redis:
+	python3 ./build.py index ${SOURCE_DIR}/redis
+	python3 ./build.py pinfo redis
+
 .PHONY: sum
 sum: sum.csv
 

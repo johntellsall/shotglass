@@ -18,4 +18,4 @@ size_mb,name,language
 526,node,Javascript
 557,postgres,C
 812,mongo,C
-3072,mysql-server,C
+3072,mysql,C

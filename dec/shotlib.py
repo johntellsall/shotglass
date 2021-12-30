@@ -43,8 +43,10 @@ def get_main_tree(git_repo):
     try:
         return git_repo.heads.main.commit.tree
     except AttributeError as err:
-        attrs = [attr for attr in dir(heads) if not attr.startswith("_")]
-        sys.exit(f"tags?? {attrs}\n{err}")
+        print(f"get_main_tree:heads?? {git_repo.heads}")
+        if not (len(git_repo.heads) == 1):
+            sys.exit(f"heads?? {git_repo.heads}\n{err}")
+        return git_repo.heads[0].commit.tree
 
 
 def get_project(repo):
