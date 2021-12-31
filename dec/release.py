@@ -16,17 +16,20 @@ majormin_pat = re.compile(
 class Release:
     raw_label: str
     majormin: str = field(init=False)
+    pre: str = field(init=False)
+    post: str = field(init=False)
     raw_date: str
     date: datetime = field(init=False, default=None)
 
     def __post_init__(self):
         self.majormin = None
         if match := majormin_pat.search(self.raw_label):
-            post = match.group("post")
             # TODO: hoist so able to have custom ignore
-            if post and not post.startswith(".0"):
-                # print(f"Ignore micro ({self.raw_label}=)")
-                return
+            self.pre = match.group("pre")
+            self.post = match.group("post")
+            # if post and not post.startswith(".0"):
+            #     # print(f"Ignore micro ({self.raw_label}=)")
+            #     return
             self.majormin = match.group("majormin")
         else:
             print(f"No major.minor ({self.raw_label}=)")
