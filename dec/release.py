@@ -39,9 +39,32 @@ class Release:
 
 
 def count_release_files(path, release):
-    # git ls-tree -r --name-only 1.0
+    """
+    for given project and Git release tag, count how many files
+
+    See also: git ls-tree -r --name-only 1.0
+    """
     git_dir = path / ".git"
     cmd = ["git", "-C", git_dir, "ls-tree", "-r", "--name-only", release]
     proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
     # TODO: check, might be off by one
     return len(proc.stdout.split("\n"))
+
+
+def get_git_date(proj_path, file_path, release="HEAD"):
+    """
+    return file's date (Author)
+    """
+    git_dir = proj_path / ".git"
+    cmd = ["git", "-C", str(git_dir), "log", "--format=%ai", "-1", "--", file_path]
+    print(f">>> {' '.join(cmd)}")
+    proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    lines = proc.stdout.split("\n")
+    assert len(lines) == 2
+    assert not lines[-1]
+    date_str = lines[0].split(" ", 1)[0]
+    return datetime.strptime(date_str, "%Y-%m-%d")
+
+
+# X: doesn't work:
+# return datetime.fromisoformat(date_iso)
