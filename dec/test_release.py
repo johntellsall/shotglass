@@ -21,3 +21,9 @@ def test_get_git_date():
     name = "src/flask/signals.py"
     git_date = release.get_git_date(Path("../SOURCE/flask"), name)
     assert git_date.year > 1970
+
+
+def test_get_git_date2():
+    name = "notfound"
+    git_date = release.get_git_date(Path("../SOURCE/flask"), name)
+    assert git_date is None

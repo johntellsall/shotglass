@@ -54,12 +54,16 @@ def count_release_files(path, release):
 def get_git_date(proj_path, file_path, release="HEAD"):
     """
     return file's date (Author)
+    Returns None if file not found.
     """
     git_dir = proj_path / ".git"
     cmd = ["git", "-C", str(git_dir), "log", "--format=%ai", "-1", "--", file_path]
     print(f">>> {' '.join(cmd)}")
     proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
     lines = proc.stdout.split("\n")
+    # detect file not found
+    if lines == [""]:
+        return None
     assert len(lines) == 2
     assert not lines[-1]
     date_str = lines[0].split(" ", 1)[0]
