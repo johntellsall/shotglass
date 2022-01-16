@@ -6,6 +6,10 @@ IMGCAT := ~/.iterm2/imgcat
 
 all:
 
+jan:
+	PYTHONBREAKPOINT='IPython.core.debugger.set_trace' \
+		ipython ./build.py jan ${SOURCE_DIR}/flask
+	
 %.csv: %.sql
 	@echo SQL:
 	cat $<
