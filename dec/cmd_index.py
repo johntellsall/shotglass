@@ -82,7 +82,6 @@ def setup_db(db):
     #
     # RELEASES
     #
-    # TODO: add key to "projects"
     db.execute(
         """
         create table releases (

@@ -10,3 +10,5 @@ numpy
 GitPython
 pylint
 pygame
+flake8
+flake8

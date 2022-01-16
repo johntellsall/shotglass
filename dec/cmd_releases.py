@@ -1,6 +1,7 @@
 # cmd_releases.py
+# deprecated?
 
-import re
+# import re
 from datetime import datetime
 from pathlib import Path
 
@@ -37,20 +38,16 @@ def cmd_releases(project_path):
     print(project_dir)
     repo = git.Repo(project_dir)
 
-    def is_interesting_release(tag):
-        return re.match(r"^[0-9.]+$", tag.name) is not None
+    # def is_interesting_release(tag):
+    #     return re.match(r"^[0-9.]+$", tag.name) is not None
 
-    # pylint: disable=using-constant-test
-    if False:
-        tags = filter(is_interesting_release, repo.tags)
-    else:
-        tags = repo.tags
+    tags = repo.tags
 
     # TODO: sort semver
-    for tagref in list(tags):
-        cool = is_interesting_release(tagref)
-        if not cool:
-            print("-", end=" ")
+    for tagref in list(repo.tags):
+        # cool = is_interesting_release(tagref)
+        # if not cool:
+        #     print("-", end=" ")
         print_release(tagref)
 
     print()
