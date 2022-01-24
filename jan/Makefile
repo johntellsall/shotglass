@@ -21,27 +21,27 @@ setup:
 .PHONY: project.db
 project.db:
 	sqlite-utils create-database $@
-	sqlite-utils create-table $@ file_hash \
+	sqlite-utils create-table --replace $@ file_hash \
 		tag text \
 		hash text \
-		name text \
+		path text \
 		size_bytes integer \
 		--not-null hash \
-		--not-null name \
+		--not-null path \
 		--pk=tag
 	sqlite-utils tables $@ --schema -t
 
 git-ls:
-	git -C $(TEST_PROJ) ls-tree  -r --long '2.0.0'
+	git -C $(TEST_PROJ) ls-tree  -r --long '2.0.0' > git-ls.dat
 
-
-# import:
-# 	sqlite-utils insert logs.db loglines access.log --convert '
-# type, source, _, verb, path, _, status, _ = line.split()
-# return {
-#     "type": type,
-#     "source": source,
-#     "verb": verb,
-#     "path": path,
-#     "status": status,
-# }' --lines
+import:
+	head -1 git-ls.dat
+	@echo
+	sqlite-utils insert project.db file_hash git-ls.dat --convert ' \
+_mode, _type, hash, size_bytes, path = line.split(); \
+return { \
+"hash": hash, \
+"path": path, \
+"size_bytes": size_bytes, \
+"tag": tag, \
+}' --lines 
