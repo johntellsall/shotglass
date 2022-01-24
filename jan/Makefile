@@ -27,8 +27,7 @@ project.db:
 		path text \
 		size_bytes integer \
 		--not-null hash \
-		--not-null path \
-		--pk=tag
+		--not-null path
 	sqlite-utils tables $@ --schema -t
 
 git-ls:
@@ -43,5 +42,6 @@ return { \
 "hash": hash, \
 "path": path, \
 "size_bytes": size_bytes, \
-"tag": tag, \
+"tag": "flask-2.0.0", \
 }' --lines 
+	sqlite-utils project.db "select * from file_hash limit 4" --table
