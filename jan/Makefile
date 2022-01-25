@@ -33,15 +33,19 @@ project.db:
 git-ls:
 	git -C $(TEST_PROJ) ls-tree  -r --long '2.0.0' > git-ls.dat
 
-import:
+stats:
+	sqlite-utils query project.db 'select count(*) from file_hash'
+
+OLD_import:
 	head -1 git-ls.dat
 	@echo
-	sqlite-utils insert project.db file_hash git-ls.dat --convert ' \
+	sqlite-utils insert project.db file_hash git-ls.dat \
+	--lines --convert ' \
 _mode, _type, hash, size_bytes, path = line.split(); \
 return { \
 "hash": hash, \
 "path": path, \
 "size_bytes": size_bytes, \
 "tag": "flask-2.0.0", \
-}' --lines 
+}'
 	sqlite-utils project.db "select * from file_hash limit 4" --table
