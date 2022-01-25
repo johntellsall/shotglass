@@ -14,14 +14,12 @@ def get_git_release_blob(path, release="2.0.0"):
 def setup(db):
     db.execute("drop table if exists file_hash")  # <== XXXXX
 
-    db.execute("create table file_hash(path, hash, size_bytes)")
+    db.execute("create table file_hash(path, hash, size_bytes, release)")
 
 
-def main(path):
-    con = sqlite3.connect("jan.db")
-    setup(con)
+def import_release(db, path, release):
 
-    blob = get_git_release_blob(path)
+    blob = get_git_release_blob(path, release)
 
     def row2item(row):
         pre, path = row.split("\t")
@@ -30,11 +28,22 @@ def main(path):
 
     data = list(map(row2item, blob.rstrip("\n").split("\n")))
 
-    con.executemany(
-        "insert into file_hash(path, hash, size_bytes) values (?, ?, ?)", data
-    )
+    insert_sql = """
+insert into file_hash(path, hash, size_bytes, release)
+values (?, ?, ?, '{release}')
+    """
+    db.executemany(insert_sql, data)
+
+
+def main(path):
+    con = sqlite3.connect("jan.db")
+
+    setup(con)
+    for release in ["1.0", "2.0.0"]:
+        import_release(con, path, release)
 
     print(list(con.execute("select count(*) from file_hash")))
+    print(list(con.execute("select * from file_hash limit 1")))
 
 
 if __name__ == "__main__":
