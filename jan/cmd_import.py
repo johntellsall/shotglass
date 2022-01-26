@@ -61,18 +61,27 @@ values (?, ?, ?, '{release}', '{project_name}')
 
 
 def is_interesting_release(release):
+    'skip tags/releases with letters, e.g. "1.2alpha3"'
     return bool(re.compile("[0-9.]+$").match(release))
+
+
+def is_minor(release):
+    """
+    Ignore most micro releases
+    Return True if major.minor (1.3) or micro=0 (1.2.0)
+    """
+    nums = release.split(".")
+    return len(nums) == 2 or nums[-1] == "0"
 
 
 def main(path):
     project_name = Path(path).name
     con = sqlite3.connect("jan.db")
 
-    # skip tags/releases with letters, e.g. "1.2alpha3"
     releases = list(filter(is_interesting_release, list_git_tags(path)))
 
     setup(con)
-    for release in releases:
+    for release in filter(is_minor, releases):
         print(f"{project_name} - release {release}")
         import_release(con, path, release, project_name)
 
