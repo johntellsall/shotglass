@@ -1,6 +1,7 @@
+import re
+import sqlite3
 import subprocess
 import sys
-import sqlite3
 from pathlib import Path
 
 
@@ -22,9 +23,6 @@ def get_git_release_blob(path, release="2.0.0"):
 
 def list_git_tags(path):
     return run(f"git -C {path} tag --list")
-
-
-assert 0, list_git_tags("../SOURCE/flask")
 
 
 def setup(db):
@@ -70,8 +68,11 @@ def main(path):
     project_name = Path(path).name
     con = sqlite3.connect("jan.db")
 
+    # skip tags/releases with letters, e.g. "1.2alpha3"
+    releases = list(filter(is_interesting_release, list_git_tags(path)))
+
     setup(con)
-    for release in ["1.0", "2.0.0"]:
+    for release in releases:
         print(f"{project_name} - release {release}")
         import_release(con, path, release, project_name)
 

@@ -2,6 +2,10 @@ TEST_PROJ:=../SOURCE/flask
 
 all:
 
+fastlint:
+	flake8 $$(git ls-files '*.py')
+
+
 jan:
 	python3 ./cmd_import.py ../SOURCE/flask
 
@@ -11,6 +15,7 @@ test-list:
 	| xargs -0 -n1 -I{} -- git log -1 --format="%ai {}" {}
 
 fmt:
+	isort .
 	black .
 
 setup:
