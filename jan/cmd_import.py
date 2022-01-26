@@ -3,6 +3,7 @@ import sqlite3
 import subprocess
 import sys
 from pathlib import Path
+import click
 
 
 def run(cmd):
@@ -74,20 +75,25 @@ def is_minor(release):
     return len(nums) == 2 or nums[-1] == "0"
 
 
-def main(path):
-    project_name = Path(path).name
+@click.command()
+@click.argument("paths", nargs=-1)
+def initdb(paths):
     con = sqlite3.connect("jan.db")
+    click.echo("Initialized the database")
 
-    releases = list(filter(is_interesting_release, list_git_tags(path)))
+    for path in paths:
+        project_name = Path(path).name
 
-    setup(con)
-    for release in filter(is_minor, releases):
-        print(f"{project_name} - release {release}")
-        import_release(con, path, release, project_name)
+        releases = list(filter(is_interesting_release, list_git_tags(path)))
+
+        setup(con)
+        for release in filter(is_minor, releases):
+            print(f"{project_name} - release {release}")
+            import_release(con, path, release, project_name)
 
     print(list(con.execute("select count(*) from file_hash")))
     print(list(con.execute("select * from file_hash limit 1")))
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    initdb()

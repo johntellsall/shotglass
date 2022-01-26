@@ -2,6 +2,16 @@ TEST_PROJ:=../SOURCE/flask
 
 all:
 
+zoot:
+	sqlite-utils memory proj_summary.csv \
+	'select name from proj_summary where language="Python" and size_mb < 500'
+
+import2:
+	python3 ./cmd_import.py ../SOURCE/django
+import-all:
+	python3 ./cmd_import.py ../SOURCE/{flask,requests,pyramid,sqlalchemy,django}
+
+
 fastlint:
 	flake8 $$(git ls-files '*.py')
 
