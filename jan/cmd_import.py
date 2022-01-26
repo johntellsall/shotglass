@@ -1,24 +1,37 @@
 import subprocess
 import sys
 import sqlite3
+from pathlib import Path
 
 
 def get_git_release_blob(path, release="2.0.0"):
+    """
+    get Git info about all files in given release
+    """
     cmd = f"git -C {path} ls-tree  -r --long '{release}'"
     proc = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
-    # if verbose:
-    #     print(f"-- RAW\n{proc.stdout[:300]}\n-- ENDRAW")
     return proc.stdout
 
 
 def setup(db):
+    """
+    create database tables
+    """
     db.execute("drop table if exists file_hash")  # <== XXXXX
 
-    db.execute("create table file_hash(path, hash, size_bytes, release)")
+    db.execute(
+        """
+    create table file_hash(
+        project_name, release, path, hash, size_bytes
+        )
+    """
+    )
 
 
-def import_release(db, path, release):
-
+def import_release(db, path, release, project_name):
+    """
+    add Git info into database
+    """
     blob = get_git_release_blob(path, release)
 
     def row2item(row):
@@ -28,19 +41,21 @@ def import_release(db, path, release):
 
     data = list(map(row2item, blob.rstrip("\n").split("\n")))
 
-    insert_sql = """
-insert into file_hash(path, hash, size_bytes, release)
-values (?, ?, ?, '{release}')
+    insert_sql = f"""
+insert into file_hash(path, hash, size_bytes, release, project_name)
+values (?, ?, ?, '{release}', '{project_name}')
     """
     db.executemany(insert_sql, data)
 
 
 def main(path):
+    project_name = Path(path).name
     con = sqlite3.connect("jan.db")
 
     setup(con)
     for release in ["1.0", "2.0.0"]:
-        import_release(con, path, release)
+        print(f"{project_name} - release {release}")
+        import_release(con, path, release, project_name)
 
     print(list(con.execute("select count(*) from file_hash")))
     print(list(con.execute("select * from file_hash limit 1")))
