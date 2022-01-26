@@ -4,6 +4,13 @@ import sqlite3
 from pathlib import Path
 
 
+def run(cmd):
+    proc = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
+    out_blob = proc.stdout
+    out_lines = out_blob.rstrip("\n").split("\n")
+    return out_lines
+
+
 def get_git_release_blob(path, release="2.0.0"):
     """
     get Git info about all files in given release
@@ -11,6 +18,13 @@ def get_git_release_blob(path, release="2.0.0"):
     cmd = f"git -C {path} ls-tree  -r --long '{release}'"
     proc = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
     return proc.stdout
+
+
+def list_git_tags(path):
+    return run(f"git -C {path} tag --list")
+
+
+assert 0, list_git_tags("../SOURCE/flask")
 
 
 def setup(db):
@@ -46,6 +60,10 @@ insert into file_hash(path, hash, size_bytes, release, project_name)
 values (?, ?, ?, '{release}', '{project_name}')
     """
     db.executemany(insert_sql, data)
+
+
+def is_interesting_release(release):
+    return bool(re.compile("[0-9.]+$").match(release))
 
 
 def main(path):
