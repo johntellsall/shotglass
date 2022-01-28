@@ -1,7 +1,6 @@
 import re
 import sqlite3
 import subprocess
-import sys
 from pathlib import Path
 import click
 
@@ -88,11 +87,13 @@ def initdb(paths):
 
         setup(con)
         for release in filter(is_minor, releases):
-            print(f"{project_name} - release {release}")
+            click.echo(f"{project_name} - release {release}")
             import_release(con, path, release, project_name)
 
-    print(list(con.execute("select count(*) from file_hash")))
-    print(list(con.execute("select * from file_hash limit 1")))
+    con.commit()
+    click.echo(list(con.execute("select count(*) from file_hash")))
+    click.echo(list(con.execute("select * from file_hash limit 1")))
+    con.close()
 
 
 if __name__ == "__main__":

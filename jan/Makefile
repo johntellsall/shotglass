@@ -6,6 +6,8 @@ zoot:
 	sqlite-utils memory proj_summary.csv \
 	'select name from proj_summary where language="Python" and size_mb < 500'
 
+jan:
+	python3 ./cmd_import.py ../SOURCE/flask
 import2:
 	python3 ./cmd_import.py ../SOURCE/django
 import-all:
@@ -15,9 +17,6 @@ import-all:
 fastlint:
 	flake8 $$(git ls-files '*.py')
 
-
-jan:
-	python3 ./cmd_import.py ../SOURCE/flask
 
 test-list:
 	cd $(TEST_PROJ) \

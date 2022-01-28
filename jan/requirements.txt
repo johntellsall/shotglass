@@ -1,2 +1,3 @@
 sqlite-utils
 click
+jupyter
