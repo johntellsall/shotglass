@@ -31,13 +31,27 @@ def setup(db):
     create database tables
     """
     db.execute("drop table if exists file_hash")  # <== XXXXX
+    db.execute("drop table if exists symbols")  # <== XXXXX
 
     db.execute(
         """
-    create table file_hash(
-        project_name, release, path, hash, size_bytes
+        create table file_hash(
+            project_name, release, path, hash, size_bytes
         )
-    """
+        """
+    )
+
+    db.execute(
+        """
+        create table symbols (
+            hash text,
+            name text,
+            start_line int,
+            end_line int,
+            kind text,
+            foreign key (hash) references file_hash(hash)
+        )
+        """
     )
 
 
@@ -77,6 +91,9 @@ def is_minor(release):
 
 def cmd_initdb(paths):
     con = sqlite3.connect("jan.db")
+    con.execute("PRAGMA synchronous=OFF")
+    con.execute("PRAGMA foreign_keys=ON")
+
     click.echo("Initialized the database")
 
     for path in paths:

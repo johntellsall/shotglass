@@ -13,6 +13,8 @@ import click
 
 import cmd_import
 
+# import cmd_index
+
 # from cmd_index import cmd_ctags, cmd_index, cmd_setup  # pylint: disable=unused-import
 # from cmd_releases import cmd_releases  # pylint: disable=unused-import
 # from cmd_info_show import cmd_info, cmd_pinfo, cmd_show  # pylint: disable=unused-import
@@ -42,10 +44,20 @@ import cmd_import
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-@click.command()
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
 @click.argument("paths", nargs=-1)
 def initdb(paths):
     cmd_import.cmd_initdb(paths)
+
+
+# @click.command()
+# def setup():
+#     cmd_index.cmd_setup()
 
 
 # def main():
@@ -60,7 +72,7 @@ def initdb(paths):
 
 
 if __name__ == "__main__":
-    initdb()
+    cli()
 
 # if __name__ == "__main__":
 #     main()

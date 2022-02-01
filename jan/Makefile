@@ -4,9 +4,13 @@ all:
 
 %.csv: %.sql
 	sqlite3 jan.db -init $<
+	sqlite-utils jan.db "select * from file_hash limit 4" --table
 
 summary:
-	sqlite-utils jan.db "select * from file_hash limit 10"
+	sqlite-utils jan.db "select * from file_hash limit 4" --table
+
+sum-code:
+	sqlite-utils jan.db "select count(*) from file_hash where path like '%.py'"
 
 zoot:
 	sqlite-utils memory proj_summary.csv \
@@ -38,17 +42,17 @@ setup:
 	.venv/bin/pip install -r ./requirements.txt
 
 # TODO: add project ID
-.PHONY: project.db
-project.db:
-	sqlite-utils create-database $@
-	sqlite-utils create-table --replace $@ file_hash \
-		tag text \
-		hash text \
-		path text \
-		size_bytes integer \
-		--not-null hash \
-		--not-null path
-	sqlite-utils tables $@ --schema -t
+# .PHONY: project.db
+# project.db:
+# 	sqlite-utils create-database $@
+# 	sqlite-utils create-table --replace $@ file_hash \
+# 		tag text \
+# 		hash text \
+# 		path text \
+# 		size_bytes integer \
+# 		--not-null hash \
+# 		--not-null path
+# 	sqlite-utils tables $@ --schema -t
 
 git-ls:
 	git -C $(TEST_PROJ) ls-tree  -r --long '2.0.0' > git-ls.dat
@@ -56,16 +60,16 @@ git-ls:
 stats:
 	sqlite-utils query project.db 'select count(*) from file_hash'
 
-OLD_import:
-	head -1 git-ls.dat
-	@echo
-	sqlite-utils insert project.db file_hash git-ls.dat \
-	--lines --convert ' \
-_mode, _type, hash, size_bytes, path = line.split(); \
-return { \
-"hash": hash, \
-"path": path, \
-"size_bytes": size_bytes, \
-"tag": "flask-2.0.0", \
-}'
-	sqlite-utils project.db "select * from file_hash limit 4" --table
+# OLD_import:
+# 	head -1 git-ls.dat
+# 	@echo
+# 	sqlite-utils insert project.db file_hash git-ls.dat \
+# 	--lines --convert ' \
+# _mode, _type, hash, size_bytes, path = line.split(); \
+# return { \
+# "hash": hash, \
+# "path": path, \
+# "size_bytes": size_bytes, \
+# "tag": "flask-2.0.0", \
+# }'
+# 	sqlite-utils project.db "select * from file_hash limit 4" --table
