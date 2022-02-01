@@ -55,6 +55,31 @@ def setup(db):
     )
 
 
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: SYMBOLS
+
+
+def import_symbols(db):
+    pass
+    #     values = make_tags_info_paths(project_dir, source_paths)
+    values = [["123", "xname", "xstart", "xend", "xkind"]]
+
+    db.executemany(
+        """
+    insert into symbols (hash, name, start_line, end_line, kind) values (
+        ?, -- file hash
+        ?, -- symbol name
+        ?, -- start_line
+        ?, -- end_line
+        ? -- kind
+        )
+    """,
+        values,
+    )
+
+
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: RELEASES
+
+
 def import_release(db, path, release, project_name):
     """
     add Git info into database
@@ -96,19 +121,25 @@ def cmd_initdb(paths):
 
     click.echo("Initialized the database")
 
-    for path in paths:
-        project_name = Path(path).name
+    setup(con)
 
-        releases = list(filter(is_interesting_release, list_git_tags(path)))
+    import_symbols(con)
 
-        setup(con)
-        for release in filter(is_minor, releases):
-            click.echo(f"{project_name} - release {release}")
-            import_release(con, path, release, project_name)
+    # for path in paths:
+    #     project_name = Path(path).name
+
+    #     releases = list(filter(is_interesting_release, list_git_tags(path)))
+
+    #     setup(con)
+    #     for release in filter(is_minor, releases):
+    #         click.echo(f"{project_name} - release {release}")
+    #         import_release(con, path, release, project_name)
 
     con.commit()
     click.echo(list(con.execute("select count(*) from file_hash")))
     click.echo(list(con.execute("select * from file_hash limit 1")))
+    click.echo(list(con.execute("select count(*) from symbols")))
+    click.echo(list(con.execute("select * from symbols limit 1")))
     con.close()
 
 
@@ -134,5 +165,7 @@ def cmd_initdb(paths):
 #     con.close()
 
 
-# if __name__ == "__main__":
-#     initdb()
+if __name__ == "__main__":
+    import sys
+
+    cmd_initdb(sys.argv[1])
