@@ -2,6 +2,12 @@ TEST_PROJ:=../SOURCE/flask
 
 all:
 
+%.csv: %.sql
+	sqlite3 jan.db -init $<
+
+summary:
+	sqlite-utils jan.db "select * from file_hash limit 10"
+
 zoot:
 	sqlite-utils memory proj_summary.csv \
 	'select name from proj_summary where language="Python" and size_mb < 500'
