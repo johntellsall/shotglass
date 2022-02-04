@@ -3,11 +3,11 @@
 # GitPython
 # GitPython
 # jupyter
-matplotlib
 # numpy
-# pandas
 # pygame
 # pylint
-pytest
-# seaborn
+matplotlib
 nbmake
+pandas
+pytest
+seaborn

@@ -5,10 +5,10 @@ all:
 # testloop -- run tests, stop at first err, continue next time
 testloop:
 	pytest --nbmake  --exitfirst --last-failed \
-	-k 'not mongo'
+	-k 'not (mongo or nov or mysql)'
 
 test:
-	pytest --nbmake
+	pytest --nbmake *.ipynb
 
 collect:
 	pytest --collect-only --nbmake
