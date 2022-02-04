@@ -1,0 +1,13 @@
+# black
+# flake8
+# GitPython
+# GitPython
+# jupyter
+# matplotlib
+# numpy
+# pandas
+# pygame
+# pylint
+pytest
+# seaborn
+nbmake
