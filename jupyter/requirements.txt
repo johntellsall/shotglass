@@ -3,7 +3,7 @@
 # GitPython
 # GitPython
 # jupyter
-# matplotlib
+matplotlib
 # numpy
 # pandas
 # pygame
