@@ -1,9 +1,10 @@
 import re
 import sqlite3
 import subprocess
-from pathlib import Path
 
 import click
+
+import cmd_index
 
 
 def run(cmd):
