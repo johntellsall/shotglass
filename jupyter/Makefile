@@ -4,7 +4,8 @@ all:
 # test -- run all tests
 # testloop -- run tests, stop at first err, continue next time
 testloop:
-	pytest --nbmake  --exitfirst --last-failed
+	pytest --nbmake  --exitfirst --last-failed \
+	-k 'not mongo'
 
 test:
 	pytest --nbmake
