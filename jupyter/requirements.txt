@@ -1,7 +1,6 @@
 # black
 # flake8
 # GitPython
-# GitPython
 # jupyter
 # numpy
 # pygame

@@ -5,7 +5,9 @@ all:
 # testloop -- run tests, stop at first err, continue next time
 testloop:
 	pytest --nbmake  --exitfirst --last-failed \
-	-k 'not (mongo or nov or mysql)'
+	-k 'not (mongo or nov or mysql or changes \
+	or numfiles or coreutils or shotglass)' \
+	*.ipynb
 
 test:
 	pytest --nbmake *.ipynb
