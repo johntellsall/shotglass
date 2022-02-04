@@ -4,13 +4,13 @@ all:
 # test -- run all tests
 # testloop -- run tests, stop at first err, continue next time
 testloop:
-	pytest --nbmake  --exitfirst --last-failed "."
+	pytest --nbmake  --exitfirst --last-failed
 
 test:
-	pytest --nbmake  --exitfirst --last-failed "."
+	pytest --nbmake
 
 collect:
-	pytest --collect-only --nbmake "." 
+	pytest --collect-only --nbmake
 
 # setup -- install Python requirements
 setup:
