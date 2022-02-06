@@ -111,7 +111,7 @@ def is_interesting_release(release):
     return bool(re.compile("[0-9.]+$").match(release))
 
 
-def is_minor(release):
+def is_okay_release(release):
     """
     Ignore most micro releases
     Return True if major.minor (1.3) or micro=0 (1.2.0)
@@ -142,13 +142,16 @@ def is_minor(release):
 #     #         import_release(con, path, release, project_name)
 
 #     con.commit()
-#     click.echo("File Hashes")
-#     click.echo(list(con.execute("select count(*) from file_hash")))
-#     click.echo(list(con.execute("select * from file_hash limit 1")))
-#     click.echo("Symbols")
-#     click.echo(list(con.execute("select count(*) from symbols")))
-#     click.echo(list(con.execute("select * from symbols limit 1")))
 #     con.close()
+
+
+def show_info(db):
+    click.echo("File Hashes")
+    click.echo(list(db.execute("select count(*) from file_hash")))
+    click.echo(list(db.execute("select * from file_hash limit 1")))
+    click.echo("Symbols")
+    click.echo(list(db.execute("select count(*) from symbols")))
+    click.echo(list(db.execute("select * from symbols limit 1")))
 
 
 @click.command()
@@ -157,19 +160,19 @@ def initdb(paths):
     con = sqlite3.connect("jan.db")
     click.echo("Initialized the database")
 
-    for path in paths:
-        project_name = Path(path).name
+    setup(con)
 
-        releases = list(filter(is_interesting_release, list_git_tags(path)))
+    for project_path in paths:
+        project_name = Path(project_path).name
 
-        setup(con)
-        for release in filter(is_minor, releases):
+        releases = list(filter(is_interesting_release, list_git_tags(project_path)))
+
+        for release in filter(is_okay_release, releases):
             click.echo(f"{project_name} - release {release}")
-            import_release(con, path, release, project_name)
+            import_release(con, project_path, release, project_name)
 
     con.commit()
-    click.echo(list(con.execute("select count(*) from file_hash")))
-    click.echo(list(con.execute("select * from file_hash limit 1")))
+    show_info(con)
     con.close()
 
 
