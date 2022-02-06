@@ -144,7 +144,7 @@ def make_project_info(project_dir):
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-def cmd_setup(project_path):  # pylint: disable=unused-argument
+def cmd_setup():
     _, cur = shotlib.get_db()
     setup_db(cur)
 
@@ -152,85 +152,85 @@ def cmd_setup(project_path):  # pylint: disable=unused-argument
     print(f"NUM PROJECTS: {num_projects}")
 
 
-# TODO: merge with cmd_info?
-# TODO: pylint: disable=too-many-locals
-def cmd_index(project_path, temporary=False):
-    project_dir = Path(project_path)
-    print(project_dir)
+# # TODO: merge with cmd_info?
+# # TODO: pylint: disable=too-many-locals
+# def cmd_index(project_path, temporary=False):
+#     project_dir = Path(project_path)
+#     print(project_dir)
 
-    repo = git.Repo(project_dir)
-    tree, source_paths = shotlib.get_project(repo)
-    if not source_paths:
-        sys.exit("No source paths")
-    con, cur = shotlib.get_db(temporary=temporary)
+#     repo = git.Repo(project_dir)
+#     tree, source_paths = shotlib.get_project(repo)
+#     if not source_paths:
+#         sys.exit("No source paths")
+#     con, cur = shotlib.get_db(temporary=temporary)
 
-    con.execute("PRAGMA synchronous=OFF")
-    con.execute("PRAGMA foreign_keys=ON")
+#     con.execute("PRAGMA synchronous=OFF")
+#     con.execute("PRAGMA foreign_keys=ON")
 
-    name = make_project_info(project_dir)
-    try:
-        cur.executemany("insert into projects (name) values (?)", [(name,)])
-    except sqlite3.IntegrityError:
-        print(f"{name}: already exists, skipping")
-        return
+#     name = make_project_info(project_dir)
+#     try:
+#         cur.executemany("insert into projects (name) values (?)", [(name,)])
+#     except sqlite3.IntegrityError:
+#         print(f"{name}: already exists, skipping")
+#         return
 
-    proj_id = shotlib.select1(cur, f"select id from projects where name = '{name}'")
-    assert proj_id
+#     proj_id = shotlib.select1(cur, f"select id from projects where name = '{name}'")
+#     assert proj_id
 
-    issues, values = make_file_info_paths(tree, source_paths)
-    # TODO: simplify
-    values = [(*row, proj_id) for row in values]
+#     issues, values = make_file_info_paths(tree, source_paths)
+#     # TODO: simplify
+#     values = [(*row, proj_id) for row in values]
 
-    cur.executemany(
-        """
-    insert into files (path, byte_count, project_id) values (?, ?, ?)
-    """,
-        values,
-    )
-    con.commit()
+#     cur.executemany(
+#         """
+#     insert into files (path, byte_count, project_id) values (?, ?, ?)
+#     """,
+#         values,
+#     )
+#     con.commit()
 
-    num_files = shotlib.select1(cur, "select count(*) from files")
-    print(f"NUM FILES: {num_files}")
+#     num_files = shotlib.select1(cur, "select count(*) from files")
+#     print(f"NUM FILES: {num_files}")
 
-    values = make_tags_info_paths(project_dir, source_paths)
+#     values = make_tags_info_paths(project_dir, source_paths)
 
-    # TODO: optimize
-    cur.executemany(
-        """
-    insert into symbols (file_id, name, start_line, end_line, kind) values (
-        (select id from files where path=?),
-        ?, -- name
-        ?, -- start_line
-        ?, -- end_line
-        ? -- kind
-        )
-    """,
-        values,
-    )
-    con.commit()
+#     # TODO: optimize
+#     cur.executemany(
+#         """
+#     insert into symbols (file_id, name, start_line, end_line, kind) values (
+#         (select id from files where path=?),
+#         ?, -- name
+#         ?, -- start_line
+#         ?, -- end_line
+#         ? -- kind
+#         )
+#     """,
+#         values,
+#     )
+#     con.commit()
 
-    num_symbols = shotlib.select1(cur, "select count(*) from symbols")
-    print(f"NUM SYMBOLS: {num_symbols}")
+#     num_symbols = shotlib.select1(cur, "select count(*) from symbols")
+#     print(f"NUM SYMBOLS: {num_symbols}")
 
-    values = make_releases_info(project_dir)
-    # TODO: simplify
-    values = [(*row, proj_id) for row in values]
+#     values = make_releases_info(project_dir)
+#     # TODO: simplify
+#     values = [(*row, proj_id) for row in values]
 
-    cur.executemany(
-        """
-    insert into releases (tag, creator_dt, project_id) values (?, ?, ?)
-    """,
-        values,
-    )
-    con.commit()
+#     cur.executemany(
+#         """
+#     insert into releases (tag, creator_dt, project_id) values (?, ?, ?)
+#     """,
+#         values,
+#     )
+#     con.commit()
 
-    num_releases = shotlib.select1(cur, "select count(*) from releases")
-    print(f"NUM RELEASES: {num_releases}")
+#     num_releases = shotlib.select1(cur, "select count(*) from releases")
+#     print(f"NUM RELEASES: {num_releases}")
 
-    shotlib.show_project_details(cur, name)
-    con.close()
-    if issues:
-        print(f"NOTE: {len(issues)} issues found")
+#     shotlib.show_project_details(cur, name)
+#     con.close()
+#     if issues:
+#         print(f"NOTE: {len(issues)} issues found")
 
 
 def cmd_ctags(file_path):

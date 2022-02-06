@@ -9,4 +9,5 @@ coverage/
 .vscode
 *.code-*
 tags
+*.dat
 *.db

@@ -1,0 +1,4 @@
+sqlite-utils
+click
+jupyter
+semver
