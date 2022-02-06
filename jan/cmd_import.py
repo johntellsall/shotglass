@@ -63,10 +63,18 @@ def setup(db):
 
 
 def import_symbols(db):
-    return  # XXXXX not yet
+    from cmd_index import make_tags_info
 
-    #     values = make_tags_info_paths(project_dir, source_paths)
-    values = [["123", "xname", "xstart", "xend", "xkind"]]
+    path = "../SOURCE/flask/src/flask/views.py"
+    symbols = make_tags_info(path)
+    # assert 0, list(symbols)[0]
+
+    # {'_type': 'tag', 'name': 'MethodView', 'path': '../SOURCE/flask/src/flask/views.py', 'access': 'public', 'inherits': 'View, metaclass=MethodViewType', 'language': 'Python', 'line': 133, 'kind': 'class', 'roles': 'def', 'end': 158}
+    def to_symbol(info):
+        "convert Ctags symbols to Shotglass"
+        return "123", info["name"], info["line"], info.get("end"), info["kind"]
+
+    # values = [["123", "xname", "xstart", "xend", "xkind"]]
 
     db.executemany(
         """
@@ -78,7 +86,7 @@ def import_symbols(db):
         ? -- kind
         )
     """,
-        values,
+        map(to_symbol, symbols),
     )
 
 
@@ -148,10 +156,10 @@ def is_okay_release(release):
 def show_info(db):
     click.echo("File Hashes")
     click.echo(list(db.execute("select count(*) from file_hash")))
-    click.echo(list(db.execute("select * from file_hash limit 1")))
+    click.echo(list(db.execute("select * from file_hash limit 4")))
     click.echo("Symbols")
     click.echo(list(db.execute("select count(*) from symbols")))
-    click.echo(list(db.execute("select * from symbols limit 1")))
+    click.echo(list(db.execute("select * from symbols limit 4")))
 
 
 @click.command()
@@ -170,6 +178,8 @@ def initdb(paths):
         for release in filter(is_okay_release, releases):
             click.echo(f"{project_name} - release {release}")
             import_release(con, project_path, release, project_name)
+
+        import_symbols(con)
 
     con.commit()
     show_info(con)

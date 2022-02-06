@@ -9,7 +9,7 @@ from pathlib import Path
 
 import git
 
-import shotlib
+# import shotlib
 
 # Universal Ctags
 CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()
