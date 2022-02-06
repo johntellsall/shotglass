@@ -1,10 +1,13 @@
+# cmd_import.py
+# - db: files are hashes
+# - direct Git commands
+#
 import re
 import sqlite3
 import subprocess
+from pathlib import Path
 
 import click
-
-import cmd_index
 
 
 def run(cmd):
@@ -60,7 +63,8 @@ def setup(db):
 
 
 def import_symbols(db):
-    pass
+    return  # XXXXX not yet
+
     #     values = make_tags_info_paths(project_dir, source_paths)
     values = [["123", "xname", "xstart", "xend", "xkind"]]
 
@@ -84,6 +88,7 @@ def import_symbols(db):
 def import_release(db, path, release, project_name):
     """
     add Git info into database
+    Single file, single release (Git tag)
     """
     blob = get_git_release_blob(path, release)
 
@@ -115,58 +120,63 @@ def is_minor(release):
     return len(nums) == 2 or nums[-1] == "0"
 
 
-def cmd_initdb(paths):
-    con = sqlite3.connect("jan.db")
-    con.execute("PRAGMA synchronous=OFF")
-    con.execute("PRAGMA foreign_keys=ON")
+# def cmd_initdb(paths):
+#     con = sqlite3.connect("jan.db")
+#     con.execute("PRAGMA synchronous=OFF")
+#     con.execute("PRAGMA foreign_keys=ON")
 
+#     click.echo("Initialized the database")
+
+#     setup(con)
+
+#     import_symbols(con)
+
+#     # for path in paths:
+#     #     project_name = Path(path).name
+
+#     #     releases = list(filter(is_interesting_release, list_git_tags(path)))
+
+#     #     setup(con)
+#     #     for release in filter(is_minor, releases):
+#     #         click.echo(f"{project_name} - release {release}")
+#     #         import_release(con, path, release, project_name)
+
+#     con.commit()
+#     click.echo("File Hashes")
+#     click.echo(list(con.execute("select count(*) from file_hash")))
+#     click.echo(list(con.execute("select * from file_hash limit 1")))
+#     click.echo("Symbols")
+#     click.echo(list(con.execute("select count(*) from symbols")))
+#     click.echo(list(con.execute("select * from symbols limit 1")))
+#     con.close()
+
+
+@click.command()
+@click.argument("paths", nargs=-1)
+def initdb(paths):
+    con = sqlite3.connect("jan.db")
     click.echo("Initialized the database")
 
-    setup(con)
+    for path in paths:
+        project_name = Path(path).name
 
-    import_symbols(con)
+        releases = list(filter(is_interesting_release, list_git_tags(path)))
 
-    # for path in paths:
-    #     project_name = Path(path).name
-
-    #     releases = list(filter(is_interesting_release, list_git_tags(path)))
-
-    #     setup(con)
-    #     for release in filter(is_minor, releases):
-    #         click.echo(f"{project_name} - release {release}")
-    #         import_release(con, path, release, project_name)
+        setup(con)
+        for release in filter(is_minor, releases):
+            click.echo(f"{project_name} - release {release}")
+            import_release(con, path, release, project_name)
 
     con.commit()
     click.echo(list(con.execute("select count(*) from file_hash")))
     click.echo(list(con.execute("select * from file_hash limit 1")))
-    click.echo(list(con.execute("select count(*) from symbols")))
-    click.echo(list(con.execute("select * from symbols limit 1")))
     con.close()
 
 
-# @click.command()
-# @click.argument("paths", nargs=-1)
-# def initdb(paths):
-#     con = sqlite3.connect("jan.db")
-#     click.echo("Initialized the database")
-
-#     for path in paths:
-#         project_name = Path(path).name
-
-#         releases = list(filter(is_interesting_release, list_git_tags(path)))
-
-#         setup(con)
-#         for release in filter(is_minor, releases):
-#             click.echo(f"{project_name} - release {release}")
-#             import_release(con, path, release, project_name)
-
-#     con.commit()
-#     click.echo(list(con.execute("select count(*) from file_hash")))
-#     click.echo(list(con.execute("select * from file_hash limit 1")))
-#     con.close()
-
-
 if __name__ == "__main__":
-    import sys
+    if 0:
+        import sys
 
-    cmd_initdb(sys.argv[1])
+        cmd_initdb(sys.argv[1])
+    else:
+        initdb()
