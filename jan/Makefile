@@ -2,6 +2,9 @@ TEST_PROJ:=../SOURCE/flask
 
 all:
 
+test:
+	pytest test_cmd_import.py
+	
 %.csv: %.sql
 	sqlite3 feb.db -init $<
 	sqlite-utils feb.db "select * from file_hash limit 4" --table

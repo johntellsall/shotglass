@@ -21,27 +21,21 @@ def run(cmd):
     return out_lines
 
 
-def get_git_release_blob(path, release="2.0.0"):
+def git_ls_tree(project_path, release="2.0.0"):
     """
     get Git info about all files in given release
     """
-    return run_blob(f"git -C {path} ls-tree  -r --long '{release}'")
 
+    def to_item(row):
+        pre, path = row.split("\t")
+        _mode, _type, hash, size_bytes = pre.split()
+        return dict(hash=hash, path=path, size_bytes=size_bytes)
 
-def get_git_ls_tree(path):
-    def to_item(line):
-        _mode, _x, hash, path = line.split(None, 3)
-        return dict(hash=hash, path=path)
-
-    cmd = f"git -C ../SOURCE/flask ls-tree -r HEAD"
+    cmd = f"git -C {project_path} ls-tree  -r --long '{release}'"
     return map(to_item, run(cmd))
 
 
-def list_git_tags(path):
-    return run(f"git -C {path} tag --list")
-
-
-def list_git_tags(path):
+def git_tag_list(path):
     return run(f"git -C {path} tag --list")
 
 
@@ -118,7 +112,7 @@ def import_release(db, path, release, project_name):
     """
     blob = get_git_release_blob(path, release)
 
-    def row2item(row):
+    def to_item(row):
         pre, path = row.split("\t")
         _mode, _type, hash, size_bytes = pre.split()
         return path, hash, size_bytes
@@ -194,13 +188,13 @@ def initdb(paths):
     for project_path in paths:
         project_name = Path(project_path).name
 
-        releases = list(filter(is_interesting_release, list_git_tags(project_path)))
+        releases = list(filter(is_interesting_release, git_tag_list(project_path)))
 
         for release in filter(is_okay_release, releases):
             click.echo(f"{project_name} - release {release}")
             import_release(con, project_path, release, project_name)
 
-            for info in get_git_ls_tree(None):
+            for info in git_ls_tree(None):
                 pass
                 # import_file_symbols(con,
 

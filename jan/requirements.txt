@@ -4,3 +4,4 @@ jupyter
 semver
 isort
 black[jupyter]
+pytest
