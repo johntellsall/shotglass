@@ -2,8 +2,8 @@
 
 import json
 import logging
-import subprocess
 import sqlite3
+import subprocess
 import sys
 from pathlib import Path
 

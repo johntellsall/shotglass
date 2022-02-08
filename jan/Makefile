@@ -3,20 +3,20 @@ TEST_PROJ:=../SOURCE/flask
 all:
 
 %.csv: %.sql
-	sqlite3 jan.db -init $<
-	sqlite-utils jan.db "select * from file_hash limit 4" --table
+	sqlite3 feb.db -init $<
+	sqlite-utils feb.db "select * from file_hash limit 4" --table
 
 summary:
-	sqlite-utils jan.db "select * from file_hash limit 4" --table
+	sqlite-utils feb.db "select * from file_hash limit 4" --table
 
 sum-code:
-	sqlite-utils jan.db "select count(*) from file_hash where path like '%.py'"
+	sqlite-utils feb.db "select count(*) from file_hash where path like '%.py'"
 
 zoot:
 	sqlite-utils memory proj_summary.csv \
 	'select name from proj_summary where language="Python" and size_mb < 500'
 
-jan:
+feb:
 	python3 ./cmd_import.py ../SOURCE/flask
 import2:
 	python3 ./cmd_import.py ../SOURCE/django
