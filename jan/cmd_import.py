@@ -188,13 +188,13 @@ def initdb(paths):
     for project_path in paths:
         project_name = Path(project_path).name
 
-        releases = list(filter(is_interesting_release, git_tag_list(project_path)))
+        releases = git_tag_list(project_path)
 
         for release in filter(is_okay_release, releases):
             click.echo(f"{project_name} - release {release}")
             import_release(con, project_path, release, project_name)
 
-            for info in git_ls_tree(None):
+            for file_info in git_ls_tree(project_path, release):
                 pass
                 # import_file_symbols(con,
 
