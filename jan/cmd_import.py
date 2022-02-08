@@ -10,9 +10,13 @@ from pathlib import Path
 import click
 
 
-def run(cmd):
+def run_blob(cmd):
     proc = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
-    out_blob = proc.stdout
+    return proc.stdout
+
+
+def run(cmd):
+    out_blob = run_blob(cmd)
     out_lines = out_blob.rstrip("\n").split("\n")
     return out_lines
 
@@ -21,9 +25,20 @@ def get_git_release_blob(path, release="2.0.0"):
     """
     get Git info about all files in given release
     """
-    cmd = f"git -C {path} ls-tree  -r --long '{release}'"
-    proc = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
-    return proc.stdout
+    return run_blob(f"git -C {path} ls-tree  -r --long '{release}'")
+
+
+def get_git_ls_tree(path):
+    def to_item(line):
+        _mode, _x, hash, path = line.split(None, 3)
+        return dict(hash=hash, path=path)
+
+    cmd = f"git -C ../SOURCE/flask ls-tree -r HEAD"
+    return map(to_item, run(cmd))
+
+
+def list_git_tags(path):
+    return run(f"git -C {path} tag --list")
 
 
 def list_git_tags(path):
@@ -62,17 +77,20 @@ def setup(db):
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: SYMBOLS
 
 
-def import_symbols(db):
+# {'_type': 'tag', 'name': 'MethodView', 'path':
+# '../SOURCE/flask/src/flask/views.py', 'access': 'public', 'inherits': 'View,
+# metaclass=MethodViewType', 'language': 'Python', 'line': 133, 'kind': 'class',
+# 'roles': 'def', 'end': 158}
+
+
+def import_file_symbols(db, path, hash):
     from cmd_index import make_tags_info
 
-    path = "../SOURCE/flask/src/flask/views.py"
     symbols = make_tags_info(path)
-    # assert 0, list(symbols)[0]
 
-    # {'_type': 'tag', 'name': 'MethodView', 'path': '../SOURCE/flask/src/flask/views.py', 'access': 'public', 'inherits': 'View, metaclass=MethodViewType', 'language': 'Python', 'line': 133, 'kind': 'class', 'roles': 'def', 'end': 158}
     def to_symbol(info):
-        "convert Ctags symbols to Shotglass"
-        return "123", info["name"], info["line"], info.get("end"), info["kind"]
+        "convert Ctags symbol to Shotglass"
+        return hash, info["name"], info["line"], info.get("end"), info["kind"]
 
     # values = [["123", "xname", "xstart", "xend", "xkind"]]
 
@@ -165,6 +183,9 @@ def show_info(db):
 @click.command()
 @click.argument("paths", nargs=-1)
 def initdb(paths):
+    def is_source(path):
+        return path.endswith(".py")
+
     con = sqlite3.connect("jan.db")
     click.echo("Initialized the database")
 
@@ -179,7 +200,9 @@ def initdb(paths):
             click.echo(f"{project_name} - release {release}")
             import_release(con, project_path, release, project_name)
 
-        import_symbols(con)
+            for info in get_git_ls_tree(None):
+                pass
+                # import_file_symbols(con,
 
     con.commit()
     show_info(con)
