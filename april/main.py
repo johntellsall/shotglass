@@ -4,6 +4,7 @@ function(path) -> data
 
 import json
 import logging
+import pprint
 import subprocess
 
 import click
@@ -15,7 +16,7 @@ logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
 
 def run_ctags(path, verbose=False):
-    "return fulltext of Ctags command output"
+    "Ctags command output -- iter of dictionaries, one per symbol"
     cmd = CTAGS_ARGS + [path]
     proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
     assert proc.returncode == 0
@@ -49,12 +50,23 @@ def git_ls_tree(project_path, release="2.0.0"):
     return map(to_item, run(cmd))
 
 
-def git_tag_list(path):
-    return run(f"git -C {path} tag --list")
+def git_tag_list(project_path):
+    "list tags (~ releases)"
+    return run(f"git -C {project_path} tag --list")
 
 
 @click.command()
-@click.argument("name")
-def hello(name):
-    click.echo(f"Hello {name}!")
-    run_ctags("../SOURCE/flask/src/flask/app.py", verbose=True)
+@click.argument("path")
+def ls_tags(path):
+    click.echo(f"List Tags {path}")
+    tags = git_tag_list(path)
+    pprint.pprint(tags)
+
+
+@click.command()
+@click.argument("path")
+def ctags(path):
+    click.echo(f"Ctags {path}")
+    symbols = list(run_ctags(path))
+    pprint.pprint(symbols)
+    # run_ctags("../SOURCE/flask/src/flask/app.py", verbose=True)
