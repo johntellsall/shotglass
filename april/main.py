@@ -2,10 +2,11 @@
 function(path) -> data
 """
 
+import json
 import logging
 import subprocess
+
 import click
-import json
 
 # Universal Ctags
 CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()
