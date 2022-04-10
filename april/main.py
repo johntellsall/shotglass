@@ -1,7 +1,11 @@
+"""
+function(path) -> data
+"""
+
 import logging
 import subprocess
 import click
-
+import json
 
 # Universal Ctags
 CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()
@@ -12,11 +16,11 @@ logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 def run_ctags(path, verbose=False):
     "return fulltext of Ctags command output"
     cmd = CTAGS_ARGS + [path]
-    stdout = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    breakpoint()
+    proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    assert proc.returncode == 0
     if verbose:
         print(f"-- RAW\n{proc.stdout[:300]}\n-- ENDRAW")
-    return proc.stdout
+    return map(json.loads, proc.stdout.rstrip().split("\n"))
 
 
 def run_blob(cmd):
@@ -52,3 +56,4 @@ def git_tag_list(path):
 @click.argument("name")
 def hello(name):
     click.echo(f"Hello {name}!")
+    run_ctags("../SOURCE/flask/src/flask/app.py", verbose=True)
