@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+#
 """
 function(path) -> data
 """
@@ -57,7 +59,23 @@ def git_tag_list(project_path):
     return run(f"git -C {project_path} tag --list")
 
 
-@click.command()
+# ::::::::::::::::::::
+
+
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
+@click.argument("path")
+def april(path):
+    click.echo(f"List Tags {path}")
+    tags = git_tag_list(path)
+    pprint.pprint(tags)
+
+
+@cli.command()
 @click.argument("path")
 def ls_tags(path):
     click.echo(f"List Tags {path}")
@@ -65,10 +83,14 @@ def ls_tags(path):
     pprint.pprint(tags)
 
 
-@click.command()
+@cli.command()
 @click.argument("path")
 def ctags(path):
     click.echo(f"Ctags {path}")
     symbols = list(run_ctags(path))
     pprint.pprint(symbols)
     # run_ctags("../SOURCE/flask/src/flask/app.py", verbose=True)
+
+
+if __name__ == "__main__":
+    cli()
