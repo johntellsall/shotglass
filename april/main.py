@@ -11,6 +11,7 @@ import subprocess
 import re
 from pathlib import PurePath
 import click
+from distutils.version import LooseVersion
 
 # Universal Ctags
 CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()
@@ -60,13 +61,42 @@ def git_tag_list(project_path):
     return run(f"git -C {project_path} tag --list")
 
 
-# ::::::::::::::::::::
+# :::::::::::::::::::: APP-CENTRIC FUNCTIONS
+
+
+# TODO: make flexible
+def is_source(path):
+    return PurePath(path).suffix in [".c", ".py"]
+
+
+# TODO: make flexible
+def is_interesting(path):
+    dull_dirs = set(["docs", "examples", "scripts", "tests"])
+    if "/" in path:
+        first, _ = path.split("/", 1)
+        if first in dull_dirs:
+            return False
+    if path.endswith("__init__.py"):
+        return False
+    if "/testsuite/" in path:
+        return False
+    return True
+
+
+def filter_goodsource(items):
+    for item in items:
+        path = item["path"]
+        if is_source(path) and is_interesting(path):
+            yield item
+
+
+# TODO: make flexible
+is_good_tag = re.compile(r"^[0-9]+\.[0-9]+$").match
 
 
 def get_good_tags(path):
     raw_tags = git_tag_list(path)
-    is_good_tag = re.compile("^[0-9]+\.[0-9]+$").match
-    tags = [tag for tag in raw_tags if is_good_tag(tag)]
+    tags = list(filter(is_good_tag, raw_tags))
     return tags
 
 
@@ -84,15 +114,29 @@ def april():
     path = "../SOURCE/flask"
     click.echo(f"List Tags {path}")
     tags = get_good_tags(path)
-    pprint.pprint(tags)
+    tags.sort(key=LooseVersion)
 
-    def is_source(item):
-        return PurePath(item["path"]).suffix in [".c", ".py"]
-
+    hashes = set()
     for tag in tags:
-        all_items = git_ls_tree(path, release=tag)
-        items = list(filter(is_source, all_items))
-        assert 0, items[:3]
+        click.secho(f"release: {tag}", bg="yellow")
+        all_items = list(git_ls_tree(path, release=tag))
+        click.secho(f"= {len(all_items)} total files", fg="yellow")
+
+        items = list(filter_goodsource(all_items))
+        click.secho(f"= {len(items)} source files", fg="yellow")
+
+        changed_items = []
+        for item in items:
+            hash = item["hash"]
+            if hash in hashes:
+                continue
+            hashes.add(hash)
+            changed_items.append(item)
+
+        click.secho(f"+/- {len(changed_items)} changed source", fg="yellow")
+
+        for item in changed_items:
+            click.secho(f"- {item['path']}")
 
 
 @cli.command()

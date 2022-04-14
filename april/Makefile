@@ -1,12 +1,12 @@
-SOURCE := ../SOURCE/flask
-
+SAMPLE := ../SOURCE/flask
+# SOURCE := 
 all:
 
 april:
 	./main.py april
 
 run:
-	./main.py ls-tags $(SOURCE)
+	./main.py ls-tags $(SAMPLE)
 
 test:
 	.venv/bin/pytest -v
@@ -22,4 +22,8 @@ fmt:
 
 fastlint:
 	flake8 .
+	@echo DONE
+
+lint:
+	pylint -E --ignore=test_code.py *.py
 	@echo DONE
