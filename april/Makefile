@@ -11,3 +11,7 @@ setup:
 fmt:
 	isort .
 	black .
+
+fastlint:
+	flake8 .
+	@echo DONE

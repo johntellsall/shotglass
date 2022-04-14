@@ -2,14 +2,9 @@
 
 import json
 import logging
-import sqlite3
 import subprocess
-import sys
 from pathlib import Path
 
-import git
-
-# import shotlib
 
 # Universal Ctags
 CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()

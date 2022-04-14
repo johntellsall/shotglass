@@ -26,7 +26,9 @@ def run_ctags(path, verbose=False):
 
 
 def run_blob(cmd):
-    proc = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
+    proc = subprocess.run(
+        cmd, shell=True, capture_output=True, text=True, check=True
+    )  # noqa: E501
     return proc.stdout
 
 
