@@ -8,7 +8,8 @@ import json
 import logging
 import pprint
 import subprocess
-
+import re
+from pathlib import PurePath
 import click
 
 # Universal Ctags
@@ -62,17 +63,36 @@ def git_tag_list(project_path):
 # ::::::::::::::::::::
 
 
+def get_good_tags(path):
+    raw_tags = git_tag_list(path)
+    is_good_tag = re.compile("^[0-9]+\.[0-9]+$").match
+    tags = [tag for tag in raw_tags if is_good_tag(tag)]
+    return tags
+
+
+# ::::::::::::::::::::
+
+
 @click.group()
 def cli():
     pass
 
 
 @cli.command()
-@click.argument("path")
-def april(path):
+# @click.argument("path")
+def april():
+    path = "../SOURCE/flask"
     click.echo(f"List Tags {path}")
-    tags = git_tag_list(path)
+    tags = get_good_tags(path)
     pprint.pprint(tags)
+
+    def is_source(item):
+        return PurePath(item["path"]).suffix in [".c", ".py"]
+
+    for tag in tags:
+        all_items = git_ls_tree(path, release=tag)
+        items = list(filter(is_source, all_items))
+        assert 0, items[:3]
 
 
 @cli.command()

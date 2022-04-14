@@ -2,9 +2,12 @@ SOURCE := ../SOURCE/flask
 
 all:
 
+april:
+	./main.py april
+
 run:
 	./main.py ls-tags $(SOURCE)
-	
+
 test:
 	.venv/bin/pytest -v
 
