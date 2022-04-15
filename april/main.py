@@ -116,13 +116,14 @@ def april(path):
 
     insert_file = (
         "insert into file (release, path, hash, size_bytes)"
-        " values ('{release}', :path, :hash, :size_bytes)"
+        f" values ('{release}', :path, :hash, :size_bytes)"
     )
 
     con.executemany(insert_file, items)
 
-    res = list(con.execute("select * from file limit 1"))
-    click.echo(res)
+    res = list(con.execute("select * from file limit 5"))
+    for row in res:
+        click.echo(row)
 
 
 @cli.command()
