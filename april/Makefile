@@ -2,6 +2,8 @@ SAMPLE := ../SOURCE/flask
 
 all:
 
+pre-commit: fmt fastlint
+
 april:
 	./main.py april
 

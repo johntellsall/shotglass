@@ -7,12 +7,14 @@ Shotglass: info about codebases over time
 import logging
 import pprint
 import re
+import sqlite3
 from distutils.version import LooseVersion
 from pathlib import PurePath
 
 import click
 
 import run
+import state
 
 logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
@@ -84,9 +86,29 @@ def cli():
 
 
 @cli.command()
-def april():
+@click.argument("path", default="../SOURCE/flask")
+def april(path):
     """
     exercise new features
+    """
+    con = sqlite3.connect(":memory:")
+    state.setup(con)
+
+    click.echo(f"List Tags {path}")
+    tags = get_good_tags(path)
+    # assert 0, tags
+    insert_sql = "insert into release (label) values (?)"
+    con.executemany(insert_sql, [[tag] for tag in tags])
+
+    res = list(con.execute("select label from release"))
+    click.echo(res)
+
+
+@cli.command()
+def demo():
+    """
+    list project Releases, and stats for each release
+    TODO: make generic (now Flask only)
     """
     path = "../SOURCE/flask"  # TODO:
     click.echo(f"List Tags {path}")
