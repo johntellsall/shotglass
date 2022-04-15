@@ -1,0 +1,55 @@
+                                1.0  1.1  1.2  1.3  1.4  1.5  1.9
+pyramid/__init__.py               2    5    5    5    1    1    1
+pyramid/asset.py                207  207   38   44   44   44   44
+pyramid/authentication.py       499  569  796  808 1139 1191 1177
+pyramid/authorization.py        133  136  136  140  140  146  146
+pyramid/compat.py                      8    8  246  246  246  276
+pyramid/config/__init__.py               1034 1157 1215 1197 1419
+pyramid/config/adapters.py                 60  206  329  327  327
+pyramid/config/assets.py                  243  251  251  275  396
+pyramid/config/factories.py                65  148  201  203  264
+pyramid/config/i18n.py                    105  126  125  107  119
+pyramid/config/predicates.py                        296  296    2
+pyramid/config/rendering.py                82  104  104   51   51
+pyramid/config/routes.py                  457  504  575  466  469
+pyramid/config/security.py                110  139  159  161  265
+pyramid/config/settings.py                160  160  160  160  107
+pyramid/config/testing.py                 141  147  169  167  167
+pyramid/config/tweens.py                  267  301  209  209  195
+pyramid/config/util.py                    261  295  162  232  240
+pyramid/config/views.py                  1517 1739 1968 2007 2133
+pyramid/config/zca.py                      20   20   20   20   20
+pyramid/csrf.py                                               332
+pyramid/decorator.py             20   20   20   20   42   40   45
+pyramid/encode.py               107  107  108   68   68   79   84
+pyramid/events.py               224  233  208  216  247  246  266
+pyramid/exceptions.py            90   33   59   62   80  113  127
+pyramid/httpexceptions.py        50 1013 1026 1036 1036 1049 1158
+pyramid/i18n.py                 321  338  349  364  364  386  397
+pyramid/interfaces.py           624  868  857 1114 1127 1167 1339
+pyramid/location.py              66   66   66   66   66   66   66
+pyramid/paster.py               193  520  642  123  127  135  111
+pyramid/path.py                  70   70   70  427  427  429  436
+pyramid/predicates.py                                         300
+pyramid/registry.py              52   68   74  224  257  257  299
+pyramid/renderers.py            351  490  507  511  644  504  523
+pyramid/request.py              372  570  437  466  461  311  334
+pyramid/resource.py               5    5    5    5    5    5    5
+pyramid/response.py               2    7   66  161  161  161  187
+pyramid/router.py               206  196  190  201  253  244  278
+pramid/scripting.py             25  104  104  108  117  117  140
+pyramid/security.py             277  277  279  284  296  388  439
+pyramid/session.py              294  280  277  275  309  628  624
+pyramid/settings.py             107  112   52   60   34   34   33
+pyramid/static.py               212  237  197  156  156  156  300
+pyramid/testing.py              880  914  909  943  618  613  639
+pyramid/threadlocal.py           60   60   60   60   60   60   83
+pyramid/traversal.py            734  743  723  828  820  825  761
+pyramid/tweens.py                          48   51   54   54   48
+pyramid/url.py                  433  435  591  815  819  949  895
+pyramid/urldispatch.py          161  169  168  231  233  235  249
+pyramid/util.py                 144  208  209  251  523  537  647
+pyramid/view.py                 331  350  315  476  452  416  736
+pyramid/viewderivers.py                                       519
+pyramid/wsgi.py                  82   70   70   78   78   78   85
+setup.py                         91   93   93  118  124  124  119
