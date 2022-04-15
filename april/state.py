@@ -31,6 +31,17 @@ SETUP_SQL = [
     "create table file (release, path, hash, size_bytes)",
 ]
 
+# res = list(con.execute("select count(*) from release"))
+# click.echo(f"{res} releases")
+
+
+def query1(con, sql=None, table=None):
+    assert sql or table
+    if table:
+        sql = f"select count(*) from {table}"
+    res = list(con.execute(sql))
+    return res[0][0]
+
 
 def setup(con):
     for sql in SETUP_SQL:

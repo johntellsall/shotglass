@@ -83,8 +83,17 @@ def db_add_releases(con, path):
     insert_sql = "insert into release (label) values (?)"
     con.executemany(insert_sql, [[tag] for tag in tags])
 
-    # res = list(con.execute("select label from release"))
-    # click.echo(res)
+
+def db_add_files(con, path, release):
+    all_items = list(git_ls_tree(path, release=release))
+    items = list(filter_goodsource(all_items))
+
+    insert_file = (
+        "insert into file (release, path, hash, size_bytes)"
+        f" values ('{release}', :path, :hash, :size_bytes)"
+    )
+
+    con.executemany(insert_file, items)
 
 
 # :::::::::::::::::::: COMMANDS
@@ -106,20 +115,17 @@ def april(path):
 
     db_add_releases(con, path)
 
+    res = state.query1(con, table="release")
+    click.echo(f"{res} releases")
+
     res = list(con.execute("select label from release"))
     releases = [row[0] for row in res]
 
     release = releases[0]
+    db_add_files(con, path, release)
 
-    all_items = list(git_ls_tree(path, release=release))
-    items = list(filter_goodsource(all_items))
-
-    insert_file = (
-        "insert into file (release, path, hash, size_bytes)"
-        f" values ('{release}', :path, :hash, :size_bytes)"
-    )
-
-    con.executemany(insert_file, items)
+    res = state.query1(con, table="file")
+    click.echo(f"{res} files")
 
     res = list(con.execute("select * from file limit 5"))
     for row in res:
