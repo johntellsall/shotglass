@@ -28,7 +28,7 @@
 
 SETUP_SQL = [
     "create table release (label)",
-    "create table file (release, path)",
+    "create table file (release, path, hash, size_bytes)",
 ]
 
 

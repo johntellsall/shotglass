@@ -115,11 +115,8 @@ def april(path):
     items = list(filter_goodsource(all_items))
     # assert 0, items[0]
 
-    insert_file = f"insert into file (release, path) values ({release}, :path" ")"
+    insert_file = f"insert into file (release, path, hash, size_bytes) values ('{release}', :path, :hash, :size_bytes)"
 
-    # def item2file(item):
-    #     return release, item["path"]
-    # con.executemany(insert_file, map(item2file, items))
     con.executemany(insert_file, items)
 
     res = list(con.execute("select * from file limit 1"))
