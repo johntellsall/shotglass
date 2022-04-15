@@ -3,6 +3,7 @@ from click.testing import CliRunner
 import main
 
 FLASK_DIR = "../SOURCE/flask/src/flask"
+SAMPLE = "sample_code/test_code.py"
 
 
 def test_ls_tags():
@@ -16,6 +17,6 @@ def test_ls_tags():
 def test_ctags():
     "test list Ctags e.g. symbol/function information"
     runner = CliRunner()
-    result = runner.invoke(main.ctags, ["test_code.py"])
+    result = runner.invoke(main.ctags, [SAMPLE])
     assert result.exit_code == 0
     assert "'kind': 'function'," in result.output

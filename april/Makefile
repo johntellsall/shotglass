@@ -1,5 +1,5 @@
 SAMPLE := ../SOURCE/flask
-# SOURCE := 
+
 all:
 
 april:

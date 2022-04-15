@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 #
 """
-function(path) -> data
+Shotglass: info about codebases over time
 """
 
 import logging
 import pprint
 import re
-from pathlib import PurePath
-import click
 from distutils.version import LooseVersion
+from pathlib import PurePath
+
+import click
 
 import run
 
@@ -83,9 +84,8 @@ def cli():
 
 
 @cli.command()
-# @click.argument("path")
 def april():
-    path = "../SOURCE/flask"
+    path = "../SOURCE/flask"  # TODO:
     click.echo(f"List Tags {path}")
     tags = get_good_tags(path)
     tags.sort(key=LooseVersion)
@@ -127,7 +127,6 @@ def ctags(path):
     click.echo(f"Ctags {path}")
     symbols = list(run.run_ctags(path))
     pprint.pprint(symbols)
-    # run_ctags("../SOURCE/flask/src/flask/app.py", verbose=True)
 
 
 if __name__ == "__main__":
