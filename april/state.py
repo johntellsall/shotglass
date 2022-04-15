@@ -26,7 +26,10 @@
 # # so the connection object should be closed manually
 # con.close()
 
-SETUP_SQL = ["create table release (label)"]
+SETUP_SQL = [
+    "create table release (label)",
+    "create table file (release, path)",
+]
 
 
 def setup(con):

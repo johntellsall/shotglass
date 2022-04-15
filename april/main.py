@@ -30,7 +30,7 @@ def git_ls_tree(project_path, release="2.0.0"):
         return dict(hash=hash, path=path, size_bytes=size_bytes)
 
     cmd = f"git -C {project_path} ls-tree  -r --long '{release}'"
-    return map(to_item, run(cmd))
+    return map(to_item, run.run(cmd))
 
 
 def git_tag_list(project_path):
@@ -77,6 +77,16 @@ def get_good_tags(path):
     return tags
 
 
+def db_add_releases(con, path):
+    click.echo(f"List Tags {path}")
+    tags = get_good_tags(path)
+    insert_sql = "insert into release (label) values (?)"
+    con.executemany(insert_sql, [[tag] for tag in tags])
+
+    # res = list(con.execute("select label from release"))
+    # click.echo(res)
+
+
 # :::::::::::::::::::: COMMANDS
 
 
@@ -94,13 +104,25 @@ def april(path):
     con = sqlite3.connect(":memory:")
     state.setup(con)
 
-    click.echo(f"List Tags {path}")
-    tags = get_good_tags(path)
-    # assert 0, tags
-    insert_sql = "insert into release (label) values (?)"
-    con.executemany(insert_sql, [[tag] for tag in tags])
+    db_add_releases(con, path)
 
     res = list(con.execute("select label from release"))
+    releases = [row[0] for row in res]
+
+    release = releases[0]
+
+    all_items = list(git_ls_tree(path, release=release))
+    items = list(filter_goodsource(all_items))
+    # assert 0, items[0]
+
+    insert_file = f"insert into file (release, path) values ({release}, :path" ")"
+
+    # def item2file(item):
+    #     return release, item["path"]
+    # con.executemany(insert_file, map(item2file, items))
+    con.executemany(insert_file, items)
+
+    res = list(con.execute("select * from file limit 1"))
     click.echo(res)
 
 
