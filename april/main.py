@@ -75,7 +75,7 @@ def get_good_tags(path):
     return tags
 
 
-# ::::::::::::::::::::
+# :::::::::::::::::::: COMMANDS
 
 
 @click.group()
@@ -85,6 +85,9 @@ def cli():
 
 @cli.command()
 def april():
+    """
+    exercise new features
+    """
     path = "../SOURCE/flask"  # TODO:
     click.echo(f"List Tags {path}")
     tags = get_good_tags(path)
@@ -116,6 +119,9 @@ def april():
 @cli.command()
 @click.argument("path")
 def ls_tags(path):
+    """
+    list tags in Git repos
+    """
     click.echo(f"List Tags {path}")
     tags = git_tag_list(path)
     pprint.pprint(tags)
@@ -124,6 +130,9 @@ def ls_tags(path):
 @cli.command()
 @click.argument("path")
 def ctags(path):
+    """
+    show symbols of single source file (from Ctags)
+    """
     click.echo(f"Ctags {path}")
     symbols = list(run.run_ctags(path))
     pprint.pprint(symbols)
