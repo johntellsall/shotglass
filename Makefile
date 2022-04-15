@@ -8,3 +8,19 @@ setup:
 .PHONY: clean
 clean:
 	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
+
+
+pre-commit: fmt fastlint
+
+# XXXX TODO: make general
+fmt:
+	make -C april fmt
+fastlint:
+	make -C april fastlint
+# fmt:
+# 	isort .
+# 	black .
+
+# fastlint:
+# 	flake8 .
+# 	@echo DONE

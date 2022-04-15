@@ -113,9 +113,11 @@ def april(path):
 
     all_items = list(git_ls_tree(path, release=release))
     items = list(filter_goodsource(all_items))
-    # assert 0, items[0]
 
-    insert_file = f"insert into file (release, path, hash, size_bytes) values ('{release}', :path, :hash, :size_bytes)"
+    insert_file = (
+        "insert into file (release, path, hash, size_bytes)"
+        " values ('{release}', :path, :hash, :size_bytes)"
+    )
 
     con.executemany(insert_file, items)
 

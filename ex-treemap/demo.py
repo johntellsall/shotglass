@@ -1,9 +1,10 @@
 # libraries
 import matplotlib
+
 matplotlib.use('svg')
 import matplotlib.pyplot as plt
 import pandas as pd
-import squarify    # pip install squarify (algorithm for treemap)
+import squarify  # pip install squarify (algorithm for treemap)
 
 # If you have 2 lists
 squarify.plot(sizes=[13, 22, 35, 5], label=["group A",

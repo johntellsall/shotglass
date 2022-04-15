@@ -23,7 +23,7 @@ fmt:
 	black .
 
 fastlint:
-	flake8 .
+	flake8 --max-line-length=88 .
 	@echo DONE
 
 lint:

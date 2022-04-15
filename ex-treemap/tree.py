@@ -2,12 +2,12 @@ import os
 import sys
 
 import matplotlib
+
 matplotlib.use('svg')
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import squarify
-
 
 DULL_DIRECTORIES = set(['.git'])
 

@@ -10,7 +10,6 @@ shotglass.py <command> <project path>
 # import sys
 # from datetime import datetime
 import click
-
 import cmd_import
 
 # import cmd_index

@@ -5,12 +5,12 @@
 import logging
 import multiprocessing.pool as mpool
 import os
-import pandas as pd
 import subprocess
 import sys
 import time
 import traceback
 
+import pandas as pd
 
 DULL_DIRECTORIES = set(['.git'])
 GOOD_EXTENSIONS = ('.py', '.c', '.go')

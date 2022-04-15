@@ -2,11 +2,10 @@
 #
 import subprocess
 
-import cmd_info_show
-import pytest
-
 import build
 import cmd_index
+import cmd_info_show
+import pytest
 
 
 @pytest.mark.xfail
