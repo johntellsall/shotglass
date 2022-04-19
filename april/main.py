@@ -48,10 +48,10 @@ def is_source(path):
 
 # TODO: make flexible
 def is_interesting(path):
-    dull_dirs = set(["docs", "examples", "scripts", "tests"])
+    DULL_DIRS = set(["docs", "examples", "scripts", "tests"])
     if "/" in path:
         first, _ = path.split("/", 1)
-        if first in dull_dirs:
+        if first in DULL_DIRS:
             return False
     if path.endswith("__init__.py"):
         return False
@@ -77,14 +77,23 @@ def get_good_tags(path):
     return tags
 
 
-def db_add_releases(con, path):
-    click.echo(f"List Tags {path}")
-    tags = get_good_tags(path)
-    insert_sql = "insert into release (label) values (?)"
-    con.executemany(insert_sql, [[tag] for tag in tags])
+def db_add_releases(con, project_path):
+    """
+    for project, insert interesting (Git) tags into db
+    """
+    click.echo(f"List Tags {project_path}")
+    tags = get_good_tags(project_path)
+
+    insert_release = "insert into release (label) values (:label)"
+    items = [{"label": tag} for tag in tags]
+    con.executemany(insert_release, items)
 
 
+# TODO: add via *hash* not path
 def db_add_files(con, path, release):
+    """
+    for project and release/tag, add interesting files into db
+    """
     all_items = list(git_ls_tree(path, release=release))
     items = list(filter_goodsource(all_items))
 
@@ -92,7 +101,6 @@ def db_add_files(con, path, release):
         "insert into file (release, path, hash, size_bytes)"
         f" values ('{release}', :path, :hash, :size_bytes)"
     )
-
     con.executemany(insert_file, items)
 
 
@@ -113,20 +121,37 @@ def april(path):
     con = sqlite3.connect(":memory:")
     state.setup(con)
 
+    click.secho("Stats", fg="yellow")
+
+    # ::: RELEASES
     db_add_releases(con, path)
 
     res = state.query1(con, table="release")
     click.echo(f"{res} releases")
 
+    # ::: FILES
     res = list(con.execute("select label from release"))
     releases = [row[0] for row in res]
 
-    release = releases[0]
-    db_add_files(con, path, release)
+    for release in releases:
+        db_add_files(con, path, release)
 
     res = state.query1(con, table="file")
     click.echo(f"{res} files")
 
+    # # ::: SYMBOLS
+    res = list(con.execute("select path, hash from file limit 1"))
+    # # TODO: don't recompute
+    # # for path,hash in res:
+
+    # for release in releases[:3]:
+    #     db_add_files(con, path, release)
+
+    # res = state.query1(con, table="file")
+    # click.echo(f"{res} files")
+
+    # ::: Summary
+    click.secho("Sample Files", fg="yellow")
     res = list(con.execute("select * from file limit 5"))
     for row in res:
         click.echo(row)
