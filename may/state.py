@@ -2,7 +2,6 @@
 
 import sqlite3
 
-
 SETUP_SQL = [
     "create table release (label)",
     "create table file (release, path, hash, size_bytes)",
@@ -12,6 +11,7 @@ SETUP_SQL = [
 def get_db(temporary=True):
     path = ":memory:" if temporary else "main.db"
     con = sqlite3.connect(path)  # pylint: disable=no-member
+    setup(con)
     return con
 
 

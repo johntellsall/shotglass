@@ -80,7 +80,6 @@ def db_add_releases(con, project_path):
     """
     for project, insert interesting (Git) tags into db
     """
-    click.echo(f"List Tags {project_path}")
     tags = get_good_tags(project_path)
 
     insert_release = "insert into release (label) values (:label)"
@@ -152,9 +151,12 @@ def demo():
     TODO: make generic (now Flask only)
     """
     path = "../SOURCE/flask"  # TODO:
-    click.echo(f"List Tags {path}")
     con = state.get_db()
+    click.echo(f"List Tags {path}")
     db_add_releases(con, path)
+    res = state.query1(con, table="release")
+    click.echo(f"Tags: {res}")
+    # breakpoint()
     # tags = get_good_tags(path)
     # tags.sort(key=LooseVersion)
 
