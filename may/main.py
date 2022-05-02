@@ -153,12 +153,28 @@ def demo():
     path = "../SOURCE/flask"  # TODO:
     con = state.get_db()
     click.echo(f"List Tags {path}")
+
+    # Git releases -> database; show count
     db_add_releases(con, path)
     res = state.query1(con, table="release")
     click.echo(f"Tags: {res}")
-    # breakpoint()
-    # tags = get_good_tags(path)
-    # tags.sort(key=LooseVersion)
+
+    # Per release: add release files -> database
+    for (label,) in con.execute("select label from release"):
+        db_add_files(con, path=path, release=label)
+
+    # Per release: show count of files
+    for (label,) in con.execute("select label from release"):
+        sql = "select count(*) from file where release = ?"
+        res = list(con.execute(sql, [label]))
+        click.secho(f"rel {label}: {res[0][0]}")
+
+    # res = state.query1(con, table="release")
+    # click.echo(f"After: Releases: {res}")
+    # for (label,) in con.execute("select label from release"):
+    #     sql = 'select count(*) from file where release='
+    #     res = state.query1(con, sql)
+    #     click.echo(f"After: Releases: {res}")
 
     # hashes = set()
     # for tag in tags[:2]:
