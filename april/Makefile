@@ -1,8 +1,21 @@
 SAMPLE := ../SOURCE/flask
+# PY_SOURCE := $(wildcard [a-su-z]*.py)
+# PY_SOURCE := $(wildcard *.py)
 
 all:
 
+# TODO: skip sample_code and test_*.py
+coverage:
+	pytest --cov
+
+# sniff -- find stinky code that shouldn't make a PR
+sniff:
+	git grep breakpoint '*.py'  && false
+
+# pre-commit
 pre-commit: fmt fastlint
+
+pre-push: sniff
 
 april:
 	./main.py april

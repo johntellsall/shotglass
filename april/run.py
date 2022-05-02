@@ -18,22 +18,6 @@ def run_ctags(path, verbose=False):
     return map(json.loads, proc.stdout.rstrip().split("\n"))
 
 
-# def run_ctags2(source, verbose=False):
-#     """
-#     Ctags command output -- iter of dictionaries, one per symbol
-#     Specify source code directly
-#     """
-#     cmd = CTAGS_ARGS + ["-"]
-#     in_source = io.StringIO(source)
-#     proc = subprocess.run(
-#         cmd, capture_output=True, text=True, check=True, stdin=in_source
-#     )
-#     assert proc.returncode == 0
-#     if verbose:
-#         print(f"-- RAW\n{proc.stdout[:300]}\n-- ENDRAW")
-#     return map(json.loads, proc.stdout.rstrip().split("\n"))
-
-
 def run_blob(cmd):
     proc = subprocess.run(
         cmd, shell=True, capture_output=True, text=True, check=True
