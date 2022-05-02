@@ -5,3 +5,4 @@ isort
 flake8
 pylint
 pytest-cov
+isort

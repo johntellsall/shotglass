@@ -4,6 +4,9 @@ SAMPLE := ../SOURCE/flask
 
 all:
 
+demo:
+	./main.py demo
+
 # TODO: skip sample_code and test_*.py
 coverage:
 	pytest --cov
@@ -16,9 +19,6 @@ sniff:
 pre-commit: fmt fastlint
 
 pre-push: sniff
-
-april:
-	./main.py april
 
 run:
 	./main.py ls-tags $(SAMPLE)

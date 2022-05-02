@@ -1,38 +1,18 @@
 # state.py
 
-# import sqlite3
+import sqlite3
 
-# langs = [
-#     ("C++", 1985),
-#     ("Objective-C", 1984),
-# ]
-
-# con = sqlite3.connect(":memory:")
-
-# # Create the table
-# con.execute("create table lang(name, first_appeared)")
-
-# # Fill the table
-# con.executemany("insert into lang(name,
-# first_appeared) values (?, ?)", langs)
-
-# # Print the table contents
-# for row in con.execute("select name, first_appeared from lang"):
-#     print(row)
-
-# print("I just deleted", con.execute("delete from lang").rowcount, "rows")
-
-# # close is not a shortcut method and it's not called automatically,
-# # so the connection object should be closed manually
-# con.close()
 
 SETUP_SQL = [
     "create table release (label)",
     "create table file (release, path, hash, size_bytes)",
 ]
 
-# res = list(con.execute("select count(*) from release"))
-# click.echo(f"{res} releases")
+
+def get_db(temporary=True):
+    path = ":memory:" if temporary else "main.db"
+    con = sqlite3.connect(path)  # pylint: disable=no-member
+    return con
 
 
 def query1(con, sql=None, table=None):
@@ -46,7 +26,3 @@ def query1(con, sql=None, table=None):
 def setup(con):
     for sql in SETUP_SQL:
         con.execute(sql)
-
-
-# # Create the table
-# con.execute("create table lang(name, first_appeared)")

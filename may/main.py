@@ -7,7 +7,6 @@ Shotglass: info about codebases over time
 import logging
 import pprint
 import re
-import sqlite3
 from distutils.version import LooseVersion
 from pathlib import PurePath
 
@@ -113,52 +112,7 @@ def cli():
 
 
 @cli.command()
-@click.argument("path", default="../SOURCE/flask")
-def april(path):
-    """
-    exercise new features
-    """
-    con = sqlite3.connect(":memory:")
-    state.setup(con)
-
-    click.secho("Stats", fg="yellow")
-
-    # ::: RELEASES
-    db_add_releases(con, path)
-
-    res = state.query1(con, table="release")
-    click.echo(f"{res} releases")
-
-    # ::: FILES
-    res = list(con.execute("select label from release"))
-    releases = [row[0] for row in res]
-
-    for release in releases:
-        db_add_files(con, path, release)
-
-    res = state.query1(con, table="file")
-    click.echo(f"{res} files")
-
-    # # ::: SYMBOLS
-    res = list(con.execute("select path, hash from file limit 1"))
-    # # TODO: don't recompute
-    # # for path,hash in res:
-
-    # for release in releases[:3]:
-    #     db_add_files(con, path, release)
-
-    # res = state.query1(con, table="file")
-    # click.echo(f"{res} files")
-
-    # ::: Summary
-    click.secho("Sample Files", fg="yellow")
-    res = list(con.execute("select * from file limit 5"))
-    for row in res:
-        click.echo(row)
-
-
-@cli.command()
-def demo():
+def list_git():
     """
     list project Releases, and stats for each release
     TODO: make generic (now Flask only)
@@ -169,8 +123,8 @@ def demo():
     tags.sort(key=LooseVersion)
 
     hashes = set()
-    for tag in tags:
-        click.secho(f"release: {tag}", bg="yellow")
+    for tag in tags[:2]:
+        click.secho(f"release: {tag}", fg="black", bg="yellow")
         all_items = list(git_ls_tree(path, release=tag))
         click.secho(f"= {len(all_items)} total files", fg="yellow")
 
@@ -189,6 +143,42 @@ def demo():
 
         for item in changed_items:
             click.secho(f"- {item['path']}")
+
+
+@cli.command()
+def demo():
+    """
+    list project Releases, and stats for each release
+    TODO: make generic (now Flask only)
+    """
+    path = "../SOURCE/flask"  # TODO:
+    click.echo(f"List Tags {path}")
+    con = state.get_db()
+    db_add_releases(con, path)
+    # tags = get_good_tags(path)
+    # tags.sort(key=LooseVersion)
+
+    # hashes = set()
+    # for tag in tags[:2]:
+    #     click.secho(f"release: {tag}", fg="black", bg="yellow")
+    #     all_items = list(git_ls_tree(path, release=tag))
+    #     click.secho(f"= {len(all_items)} total files", fg="yellow")
+
+    #     items = list(filter_goodsource(all_items))
+    #     click.secho(f"= {len(items)} source files", fg="yellow")
+
+    #     changed_items = []
+    #     for item in items:
+    #         hash = item["hash"]
+    #         if hash in hashes:
+    #             continue
+    #         hashes.add(hash)
+    #         changed_items.append(item)
+
+    #     click.secho(f"+/- {len(changed_items)} changed source", fg="yellow")
+
+    #     for item in changed_items:
+    #         click.secho(f"- {item['path']}")
 
 
 @cli.command()
