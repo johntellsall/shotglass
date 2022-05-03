@@ -102,16 +102,22 @@ def db_add_files(con, path, release):
     con.executemany(insert_file, items)
 
 
+# CTAGS
+# {'_type': 'tag', 'name': 'Flask', 'path': '.temp.py', 'access': 'public',
+# 'inherits': 'object', 'language': 'Python', 'line': 173, 'kind': 'class',
+# 'roles': 'def', 'end': 655}
+
+
 def db_add_symbols(con, project_path, hash, path, release):
-    return
     run.run_blob(f"git -C {project_path} show {hash} > .temp.py")
     items = list(run.run_ctags(".temp.py"))
+    num = None
+    for num, item in enumerate(items):
+        pass  # click.echo(f"- {num:03d} {item}")
+    click.echo(f"- {path}: {num} symbols")
 
-    insert_sym = (
-        "insert into symbol (release, path, hash, size_bytes)"
-        f" values ('{release}', :path, :hash, :size_bytes)"
-    )
-    con.executemany(insert_sym, items)
+    # insert_sym = "insert into symbol (name)" f" values (:name)"
+    # con.executemany(insert_sym, items)
 
 
 # :::::::::::::::::::: COMMANDS

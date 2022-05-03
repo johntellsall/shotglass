@@ -6,7 +6,7 @@ SETUP_SQL = [
     "PRAGMA foreign_keys = ON",
     "create table release (label)",
     "create table file (" "id integer primary key, release, path, hash, size_bytes)",
-    "create table symbol (release, path, hash, size_bytes,"
+    "create table symbol (name,"
     "file_id int,"
     "foreign key (file_id) references file (id) "
     ")",
