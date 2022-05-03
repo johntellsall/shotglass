@@ -102,6 +102,18 @@ def db_add_files(con, path, release):
     con.executemany(insert_file, items)
 
 
+def db_add_symbols(con, project_path, hash, path, release):
+    return
+    run.run_blob(f"git -C {project_path} show {hash} > .temp.py")
+    items = list(run.run_ctags(".temp.py"))
+
+    insert_sym = (
+        "insert into symbol (release, path, hash, size_bytes)"
+        f" values ('{release}', :path, :hash, :size_bytes)"
+    )
+    con.executemany(insert_sym, items)
+
+
 # :::::::::::::::::::: COMMANDS
 
 
@@ -122,7 +134,8 @@ def list_git():
     tags.sort(key=LooseVersion)
 
     hashes = set()
-    for tag in tags[:2]:
+    # for each release
+    for tag in tags:
         click.secho(f"release: {tag}", fg="black", bg="yellow")
         all_items = list(git_ls_tree(path, release=tag))
         click.secho(f"= {len(all_items)} total files", fg="yellow")
@@ -138,8 +151,10 @@ def list_git():
             hashes.add(hash)
             changed_items.append(item)
 
+        # show count of files changed in this release
         click.secho(f"+/- {len(changed_items)} changed source", fg="yellow")
 
+        # .. and the files
         for item in changed_items:
             click.secho(f"- {item['path']}")
 
@@ -150,53 +165,32 @@ def demo():
     list project Releases, and stats for each release
     TODO: make generic (now Flask only)
     """
-    path = "../SOURCE/flask"  # TODO:
+    project_path = "../SOURCE/flask"  # TODO:
     con = state.get_db()
-    click.echo(f"List Tags {path}")
+    click.echo(f"List Tags {project_path}")
 
     # Git releases -> database; show count
-    db_add_releases(con, path)
-    res = state.query1(con, table="release")
-    click.echo(f"Tags: {res}")
+    db_add_releases(con, project_path)
+    count = state.query1(con, table="release")
+    click.echo(f"Tags: {count}")
 
     # Per release: add release files -> database
     for (label,) in con.execute("select label from release"):
-        db_add_files(con, path=path, release=label)
+        db_add_files(con, path=project_path, release=label)
 
     # Per release: show count of files
     for (label,) in con.execute("select label from release"):
         sql = "select count(*) from file where release = ?"
-        res = list(con.execute(sql, [label]))
-        click.secho(f"rel {label}: {res[0][0]}")
+        result = list(con.execute(sql, [label]))
+        click.secho(f"rel {label}: {result[0][0]}")
 
-    # res = state.query1(con, table="release")
-    # click.echo(f"After: Releases: {res}")
-    # for (label,) in con.execute("select label from release"):
-    #     sql = 'select count(*) from file where release='
-    #     res = state.query1(con, sql)
-    #     click.echo(f"After: Releases: {res}")
-
-    # hashes = set()
-    # for tag in tags[:2]:
-    #     click.secho(f"release: {tag}", fg="black", bg="yellow")
-    #     all_items = list(git_ls_tree(path, release=tag))
-    #     click.secho(f"= {len(all_items)} total files", fg="yellow")
-
-    #     items = list(filter_goodsource(all_items))
-    #     click.secho(f"= {len(items)} source files", fg="yellow")
-
-    #     changed_items = []
-    #     for item in items:
-    #         hash = item["hash"]
-    #         if hash in hashes:
-    #             continue
-    #         hashes.add(hash)
-    #         changed_items.append(item)
-
-    #     click.secho(f"+/- {len(changed_items)} changed source", fg="yellow")
-
-    #     for item in changed_items:
-    #         click.secho(f"- {item['path']}")
+    # Per file: extract symbols
+    # TODO: restrict to interesting releases+files
+    sql = "select path, hash, release from file"
+    for path, hash, release in con.execute(sql):
+        click.secho(f"- {path=} {hash=}")
+        # TODO: more work here
+        db_add_symbols(con, project_path, hash=hash, path=path, release=release)
 
 
 @cli.command()
