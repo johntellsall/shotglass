@@ -4,6 +4,9 @@ SAMPLE := ../SOURCE/flask
 
 all:
 
+%.csv: %.sql
+	sqlite3 main.db ".read $<"
+	
 demo:
 	./main.py add-project --limit ../SOURCE/flask
 
