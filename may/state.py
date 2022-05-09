@@ -4,9 +4,17 @@ import sqlite3
 
 SETUP_SQL = [
     "PRAGMA foreign_keys = ON",
-    "create table if not exists release (label)",
+    """create table if not exists project (
+        id integer primary key, name
+        )""",
+    """create table if not exists release (
+        label, project_id,
+        foreign key (project_id) references project (id)
+        )""",
     """create table if not exists file (
-        id integer primary key, release, path, hash, size_bytes
+        id integer primary key, release, path, hash, size_bytes,
+        project_id,
+        foreign key (project_id) references project (id)
         )""",
     """create table if not exists symbol (
         name, path, line_start, line_end, kind,

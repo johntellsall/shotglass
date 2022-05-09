@@ -4,17 +4,17 @@ SAMPLE := ../SOURCE/flask
 
 all:
 
+demo:
+	./main.py reset-db
+	./main.py add-project --limit ../SOURCE/flask
+	make summary
+# ./main.py add-project --limit ../SOURCE/flask
+
 summary: summary.csv
 
 %.csv: %.sql
 	sqlite3 main.db ".read $<"
 
-demo:
-	./main.py reset-db
-	./main.py add-project --limit ../SOURCE/flask
-	make summary
-	./main.py add-project --limit ../SOURCE/pyramid
-	make summary
 
 
 # TODO: skip sample_code and test_*.py
