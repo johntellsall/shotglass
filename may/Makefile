@@ -5,7 +5,7 @@ SAMPLE := ../SOURCE/flask
 all:
 
 demo:
-	./main.py demo
+	./main.py add-project --limit ../SOURCE/flask
 
 # TODO: skip sample_code and test_*.py
 coverage:

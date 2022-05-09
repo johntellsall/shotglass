@@ -108,16 +108,44 @@ def db_add_files(con, path, release):
 # 'roles': 'def', 'end': 655}
 
 
-def db_add_symbols(con, project_path, hash, path, release):
-    run.run_blob(f"git -C {project_path} show {hash} > .temp.py")
-    items = list(run.run_ctags(".temp.py"))
-    num = None
-    for num, item in enumerate(items):
-        pass  # click.echo(f"- {num:03d} {item}")
-    click.echo(f"- {path}: {num} symbols")
+class IterFixedFields:
+    """
+    ensure dict-like items have all required fields
+    - ex: "end" is not always provided by Ctags
+    """
 
-    # insert_sym = "insert into symbol (name)" f" values (:name)"
-    # con.executemany(insert_sym, items)
+    FIELDS = ("name", "path", "start", "end", "kind")
+
+    def __init__(self, items):
+        self.items = items
+        self.proto = dict.fromkeys(self.FIELDS)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if not self.items:
+            raise StopIteration
+        item = self.proto.copy()
+        item.update(self.items.pop(0))
+        return item
+
+
+def db_add_symbols(con, project_path, hash, path, release):
+    assert path.endswith(".py")
+
+    # copy file from Git to filesystem (uncompress if needed)
+    run.run_blob(f"git -C {project_path} show {hash} > .temp.py")
+
+    # parse symbols from source file
+    items = list(run.run_ctags(".temp.py"))
+
+    # insert symbols into database
+    insert_sym = f"""
+    insert into symbol (name, path, line_start, line_end, kind) values (
+        :name, '{path}', :line, :end, :kind)
+    """
+    con.executemany(insert_sym, IterFixedFields(items))
 
 
 # :::::::::::::::::::: COMMANDS
@@ -166,12 +194,12 @@ def list_git():
 
 
 @cli.command()
-def demo():
+@click.option("--limit", is_flag=True)
+@click.argument("project_path")
+def add_project(limit, project_path):
     """
     list project Releases, and stats for each release
-    TODO: make generic (now Flask only)
     """
-    project_path = "../SOURCE/flask"  # TODO:
     con = state.get_db()
     click.echo(f"List Tags {project_path}")
 
@@ -193,10 +221,23 @@ def demo():
     # Per file: extract symbols
     # TODO: restrict to interesting releases+files
     sql = "select path, hash, release from file"
-    for path, hash, release in con.execute(sql):
-        click.secho(f"- {path=} {hash=}")
+    if limit:
+        sql += " LIMIT 5"
+    batch = 5
+    for num, (path, hash, release) in enumerate(con.execute(sql)):
+        if not num or (num + 1) % batch == 0:
+            click.secho(f"- {num+1:03d} {path=} {hash=}")
+            batch *= 2
         # TODO: more work here
         db_add_symbols(con, project_path, hash=hash, path=path, release=release)
+
+    rel_count = state.query1(con, table="release")
+    sym_count = state.query1(con, table="symbol")
+
+    click.echo(f"Symbols: {sym_count} Releases: {rel_count}")
+
+    for item in con.execute("select * from symbol limit 3"):
+        click.echo(f"- {dict(item)}")
 
 
 @cli.command()

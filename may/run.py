@@ -1,6 +1,5 @@
 # run.py
 
-
 import json
 import subprocess
 
@@ -15,20 +14,8 @@ def run_ctags(path, verbose=False):
     assert proc.returncode == 0
     if verbose:
         print(f"-- RAW\n{proc.stdout[:300]}\n-- ENDRAW")
-    if 1:
-        # return map(json.loads, proc.stdout.rstrip().split("\n"))
-        return map(json.loads, filter(None, proc.stdout.rstrip().split("\n")))
 
-    else:
-
-        def safe_loads(json_str):
-            try:
-                return json.loads(json_str)
-            except json.decoder.JSONDecodeError:
-                assert 0, json_str
-                print(f"??? {json_str[:50]}")
-
-        return filter(None, map(safe_loads, proc.stdout.rstrip().split("\n")))
+    return map(json.loads, filter(None, proc.stdout.rstrip().split("\n")))
 
 
 def run_blob(cmd):
