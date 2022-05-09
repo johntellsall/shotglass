@@ -8,7 +8,7 @@ import logging
 import pprint
 import re
 from distutils.version import LooseVersion
-from pathlib import PurePath
+from pathlib import Path, PurePath
 
 import click
 
@@ -267,6 +267,14 @@ def ls_tags(path):
     click.echo(f"List Tags {path}")
     tags = git_tag_list(path)
     pprint.pprint(tags)
+
+
+@cli.command()
+def reset_db():
+    """
+    delete database
+    """
+    Path("main.db").unlink()
 
 
 @cli.command()
