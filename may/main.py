@@ -194,23 +194,38 @@ def list_git():
 
 
 @cli.command()
+def summary():
+    con = state.get_db()
+    # list Projects
+    # per project: count Releases, Files, Symbols
+
+    num_symbols = state.query1(con, table="release")
+    num_symbols = state.query1(con, table="symbol")
+
+    click.echo(f"Symbols: {num_symbols} Releases: {num_symbols}")
+
+
+@cli.command()
 @click.option("--limit", is_flag=True)
 @click.argument("project_path")
 def add_project(limit, project_path):
     """
     list project Releases, and stats for each release
     """
-    con = state.get_db()
+    con = state.get_db(temporary=False)
     click.echo(f"List Tags {project_path}")
 
     # Git releases -> database; show count
     db_add_releases(con, project_path)
+    con.commit()
+
     count = state.query1(con, table="release")
     click.echo(f"Tags: {count}")
 
     # Per release: add release files -> database
     for (label,) in con.execute("select label from release"):
         db_add_files(con, path=project_path, release=label)
+    con.commit()
 
     # Per release: show count of files
     for (label,) in con.execute("select label from release"):
@@ -230,6 +245,7 @@ def add_project(limit, project_path):
             batch *= 2
         # TODO: more work here
         db_add_symbols(con, project_path, hash=hash, path=path, release=release)
+    con.commit()
 
     rel_count = state.query1(con, table="release")
     sym_count = state.query1(con, table="symbol")
@@ -238,6 +254,8 @@ def add_project(limit, project_path):
 
     for item in con.execute("select * from symbol limit 3"):
         click.echo(f"- {dict(item)}")
+
+    con.close()
 
 
 @cli.command()

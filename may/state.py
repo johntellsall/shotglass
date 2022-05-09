@@ -4,11 +4,11 @@ import sqlite3
 
 SETUP_SQL = [
     "PRAGMA foreign_keys = ON",
-    "create table release (label)",
-    """create table file (
+    "create table if not exists release (label)",
+    """create table if not exists file (
         id integer primary key, release, path, hash, size_bytes
         )""",
-    """create table symbol (
+    """create table if not exists symbol (
         name, path, line_start, line_end, kind,
         file_id int,
         foreign key (file_id) references file (id)
