@@ -14,6 +14,7 @@ import click
 
 import run
 import state
+from state import query1
 
 logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
@@ -76,19 +77,37 @@ def get_good_tags(path):
     return tags
 
 
+def db_add_project(con, project_path):
+    insert_project = "insert into project (name) values (:name)"
+    name = PurePath(project_path).name
+    con.execute(insert_project, [name])
+
+
 def db_add_releases(con, project_path):
     """
     for project, insert interesting (Git) tags into db
     """
+
     tags = get_good_tags(project_path)
 
-    insert_release = "insert into release (label) values (:label)"
+    project_id = db_get_project_id(con, project_path)
+    insert_release = f"""
+    insert into release (label, project_id)
+    values (:label, {project_id}
+    )"""
     items = [{"label": tag} for tag in tags]
     con.executemany(insert_release, items)
 
 
+def db_get_project_id(con, path):
+    name = PurePath(path).name
+    # TODO: query1 with args
+    sql = f"select id from project where name='{name}'"
+    return query1(con, sql=sql)
+
+
 # TODO: add via *hash* not path
-def db_add_files(con, path, release):
+def db_add_files(con, path, project_id, release):
     """
     for project and release/tag, add interesting files into db
     """
@@ -96,8 +115,8 @@ def db_add_files(con, path, release):
     items = list(filter_goodsource(all_items))
 
     insert_file = (
-        "insert into file (release, path, hash, size_bytes)"
-        f" values ('{release}', :path, :hash, :size_bytes)"
+        "insert into file (project_id, release, path, hash, size_bytes)"
+        f" values ({project_id}, '{release}', :path, :hash, :size_bytes)"
     )
     con.executemany(insert_file, items)
 
@@ -146,6 +165,77 @@ def db_add_symbols(con, project_path, hash, path, release):
         :name, '{path}', :line, :end, :kind)
     """
     con.executemany(insert_sym, IterFixedFields(items))
+
+
+def do_add_symbols(con, project_path, limit):
+    """
+    list files from database (one project only)
+    - parse each file for symbols
+    - add symbols to database
+    """
+    # Per file: extract symbols
+    # TODO: restrict to interesting releases+files
+    project_id = db_get_project_id(con, project_path)
+    project_name = Path(project_path).name
+
+    click.secho(f"{project_name}: adding file info", fg="cyan")
+    breakpoint()
+    sql = f"select path, hash, release from file where project_id={project_id}"
+    if limit:
+        sql += " LIMIT 5"
+    batch = 5
+    for num, (path, hash, release) in enumerate(con.execute(sql)):
+        if not num or (num + 1) % batch == 0:
+            click.secho(f"- {num+1:03d} {path=} {hash=}")
+            batch *= 2
+        # TODO: more work here
+        db_add_symbols(con, project_path, hash=hash, path=path, release=release)
+    con.commit()
+
+
+def summarize_project(con, project_name):
+    project_id = db_get_project_id(con, project_name)
+
+    def sql_count(table):
+        return f"select count(*) from {table} where project_id={project_id}"
+
+    rel_count = state.query1(con, sql_count("release"))
+    sym_count = state.query1(con, sql_count("symbol"))
+    file_count = state.query1(con, sql_count("file"))
+
+    click.secho(
+        f"{project_name}: Files: {file_count} Symbols: {sym_count}"
+        f" Releases: {rel_count}",
+        fg="yellow",
+    )
+
+    click.secho(f"{project_name}: symbol examples", fg="yellow")
+    for item in con.execute("select * from symbol limit 3"):
+        click.echo(f"- {dict(item)}")
+
+
+def do_add_files(con, project_path):
+    # Per project-release: add release files -> database
+    project_id = db_get_project_id(con, project_path)
+    project_name = Path(project_path).name
+
+    click.secho(f"{project_name}: adding files", fg="magenta")
+
+    release_sql = f"select label from release where project_id={project_id}"
+    for (label,) in con.execute(release_sql):
+        click.echo(f"{project_id=} release {label}")
+        db_add_files(con, project_id=project_id, path=project_path, release=label)
+    con.commit()
+
+    # Per project-release: show count of files
+    click.secho(f"{project_name}: files per release", fg="yellow")
+    for (label,) in con.execute(release_sql):
+        sql = (
+            "select count(*) from file where "
+            f"project_id={project_id} and release = ?"
+        )
+        result = list(con.execute(sql, [label]))
+        click.secho(f"rel {label}: num files: {result[0][0]}")
 
 
 # :::::::::::::::::::: COMMANDS
@@ -199,10 +289,13 @@ def summary():
     # list Projects
     # per project: count Releases, Files, Symbols
 
-    num_symbols = state.query1(con, table="release")
+    num_projects = state.query1(con, table="project")
+    num_releases = state.query1(con, table="release")
     num_symbols = state.query1(con, table="symbol")
 
-    click.echo(f"Symbols: {num_symbols} Releases: {num_symbols}")
+    click.echo(
+        f"Projects: {num_projects} Symbols: {num_symbols} Releases: {num_releases}"
+    )
 
 
 @cli.command()
@@ -212,7 +305,15 @@ def add_project(limit, project_path):
     """
     list project Releases, and stats for each release
     """
+
     con = state.get_db(temporary=False)
+
+    db_add_project(con, project_path)
+    con.commit()
+
+    num_projects = state.query1(con, table="project")
+    click.echo(f"Projects: {num_projects}")
+
     click.echo(f"List Tags {project_path}")
 
     # Git releases -> database; show count
@@ -222,38 +323,7 @@ def add_project(limit, project_path):
     count = state.query1(con, table="release")
     click.echo(f"Tags: {count}")
 
-    # Per release: add release files -> database
-    for (label,) in con.execute("select label from release"):
-        db_add_files(con, path=project_path, release=label)
-    con.commit()
-
-    # Per release: show count of files
-    for (label,) in con.execute("select label from release"):
-        sql = "select count(*) from file where release = ?"
-        result = list(con.execute(sql, [label]))
-        click.secho(f"rel {label}: {result[0][0]}")
-
-    # Per file: extract symbols
-    # TODO: restrict to interesting releases+files
-    sql = "select path, hash, release from file"
-    if limit:
-        sql += " LIMIT 5"
-    batch = 5
-    for num, (path, hash, release) in enumerate(con.execute(sql)):
-        if not num or (num + 1) % batch == 0:
-            click.secho(f"- {num+1:03d} {path=} {hash=}")
-            batch *= 2
-        # TODO: more work here
-        db_add_symbols(con, project_path, hash=hash, path=path, release=release)
-    con.commit()
-
-    rel_count = state.query1(con, table="release")
-    sym_count = state.query1(con, table="symbol")
-
-    click.echo(f"Symbols: {sym_count} Releases: {rel_count}")
-
-    for item in con.execute("select * from symbol limit 3"):
-        click.echo(f"- {dict(item)}")
+    do_add_symbols(con, limit=limit, project_path=project_path)
 
     con.close()
 
@@ -274,7 +344,10 @@ def reset_db():
     """
     delete database
     """
-    Path("main.db").unlink()
+    try:
+        Path("main.db").unlink()
+    except FileNotFoundError:
+        pass
 
 
 @cli.command()

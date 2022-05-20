@@ -1,16 +1,31 @@
+# TODO: export PYTHONBREAKPOINT=ipdb.set_trace
+
+
 SAMPLE := ../SOURCE/flask
-# PY_SOURCE := $(wildcard [a-su-z]*.py)
-# PY_SOURCE := $(wildcard *.py)
 
 all:
 
 demo:
 	./main.py reset-db
+	./main.py add-project --limit ../SOURCE/pyramid
+	make summary
+
+demo2:
+	./main.py reset-db
+	./main.py add-project --limit ../SOURCE/flask
+	./main.py add-project --limit ../SOURCE/pyramid
+
+demo2b:
+	./main.py reset-db
 	./main.py add-project --limit ../SOURCE/flask
 	make summary
-# ./main.py add-project --limit ../SOURCE/flask
+	./main.py add-project --limit ../SOURCE/pyramid
+	make summary
 
 summary: summary.csv
+
+pysummary:
+	./main.py summary
 
 %.csv: %.sql
 	sqlite3 main.db ".read $<"
