@@ -30,10 +30,10 @@ def cmd_list_git():
 
         changed_items = []
         for item in items:
-            hash = item["hash"]
-            if hash in hashes:
+            filehash = item["hash"]
+            if filehash in hashes:
                 continue
-            hashes.add(hash)
+            hashes.add(filehash)
             changed_items.append(item)
 
         # show count of files changed in this release

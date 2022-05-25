@@ -10,6 +10,20 @@ from pathlib import PurePath
 import run
 
 
+def git_ls_tree(project_path, release="2.0.0"):
+    """
+    get Git info about all files in given release
+    """
+
+    def to_item(row):
+        pre, path = row.split("\t")
+        _mode, _type, filehash, size_bytes = pre.split()
+        return dict(hash=filehash, path=path, size_bytes=size_bytes)
+
+    cmd = f"git -C {project_path} ls-tree  -r --long '{release}'"
+    return map(to_item, run.run(cmd))
+
+
 def git_tag_list(project_path):
     "list tags (~ releases)"
     return run.run(f"git -C {project_path} tag --list")

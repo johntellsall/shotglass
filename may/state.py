@@ -1,4 +1,5 @@
 # state.py
+"database setup and functions"
 
 import sqlite3
 

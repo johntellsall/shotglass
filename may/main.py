@@ -19,20 +19,6 @@ from state import query1
 logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
 
-def git_ls_tree(project_path, release="2.0.0"):
-    """
-    get Git info about all files in given release
-    """
-
-    def to_item(row):
-        pre, path = row.split("\t")
-        _mode, _type, hash, size_bytes = pre.split()
-        return dict(hash=hash, path=path, size_bytes=size_bytes)
-
-    cmd = f"git -C {project_path} ls-tree  -r --long '{release}'"
-    return map(to_item, run.run(cmd))
-
-
 # :::::::::::::::::::: APP-CENTRIC FUNCTIONS
 
 
@@ -73,7 +59,7 @@ def db_add_files(con, path, project_id, release):
     """
     for project and release/tag, add interesting files into db
     """
-    all_items = list(git_ls_tree(path, release=release))
+    all_items = list(goodsource.git_ls_tree(path, release=release))
     items = list(goodsource.filter_goodsource(all_items))
 
     insert_file = (
@@ -113,14 +99,14 @@ class IterFixedFields:
 
 
 # TODO: how do we assoc release with symbol? Needed?
-def db_add_symbols(con, project_path, hash, path):
+def db_add_symbols(con, project_path, filehash, path):
     """
     Parse symbols from file, add to database
     """
     assert path.endswith(".py")
 
     # copy file from Git to filesystem (uncompress if needed)
-    run.run_blob(f"git -C {project_path} show {hash} > .temp.py")
+    run.run_blob(f"git -C {project_path} show {filehash} > .temp.py")
 
     # parse symbols from source file
     items = list(run.run_ctags(".temp.py"))
@@ -149,12 +135,12 @@ def do_add_symbols(con, project_path, limit):
     if limit:
         sql += " LIMIT 5"
     batch = 5
-    for num, (path, hash, release) in enumerate(con.execute(sql)):
+    for num, (path, filehash, _release) in enumerate(con.execute(sql)):
         if not num or (num + 1) % batch == 0:
-            click.secho(f"- {num+1:03d} {path=} {hash=}")
+            click.secho(f"- {num+1:03d} {path=} {filehash=}")
             batch *= 2
         # TODO: more work here
-        db_add_symbols(con, project_path, hash=hash, path=path, release=release)
+        db_add_symbols(con, project_path, filehash=filehash, path=path)
     con.commit()
 
 
@@ -204,9 +190,8 @@ def summary():
 
 
 @cli.command()
-@click.option("--limit", is_flag=True)
 @click.argument("project_path")
-def add_project(limit, project_path):
+def add_project(project_path):
     """
     list project Releases, and stats for each release
     """
@@ -224,15 +209,7 @@ def add_project(limit, project_path):
     do_add_files(con, project_path)
     con.commit()
 
-    # num_projects = state.query1(con, table="project")
-    # click.echo(f"Projects: {num_projects}")
-
-    # click.echo(f"List Tags {project_path}")
-
-    # count = state.query1(con, table="release")
-    # click.echo(f"Tags: {count}")
-
-    # do_add_symbols(con, limit=limit, project_path=project_path)
+    # TODO: do_add_symbols(con, limit=limit, project_path=project_path)
 
     con.close()
 

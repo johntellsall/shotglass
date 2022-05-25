@@ -1,5 +1,7 @@
 # test_commands.py
 #
+"test standalone commands"
+
 from click.testing import CliRunner
 
 import main

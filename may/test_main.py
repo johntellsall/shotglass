@@ -1,3 +1,5 @@
+"test main -- outer-level commands"
+
 from click.testing import CliRunner
 
 import main
