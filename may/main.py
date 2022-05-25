@@ -6,12 +6,12 @@ Shotglass: info about codebases over time
 
 import logging
 import pprint
-import re
-from distutils.version import LooseVersion
 from pathlib import Path, PurePath
 
 import click
 
+import commands
+import goodsource
 import run
 import state
 from state import query1
@@ -33,51 +33,13 @@ def git_ls_tree(project_path, release="2.0.0"):
     return map(to_item, run.run(cmd))
 
 
-def git_tag_list(project_path):
-    "list tags (~ releases)"
-    return run.run(f"git -C {project_path} tag --list")
-
-
 # :::::::::::::::::::: APP-CENTRIC FUNCTIONS
 
 
-# TODO: make flexible
-def is_source(path):
-    return PurePath(path).suffix in [".c", ".py"]
-
-
-# TODO: make flexible
-def is_interesting(path):
-    DULL_DIRS = set(["docs", "examples", "scripts", "tests"])
-    if "/" in path:
-        first, _ = path.split("/", 1)
-        if first in DULL_DIRS:
-            return False
-    if path.endswith("__init__.py"):
-        return False
-    if "/testsuite/" in path:
-        return False
-    return True
-
-
-def filter_goodsource(items):
-    for item in items:
-        path = item["path"]
-        if is_source(path) and is_interesting(path):
-            yield item
-
-
-# TODO: make flexible
-is_good_tag = re.compile(r"^[0-9]+\.[0-9]+$").match
-
-
-def get_good_tags(path):
-    raw_tags = git_tag_list(path)
-    tags = list(filter(is_good_tag, raw_tags))
-    return tags
-
-
 def db_add_project(con, project_path):
+    """
+    add single project record into database
+    """
     insert_project = "insert into project (name) values (:name)"
     name = PurePath(project_path).name
     con.execute(insert_project, [name])
@@ -87,8 +49,7 @@ def db_add_releases(con, project_path):
     """
     for project, insert interesting (Git) tags into db
     """
-
-    tags = get_good_tags(project_path)
+    tags = goodsource.get_good_tags(project_path)
 
     project_id = db_get_project_id(con, project_path)
     insert_release = f"""
@@ -112,7 +73,7 @@ def db_add_files(con, path, project_id, release):
     for project and release/tag, add interesting files into db
     """
     all_items = list(git_ls_tree(path, release=release))
-    items = list(filter_goodsource(all_items))
+    items = list(goodsource.filter_goodsource(all_items))
 
     insert_file = (
         "insert into file (project_id, release, path, hash, size_bytes)"
@@ -196,28 +157,10 @@ def do_add_symbols(con, project_path, limit):
     con.commit()
 
 
-def summarize_project(con, project_name):
-    project_id = db_get_project_id(con, project_name)
-
-    def sql_count(table):
-        return f"select count(*) from {table} where project_id={project_id}"
-
-    rel_count = state.query1(con, sql_count("release"))
-    sym_count = state.query1(con, sql_count("symbol"))
-    file_count = state.query1(con, sql_count("file"))
-
-    click.secho(
-        f"{project_name}: Files: {file_count} Symbols: {sym_count}"
-        f" Releases: {rel_count}",
-        fg="yellow",
-    )
-
-    click.secho(f"{project_name}: symbol examples", fg="yellow")
-    for item in con.execute("select * from symbol limit 3"):
-        click.echo(f"- {dict(item)}")
-
-
 def do_add_files(con, project_path):
+    """
+    for each project's releases, add those files into database
+    """
     # Per project-release: add release files -> database
     project_id = db_get_project_id(con, project_path)
     project_name = Path(project_path).name
@@ -251,54 +194,12 @@ def cli():
 
 @cli.command()
 def list_git():
-    """
-    list project Releases, and stats for each release
-    TODO: make generic (now Flask only)
-    """
-    path = "../SOURCE/flask"  # TODO:
-    click.echo(f"List Tags {path}")
-    tags = get_good_tags(path)
-    tags.sort(key=LooseVersion)
-
-    hashes = set()
-    # for each release
-    for tag in tags:
-        click.secho(f"release: {tag}", fg="black", bg="yellow")
-        all_items = list(git_ls_tree(path, release=tag))
-        click.secho(f"= {len(all_items)} total files", fg="yellow")
-
-        items = list(filter_goodsource(all_items))
-        click.secho(f"= {len(items)} source files", fg="yellow")
-
-        changed_items = []
-        for item in items:
-            hash = item["hash"]
-            if hash in hashes:
-                continue
-            hashes.add(hash)
-            changed_items.append(item)
-
-        # show count of files changed in this release
-        click.secho(f"+/- {len(changed_items)} changed source", fg="yellow")
-
-        # .. and the files
-        for item in changed_items:
-            click.secho(f"- {item['path']}")
+    commands.cmd_list_git()
 
 
 @cli.command()
 def summary():
-    con = state.get_db()
-    # list Projects
-    # per project: count Releases, Files, Symbols
-    breakpoint()
-    num_projects = state.query1(con, table="project")
-    num_releases = state.query1(con, table="release")
-    num_symbols = state.query1(con, table="symbol")
-
-    click.echo(
-        f"Projects: {num_projects} Symbols: {num_symbols} Releases: {num_releases}"
-    )
+    commands.cmd_summary()
 
 
 @cli.command()
@@ -314,19 +215,23 @@ def add_project(limit, project_path):
     db_add_project(con, project_path)
     con.commit()
 
-    num_projects = state.query1(con, table="project")
-    click.echo(f"Projects: {num_projects}")
-
-    click.echo(f"List Tags {project_path}")
-
     # Git releases -> database; show count
     db_add_releases(con, project_path)
     con.commit()
 
-    count = state.query1(con, table="release")
-    click.echo(f"Tags: {count}")
+    # per release -> add files to db
+    do_add_files(con, project_path)
+    con.commit()
 
-    do_add_symbols(con, limit=limit, project_path=project_path)
+    # num_projects = state.query1(con, table="project")
+    # click.echo(f"Projects: {num_projects}")
+
+    # click.echo(f"List Tags {project_path}")
+
+    # count = state.query1(con, table="release")
+    # click.echo(f"Tags: {count}")
+
+    # do_add_symbols(con, limit=limit, project_path=project_path)
 
     con.close()
 
@@ -338,7 +243,7 @@ def ls_tags(path):
     list tags in Git repos
     """
     click.echo(f"List Tags {path}")
-    tags = git_tag_list(path)
+    tags = goodsource.git_tag_list(path)
     pprint.pprint(tags)
 
 

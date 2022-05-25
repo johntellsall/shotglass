@@ -6,7 +6,6 @@ all:
 demo:
 	./main.py reset-db
 	./main.py add-project --limit ../SOURCE/pyramid
-	make summary
 	make pysummary
 
 demo2:
