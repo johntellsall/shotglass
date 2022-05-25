@@ -1,5 +1,3 @@
-# TODO: export PYTHONBREAKPOINT=ipdb.set_trace
-
 
 SAMPLE := ../SOURCE/flask
 
@@ -9,6 +7,7 @@ demo:
 	./main.py reset-db
 	./main.py add-project --limit ../SOURCE/pyramid
 	make summary
+	make pysummary
 
 demo2:
 	./main.py reset-db
@@ -67,3 +66,4 @@ fastlint:
 lint:
 	pylint -E --ignore=test_code.py *.py
 	@echo DONE
+

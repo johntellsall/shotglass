@@ -150,7 +150,11 @@ class IterFixedFields:
         return item
 
 
+# TODO: how do we assoc release with symbol? Needed?
 def db_add_symbols(con, project_path, hash, path, release):
+    """
+    Parse symbols from file, add to database
+    """
     assert path.endswith(".py")
 
     # copy file from Git to filesystem (uncompress if needed)
@@ -179,7 +183,6 @@ def do_add_symbols(con, project_path, limit):
     project_name = Path(project_path).name
 
     click.secho(f"{project_name}: adding file info", fg="cyan")
-    breakpoint()
     sql = f"select path, hash, release from file where project_id={project_id}"
     if limit:
         sql += " LIMIT 5"
@@ -288,7 +291,7 @@ def summary():
     con = state.get_db()
     # list Projects
     # per project: count Releases, Files, Symbols
-
+    breakpoint()
     num_projects = state.query1(con, table="project")
     num_releases = state.query1(con, table="release")
     num_symbols = state.query1(con, table="symbol")

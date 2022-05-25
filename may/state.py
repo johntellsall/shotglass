@@ -26,7 +26,7 @@ SETUP_SQL = [
 ]
 
 
-def get_db(temporary=True):
+def get_db(temporary=False):
     path = ":memory:" if temporary else "main.db"
     con = sqlite3.connect(path)  # pylint: disable=no-member
     con.row_factory = sqlite3.Row
