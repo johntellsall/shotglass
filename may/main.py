@@ -47,7 +47,7 @@ def db_add_project(con, project_path):
 
 def db_add_releases(con, project_path):
     """
-    for project, insert interesting (Git) tags into db
+    for project, insert interesting (Git) tags/releases into db
     """
     tags = goodsource.get_good_tags(project_path)
 
@@ -61,6 +61,7 @@ def db_add_releases(con, project_path):
 
 
 def db_get_project_id(con, path):
+    "helper: fetch project's int ID"
     name = PurePath(path).name
     # TODO: query1 with args
     sql = f"select id from project where name='{name}'"

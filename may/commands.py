@@ -1,10 +1,11 @@
 # commands.py
 
-import click
 from distutils.version import LooseVersion
 
-import state
+import click
+
 import goodsource
+import state
 
 
 def cmd_list_git():

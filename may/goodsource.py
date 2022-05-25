@@ -1,5 +1,8 @@
 # goodsource.py
-
+"""
+Given a Git tag/release, is it interesting enough to capture?
+- likewise, files and directories
+"""
 
 import re
 from pathlib import PurePath
