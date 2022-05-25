@@ -66,11 +66,12 @@ fastlint:
 	@echo DONE
 
 # lint -- find major errors with core files
-# lintv -- find any issues with any files
+# lintv -- verbose: find any issues with any files
+PYLINT := pylint --rcfile=../pylintrc
 lint:
-	pylint -E --ignore='test_*.py' $(PY_SOURCE)
+	$(PYLINT) -E --ignore='test_*.py' $(PY_SOURCE)
 	@echo DONE
 lintv:
-	pylint $(PY_SOURCE)
+	$(PYLINT) $(PY_SOURCE)
 	@echo DONE
 
