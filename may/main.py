@@ -113,7 +113,7 @@ class IterFixedFields:
 
 
 # TODO: how do we assoc release with symbol? Needed?
-def db_add_symbols(con, project_path, hash, path, release):
+def db_add_symbols(con, project_path, hash, path):
     """
     Parse symbols from file, add to database
     """

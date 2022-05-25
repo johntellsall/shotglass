@@ -1,5 +1,8 @@
 
 SAMPLE := ../SOURCE/flask
+# PY_SOURCE := $(shell git ls-files './*.py')
+PY_SOURCE := $(shell ls -1 *.py)
+
 
 all:
 
@@ -62,7 +65,12 @@ fastlint:
 	flake8 --max-line-length=88 .
 	@echo DONE
 
+# lint -- find major errors with core files
+# lintv -- find any issues with any files
 lint:
-	pylint -E --ignore=test_code.py *.py
+	pylint -E --ignore='test_*.py' $(PY_SOURCE)
+	@echo DONE
+lintv:
+	pylint $(PY_SOURCE)
 	@echo DONE
 
