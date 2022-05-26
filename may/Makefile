@@ -64,7 +64,7 @@ fmt:
 	black .
 
 fastlint:
-	flake8 --max-line-length=88 .
+	flake8 .
 	@echo DONE
 
 # lint -- find major errors with core files
