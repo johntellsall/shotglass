@@ -20,6 +20,7 @@ def run_ctags(path, verbose=False):
 
 
 def run_blob(cmd):
+    "run command, return stdout as string"
     proc = subprocess.run(
         cmd, shell=True, capture_output=True, text=True, check=True
     )  # noqa: E501
@@ -27,6 +28,7 @@ def run_blob(cmd):
 
 
 def run(cmd):
+    "run command, return stdout split into lines"
     out_blob = run_blob(cmd)
     out_lines = out_blob.rstrip("\n").split("\n")
     return out_lines

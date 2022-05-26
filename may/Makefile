@@ -8,19 +8,21 @@ all:
 
 demo:
 	./main.py reset-db
-	./main.py add-project --limit ../SOURCE/pyramid
+	./main.py add-project ../SOURCE/pyramid
 	make pysummary
 
 demo2:
 	./main.py reset-db
-	./main.py add-project --limit ../SOURCE/flask
-	./main.py add-project --limit ../SOURCE/pyramid
+	./main.py add-project ../SOURCE/flask
+	make pysummary
+	./main.py add-project ../SOURCE/pyramid
+	make pysummary
 
 demo2b:
 	./main.py reset-db
-	./main.py add-project --limit ../SOURCE/flask
+	./main.py add-project ../SOURCE/flask
 	make summary
-	./main.py add-project --limit ../SOURCE/pyramid
+	./main.py add-project ../SOURCE/pyramid
 	make summary
 
 summary: summary.csv

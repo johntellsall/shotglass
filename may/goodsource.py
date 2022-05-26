@@ -5,12 +5,13 @@ Given a Git tag/release, is it interesting enough to capture?
 """
 
 import re
+from distutils.version import LooseVersion
 from pathlib import PurePath
 
 import run
 
 
-def git_ls_tree(project_path, release="2.0.0"):
+def git_ls_tree(project_path, release):
     """
     get Git info about all files in given release
     """
@@ -29,12 +30,17 @@ def git_tag_list(project_path):
     return run.run(f"git -C {project_path} tag --list")
 
 
+def sort_versions(mylist):
+    mylist.sort(key=LooseVersion)
+
+
 # TODO: make flexible
 def is_source(path):
     return PurePath(path).suffix in [".c", ".py"]
 
 
 # TODO: make flexible
+# TODO: add "+package+"
 def is_interesting(path):
     DULL_DIRS = set(["docs", "examples", "scripts", "tests"])
     if "/" in path:

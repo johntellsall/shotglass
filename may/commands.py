@@ -8,6 +8,7 @@ import goodsource
 import state
 
 
+# TODO: remove?
 def cmd_list_git():
     """
     list project Releases, and stats for each release

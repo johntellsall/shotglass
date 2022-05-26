@@ -103,7 +103,7 @@ def db_add_symbols(con, project_path, filehash, path):
     """
     Parse symbols from file, add to database
     """
-    assert path.endswith(".py")
+    assert path.endswith(".py")  # TODO:
 
     # copy file from Git to filesystem (uncompress if needed)
     run.run_blob(f"git -C {project_path} show {filehash} > .temp.py")
@@ -148,21 +148,26 @@ def do_add_files(con, project_path):
     """
     for each project's releases, add those files into database
     """
+
     # Per project-release: add release files -> database
     project_id = db_get_project_id(con, project_path)
     project_name = Path(project_path).name
 
-    click.secho(f"{project_name}: adding files", fg="magenta")
+    click.secho(f"{project_name}: adding files", bg="magenta", fg="black")
 
     release_sql = f"select label from release where project_id={project_id}"
-    for (label,) in con.execute(release_sql):
+    releases = [label for (label,) in con.execute(release_sql)]
+    goodsource.sort_versions(releases)
+
+    for label in releases:
         click.echo(f"{project_id=} release {label}")
         db_add_files(con, project_id=project_id, path=project_path, release=label)
     con.commit()
 
     # Per project-release: show count of files
     click.secho(f"{project_name}: files per release", fg="yellow")
-    for (label,) in con.execute(release_sql):
+
+    for label in releases:
         sql = (
             "select count(*) from file where "
             f"project_id={project_id} and release = ?"
