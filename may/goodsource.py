@@ -5,9 +5,9 @@ Given a Git tag/release, is it interesting enough to capture?
 """
 
 import re
+import subprocess
 from distutils.version import LooseVersion
 from pathlib import PurePath
-import subprocess
 
 import run
 

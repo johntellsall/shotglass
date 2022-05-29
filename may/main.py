@@ -6,8 +6,8 @@ Shotglass: info about codebases over time
 
 import logging
 import pprint
-from pathlib import Path, PurePath
 import re
+from pathlib import Path, PurePath
 
 import click
 
@@ -66,6 +66,9 @@ def db_add_files(con, path, project_id, release):
     """
     all_items = list(goodsource.git_ls_tree(path, release=release))
     items = list(goodsource.filter_goodsource(all_items))
+    if not items:
+        click.secho(f"{path}: {release=}: no files")
+        return
 
     insert_file = (
         "insert into file (project_id, release, path, hash, size_bytes)"
@@ -108,13 +111,18 @@ def db_add_symbols(con, project_path, filehash, path):
     """
     Parse symbols from file, add to database
     """
-    assert path.endswith(".py")  # TODO:
+    if not path.endswith(".py"):  # TODO:
+        click.echo(f"{path=}: unsupported language")
+        return
 
     # copy file from Git to filesystem (uncompress if needed)
     run.run_blob(f"git -C {project_path} show {filehash} > .temp.py")
 
     # parse symbols from source file
     items = list(run.run_ctags(".temp.py"))
+    if not items:
+        click.secho(f"- {path=}: no symbols")
+        return
 
     # insert symbols into database
     insert_sym = f"""
@@ -124,7 +132,7 @@ def db_add_symbols(con, project_path, filehash, path):
     con.executemany(insert_sym, IterFixedFields(items))
 
 
-def do_add_symbols(con, project_path, limit):
+def do_add_symbols(con, project_path, limit=False):
     """
     list files from database (one project only)
     - parse each file for symbols
@@ -233,7 +241,9 @@ def add_project(project_path):
     do_add_files(con, project_path)
     con.commit()
 
-    # TODO: do_add_symbols(con, limit=limit, project_path=project_path)
+    # per file -> add symbols to db
+    do_add_symbols(con, project_path=project_path)
+    con.commit()
 
     con.close()
 
@@ -269,6 +279,15 @@ def ctags(path):
     click.echo(f"Ctags {path}")
     symbols = list(run.run_ctags(path))
     pprint.pprint(symbols)
+
+
+@cli.command()
+@click.argument("path")
+def count_defs(path):
+    "print rough count of Python functions in project"
+    cmd = f"cd {path} ; git ls-files '*.py' | xargs grep -w def | wc -l"
+    count = int(run.run_blob(cmd))
+    click.echo(f"{path}: def {count=}")
 
 
 if __name__ == "__main__":
