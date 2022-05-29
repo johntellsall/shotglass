@@ -7,6 +7,7 @@ Given a Git tag/release, is it interesting enough to capture?
 import re
 from distutils.version import LooseVersion
 from pathlib import PurePath
+import subprocess
 
 import run
 
@@ -22,7 +23,11 @@ def git_ls_tree(project_path, release):
         return dict(hash=filehash, path=path, size_bytes=size_bytes)
 
     cmd = f"git -C {project_path} ls-tree  -r --long '{release}'"
-    return map(to_item, run.run(cmd))
+    try:
+        return map(to_item, run.run(cmd))
+    except subprocess.CalledProcessError as error:
+        print(f"?? {cmd} -- {error}")
+        return []
 
 
 def git_tag_list(project_path):
@@ -84,7 +89,11 @@ class AllSourceConfig(SourceConfig):
 
 
 class GoodSourceConfig(SourceConfig):
+    # TODO: make flexible
+    is_good_tag = re.compile(r"^[0-9]+\.[0-9]+$").match
+
     def get_tags(self):
         raw_tags = git_tag_list(self.path)
-        tags = list(filter(is_good_tag, raw_tags))
+        tags = list(filter(self.is_good_tag, raw_tags))
+        # tags = tags[:10]
         return tags

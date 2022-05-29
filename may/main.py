@@ -7,6 +7,7 @@ Shotglass: info about codebases over time
 import logging
 import pprint
 from pathlib import Path, PurePath
+import re
 
 import click
 
@@ -210,7 +211,18 @@ def add_project(project_path):
     db_add_project(con, project_path)
     con.commit()
 
-    proj_config = goodsource.AllSourceConfig(project_path)
+    if 0:
+        proj_config = goodsource.GoodSourceConfig(project_path)
+    else:
+
+        class SqlAlchemyConfig(goodsource.GoodSourceConfig):
+            is_good_tag = re.compile(r"^rel[0-9_]+_0$").match
+            # TODO:
+
+            def is_good_tag(_self, s):
+                return s == "rel_1_4_0"
+
+        proj_config = SqlAlchemyConfig(project_path)
 
     # Git releases -> database; show count
     db_add_releases(con, proj_config)
