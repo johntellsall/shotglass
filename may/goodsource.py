@@ -69,3 +69,22 @@ def get_good_tags(path):
     raw_tags = git_tag_list(path)
     tags = list(filter(is_good_tag, raw_tags))
     return tags
+
+
+class SourceConfig:
+    def __init__(self, path):
+        self.path = path
+
+    def get_tags(self):
+        return git_tag_list(self.path)
+
+
+class AllSourceConfig(SourceConfig):
+    pass
+
+
+class GoodSourceConfig(SourceConfig):
+    def get_tags(self):
+        raw_tags = git_tag_list(self.path)
+        tags = list(filter(is_good_tag, raw_tags))
+        return tags

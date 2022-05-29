@@ -36,6 +36,9 @@ def db_add_releases(con, project_path):
     for project, insert interesting (Git) tags/releases into db
     """
     tags = goodsource.get_good_tags(project_path)
+    if not tags:
+        click.secho(f"{project_path}: no good tags, skipping project", fg="red")
+        return
 
     project_id = db_get_project_id(con, project_path)
     insert_release = f"""

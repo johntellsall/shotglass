@@ -7,3 +7,4 @@ pylint
 pytest-cov
 isort
 ipdb
+pyright

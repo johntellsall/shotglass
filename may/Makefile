@@ -8,15 +8,25 @@ all:
 
 demo:
 	./main.py reset-db
-	./main.py add-project ../SOURCE/pyramid
+	./main.py add-project ../SOURCE/sqlalchemy
 	make pysummary
 
-demo2:
-	./main.py reset-db
-	./main.py add-project ../SOURCE/flask
-	make pysummary
-	./main.py add-project ../SOURCE/pyramid
-	make pysummary
+# demo3:
+# 	./main.py reset-db
+# 	./main.py add-project ../SOURCE/pyramid
+# 	make pysummary
+# 	./main.py add-project ../SOURCE/sqlalchemy
+# 	make pysummary
+# 	./main.py add-project ../SOURCE/requests
+# 	make pysummary
+
+
+# demo2:
+# 	./main.py reset-db
+# 	./main.py add-project ../SOURCE/flask
+# 	make pysummary
+# 	./main.py add-project ../SOURCE/pyramid
+# 	make pysummary
 
 demo2b:
 	./main.py reset-db
@@ -46,7 +56,10 @@ sniff:
 # pre-commit
 pre-commit: fmt fastlint
 
-pre-push: sniff
+pre-push: sniff check-types
+
+check-types:
+	pyright
 
 run:
 	./main.py ls-tags $(SAMPLE)
