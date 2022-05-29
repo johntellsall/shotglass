@@ -31,11 +31,12 @@ def db_add_project(con, project_path):
     con.execute(insert_project, [name])
 
 
-def db_add_releases(con, project_path):
+def db_add_releases(con, project_obj):
     """
     for project, insert interesting (Git) tags/releases into db
     """
-    tags = goodsource.get_good_tags(project_path)
+    tags = project_obj.get_tags()
+    project_path = project_obj.path
     if not tags:
         click.secho(f"{project_path}: no good tags, skipping project", fg="red")
         return
@@ -209,8 +210,11 @@ def add_project(project_path):
     db_add_project(con, project_path)
     con.commit()
 
+    proj_config = goodsource.AllSourceConfig(project_path)
+
     # Git releases -> database; show count
-    db_add_releases(con, project_path)
+    db_add_releases(con, proj_config)
+
     con.commit()
 
     # per release -> add files to db

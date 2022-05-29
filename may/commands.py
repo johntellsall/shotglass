@@ -56,24 +56,3 @@ def cmd_summary():
 
     click.echo(f"Projects: {num_projects} Releases: {num_releases}", nl=False)
     click.echo(f" Files: {num_files} Symbols: {num_symbols}")
-
-
-# def summarize_project(con, project_name):
-#     project_id = db_get_project_id(con, project_name)
-
-#     def sql_count(table):
-#         return f"select count(*) from {table} where project_id={project_id}"
-
-#     rel_count = state.query1(con, sql_count("release"))
-#     sym_count = state.query1(con, sql_count("symbol"))
-#     file_count = state.query1(con, sql_count("file"))
-
-#     click.secho(
-#         f"{project_name}: Files: {file_count} Symbols: {sym_count}"
-#         f" Releases: {rel_count}",
-#         fg="yellow",
-#     )
-
-#     click.secho(f"{project_name}: symbol examples", fg="yellow")
-#     for item in con.execute("select * from symbol limit 3"):
-#         click.echo(f"- {dict(item)}")

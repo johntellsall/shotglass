@@ -53,7 +53,6 @@ coverage:
 sniff:
 	git grep breakpoint '*.py'  && false
 
-# pre-commit
 pre-commit: fmt fastlint
 
 pre-push: sniff check-types
