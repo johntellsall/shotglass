@@ -1,0 +1,25 @@
+{
+    "include": [
+        "."
+    ],
+    "exclude": [
+        "**/node_modules",
+        "**/__pycache__",
+        ".venv"
+    ],
+    "ignore": [
+        "src/oldstuff"
+    ],
+    "stubPath": "src/stubs",
+    "venv": ".venv",
+    "venvPath": ".venv",
+    "reportMissingImports": true,
+    "reportMissingTypeStubs": false,
+    "pythonVersion": "3.9",
+    "pythonPlatform": "macOS",
+    "executionEnvironments": [
+        {
+            "root": "."
+        }
+    ]
+}

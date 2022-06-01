@@ -13,10 +13,11 @@ clean:
 pre-commit: fmt fastlint
 
 # XXXX TODO: make general
+SRC_DIR := may
 fmt:
-	make -C april fmt
+	make -C $(SRC_DIR) fmt
 fastlint:
-	make -C april fastlint
+	make -C $(SRC_DIR) fastlint
 # fmt:
 # 	isort .
 # 	black .
