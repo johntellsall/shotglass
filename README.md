@@ -1,3 +1,13 @@
+# Shotglass
+
+## WHY
+
+Shotglass is an experimental platform for letting humans
+visually analyze large codebases over time.
+
+Computers are useful, but they can only answer questions. The goal of this project is to render source code visually, and letting a human brain interpret the results.
+
+
 # NOTE
 
 This document is a bit of a grab bag at the moment.
@@ -195,7 +205,6 @@ v4.0.0 :  79       ..- -.  .+.... - --  . -    . . ....- .. . . .-. .-
 
 # [MORE DEMOS](DEMOS.md)
 
-# [EXPERIMENTS](EXPERIMENTS.md)
 
 # Related Projects
 

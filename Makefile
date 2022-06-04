@@ -9,8 +9,11 @@ setup:
 clean:
 	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
+pre-commit:
 
-pre-commit: fmt fastlint
+pre-push:
+
+pre-commit-code: fmt fastlint
 
 # XXXX TODO: make general
 SRC_DIR := may
