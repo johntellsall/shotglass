@@ -5,21 +5,15 @@
 Shotglass is an experimental platform for letting humans
 visually analyze large codebases over time.
 
-Computers are useful, but they can only answer questions. The goal of this project is to render source code visually, and letting a human brain interpret the results.
+Computers are useful, but they can only answer questions. The goal of this project is to render source code visually, and let a human brain interpret the results.
+
+Computers answer "what" and "when" but never "why".
 
 
-# NOTE
+## Example: Flask: important files over time
 
-This document is a bit of a grab bag at the moment.
-
-# Shotglass Commands
-
-## Command: TABLE
 
 The `table` command shows how important files change over time. It scans through a Git repo, counting lines on important files.
-
-### Example: Flask
-
 
 ```bash
 ./manage.py table --versions=0.6,0.8,0.10,0.12 ../SOURCE/flask/
@@ -63,57 +57,12 @@ The `table` command lists files in the latest version, then tracks those files b
 - even if a file has the same line count, its contents can change over time -- `git diff` will show this.
 - the column widths can easily become hard to read
 
-### Example: Redis
+Related: [redis-table.md](Redis codebase over time)
 
-```bash
-./manage.py table --ignore=example --suffixes=c --versions=2.2-alpha0,2.3-alpha0,3.0-alpha0 ../SOURCE/redis/
-                                         2.2-alpha0 2.3-alpha0 3.0-alpha0
-deps/hiredis/async.c                                   321      321
-deps/hiredis/hiredis.c                                1058     1058
-deps/hiredis/net.c                                     170      170
-deps/hiredis/sds.c                                     479      479
-deps/hiredis/test.c                                    479      479
-deps/linenoise/linenoise.c                             598      609
-src/adlist.c                                  325      325      325
-src/ae.c                                      390      390      390
-src/ae_epoll.c                                 91       91       91
-src/ae_kqueue.c                                93       93       93
-src/ae_select.c                                72       72       72
-src/anet.c                                    270      347      347
-src/aof.c                                     700      646      648
-src/config.c                                  438      568      625
-src/db.c                                      508      617      618
-src/debug.c                                   311      293      293
-src/dict.c                                    687      711      712
-src/diskstore.c                                        509      509
-src/dscache.c                                         1026     1051
-src/endian.c                                                     63
-src/intset.c                                           422      445
-src/lzf_c.c                                   295      295      295
-src/lzf_d.c                                   150      150      150
-src/multi.c                                   266      264      268
-src/networking.c                              594      848      847
-src/object.c                                  414      418      418
-src/pqsort.c                                  197      197      197
-src/pubsub.c                                  267      267      267
-src/rdb.c                                     891      998     1014
-```
-
-The above table shows three alpha versions and a major version jump. We see:
-- the "deps/hires" directory is new to 2.3
-- `diskstore.c` appeared in 2.3 and has no changes in version 3.0
-- most other files increase or decrease slightly, if there is any change
-
-<HR>
-
-
-## Command: MAKE_INDEX
-
-### DEMO: Flask, a small project
+## Example: Flask: hires rendering of codebase at present
 
 Shotglass displays information about all source files in a large
-project. For each file, it renders a single dot per line of code. If
-code has a symbol definition, ...
+project. For each file, it renders a single dot per line of code. 
 
 Overall workflow:
 
@@ -137,17 +86,19 @@ Overall workflow:
 ![Flask](images/flask_path.png)
 
 
-# DEMO: Django, a bit larger
+### Compare: Django = 12x Flask
+
+Django's larger than Flask, so it's a good point of comparison.
 
 ```
     $ apt source python-django
 
     $ ./manage.py make_index django
-    2016-05-21 19:01:46,708 DEBUG    finding source
-    2016-05-21 19:01:46,791 DEBUG    finding tags
-    2016-05-21 19:01:49,622 INFO     django: 6,049 tags
-    2016-05-21 19:01:49,622 DEBUG    calculating file sizes
-    2016-05-21 19:01:53,366 DEBUG    done
+    19:01:46,708 DEBUG    finding source
+    19:01:46,791 DEBUG    finding tags
+    19:01:49,622 INFO     django: 6,049 tags
+    19:01:49,622 DEBUG    calculating file sizes
+    19:01:53,366 DEBUG    done
 
     $ ./manage.py show django
     project              symbols   max  avg    total
@@ -203,9 +154,23 @@ v4.0.0 :  79       ..- -.  .+.... - --  . -    . . ....- .. . . .-. .-
 ```
 
 
-# [MORE DEMOS](DEMOS.md)
+## More Demos
 
+* [Web frameworks](web-frameworks.md) from 4 - 60 KLOC
+* [Databases](databases.md) from 1x to 20x
+* Codebases over time: [Django framework, Python language](code-over-time.md)
+* Shotglass [features](features.md)
 
-# Related Projects
+## Related Projects
 
 * [A Repository with 44 Years of Unix Evolution](https://www2.dmst.aueb.gr/dds/pubs/conf/2015-MSR-Unix-History/html/Spi15c.html)
+
+* [tool that creates pretty visualisations of codebases](https://www.codeatlas.dev)
+
+## Related Articles
+
+* [Ask HN: Visualizing software designs, especially of large systems](https://news.ycombinator.com/item?id=31569646)
+
+## Also
+
+* [Ilograph: render service dependencies](https://app.ilograph.com/demo.ilograph.Ilograph/Request)
