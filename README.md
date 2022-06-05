@@ -10,55 +10,6 @@ Computers are useful, but they can only answer questions. The goal of this proje
 Computers answer "what" and "when" but never "why".
 
 
-## Example: Flask: important files over time
-
-
-The `table` command shows how important files change over time. It scans through a Git repo, counting lines on important files.
-
-```bash
-./manage.py table --versions=0.6,0.8,0.10,0.12 ../SOURCE/flask/
-
-                                0.6  0.8 0.10 0.12
-flask/__init__.py                34   41   50   49
-flask/__main__.py                               15
-flask/_compat.py                           73   96
-flask/app.py                    874 1518 1842 2000
-flask/blueprints.py                  321  401  413
-flask/cli.py                                   511
-flask/config.py                 152  169  168  263
-flask/ctx.py                     66  175  394  410
-flask/debughelpers.py                 79   87  155
-flask/ext/__init__.py                 29   29   29
-flask/exthook.py                     119  120  143
-flask/globals.py                 20   28   44   61
-flask/helpers.py                463  649  849  960
-flask/json.py                             228  269
-flask/logging.py                 42   43   45   94
-flask/sessions.py                    205  327  366
-flask/signals.py                 50   51   55   56
-flask/templating.py              96  138  143  149
-flask/testing.py                 45  118  124  143
-flask/views.py                       151  149  149
-flask/wrappers.py                88  138  184  205
-setup.py                         79  108  112  100
-```
-
-From the above, we can see:
-- `app.py` has the vast majority of the code.
-- `cli.py` appeared recently, with a moderate amount of code.
-- `config.py`, `helpers.py` and others have existed for a while, and have gradually increased in size to roughly double.
-- `signals.py` is old and hasn't really changed.
-
-The `table` command lists files in the latest version, then tracks those files back in time. It doesn't visualize large files splitting into pieces.
-
-### Questions
-
-- what dates correspond to the listed versions?
-- even if a file has the same line count, its contents can change over time -- `git diff` will show this.
-- the column widths can easily become hard to read
-
-Related: [redis-table.md](Redis codebase over time)
-
 ## Example: Flask: hires rendering of codebase at present
 
 Shotglass displays information about all source files in a large
@@ -108,6 +59,56 @@ Django's larger than Flask, so it's a good point of comparison.
 ```
 
 ![Django](images/django_path.png)
+
+
+## Example: Flask: important files over time
+
+
+The `table` command shows how important files change over time. It scans through a Git repo, counting lines on important files.
+
+```bash
+./manage.py table --versions=0.6,0.8,0.10,0.12 ../SOURCE/flask/
+
+                                0.6  0.8 0.10 0.12
+flask/__init__.py                34   41   50   49
+flask/__main__.py                               15
+flask/_compat.py                           73   96
+flask/app.py                    874 1518 1842 2000
+flask/blueprints.py                  321  401  413
+flask/cli.py                                   511
+flask/config.py                 152  169  168  263
+flask/ctx.py                     66  175  394  410
+flask/debughelpers.py                 79   87  155
+flask/ext/__init__.py                 29   29   29
+flask/exthook.py                     119  120  143
+flask/globals.py                 20   28   44   61
+flask/helpers.py                463  649  849  960
+flask/json.py                             228  269
+flask/logging.py                 42   43   45   94
+flask/sessions.py                    205  327  366
+flask/signals.py                 50   51   55   56
+flask/templating.py              96  138  143  149
+flask/testing.py                 45  118  124  143
+flask/views.py                       151  149  149
+flask/wrappers.py                88  138  184  205
+setup.py                         79  108  112  100
+```
+
+From the above, we can see:
+- `app.py` has the vast majority of the code.
+- `cli.py` appeared recently, with a moderate amount of code.
+- `config.py`, `helpers.py` and others have existed for a while, and have gradually increased in size to roughly double.
+- `signals.py` is old and hasn't really changed.
+
+The `table` command lists files in the latest version, then tracks those files back in time. It doesn't visualize large files splitting into pieces.
+
+### Questions
+
+- what dates correspond to the listed versions?
+- even if a file has the same line count, its contents can change over time -- `git diff` will show this.
+- the column widths can easily become hard to read
+
+Related: [redis-table.md](Redis codebase over time)
 
 # Code over Time
 
