@@ -1,0 +1,6 @@
+colorbrewer
+click
+palettable
+Pillow
+pyflake8
+flake8
