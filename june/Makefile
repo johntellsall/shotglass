@@ -1,4 +1,6 @@
 PY_SOURCE := $(shell git ls-files '*.py')
+# IMGCAT := ${HOME}/bin/imgcat
+IMGCAT := imgcat
 
 all:
 
@@ -10,4 +12,5 @@ setup:
 	.venv/bin/pip install -qr ./requirements.txt
 
 run:
-	.venv/bin/python3 $(PY_SOURCE)
+	.venv/bin/python3 spider.py spider.py
+	${IMGCAT} z.png

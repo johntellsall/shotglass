@@ -22,6 +22,9 @@ IMAGE_HEIGHT = 1000
 COL_WIDTH, COL_HEIGHT = 100, 1000
 COL_GAP = 10
 
+# https://www.gnu.org/software/src-highlite/
+CMD_SOURCE_HIGHLIGHT = "source-highlight"
+
 
 def serpentine_iter(width):
     y = 0
@@ -34,7 +37,7 @@ def serpentine_iter(width):
 
 
 def render_highlight(path):
-    cmd = ["source-highlight", "-i", path]
+    cmd = [CMD_SOURCE_HIGHLIGHT, "-i", path]
     output = subprocess.check_output(cmd, text=True)
     output = re.compile("^.+<pre><tt>", re.DOTALL).sub("", output)
     return output.split("\n")
@@ -149,7 +152,7 @@ def render_blocks(image, paths):
     return image
 
 
-# XX merge render_* functions
+# TODO: merge render_* functions
 
 
 def render_source(image, paths):
@@ -166,15 +169,14 @@ def render_source(image, paths):
 @click.command()
 @click.option("--output", default="z.png")
 @click.option("--style", default="source")
-@click.option("paths", nargs="+")
+@click.argument("paths", nargs=-1)
 def spider(output, style, paths):
     click.secho("Hello!", fg="yellow")
     im = Image.new("RGB", (IMAGE_WIDTH, IMAGE_HEIGHT), color="white")
     render = render_source
     if style == "blocks":
         render = render_blocks
-    # elif options["style"] == "diff":
-    #     render = render_diff
+
     render(image=im, paths=paths)
     im.save(output)
     print(f"{output}: image written")
