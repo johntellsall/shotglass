@@ -2,6 +2,7 @@ PY_SOURCE := $(shell git ls-files '*.py')
 # IMGCAT := ${HOME}/bin/imgcat
 IMGCAT := imgcat
 TEST_FILE := ../SOURCE/flask/src/flask/app.py
+TEST_BATCH := ../SOURCE/flask/src/flask/*.py
 
 all:
 
@@ -12,8 +13,12 @@ setup:
 	test -d .venv || python3 -m venv .venv
 	.venv/bin/pip install -qr ./requirements.txt
 
-run:
+run1:
 	.venv/bin/python3 spider.py $(TEST_FILE)
+	${IMGCAT} z.png
+
+run2:
+	.venv/bin/python3 spider.py --style=blocks $(TEST_BATCH)
 	${IMGCAT} z.png
 
 pre-commit: fastlint
