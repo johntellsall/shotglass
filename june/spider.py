@@ -26,16 +26,6 @@ COL_GAP = 10
 CMD_SOURCE_HIGHLIGHT = "source-highlight"
 
 
-def serpentine_iter(width):
-    y = 0
-    while True:
-        for x in range(width):
-            yield x, y
-        for x in range(width):
-            yield width - x - 1, y + 1
-        y += 2
-
-
 def render_highlight(path):
     cmd = [CMD_SOURCE_HIGHLIGHT, "-i", path]
     output = subprocess.check_output(cmd, text=True)
@@ -47,16 +37,6 @@ def get_colormap():
     cmap_obj = colorbrewer.qualitative.Set3_12
     cmap_colors = list(map(tuple, cmap_obj.colors))
     return itertools.cycle(cmap_colors)
-
-
-def get_count(paths):
-    output = subprocess.check_output(["wc", "-l"] + paths, text=True)
-    assert 0, output
-    wordcount_re = re.compile(
-        r"^\s*  ([0-9]+)" r"\s+   (.+)    $", re.MULTILINE | re.VERBOSE
-    )
-    matches = wordcount_re.finditer(output)
-    return {path: int(count) for count, path in (m.groups() for m in matches)}
 
 
 class Render(object):
