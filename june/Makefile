@@ -19,4 +19,4 @@ run:
 pre-commit: fastlint
 
 test:
-	pytest
+	pytest --cov=. --cov-report=term-missing

@@ -4,3 +4,4 @@ palettable
 Pillow
 flake8
 pytest
+pytest-cov
