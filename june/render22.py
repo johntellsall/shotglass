@@ -3,7 +3,6 @@ render.py
 """
 
 import logging
-import sys
 
 import click
 
@@ -63,6 +62,8 @@ def do_render(symbols):
 def render_project(project):
     SELECT = "select name,path,line_start,line_end from symbol"
     db = state.get_db(setup=False)
+    interesting = 0
+    total_size = 0
     for symbol in db.execute(SELECT):
         # skip dull symbols
         if symbol["path"].startswith("test/"):
@@ -72,34 +73,26 @@ def render_project(project):
         if symbol["name"].startswith("_"):
             continue
 
-        size = 1
+        interesting += 1
+        sym_size = 1
         try:
-            size = symbol["line_end"] - symbol["line_start"]
+            sym_size = symbol["line_end"] - symbol["line_start"]
         except TypeError:
             pass
-        print(f'{symbol["name"]:25} {size:3}\t{symbol["path"]})')
+        total_size += sym_size
+        print(f'{symbol["name"]:25} {sym_size:3}\t{symbol["path"]}')
 
-    assert 0
-    # proj_symbols = Symbol.objects.filter(source_file__project=project)
-
-    num_symbols = proj_symbols.count()
+    total_symbols = state.query1(db, table="symbol")
     print("render")
-    print(f"{project}: {num_symbols} symbols")
-
-    if num_symbols < 1:
-        sys.exit(f"{project}: no symbols")
-
-    zap_skeleton(project)
-
-    render(proj_symbols)
-
-    count = Skeleton.objects.count()
-    print(f"{project}: Skeleton.{count=}")
+    print(f"{project}:")
+    print(f"- {total_symbols} symbols, {interesting} interesting")
+    print(f"- {total_size} lines of interesting symbols")
+    print(f"- {int(total_size/interesting)} average lines per interesting symbol")
 
 
 @click.command()
 # @click.option('--count', default=1, help='number of greetings')
-@click.argument("projects")
+@click.argument("projects", nargs=-1)
 def render(projects):
     for project in projects:
         render_project(project)
