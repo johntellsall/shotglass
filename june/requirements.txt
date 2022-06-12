@@ -1,7 +1,8 @@
-colorbrewer
+black
 click
+colorbrewer
+flake8
+ipdb
 palettable
 Pillow
-flake8
-pytest
 pytest-cov
