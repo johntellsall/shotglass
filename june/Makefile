@@ -10,7 +10,7 @@ render:
 	python3 ./render22.py NOTYET
 
 fastlint:
-	pyflakes $(PY_SOURCE)
+	flake8 $(PY_SOURCE)
 
 setup:
 	test -d .venv || python3 -m venv .venv

@@ -2,6 +2,8 @@
 render.py
 """
 
+# noqa: F821
+
 import logging
 import sys
 

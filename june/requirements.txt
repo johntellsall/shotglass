@@ -6,3 +6,4 @@ ipdb
 palettable
 Pillow
 pytest-cov
+pylint
