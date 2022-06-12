@@ -13,6 +13,9 @@ setup:
 	test -d .venv || python3 -m venv .venv
 	.venv/bin/pip install -qr ./requirements.txt
 
+run3:
+	.venv/bin/python3 label.py $(TEST_FILE)
+
 run1:
 	.venv/bin/python3 spider.py $(TEST_FILE)
 	${IMGCAT} z.png

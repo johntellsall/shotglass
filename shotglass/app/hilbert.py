@@ -17,7 +17,7 @@ from functools import lru_cache, reduce
 def int_to_Hilbert(i, nD=2):  # Default is the 2D Hilbert walk.
     index_chunks = unpack_index(i, nD)
     nChunks = len(index_chunks)
-    mask = 2 ** nD - 1
+    mask = 2**nD - 1
     start, end = initial_start_end(nChunks, nD)
     coord_chunks = [0] * nChunks
     for j, i in enumerate(index_chunks):
@@ -30,7 +30,7 @@ def Hilbert_to_int(coords):
     nD = len(coords)
     coord_chunks = unpack_coords(coords)
     nChunks = len(coord_chunks)
-    mask = 2 ** nD - 1
+    mask = 2**nD - 1
     start, end = initial_start_end(nChunks, nD)
     index_chunks = [0] * nChunks
     for j in range(nChunks):
@@ -59,7 +59,7 @@ def initial_start_end(nChunks, nD):
 # unpack_index( int index, nD ) --> list of index chunks.
 #
 def unpack_index(i, nD):
-    p = 2 ** nD  # Chunks are like digits in base 2**nD.
+    p = 2**nD  # Chunks are like digits in base 2**nD.
     nChunks = max(1, int(ceil(log(i + 1, p))))  # num of digits
     chunks = [0] * nChunks
     for j in range(nChunks - 1, -1, -1):
@@ -69,7 +69,7 @@ def unpack_index(i, nD):
 
 
 def pack_index(chunks, nD):
-    p = 2 ** nD  # Turn digits mod 2**nD back into a single number:
+    p = 2**nD  # Turn digits mod 2**nD back into a single number:
     return reduce(lambda n, chunk: n * p + chunk, chunks)
 
 
