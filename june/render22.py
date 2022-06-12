@@ -2,8 +2,6 @@
 render.py
 """
 
-# noqa: F821
-
 import logging
 import sys
 
@@ -63,9 +61,25 @@ def do_render(symbols):
 
 
 def render_project(project):
+    SELECT = "select name,path,line_start,line_end from symbol"
     db = state.get_db(setup=False)
-    for symbol in db.execute("select name from symbol"):
-        assert 0, symbol
+    for symbol in db.execute(SELECT):
+        # skip dull symbols
+        if symbol["path"].startswith("test/"):
+            continue
+        if "testing/" in symbol["path"]:
+            continue
+        if symbol["name"].startswith("_"):
+            continue
+
+        size = 1
+        try:
+            size = symbol["line_end"] - symbol["line_start"]
+        except TypeError:
+            pass
+        print(f'{symbol["name"]:25} {size:3}\t{symbol["path"]})')
+
+    assert 0
     # proj_symbols = Symbol.objects.filter(source_file__project=project)
 
     num_symbols = proj_symbols.count()

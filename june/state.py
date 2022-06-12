@@ -30,6 +30,7 @@ SETUP_SQL = [
 def get_db(temporary=False, setup=True):
     path = ":memory:" if temporary else "main.db"
     con = sqlite3.connect(path)  # pylint: disable=no-member
+    # allow field access by name in addition to index
     con.row_factory = sqlite3.Row
     if setup:
         do_setup(con)
