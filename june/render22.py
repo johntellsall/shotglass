@@ -7,9 +7,8 @@ import sys
 
 import click
 
-
 import hilbert
-
+import state
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +61,10 @@ def do_render(symbols):
 
 
 def render_project(project):
-    proj_symbols = Symbol.objects.filter(source_file__project=project)
+    db = state.get_db(setup=False)
+    for symbol in db.execute("select name from symbol"):
+        assert 0, symbol
+    # proj_symbols = Symbol.objects.filter(source_file__project=project)
 
     num_symbols = proj_symbols.count()
     print("render")

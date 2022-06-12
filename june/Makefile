@@ -6,6 +6,9 @@ TEST_BATCH := ../SOURCE/flask/src/flask/*.py
 
 all:
 
+render:
+	python3 ./render22.py NOTYET
+
 fastlint:
 	pyflakes $(PY_SOURCE)
 
