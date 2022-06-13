@@ -5,5 +5,7 @@ flake8
 ipdb
 palettable
 Pillow
+pytest
 pytest-cov
 pylint
+palettable

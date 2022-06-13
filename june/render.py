@@ -46,20 +46,20 @@ def make_skeleton(symbols):
         yield Skeleton(position=pos, x=x, y=y, symbol=symbol)
 
 
-def zap_skeleton(project):
-    Skeleton.objects.filter(symbol__source_file__project=project).delete()
+# def zap_skeleton(project):
+#     Skeleton.objects.filter(symbol__source_file__project=project).delete()
 
 
-# pylint: disable=no-member
-def do_render(symbols):
-    """
-    render skeleton, store in database
-    """
-    skel = make_skeleton(symbols)
-    Skeleton.objects.bulk_create(skel)
+# # pylint: disable=no-member
+# def do_render(symbols):
+#     """
+#     render skeleton, store in database
+#     """
+#     skel = make_skeleton(symbols)
+#     Skeleton.objects.bulk_create(skel)
 
 
-def render_project(project):
+def stats_project(project):
     SELECT = "select name,path,line_start,line_end from symbol"
     db = state.get_db(setup=False)
     interesting = 0
@@ -90,13 +90,20 @@ def render_project(project):
     print(f"- {int(total_size/interesting)} average lines per interesting symbol")
 
 
-@click.command()
-# @click.option('--count', default=1, help='number of greetings')
+# ::::::::::::::::::::::::: COMMANDS
+
+
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
 @click.argument("projects", nargs=-1)
-def render(projects):
+def stats(projects):
     for project in projects:
-        render_project(project)
+        stats_project(project)
 
 
 if __name__ == "__main__":
-    render()
+    cli()
