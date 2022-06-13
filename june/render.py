@@ -24,13 +24,14 @@ def calc_sym_position(symbols):
     for symbol in symbols:
         yield pos, symbol
         pos += 1
-        new_path = symbol.source_file.path
+        new_path = symbol["path"]
+        # add black smudge between files
         if new_path != prev_path:
             if prev_path:
                 print(f"{pos} {new_path}")
-                pos += 5  # add black smudge TODO ??
+                pos += 5
             prev_path = new_path
-        pos += symbol.length - 1
+        pos += calc_sym_size(symbol) - 1
 
 
 def make_skeleton(symbols):
@@ -40,22 +41,22 @@ def make_skeleton(symbols):
     skeleton = calc_sym_position(symbols)
     for num, (pos, symbol) in enumerate(skeleton):
         x, y = get_xy(pos)
-        if num <= 5:
-            print(f"position={pos}, x={x}, y={y}, {symbol=}")
+        # if num <= 5:
+        print(f"position={pos}, x={x}, y={y}, {symbol=}")
 
-        yield Skeleton(position=pos, x=x, y=y, symbol=symbol)
+        # XX yield Skeleton(position=pos, x=x, y=y, symbol=symbol)
 
 
 # def zap_skeleton(project):
 #     Skeleton.objects.filter(symbol__source_file__project=project).delete()
 
 
-# # pylint: disable=no-member
-# def do_render(symbols):
-#     """
-#     render skeleton, store in database
-#     """
-#     skel = make_skeleton(symbols)
+def render_project(project):
+    db = state.get_db(setup=False)
+    symbols = get_symbols(db)
+    make_skeleton(symbols)
+
+
 #     Skeleton.objects.bulk_create(skel)
 
 # TODO: make flexible
@@ -70,18 +71,25 @@ def is_interesting(sym):
     return True
 
 
+def get_symbols(db):
+    return filter(is_interesting, db.execute(SYMBOL_SQL))
+
+
+def calc_sym_size(symbol):
+    try:
+        return symbol["line_end"] - symbol["line_start"]
+    except TypeError:
+        return 1
+
+
 def stats_project(project):
     db = state.get_db(setup=False)
     interesting = 0
     total_size = 0
 
-    for symbol in filter(is_interesting, db.execute(SYMBOL_SQL)):
+    for symbol in get_symbols(db):
         interesting += 1
-        sym_size = 1
-        try:
-            sym_size = symbol["line_end"] - symbol["line_start"]
-        except TypeError:
-            pass
+        sym_size = calc_sym_size(symbol)
         total_size += sym_size
         print(f'{symbol["name"]:25} {sym_size:3}\t{symbol["path"]}')
 
@@ -100,6 +108,13 @@ def stats_project(project):
 @click.group()
 def cli():
     pass
+
+
+@cli.command()
+@click.argument("projects", nargs=-1)
+def render(projects):
+    for project in projects:
+        render_project(project)
 
 
 @cli.command()

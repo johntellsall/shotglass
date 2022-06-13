@@ -9,9 +9,11 @@ all:
 fmt:
 	isort .
 	black .
-	
+
 render:
-	python3 ./render22.py NOTYET
+	python3 ./render.py render NOTYET
+stats:
+	python3 ./render.py stats NOTYET
 
 fastlint:
 	flake8 $(PY_SOURCE)
@@ -34,5 +36,4 @@ run2:
 pre-commit: fastlint
 
 test:
-	pytest
-	# pytest --cov=. --cov-report=term-missing .
+	pytest --cov=. --cov-report=term-missing .
