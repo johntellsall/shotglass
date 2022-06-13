@@ -10,9 +10,9 @@ import hilbert
 import state
 
 logger = logging.getLogger(__name__)
-
-
 get_xy = hilbert.int_to_Hilbert
+
+SYMBOL_SQL = "select name,path,line_start,line_end from symbol"
 
 
 def calc_sym_position(symbols):
@@ -58,21 +58,24 @@ def make_skeleton(symbols):
 #     skel = make_skeleton(symbols)
 #     Skeleton.objects.bulk_create(skel)
 
+# TODO: make flexible
+def is_interesting(sym):
+    "skip dull symbols"
+    if sym["path"].startswith("test/"):
+        return False
+    if "testing/" in sym["path"]:
+        return False
+    if sym["name"].startswith("_"):
+        return False
+    return True
+
 
 def stats_project(project):
-    SELECT = "select name,path,line_start,line_end from symbol"
     db = state.get_db(setup=False)
     interesting = 0
     total_size = 0
-    for symbol in db.execute(SELECT):
-        # skip dull symbols
-        if symbol["path"].startswith("test/"):
-            continue
-        if "testing/" in symbol["path"]:
-            continue
-        if symbol["name"].startswith("_"):
-            continue
 
+    for symbol in filter(is_interesting, db.execute(SYMBOL_SQL)):
         interesting += 1
         sym_size = 1
         try:
@@ -83,6 +86,7 @@ def stats_project(project):
         print(f'{symbol["name"]:25} {sym_size:3}\t{symbol["path"]}')
 
     total_symbols = state.query1(db, table="symbol")
+
     print("render")
     print(f"{project}:")
     print(f"- {total_symbols} symbols, {interesting} interesting")

@@ -6,6 +6,10 @@ TEST_BATCH := ../SOURCE/flask/src/flask/*.py
 
 all:
 
+fmt:
+	isort .
+	black .
+	
 render:
 	python3 ./render22.py NOTYET
 

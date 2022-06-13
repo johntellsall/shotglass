@@ -8,9 +8,8 @@
 # http://www.tiac.net/~sw/2008/10/Hilbert
 
 
-from math import log, ceil
-
 from functools import lru_cache, reduce
+from math import ceil, log
 
 
 @lru_cache(maxsize=None)

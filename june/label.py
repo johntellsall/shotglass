@@ -8,7 +8,6 @@ import click
 from palettable import colorbrewer
 from PIL import Image, ImageDraw
 
-
 BLACK = (0, 0, 0)
 CMAP_OBJ = colorbrewer.qualitative.Set3_12
 CMAP_COLORS = list(map(tuple, CMAP_OBJ.colors))

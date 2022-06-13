@@ -16,7 +16,6 @@ import click
 from palettable import colorbrewer
 from PIL import Image, ImageDraw
 
-
 IMAGE_WIDTH = 1000
 IMAGE_HEIGHT = 1000
 COL_WIDTH, COL_HEIGHT = 100, 1000

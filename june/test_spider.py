@@ -1,6 +1,7 @@
 # test_spider.py
 
 from click.testing import CliRunner
+
 from spider import spider
 
 
