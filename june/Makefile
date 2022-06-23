@@ -12,6 +12,8 @@ fmt:
 
 render:
 	python3 ./render.py render NOTYET
+	@echo DONE
+	
 stats:
 	python3 ./render.py stats NOTYET
 

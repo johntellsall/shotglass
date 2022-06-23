@@ -3,6 +3,7 @@ render.py
 """
 
 import logging
+from dataclasses import dataclass
 
 import click
 
@@ -13,6 +14,18 @@ logger = logging.getLogger(__name__)
 get_xy = hilbert.int_to_Hilbert
 
 SYMBOL_SQL = "select name,path,line_start,line_end from symbol"
+
+
+@dataclass
+class Skeleton:
+    """
+    single symbol in fractal 2D visual space
+    """
+
+    position: int  # index starting from 0
+    x: int
+    y: int
+    symbol_name: str
 
 
 def calc_sym_position(symbols):
@@ -28,36 +41,11 @@ def calc_sym_position(symbols):
         # add black smudge between files
         if new_path != prev_path:
             if prev_path:
-                print(f"{pos} {new_path}")
+                # print(f"{pos} {new_path}")
                 pos += 5
             prev_path = new_path
         pos += calc_sym_size(symbol) - 1
 
-
-def make_skeleton(symbols):
-    """
-    make skeleton, annotate X,Y position of each symbol
-    """
-    skeleton = calc_sym_position(symbols)
-    for num, (pos, symbol) in enumerate(skeleton):
-        x, y = get_xy(pos)
-        # if num <= 5:
-        print(f"position={pos}, x={x}, y={y}, {symbol=}")
-
-        # XX yield Skeleton(position=pos, x=x, y=y, symbol=symbol)
-
-
-# def zap_skeleton(project):
-#     Skeleton.objects.filter(symbol__source_file__project=project).delete()
-
-
-def render_project(project):
-    db = state.get_db(setup=False)
-    symbols = get_symbols(db)
-    make_skeleton(symbols)
-
-
-#     Skeleton.objects.bulk_create(skel)
 
 # TODO: make flexible
 def is_interesting(sym):
@@ -80,6 +68,40 @@ def calc_sym_size(symbol):
         return symbol["line_end"] - symbol["line_start"]
     except TypeError:
         return 1
+
+
+def make_skeleton(symbols):
+    """
+    make skeleton, annotate X,Y position of each symbol
+    """
+    print(f"make_skeleton {symbols[0]}")
+    skeleton = calc_sym_position(symbols)
+    for num, (pos, symbol) in enumerate(skeleton):
+        x, y = get_xy(pos)
+        if num % 100 == 0:
+            print(f"{pos=}, {x},{y}, {symbol['name']}")
+
+        yield Skeleton(pos, x, y, symbol_name=symbol["name"])
+
+
+def render_project(project):
+    db = state.get_db(setup=False)
+
+    response = db.execute("select count(*) from file")
+    num_files = list(response)[0][0]
+    print(f"DB: {num_files=}")
+    response = db.execute("select count(*) from symbol")
+    num_symbols = list(response)[0][0]
+    print(f"DB: {num_symbols=}")
+
+    symbols = get_symbols(db)
+    symbols = list(symbols)
+    print(f"DB: {symbols[0]['path']}")
+
+    skel_list = list(make_skeleton(symbols))
+    for skel in skel_list[:3]:
+        print(skel)
+    print(f"DB: {len(skel_list)} skel count")
 
 
 def stats_project(project):
