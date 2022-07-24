@@ -4,6 +4,7 @@ render.py
 
 import logging
 from dataclasses import dataclass
+from random import choice
 
 import click
 
@@ -84,6 +85,35 @@ def make_skeleton(symbols):
         yield Skeleton(pos, x, y, symbol_name=symbol["name"])
 
 
+def render_image(skeleton, outfile):
+    from palettable.colorbrewer.qualitative import Dark2_7
+
+    palette = Dark2_7
+
+    from PIL import Image
+
+    imgx = 512
+    imgy = 512
+    image = Image.new("RGB", (imgx, imgy))
+    pixels = image.load()
+
+    def putpixel(x, y, r, g, b):
+        try:
+            pixels[int(round(x)), int(round(y))] = (
+                int(round(r)),
+                int(round(g)),
+                int(round(b)),
+            )
+        except KeyError:
+            pass
+
+    for skel in skeleton:
+        color = choice(palette.colors)
+        putpixel(skel.x, skel.y, *color)
+    image.save(outfile)
+    print(f"{outfile} image written")
+
+
 def render_project(project):
     db = state.get_db(setup=False)
 
@@ -102,6 +132,8 @@ def render_project(project):
     for skel in skel_list[:3]:
         print(skel)
     print(f"DB: {len(skel_list)} skel count")
+
+    render_image(skel_list, "shotglass.png")
 
 
 def stats_project(project):
