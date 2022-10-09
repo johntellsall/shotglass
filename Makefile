@@ -21,7 +21,7 @@ fmt:
 fastlint:
 	make -C $(SRC_DIR) fastlint
 pre-commit:
-	make -C $(SRC_DIR) pre-commit
+	# make -C $(SRC_DIR) pre-commit
 # fmt:
 # 	isort .
 # 	black .
