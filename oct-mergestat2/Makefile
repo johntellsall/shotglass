@@ -3,6 +3,7 @@ all:
 run:
 	python3 plot.py
 	@echo DONE
+	imgcat plot.png
 
 venv:
 	python3 -m venv venv
