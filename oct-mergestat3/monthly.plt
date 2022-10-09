@@ -11,6 +11,10 @@ set format x "%Y"
 
 set ylabel "Commits per Month"
 
+# TODO: hide line labels
+
+
+
 set output 'monthly.png'
 set datafile separator ","
 set key autotitle columnhead
