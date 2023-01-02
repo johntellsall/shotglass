@@ -1,0 +1,5 @@
+matplotlib
+isort
+pytest
+flake8
+flake8
