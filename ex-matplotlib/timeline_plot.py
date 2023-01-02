@@ -8,13 +8,14 @@ import numpy as np
 
 
 def get_data():
+    def parse_ymd(datestr):
+        return datetime.strptime(datestr, "%Y-%m-%d")
     db_name = "timeline.db"
     with contextlib.closing(sqlite3.connect(db_name)) as con:
         cursor = con.execute("select name,date from timeline")
         data = cursor.fetchall()
     names = [item[0] for item in data]
-    dates = [item[1] for item in data]
-    assert 0, (names[:3], dates[:3])
+    dates = [parse_ymd(item[1].split()[0]) for item in data]
     return names, dates
 
 
