@@ -41,6 +41,7 @@ def make_db():
 
 def main():
     make_db()
-    
-if __name__=='__main__':
+
+
+if __name__ == '__main__':
     main()
