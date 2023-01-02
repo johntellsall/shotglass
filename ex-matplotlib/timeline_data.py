@@ -2,9 +2,6 @@ import contextlib
 import sqlite3
 from datetime import datetime
 
-import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
-import numpy as np
 
 def get_rawdata():
     names = ['v2.2.4', 'v3.0.3', 'v3.0.2', 'v3.0.1', 'v3.0.0', 'v2.2.3',
@@ -23,15 +20,24 @@ def get_rawdata():
     dates = [datetime.strptime(d, "%Y-%m-%d") for d in dates]
     return {"names": names, "dates": dates}
 
-# sqlite3
-#
 
 def make_db():
+    raw = get_rawdata()
     db_name = 'timeline.db'
     with contextlib.closing(sqlite3.connect(db_name)) as con:
         con.execute('drop table if exists timeline')
         con.execute('create table timeline (name text, date text)')
+        data_namesdates = list(zip(raw['names'], raw['dates']))
+        con.executemany('insert into timeline values (?, ?)', data_namesdates)
+        con.commit()
+
     print(f'{db_name}: written')
+
+    with contextlib.closing(sqlite3.connect(db_name)) as con:
+        cursor = con.execute('select * from timeline limit 1')
+        sel_data = cursor.fetchall()
+    print(f'{db_name}: read: {sel_data}')
+
 
 def main():
     make_db()
