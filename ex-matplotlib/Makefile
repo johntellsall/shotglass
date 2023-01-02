@@ -1,5 +1,8 @@
 all:
 
+run:
+	venv/bin/python3 ./timeline.py
+
 fastlint:
 	flake8 .
 	@echo DONE
