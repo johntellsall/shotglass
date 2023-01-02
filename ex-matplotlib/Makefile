@@ -1,7 +1,7 @@
 all:
 
 run:
-	venv/bin/python3 ./timeline.py
+	venv/bin/python3 ./timeline_data.py
 
 fastlint:
 	flake8 .
