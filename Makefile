@@ -10,17 +10,17 @@ clean:
 	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
 
-pre-push:
+# pre-push:
 
-pre-commit-code: fmt fastlint
+# pre-commit-code: fmt fastlint
 
-# TODO: make general
-SRC_DIR := june
-fmt:
-	make -C $(SRC_DIR) fmt
-fastlint:
-	make -C $(SRC_DIR) fastlint
-pre-commit:
+# # TODO: make general
+# SRC_DIR := june
+# fmt:
+# 	make -C $(SRC_DIR) fmt
+# fastlint:
+# 	make -C $(SRC_DIR) fastlint
+# pre-commit:
 	# make -C $(SRC_DIR) pre-commit
 # fmt:
 # 	isort .
