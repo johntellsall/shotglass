@@ -5,16 +5,25 @@ all:
 # help:
 # 	awk '/^[a-z]/ && {print $$1}' Makefile
 
+# :::::::: DATABASE MANAGE
+
 dbsetup:  ## setup database with tables
 	python3 dbsetup.py $(DBPATH)
 	sqlite3 -echo $(DBPATH) '.tables'
 
 dbimport:
 	python3 import_alpine.py $(DBPATH)
-	
-# TODO: needs "alpine" table
+
 scan_tags:
 	python3 ./scan_tags.py $(DBPATH)
+
+# :::::::: DATABASE QUERY
+
+list_versions:
+	python3 ./list_versions.py $(DBPATH)
+
+summarize_tags:
+	python3 ./summarize_tags.py $(DBPATH)
 
 # :::::::: FILESYSTEM
 
@@ -23,11 +32,12 @@ alpine_stats:  ## show subset of package info
 
 # :::::::: FIXME:
 
+# :::::::: ALPHA
+
 scan_packages:
 	python3 scan_packages.py
 
-list_versions:
-	python3 ./list_versions.py
+
 
 # list remote tags
 ex-list-tags:
@@ -59,7 +69,16 @@ github-packages.csv: gh-package-list.sql Makefile
 	awk -F/ '{print $$4"/"$$5 " -- "$$0}' .gh-packages.csv | head -5
 	# head -5 $@
 
+# :::::::: UTILITIES
+
+fastlint:
+	PY_SOURCE=$$(git ls-files '*.py') \
+	; flake8 $${PY_SOURCE}
+
 format:
 	PY_SOURCE=$$(git ls-files '*.py') \
 	; isort $${PY_SOURCE} \
 	; black $${PY_SOURCE}
+
+# test:
+# 	pytest --exitfirst $$(git ls-files 'test*.py')

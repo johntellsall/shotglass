@@ -7,7 +7,6 @@ import re
 import sys
 
 
-
 def parse_apkbuild(path):
     """Parse an APKBUILD file and return a dict of the variables."""
     build_vars = {}
@@ -40,8 +39,8 @@ def parse_apkbuild(path):
     return build_vars
 
 
-def main():
-    for path in map(pathlib.Path, sys.argv[1:]):
+def main(package_paths):
+    for path in map(pathlib.Path, package_paths):
         if path.is_dir():
             path = path / "APKBUILD"
         package = parse_apkbuild(path)
@@ -58,4 +57,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])

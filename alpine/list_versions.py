@@ -18,10 +18,10 @@ def parse_semver(raw_tag):
     return int(major), int(minor), int(patch)
 
 
-def main():
+def main(dbpath):
     tag_pat = re.compile(r"([0-9]+.+)\^")
     package_tags = defaultdict(list)
-    with contextlib.closing(sqlite3.connect("alpine.db")) as conn:
+    with contextlib.closing(sqlite3.connect(dbpath)) as conn:
         cursor = conn.execute(
             """
             select package, tag from package_tags
@@ -56,4 +56,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1])
