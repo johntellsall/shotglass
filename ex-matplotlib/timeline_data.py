@@ -70,7 +70,7 @@ def get_github_data():
 
     url = "https://api.github.com/repos/matplotlib/matplotlib/releases"
     url += "?per_page=100"
-    data = json.loads(urllib.request.urlopen(url, timeout=0.4).read().decode())
+    data = json.loads(urllib.request.urlopen(url).read().decode())
 
     dates = []
     names = []
@@ -110,8 +110,8 @@ def make_db(data):
 
 
 def main():
-    # raw = get_rawdata()
-    data = get_rawdata()
+    # data = get_rawdata()
+    data = get_github_data()
     summarize(data)
     # make_db(raw)
 
