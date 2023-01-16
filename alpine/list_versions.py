@@ -5,6 +5,7 @@ import contextlib
 import re
 import sqlite3
 from collections import defaultdict
+import sys
 
 
 def parse_semver(raw_tag):
@@ -39,7 +40,7 @@ def main(dbpath):
             try:
                 tag = parse_semver(tag_value)
             except ValueError as err:
-                # print(f"package={package}: {tag_value=} {err=}")
+                print(f"package={package}: {tag_value=} {err=}")
                 continue
             package_tags[package].append(tag)
 

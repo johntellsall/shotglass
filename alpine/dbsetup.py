@@ -5,7 +5,7 @@ import sys
 
 
 CREATE_TABLES_SQL = [
-"""
+    """
 -- create table to set int fields
 CREATE TABLE IF NOT EXISTS "alpine"(
   "package" TEXT,
@@ -14,11 +14,12 @@ CREATE TABLE IF NOT EXISTS "alpine"(
   "source" TEXT
 );
 """,
-"""
+    """
 create table if not exists package_tags (
     package TEXT, tag TEXT
 )"""
 ]
+
 
 def queryall(conn, sql):
     return conn.execute(sql).fetchall()

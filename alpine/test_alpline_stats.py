@@ -2,13 +2,13 @@ import pathlib
 
 import pytest
 
-import pkg_stats
+import alpine_stats
 
 
 def test_parse():
-    out = pkg_stats.parse_apkbuild(pathlib.Path("test-data/axel.apkbuild"))
-    out_options = out.pop("options")
-    out_sha = out.pop("sha512sums")
+    out = alpine_stats.parse_apkbuild(pathlib.Path("test-data/axel.apkbuild"))
+    out.pop("options")
+    out.pop("sha512sums")
     assert out == {
         "arch": "all",
         "makedepends": "openssl-dev>3",
@@ -25,6 +25,6 @@ def test_parse():
 @pytest.mark.xfail
 def test_parse2():
     "these keys aren't parsed yet: options, sha512sums"
-    out = pkg_stats.parse_apkbuild(pathlib.Path("test-data/axel.apkbuild"))
+    out = alpine_stats.parse_apkbuild(pathlib.Path("test-data/axel.apkbuild"))
     assert out.pop("options") == '"!check"', "should strip comments"
     assert len(out.pop("sha512sums")) > 50

@@ -79,5 +79,6 @@ def main(dbpath):
                 conn.execute(sql_insert, (package, tag))
             conn.commit()
 
+
 if __name__ == "__main__":
     main(sys.argv[1])
