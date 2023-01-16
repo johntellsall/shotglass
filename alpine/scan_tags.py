@@ -71,16 +71,9 @@ def main(dbpath):
             continue
         package_tags[package] = tags
 
-    # save the tags to a database
+    # save the tags to database
+    sql_insert = "insert into package_tags values (?, ?)"
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
-        # conn.execute(
-        #     """
-        #     create table if not exists package_tags (
-        #     package TEXT, tag TEXT
-        #     )"""
-        # )
-        # conn.commit()
-        sql_insert = "insert into package_tags values (?, ?)"
         for package, tags in package_tags.items():
             for tag in tags:
                 conn.execute(sql_insert, (package, tag))
