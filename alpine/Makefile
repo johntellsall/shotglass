@@ -7,6 +7,8 @@ all:
 
 dbsetup:  ## setup database with tables
 	python3 dbsetup.py $(DBPATH)
+	sqlite3 -echo $(DBPATH) '.tables'
+
 
 # TODO: needs "alpine" table
 scan_tags:
@@ -14,7 +16,7 @@ scan_tags:
 
 # :::::::: FILESYSTEM
 
-alpine_stats:
+alpine_stats:  ## show subset of package info
 	python3 alpine_stats.py aports/main/*
 
 # :::::::: FIXME:

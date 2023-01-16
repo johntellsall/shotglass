@@ -1,4 +1,6 @@
 # alpine_stats.py
+# Scan given Alpine package directories, print subset of info
+# Intended as a "smoke test", not for import/reuse.
 #
 import pathlib
 import re

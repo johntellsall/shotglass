@@ -1,7 +1,7 @@
 # list_tags.py
 # Per Alpine package, scrape Git tags (= package releases)
 # INPUT:
-# - Alpine "aports" tree, APKBUILD files
+# - "alpine" table with package names and source URLs
 # OUTPUT database, "package_tags" table
 #
 import contextlib
@@ -14,6 +14,7 @@ import sys
 def list_tags(repos):
     """
     List tags for remote Git repository
+    Note: uses network (github.com)
     """
     cmd = f"git ls-remote --tags {repos}"
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
@@ -46,13 +47,14 @@ def main(dbpath):
     # - also list currently-scraped packages
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
         distro_packages = conn.execute(query_packages).fetchall()
-
+        if not distro_packages:
+            sys.exit('db.alpline: table has no packages')
         cursor = conn.execute("select distinct(package) from package_tags")
         prev_packages = set((row[0] for row in cursor.fetchall()))
 
     # per package, scrape the list of tags
     package_tags = {}
-    for package, source in distro_packages[:10]:
+    for package, source in distro_packages:
         if package in prev_packages:
             print(f"package={package}: done, skipping")
             continue
