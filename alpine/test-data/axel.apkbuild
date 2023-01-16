@@ -1,0 +1,37 @@
+# Contributor:
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=axel
+pkgver=2.17.11
+pkgrel=1
+pkgdesc="A multiple-connection concurrent downloader"
+url="https://github.com/axel-download-accelerator/axel"
+arch="all"
+options="!check" # has no checks
+license="GPL-2.0-or-later WITH OpenSSL-Exception"
+makedepends="openssl-dev>3"
+subpackages="$pkgname-doc"
+source="$url/releases/download/v$pkgver/axel-$pkgver.tar.xz"
+
+# secfixes:
+#   2.17.8-r0:
+#     - CVE-2020-13614
+
+build() {
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--mandir=/usr/share/man \
+		--localstatedir=/var \
+		--disable-nls
+	make
+}
+
+package() {
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="
+111e8b3bbb70e717bee8b3c318c18d0121776301c609c0894376a371238dd839f5dae7edda6738d2b89296fd4b6ac1083399acf62308eaa479b6d70b080e65a1  axel-2.17.11.tar.xz
+"

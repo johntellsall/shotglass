@@ -1,0 +1,28 @@
+.schema package_tags
+CREATE TABLE package_tags (package TEXT, tag TEXT);
+-- CREATE TABLE package_tags (package TEXT, tag TEXT);
+
+-- NUMBER OF PACKAGE_TAGS
+select count(*) from package_tags;
+1103
+
+--  SAMPLE
+select * from package_tags limit 3;
+abi-compliance-checker|1.98.7
+abi-compliance-checker|1.98.7^{}
+abi-compliance-checker|1.98.8
+
+-- LARGEST PACKAGES
+select package, count(*) from package_tags group by package order by 2 desc limit 5;
+bctoolbox|234
+apache2-mod-wsgi|208
+bash-completion|182
+arm-trusted-firmware|117
+abi-compliance-checker|66
+-- SMALLEST PACKAGES
+select package, count(*) from package_tags group by package order by 2 asc limit 5;
+apache-mod-auth-radius|1
+argp-standalone|3
+bmd-tools|4
+bwm-ng|5
+akms|6

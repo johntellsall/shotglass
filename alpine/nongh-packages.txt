@@ -1,0 +1,55 @@
+.schema alpine
+CREATE TABLE IF NOT EXISTS "alpine"(
+  "package" TEXT,
+  "num_files" INT,
+  "build_num_lines" INT,
+  "source" TEXT
+);
+
+-- NUM OF GITHUB PACKAGES PER UPSTREAM
+select count(*) from alpine;
+1561
+select count(*) from alpine where
+source like "%github.com%";
+356
+select count(*) from alpine where
+source like "%gitlab.%";
+71
+
+-- OTHER
+select count(*) from alpine where
+source not like "%github.com%"
+and source not like "%gitlab.%";
+1134
+
+-- LIST OF OTHER
+select source from alpine where
+source not like "%github.com%"
+and source not like "%gitlab.%"
+limit 20;
+source
+aaudit-common.lua
+
+https://search.cpan.org/CPAN/authors/id/P/PE/PETDANCE/ack-v$pkgver.tar.gz
+https://download.savannah.nongnu.org/releases/acl/acl-$pkgver.tar.gz
+https://dev.alpinelinux.org/archive/aconf/aconf-$pkgver.tar.xz
+https://downloads.sourceforge.net/acpiclient/acpi-$pkgver.tar.gz
+acpica-unix-$pkgver.tar.gz::https://acpica.org/sites/acpica/files/acpica-unix-$pkgver.tar.gz
+
+crontab
+$source ${_i#*:}
+None
+https://alsa-project.org/files/pub/lib/alsa-lib-$pkgver.tar.bz2
+https://alsa-project.org/files/pub/lib/alsa-ucm-conf-$pkgver.tar.bz2
+https://alsa-project.org/files/pub/utils/alsa-utils-$pkgver.tar.bz2
+https://pldaniels.com/altermime/altermime-$pkgver.tar.gz
+
+$pkgname-$pkgver.tar.gz::https://aomedia.googlesource.com/aom/+archive/v$pkgver.tar.gz
+https://downloads.sourceforge.net/project/modauthkerb/mod_auth_kerb/mod_auth_kerb-$pkgver/mod_auth_kerb-$pkgver.tar.gz
+http://samba.org/ftp/unpacked/lorikeet/mod_auth_ntlm_winbind/mod_auth_ntlm_winbind.c
+
+-- LIST OF GITHUB PACKAGES
+-- select package, source from alpine
+-- where source not like "%github.com%"
+-- and source not like "gitlab.%"
+-- order by 1 asc limit 20;
