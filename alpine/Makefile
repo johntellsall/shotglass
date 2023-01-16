@@ -1,5 +1,8 @@
 all:
 
+scan_packages:
+	python3 scan_packages.py
+
 list_versions:
 	python3 ./list_versions.py
 
@@ -28,6 +31,15 @@ setup:
 
 %.txt: %.sql
 	sqlite3 -echo alpine.db < $< | tee $@
+
+%.show: %.sql
+	sqlite3 -echo alpine.db < $< | head -20
+
+# TODO: fix output, add header
+github-packages.csv: gh-package-list.sql Makefile
+	sqlite3 alpine.db < $< > .gh-packages.csv
+	awk -F/ '{print $$4"/"$$5 " -- "$$0}' .gh-packages.csv | head -5
+	# head -5 $@
 
 format:
 	PY_SOURCE=$$(git ls-files '*.py') \

@@ -87,15 +87,21 @@ def main():
     print("SUMMARY")
     with contextlib.closing(sqlite3.connect("alpine.db")) as conn:
         package_tags_count = query1(conn, count="package_tags")
-        package_count = query1(conn, sql="""
+        package_count = query1(
+            conn,
+            sql="""
             select count(distinct(package)) from package_tags
-            """)
+            """,
+        )
 
         distro_count = query1(conn, count="alpine")
-        d_github_count = query1(conn, sql="""
+        d_github_count = query1(
+            conn,
+            sql="""
             select count(*) from alpine where
             source like '%github.com/%'
-            """)
+            """,
+        )
 
         print("alpine distro:")
         print(f" - {distro_count} packages")
