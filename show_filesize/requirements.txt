@@ -1,3 +1,3 @@
-GitPython==2.1.10
+GitPython==3.1.30
 natsort==5.2.0
 ruamel-yaml==0.11.14
