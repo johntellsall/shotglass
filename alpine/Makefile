@@ -15,7 +15,9 @@ scan_tags:
 # :::::::: FILESYSTEM
 
 alpine_stats:
-	python3 pkg_stats.py aports/main/*
+	python3 alpine_stats.py aports/main/*
+
+# :::::::: FIXME:
 
 scan_packages:
 	python3 scan_packages.py
