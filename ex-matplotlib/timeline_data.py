@@ -63,12 +63,13 @@ def get_rawdata():
     return {"names": names, "dates": dates}
 
 
-def get_github_data():
+def get_github_data(repos):
 
     # Try to fetch a list of Matplotlib releases and their dates
     # from https://api.github.com/repos/matplotlib/matplotlib/releases
 
-    url = "https://api.github.com/repos/matplotlib/matplotlib/releases"
+    assert '/' in repos, 'repos must be of the form "user/repo"'
+    url = f"https://api.github.com/repos/{repos}/releases"
     url += "?per_page=100"
     data = json.loads(urllib.request.urlopen(url).read().decode())
 
@@ -110,8 +111,9 @@ def make_db(data):
 
 
 def main():
+    repos = "matplotlib/matplotlib"
     # data = get_rawdata()
-    data = get_github_data()
+    data = get_github_data(repos)
     summarize(data)
     # make_db(raw)
 
