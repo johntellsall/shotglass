@@ -1,5 +1,7 @@
 import contextlib
+import json
 import sqlite3
+import urllib.request
 from datetime import datetime
 
 
@@ -61,8 +63,36 @@ def get_rawdata():
     return {"names": names, "dates": dates}
 
 
-def make_db():
-    raw = get_rawdata()
+def get_github_data():
+
+    # Try to fetch a list of Matplotlib releases and their dates
+    # from https://api.github.com/repos/matplotlib/matplotlib/releases
+
+    url = "https://api.github.com/repos/matplotlib/matplotlib/releases"
+    url += "?per_page=100"
+    data = json.loads(urllib.request.urlopen(url, timeout=0.4).read().decode())
+
+    dates = []
+    names = []
+    for item in data:
+        if "rc" not in item["tag_name"] and "b" not in item["tag_name"]:
+            dates.append(item["published_at"].split("T")[0])
+            names.append(item["tag_name"])
+
+    # Convert date strings (e.g. 2014-10-18) to datetime
+    dates = [datetime.strptime(d, "%Y-%m-%d") for d in dates]
+    return {"names": names, "dates": dates}
+
+
+def summarize(data):
+    print(f"Number of releases: {len(data['names'])}")
+    releases = data["names"][0], data["names"][-1]
+    print(f"Release range: {releases[0]} {releases[-1]}")
+    dates = data['dates'][0], data['dates'][-1]
+    print(f"Release date range: {dates[0].date()} {dates[-1].date()}")
+
+
+def make_db(data):
     db_name = "timeline.db"
     with contextlib.closing(sqlite3.connect(db_name)) as con:
         con.execute("drop table if exists timeline")
@@ -80,7 +110,10 @@ def make_db():
 
 
 def main():
-    make_db()
+    # raw = get_rawdata()
+    data = get_rawdata()
+    summarize(data)
+    # make_db(raw)
 
 
 if __name__ == "__main__":

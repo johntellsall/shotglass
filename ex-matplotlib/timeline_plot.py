@@ -1,6 +1,6 @@
 import contextlib
-from datetime import datetime
 import sqlite3
+from datetime import datetime
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
@@ -10,6 +10,7 @@ import numpy as np
 def get_data():
     def parse_ymd(datestr):
         return datetime.strptime(datestr, "%Y-%m-%d")
+
     db_name = "timeline.db"
     with contextlib.closing(sqlite3.connect(db_name)) as con:
         cursor = con.execute("select name,date from timeline")
@@ -34,15 +35,15 @@ def do_plot(data):
         dates, np.zeros_like(dates), "-o", color="k", markerfacecolor="w"
     )  # Baseline and markers on it.
 
-    # annotate lines
-    for d, l, r in zip(dates, levels, names):
+    # annotate: put release at end of each stem
+    for rdate, rlevel, rname in zip(dates, levels, names):
         ax.annotate(
-            r,
-            xy=(d, l),
-            xytext=(-3, np.sign(l) * 3),
+            rname,
+            xy=(rdate, rlevel),
+            xytext=(-3, np.sign(rlevel) * 3),
             textcoords="offset points",
             horizontalalignment="right",
-            verticalalignment="bottom" if l > 0 else "top",
+            verticalalignment="bottom" if rlevel > 0 else "top",
         )
 
     # format xaxis with 4 month intervals
