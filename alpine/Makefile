@@ -1,16 +1,21 @@
+DBPATH := ../shotglass.db
+
 all:
 
-dbsetup:
-	python3 dbsetup.py ../shotglass.db
-	
+# help:
+# 	awk '/^[a-z]/ && {print $$1}' Makefile
+
+dbsetup:  ## setup database with tables
+	python3 dbsetup.py $(DBPATH)
+
+list_tags:
+	python3 ./list_tags.py $(DBPATH)
+
 scan_packages:
 	python3 scan_packages.py
 
 list_versions:
 	python3 ./list_versions.py
-
-list_tags:
-	python3 ./list_tags.py
 
 # list remote tags
 ex-list-tags:

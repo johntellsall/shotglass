@@ -8,6 +8,7 @@ import contextlib
 import re
 import sqlite3
 import subprocess
+import sys
 
 
 def list_tags(repos):
@@ -32,7 +33,7 @@ def queryall(conn, sql):
     return conn.execute(sql).fetchall()
 
 
-def main():
+def main(dbpath):
     # TODO: note non-GitHub sources
     query_packages = """
         select package, source from alpine where
@@ -43,7 +44,7 @@ def main():
 
     # grab package names from Alpine distro
     # - also list currently-scraped packages
-    with contextlib.closing(sqlite3.connect("alpine.db")) as conn:
+    with contextlib.closing(sqlite3.connect(dbpath)) as conn:
         distro_packages = conn.execute(query_packages).fetchall()
 
         cursor = conn.execute("select distinct(package) from package_tags")
@@ -69,14 +70,14 @@ def main():
         package_tags[package] = tags
 
     # save the tags to a database
-    with contextlib.closing(sqlite3.connect("alpine.db")) as conn:
-        conn.execute(
-            """
-            create table if not exists package_tags (
-            package TEXT, tag TEXT
-            )"""
-        )
-        conn.commit()
+    with contextlib.closing(sqlite3.connect(dbpath)) as conn:
+        # conn.execute(
+        #     """
+        #     create table if not exists package_tags (
+        #     package TEXT, tag TEXT
+        #     )"""
+        # )
+        # conn.commit()
         sql_insert = "insert into package_tags values (?, ?)"
         for package, tags in package_tags.items():
             for tag in tags:
@@ -85,7 +86,7 @@ def main():
 
     # validate package-tags count
     print("SUMMARY")
-    with contextlib.closing(sqlite3.connect("alpine.db")) as conn:
+    with contextlib.closing(sqlite3.connect(dbpath)) as conn:
         package_tags_count = query1(conn, count="package_tags")
         package_count = query1(
             conn,
@@ -112,4 +113,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1])
