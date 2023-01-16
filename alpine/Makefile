@@ -1,5 +1,8 @@
 all:
 
+dbsetup:
+	python3 dbsetup.py ../shotglass.db
+	
 scan_packages:
 	python3 scan_packages.py
 
