@@ -1,9 +1,4 @@
 # pkg_stats.py
-# Import Alpine packages info and create database
-# INPUT:
-# - per package: info from Alpine APKBUILD files
-# OUTPUT database, "alpine" table:
-# - per package: number of files, number of lines in APKBUILD, source URL
 #
 import pathlib
 import re
@@ -11,25 +6,28 @@ import subprocess
 import sys
 
 
-def do_import():
-    cmd = """
-sqlite3 -echo alpine.db << EOF
-drop table if exists alpine;
--- create table to set int fields
-CREATE TABLE IF NOT EXISTS "alpine"(
-  "package" TEXT,
-  "num_files" INT,
-  "build_num_lines" INT,
-  "source" TEXT
-);
-.separator ","
-.import temp.csv alpine
+# def do_import():
+# # drop table if exists alpine;
+# # -- create table to set int fields
+# # CREATE TABLE IF NOT EXISTS "alpine"(
+# #   "package" TEXT,
+# #   "num_files" INT,
+# #   "build_num_lines" INT,
+# #   "source" TEXT
+# # );
+#     cmd = """
 
-select count(*) from alpine;
-select * from alpine order by num_files desc limit 3
-EOF
-"""
-    subprocess.run(cmd, shell=True)
+# # TODO: delete data in table
+
+# sqlite3 -echo alpine.db << EOF
+# .separator ","
+# .import temp.csv alpine
+
+# select count(*) from alpine;
+# select * from alpine order by num_files desc limit 3
+# EOF
+# """
+#     subprocess.run(cmd, shell=True)
 
 
 def parse_apkbuild(path):
@@ -64,34 +62,34 @@ def parse_apkbuild(path):
     return build_vars
 
 
-def calc_pkg_stats(package, outf):
-    print(package)
-    num_files = len(list(package.iterdir()))
-    build_lines = open(package / "APKBUILD").readlines()
-    build_num_lines = len(build_lines)
-    source_pat = re.compile(r'source="(.*)')  # FIXME: incomplete
-    build_source = open(package / "APKBUILD").read()
-    source = None
-    match = source_pat.search(build_source)
-    if match:
-        source = match.group(1).rstrip('"')
-    print(f"{package.name},{num_files},{build_num_lines},{source}", file=outf)
+# def calc_pkg_stats(package, outf):
+#     print(package)
+#     num_files = len(list(package.iterdir()))
+#     build_lines = open(package / "APKBUILD").readlines()
+#     build_num_lines = len(build_lines)
+#     source_pat = re.compile(r'source="(.*)')  # FIXME: incomplete
+#     build_source = open(package / "APKBUILD").read()
+#     source = None
+#     match = source_pat.search(build_source)
+#     if match:
+#         source = match.group(1).rstrip('"')
+#     print(f"{package.name},{num_files},{build_num_lines},{source}", file=outf)
 
 
-def calc_stats():
-    with open("temp.csv", "w") as outf:
-        print("package,num_files,build_num_lines,source", file=outf)
-        packages = filter(lambda p: p.is_dir(), pathlib.Path("aports/main").iterdir())
-        packages = list(sorted(packages))
-        for package in packages:
-            calc_pkg_stats(package, outf)
+# def calc_stats():
+#     with open("temp.csv", "w") as outf:
+#         print("package,num_files,build_num_lines,source", file=outf)
+#         packages = filter(lambda p: p.is_dir(), pathlib.Path("aports/main").iterdir())
+#         packages = list(sorted(packages))
+#         for package in packages:
+#             calc_pkg_stats(package, outf)
 
-    subprocess.run("head temp.csv", shell=True)
+#     subprocess.run("head temp.csv", shell=True)
 
 
-def main():
-    calc_stats()
-    do_import()
+# def main():
+#     calc_stats()
+#     do_import()
 
 
 def main2():

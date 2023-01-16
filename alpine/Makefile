@@ -8,8 +8,14 @@ all:
 dbsetup:  ## setup database with tables
 	python3 dbsetup.py $(DBPATH)
 
-list_tags:
-	python3 ./list_tags.py $(DBPATH)
+# TODO: needs "alpine" table
+scan_tags:
+	python3 ./scan_tags.py $(DBPATH)
+
+# :::::::: FILESYSTEM
+
+alpine_stats:
+	python3 pkg_stats.py aports/main/*
 
 scan_packages:
 	python3 scan_packages.py
@@ -21,8 +27,6 @@ list_versions:
 ex-list-tags:
 	git ls-remote --tags https://github.com/tmux/tmux
 
-build:
-	python3 pkg_stats.py aports/main/*
 
 show:
 	sqlite3 -echo alpine.db '.read show.sql'
