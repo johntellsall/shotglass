@@ -9,7 +9,9 @@ dbsetup:  ## setup database with tables
 	python3 dbsetup.py $(DBPATH)
 	sqlite3 -echo $(DBPATH) '.tables'
 
-
+dbimport:
+	python3 import_alpine.py $(DBPATH)
+	
 # TODO: needs "alpine" table
 scan_tags:
 	python3 ./scan_tags.py $(DBPATH)
