@@ -8,6 +8,7 @@ all:
 # :::::::: DATABASE MANAGE
 
 dbsetup:  ## setup database with tables
+	-$(RM) $(DBPATH)
 	python3 dbsetup.py $(DBPATH)
 	sqlite3 -echo $(DBPATH) '.tables'
 
@@ -24,6 +25,9 @@ list_versions:
 
 summarize_tags:
 	python3 ./summarize_tags.py $(DBPATH)
+
+schema:
+	sqlite3 -echo $(DBPATH) '.schema *'
 
 show:
 	sqlite3 -echo $(DBPATH) '.read show.sql'

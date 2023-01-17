@@ -5,7 +5,7 @@ import sys
 CREATE_TABLES_SQL = [
     """
 -- create table to set int fields
-CREATE TABLE IF NOT EXISTS "alpine"(
+CREATE TABLE "alpine"(
   "package" TEXT,
   "num_files" INT,
   "build_num_lines" INT,
@@ -13,9 +13,14 @@ CREATE TABLE IF NOT EXISTS "alpine"(
 );
 """,
     """
-create table if not exists package_tags (
+create table package_tags (
     package TEXT, tag TEXT
-)""",
+);""",
+    """
+create table package_github (
+    package TEXT, api_repos TEXT
+);
+""",
 ]
 
 
@@ -25,9 +30,10 @@ def queryall(conn, sql):
 
 def main(dbpath):
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
-        for create_table in CREATE_TABLES_SQL:
-            conn.execute(create_table)
-            conn.commit()
+        for num, create_table in enumerate(CREATE_TABLES_SQL):
+            print(num, create_table)
+            with conn:
+                conn.execute(create_table)
 
 
 if __name__ == "__main__":
