@@ -48,7 +48,7 @@ def main(dbpath):
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
         distro_packages = conn.execute(query_packages).fetchall()
         if not distro_packages:
-            sys.exit('db.alpline: table has no packages')
+            sys.exit("db.alpline: table has no packages")
         cursor = conn.execute("select distinct(package) from package_tags")
         prev_packages = set((row[0] for row in cursor.fetchall()))
 

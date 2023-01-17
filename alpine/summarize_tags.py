@@ -1,4 +1,3 @@
-
 import contextlib
 import sqlite3
 import sys
@@ -13,6 +12,7 @@ def query1(conn, sql=None, count=None):
 
 # def queryall(conn, sql):
 #     return conn.execute(sql).fetchall()
+
 
 def summarize_tags(dbpath):
     # validate package-tags count
@@ -42,8 +42,10 @@ def summarize_tags(dbpath):
         print(f" - {package_tags_count} rows")
         print(f" - {package_count} packages")
 
+
 def main(dbpath):
     summarize_tags(dbpath)
-    
+
+
 if __name__ == "__main__":
     main(sys.argv[1])

@@ -36,12 +36,10 @@ ex-list-tags:  ## list remote tags
 alpine_stats:  ## show subset of package info
 	python3 alpine_stats.py aports/main/*
 
-# :::::::: FIXME:
-
 # :::::::: ALPHA
 
 scan_packages:
-	python3 scan_packages.py
+	python3 scan_packages.py $(DBPATH)
 
 
 # :::::::: UTILITIES

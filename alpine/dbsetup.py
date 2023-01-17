@@ -1,8 +1,6 @@
-
 import contextlib
 import sqlite3
 import sys
-
 
 CREATE_TABLES_SQL = [
     """
@@ -17,7 +15,7 @@ CREATE TABLE IF NOT EXISTS "alpine"(
     """
 create table if not exists package_tags (
     package TEXT, tag TEXT
-)"""
+)""",
 ]
 
 

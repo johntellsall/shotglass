@@ -4,8 +4,8 @@
 import contextlib
 import re
 import sqlite3
-from collections import defaultdict
 import sys
+from collections import defaultdict
 
 
 def parse_semver(raw_tag):
