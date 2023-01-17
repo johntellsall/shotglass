@@ -17,13 +17,19 @@ dbimport:
 scan_tags:
 	python3 ./scan_tags.py $(DBPATH)
 
-# :::::::: DATABASE QUERY
+# :::::::: DATABASE QUERY / EXAMPLES
 
 list_versions:
 	python3 ./list_versions.py $(DBPATH)
 
 summarize_tags:
 	python3 ./summarize_tags.py $(DBPATH)
+
+show:
+	sqlite3 -echo $(DBPATH) '.read show.sql'
+
+ex-list-tags:  ## list remote tags
+	git ls-remote --tags https://github.com/tmux/tmux
 
 # :::::::: FILESYSTEM
 
@@ -38,17 +44,7 @@ scan_packages:
 	python3 scan_packages.py
 
 
-
-# list remote tags
-ex-list-tags:
-	git ls-remote --tags https://github.com/tmux/tmux
-
-
-show:
-	sqlite3 -echo alpine.db '.read show.sql'
-show2:
-	clear
-	sqlite3 -echo alpine.db '.read show2.sql'
+# :::::::: UTILITIES
 
 test:
 	pytest --exitfirst $$(git ls-files 'test*.py')
@@ -63,14 +59,6 @@ setup:
 %.show: %.sql
 	sqlite3 -echo alpine.db < $< | head -20
 
-# TODO: fix output, add header
-github-packages.csv: gh-package-list.sql Makefile
-	sqlite3 alpine.db < $< > .gh-packages.csv
-	awk -F/ '{print $$4"/"$$5 " -- "$$0}' .gh-packages.csv | head -5
-	# head -5 $@
-
-# :::::::: UTILITIES
-
 fastlint:
 	PY_SOURCE=$$(git ls-files '*.py') \
 	; flake8 $${PY_SOURCE}
@@ -79,6 +67,3 @@ format:
 	PY_SOURCE=$$(git ls-files '*.py') \
 	; isort $${PY_SOURCE} \
 	; black $${PY_SOURCE}
-
-# test:
-# 	pytest --exitfirst $$(git ls-files 'test*.py')
