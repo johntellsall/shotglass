@@ -12,6 +12,11 @@ CREATE TABLE "alpine"(
   "source" TEXT
 );
 """,
+"""
+create table package_files_lines (
+    package TEXT, path TEXT, num_lines INT
+)
+""",
     """
 create table package_tags (
     package TEXT, tag TEXT

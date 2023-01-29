@@ -1,4 +1,5 @@
 DBPATH := ../shotglass.db
+SAMPLE_REPOS := ../SOURCE/flask
 
 all:
 
@@ -41,6 +42,11 @@ alpine_stats:  ## show subset of package info
 	python3 alpine_stats.py aports/main/*
 
 # :::::::: ALPHA
+
+scan_lines0:
+	python3 scan_lines.py $(DBPATH) $(SAMPLE_REPOS)
+scan_lines:
+	python3 scan_lines.py $(DBPATH) $(wildcard ../SOURCE/[a-z]*)
 
 scan_packages:
 	python3 scan_packages.py $(DBPATH)

@@ -20,7 +20,11 @@ def list_files_lines(repos):
     # FIXME: handle paths with spaces
     # EX: cmd = "git ls-files -z | xargs -0 wc -l"
     cmd = "git ls-files | xargs wc -l"
-    result = subprocess.run(cmd, capture_output=True, check=True, cwd=repos, shell=True, text=True)
+    try:
+        result = subprocess.run(cmd, capture_output=True, check=True, cwd=repos, shell=True, text=True)
+    except subprocess.CalledProcessError as exc:
+        print('??', repos, exc)
+        return []
     count_path_pat = re.compile(r"^\s+(\d+) (.+)", re.MULTILINE)
     matches = count_path_pat.findall(result.stdout)
     return matches
@@ -40,24 +44,39 @@ def queryall(conn, sql):
 def main(args):
     dbpath, repos_list = args[0], args[1:]
 
+    # TODO: uses "repos" as package name
     sql_insert = "insert into package_files_lines values (?, ?, ?)"
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
         for repos in repos_list:
-            assert Path(repos).is_dir(), f"repos={repos} must be a repos directory"
             print(f"repos={repos}")
-            files_lines = list_files_lines(repos)
-            print(f"files_lines={len(files_lines)}")
+            if not Path(repos).is_dir():
+                print(f"?? repos={repos} must be a repos directory")
+                continue
 
+            files_lines = list_files_lines(repos)
+            if not files_lines:
+                continue
             repos_name = Path(repos).name
             for count, path in files_lines:
-                pass # conn.execute(sql_insert, (repos_name, path, count))
-            # conn.commit()
-            print(f"- total {count}")
+                conn.execute(sql_insert, (repos_name, path, count))
+            conn.commit()
+            num_files = len(files_lines)
+            assert path=='total'
+            print(f"name={repos_name} {num_files=} total_lines={count}")
 
-    # query_packages = """
-    #     select package, source from alpine where
-    #     source like '%github.com/%'
-    # """
+    num_packages_sql = """
+    select count(*) from package_files_lines
+    where path='total'
+    """
+    num_lines_sql = """
+    select sum(num_lines) from package_files_lines
+    where path='total'
+    """
+    with contextlib.closing(sqlite3.connect(dbpath)) as conn:
+        num_packages = query1(conn, num_packages_sql)
+        print(f"{num_packages=}")
+        num_lines = query1(conn, num_lines_sql)
+        print(f"{int(num_lines/1000):,} KLOC")
 
     # repos_pat = re.compile("(https://github.com/.+?/.+?/)")
 
