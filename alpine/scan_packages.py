@@ -6,6 +6,7 @@ import sqlite3
 import sys
 import urllib.request
 
+# FIXME: handle HTTP Error 403: rate limit exceeded
 
 def get_api_data(url):
     try:
@@ -51,7 +52,7 @@ def main(dbpath):
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
         already = [row[0] for row in conn.execute(query_already)]
 
-        for package, source in conn.execute(query_github).fetchall()[:3]:
+        for package, source in conn.execute(query_github).fetchall():
             if package in already:
                 continue
             source_url = source.replace('$pkgname', package)

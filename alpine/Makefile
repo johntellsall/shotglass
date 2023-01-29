@@ -61,6 +61,8 @@ setup:
 %.show: %.sql
 	sqlite3 -echo alpine.db < $< | head -20
 
+show-all: $(patsubst %.sql,%.show,$(wildcard *.sql))
+
 fastlint:
 	PY_SOURCE=$$(git ls-files '*.py') \
 	; flake8 $${PY_SOURCE}
