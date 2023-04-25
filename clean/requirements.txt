@@ -1,4 +1,4 @@
 pytest
 pytest-watch
 ipdb
-gitpython
+# OBSOLETE: gitpython
