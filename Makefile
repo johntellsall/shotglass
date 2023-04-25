@@ -9,6 +9,8 @@ setup:
 clean:
 	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
+distclean: clean
+	-$(RM) -rf .venv
 
 # pre-push:
 
