@@ -3,6 +3,7 @@ SAMPLE_REPOS := ../SOURCE/flask
 
 all:
 
+
 # help:
 # 	awk '/^[a-z]/ && {print $$1}' Makefile
 
@@ -16,8 +17,9 @@ dbsetup:  ## setup database with tables
 dbimport:  ## import Alpine packages (APKBUILD) info into database
 	python3 import_alpine.py $(DBPATH)
 
-scan_tags:
-	python3 ./scan_tags.py $(DBPATH)
+scan_releases:
+	python3 ./scan_releases.py $(DBPATH)
+	@echo "DONE: summarize with 'make list-pkg-tags.txt'"
 
 # :::::::: DATABASE QUERY / EXAMPLES
 
@@ -64,11 +66,8 @@ setup:
 distclean:
 	-$(RM) -rf venv .pytest_cache
 
-%.txt: %.sql
-	sqlite3 -echo alpine.db < $< | tee $@
-
-%.show: %.sql
-	sqlite3 -echo alpine.db < $< | head -20
+%.show: %.sql  # run SQL report, send to screen (no output file)
+	sqlite3 -echo alpine.db < $<
 
 show-all: $(patsubst %.sql,%.show,$(wildcard *.sql))
 
