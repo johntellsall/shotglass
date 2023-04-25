@@ -13,7 +13,7 @@ dbsetup:  ## setup database with tables
 	python3 dbsetup.py $(DBPATH)
 	sqlite3 -echo $(DBPATH) '.tables'
 
-dbimport:
+dbimport:  ## import Alpine packages (APKBUILD) info into database
 	python3 import_alpine.py $(DBPATH)
 
 scan_tags:
@@ -60,6 +60,9 @@ test:
 setup:
 	python3 -m venv venv
 	venv/bin/pip install -r requirements.txt
+
+distclean:
+	-$(RM) -rf venv .pytest_cache
 
 %.txt: %.sql
 	sqlite3 -echo alpine.db < $< | tee $@

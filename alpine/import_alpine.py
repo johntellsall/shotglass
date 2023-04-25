@@ -19,7 +19,7 @@ def do_import(dbpath):
 
 sqlite3 -echo {dbpath} << EOF
 
--- ZAP ALPLINE TABLE
+-- ZAP ALPINE TABLE
 delete from alpine;
 
 -- IMPORT ALPINE FROM CSV
@@ -92,6 +92,8 @@ def calc_stats():
     scan Alpine packages, output to CSV
     """
     package_dir = pathlib.Path("aports/main")
+    validate = False
+    
     with open("temp.csv", "w") as outf:
         print("package,num_files,build_num_lines,source", file=outf)
         packages = filter(lambda p: p.is_dir(), package_dir.iterdir())
@@ -99,7 +101,8 @@ def calc_stats():
         for package in packages:
             calc_pkg_stats(package, outf)
 
-    subprocess.run("head temp.csv", shell=True)
+    if validate:
+        subprocess.run("head temp.csv", shell=True)
 
 
 def main(dbpath):
