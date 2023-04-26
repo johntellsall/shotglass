@@ -7,38 +7,12 @@ import pprint
 import re
 import sqlite3
 import sys
-import urllib.request
 
-
-def get_api_data(url):
-    try:
-        return json.loads(urllib.request.urlopen(url).read().decode())
-    except urllib.error.HTTPError as err:
-        print('HTTPError:', err, url)
-        return None
-
-
-def get_github_releases(repos):
-    assert "/" in repos, 'repos must be in the form of "user/repo"'
-    url = f"https://api.github.com/repos/{repos}/releases"
-    url += "?per_page=100"
-    return get_api_data(url)
-
-
-def get_github_repos(source):
-    repos_pat = re.compile('github.com/(.+?/.+?)/')
-    match = repos_pat.search(source)
-    if not match:
-        # print('repos not found in source:', source)
-        return None
-    repos = match.group(1)
-    assert "/" in repos, 'repos must be in the form of "user/repo"'
-    url = f"https://api.github.com/repos/{repos}"
-    return get_api_data(url)
+import github_api as api
 
 
 def demo():
-    data = get_github_repos("matplotlib/matplotlib")
+    data = api.get_github_repos("matplotlib/matplotlib")
     pprint.pprint(data)
 
 # 
