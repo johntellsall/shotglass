@@ -53,6 +53,7 @@ scan_lines:
 scan_packages:
 	python3 scan_packages.py $(DBPATH)
 	echo "SUMMARIZE: 'make list-pkg-tags.show'"
+	make list-pkg-tags.show
 
 # :::::::: UTILITIES
 

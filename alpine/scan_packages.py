@@ -1,3 +1,6 @@
+# FIXME: needs work!
+# FIXME: handle HTTP Error 403: rate limit exceeded
+
 import contextlib
 import json
 import pprint
@@ -6,7 +9,6 @@ import sqlite3
 import sys
 import urllib.request
 
-# FIXME: handle HTTP Error 403: rate limit exceeded
 
 def get_api_data(url):
     try:

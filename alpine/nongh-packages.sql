@@ -16,7 +16,9 @@ and source not like "%gitlab.%";
 select source from alpine where
 source not like "%github.com%"
 and source not like "%gitlab.%"
-limit 20;
+order by 1
+;
+-- limit 20;
 
 -- LIST OF GITHUB PACKAGES
 -- select package, source from alpine

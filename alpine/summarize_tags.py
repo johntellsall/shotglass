@@ -10,10 +10,6 @@ def query1(conn, sql=None, count=None):
     return cursor.fetchone()[0]
 
 
-# def queryall(conn, sql):
-#     return conn.execute(sql).fetchall()
-
-
 def summarize_tags(dbpath):
     # validate package-tags count
     print("SUMMARY")
