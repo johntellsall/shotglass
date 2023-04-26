@@ -1,4 +1,5 @@
 # scan_lines.py
+# FIXME: needs work
 # Count number of lines for all files in a Git repos
 # INPUT:
 # - "alpine" table with package names and source URLs
@@ -14,8 +15,8 @@ import sys
 
 def list_files_lines(repos):
     """
-    XX List tags for remote Git repository
-    Note: uses network (github.com)
+    List files for local checked-out Git repository
+    Includes number of lines per file, and total.
     """
     # FIXME: handle paths with spaces
     # EX: cmd = "git ls-files -z | xargs -0 wc -l"
@@ -59,9 +60,10 @@ def main(args):
             repos_name = Path(repos).name
             for count, path in files_lines:
                 conn.execute(sql_insert, (repos_name, path, count))
+            # check that "wc -l" last line is "total"
+            assert path=='total'
             conn.commit()
             num_files = len(files_lines)
-            assert path=='total'
             print(f"name={repos_name} {num_files=} total_lines={count}")
 
     num_packages_sql = """
