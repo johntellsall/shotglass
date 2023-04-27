@@ -5,17 +5,26 @@ import os
 import re
 import requests
 
+# FIXME: make authorized vs public more obvious
+
+def _get_token():
+    return os.environ.get('GITHUB_TOKEN')
+
+def is_authorized():
+    token = _get_token()
+    if not (token and token.startswith('gh')):
+        return False
+    return True
 
 def get_api_data(url):
     "return JSON from URL"
     headers = {}
     try:
-        GITHUB_TOKEN = os.environ['GITHUB_TOKEN']
-        assert GITHUB_TOKEN.startswith('gh')
+        token = _get_token()
         headers = {
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28",
-            'Authorization': f'Bearer {GITHUB_TOKEN}'
+            'Authorization': f'Bearer {token}'
         }
     except KeyError:
         pass
@@ -35,7 +44,16 @@ def get_github_releases(repos):
 
 
 def get_github_repos(repos):
-    assert "/" in repos, 'repos must be in the form of "user/repo"'
+    if repos.startswith('http') or "/" not in repos:
+        raise ValueError('repos must be in the form of "user/repo"')
     url = f"https://api.github.com/repos/{repos}"
     return get_api_data(url)
 
+
+def parse_github_url(url):
+    "return 'user/repo' from URL"
+    github_pat = re.compile(r'github.com/(.+?/[^/]+)')
+    if match := github_pat.search(url):
+        return match.group(1)   # "user/repo"
+    return None
+    

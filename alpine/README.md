@@ -73,6 +73,7 @@ Note: uses GitHub API
      
 ### NEEDS WORK: scan_lines.py: count source files and lines
 
+Read files from checked-out Git repos.
 Updates database, "package_files_lines" table.
 
     python3 scan_lines.py ../shotglass.db ../SOURCE/flask
@@ -84,11 +85,14 @@ Updates database, "package_files_lines" table.
 
 ### NEEDS WORK: scan_packages.py
 
+Scan GitHub for package name and repos URL.
+Updates database, "package_github" table.
+
     python3 scan_packages.py ../shotglass.db
 
 ## Reports
 
-To run a report and output the results to the screen, type "make **myreport**.show". 
+To run a report and output the results to the screen, type `make **myreport**.show` 
 
 ### gh-package-list.sql: list GitHub packages
 
@@ -97,7 +101,7 @@ To run a report and output the results to the screen, type "make **myreport**.sh
     abi-compliance-checker|$pkgname-$pkgver.tar.gz::https://github.com/lvc/abi-compliance-checker/archive/$pkgver.tar.gz
     akms|https://github.com/jirutka/akms/archive/v$pkgver/$pkgname-$pkgver.tar.gz
     
-### gh-packages.sql: list details of GH packages
+### gh-packages.sql: list details of GitHub packages
 
     make gh-packages.show
 

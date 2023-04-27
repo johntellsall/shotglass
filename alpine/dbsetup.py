@@ -21,6 +21,12 @@ create table package_files_lines (
 create table package_tags (
     package TEXT, tag TEXT
 );""",
+# list of releases from GitHub API
+# https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28
+    """
+create table package_releases (
+    package TEXT, releases_json TEXT
+);""",
     """
 create table package_github (
     package TEXT, api_repos TEXT

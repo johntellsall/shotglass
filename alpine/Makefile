@@ -19,7 +19,12 @@ dbimport:  ## import Alpine packages (APKBUILD) info into database
 
 scan_releases:
 	python3 ./scan_releases.py $(DBPATH)
-	@echo "DONE: summarize with 'make list-pkg-tags.txt'"
+	@echo "DONE: summarize with 'make list-pkg-tags.show'"
+
+zap_releases:  ## delete contents of package_tags table
+	sqlite3 -echo $(DBPATH) 'delete from package_tags'
+	sqlite3 -echo $(DBPATH) 'select count(*) from package_tags' | grep 0
+
 
 # :::::::: DATABASE QUERY / EXAMPLES
 
@@ -53,7 +58,7 @@ scan_lines:
 scan_packages:
 	python3 scan_packages.py $(DBPATH)
 	echo "SUMMARIZE: 'make list-pkg-tags.show'"
-	make list-pkg-tags.show
+# make list-pkg-tags.show
 
 # :::::::: UTILITIES
 

@@ -6,10 +6,13 @@
 # - "package_tags" table
 #
 import contextlib
+import json
 import re
 import sqlite3
 import subprocess
 import sys
+
+import github_api as api
 
 
 def list_tags(repos):
@@ -36,7 +39,15 @@ def queryall(conn, sql):
 
 
 def save_tags(dbpath, tags):
-    "save the tags to database"
+    """
+    save the tags to database
+    INPUT:
+    - tags: dict of package names and list of tags
+    EXAMPLE:
+    {'abi-compliance-checker': ['1.98.7', '1.98.7^{}', '1.98.8'}}
+    """
+    if type(tags) is not dict:
+        raise TypeError("Only dict allowed")
     sql_insert = "insert into package_tags values (?, ?)"
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
         for package, tags in tags.items():
@@ -46,7 +57,21 @@ def save_tags(dbpath, tags):
         conn.commit()
 
 
+def save_releases(dbpath, package, releases):
+    "save the list of releases to database"
+    if type(releases) is not list:
+        raise TypeError("Only list allowed")
+    sql_replace = "replace into package_releases values (?, ?)"
+    with contextlib.closing(sqlite3.connect(dbpath)) as conn:
+        releases_json = json.dumps(releases)
+        conn.execute(sql_replace, (package, releases_json))
+        conn.commit()
+
+
 def main(dbpath):
+    if not api.is_authorized():
+        sys.exit("Unauthorized: set GITHUB_TOKEN and restart")
+        
     # TODO: note non-GitHub sources
     query_packages = """
         select package, source from alpine where
@@ -66,33 +91,45 @@ def main(dbpath):
 
     # per package, scrape the list of release tags
     package_tags = {}
-    for package, source in distro_packages:
-        if package in prev_packages:
-            print(f"package={package}: done, skipping")
-            continue
+    limit = 3
+    if limit:
+        distro_packages = distro_packages[:limit]
+    for package, source_url in distro_packages:
+        # if package in prev_packages:
+        #     print(f"package={package}: done, skipping")
+        #     continue
 
         # parse repos URL from package metadata XX
+        source_url = source_url.replace('$pkgname', package)  # package name
+        source_url = source_url.replace('$_pkgname', package)  # TODO: "base name"?
         try:
-            repos = repos_pat.search(source).group(1)
+            repos = repos_pat.search(source_url).group(1)
         except AttributeError:
-            print(f"package={package}: source={source}, repos not found")
+            print(f"package={package}: source={source_url}, repos={repos} not found")
             info = {package: {"error": "repos not found",
-                            source: source }}
-            save_tags(dbpath, info)
+                            source_url: source_url }}
+            # XX save_tags(dbpath, info)
             continue
 
-        # get release tags from remote repos (via API)
+        # get release tags from remote repos (via Git)
         tags = list_tags(repos)
         print(f"{package}: {len(tags)}")
         if not tags:
-            print(f"package={package}: tags not found")
+            print(f"package={package}: repos={repos}, tags not found")
             info = {package: {"error": "tags not found"}}
-            save_tags(dbpath, info)
+            # XX save_tags(dbpath, info)
             continue
         package_tags[package] = tags
 
         # save package's release tags to database
         save_tags(dbpath, package_tags)
+
+        # get release info from GitHub API, save blob to database
+        owner_repos = api.parse_github_url(source_url)
+        releases_list = api.get_github_releases(owner_repos)
+        # FIXME: handle errors e.g. {'message': 'Bad credentials'}
+        save_releases(dbpath, package, releases_list)
+
         package_tags = {}
 
 
