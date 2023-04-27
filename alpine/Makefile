@@ -1,4 +1,5 @@
-DBPATH := ../shotglass.db
+# DBPATH := ../shotglass.db
+DBPATH := alpine.db
 SAMPLE_REPOS := ../SOURCE/flask
 
 all:
@@ -6,7 +7,11 @@ all:
 
 # help:
 # 	awk '/^[a-z]/ && {print $$1}' Makefile
+# :::::::: RENDER
 
+plot:
+	python3 plot.py $(DBPATH)
+	
 # :::::::: DATABASE MANAGE
 
 dbsetup:  ## setup database with tables
@@ -66,7 +71,7 @@ test:  ## run Python tests (dev mode: exit on first error)
 	pytest --exitfirst $$(git ls-files 'test*.py')
 
 setup:  ## setup Python virtualenv
-	python3 -m venv venv
+	test -d venv || python3 -m venv venv
 	venv/bin/pip install -r requirements.txt
 
 distclean:
