@@ -1,5 +1,6 @@
 # scan_releases.py
 # Per Alpine package, scrape Git tags (= package releases)
+# TODO: handle rate limits!
 # INPUT:
 # - "alpine" table with package names and source URLs
 # OUTPUT
@@ -11,8 +12,10 @@ import re
 import sqlite3
 import subprocess
 import sys
+import time
 
 import github_api as api
+from dbsetup import query1, queryall
 
 
 def list_tags(repos):
@@ -25,17 +28,6 @@ def list_tags(repos):
     tag_pat = re.compile(r"refs/tags/(.+)")
     matches = tag_pat.findall(result.stdout)
     return matches
-
-
-def query1(conn, sql=None, count=None):
-    if count:
-        sql = f"select count(*) from {count}"
-    cursor = conn.execute(sql)
-    return cursor.fetchone()[0]
-
-
-def queryall(conn, sql):
-    return conn.execute(sql).fetchall()
 
 
 def save_tags(dbpath, tags):
@@ -78,7 +70,7 @@ def main(dbpath):
         source like '%github.com/%'
     """
 
-    repos_pat = re.compile("(https://github.com/.+?/.+?/)")
+    repos_pat = re.compile(r"(https://github.com/.+?/.+?/)")
 
     # grab package names from Alpine distro
     # - also list currently-scraped packages
@@ -91,13 +83,15 @@ def main(dbpath):
 
     # per package, scrape the list of release tags
     package_tags = {}
-    limit = 3
+    limit = 50
     if limit:
         distro_packages = distro_packages[:limit]
     for package, source_url in distro_packages:
-        # if package in prev_packages:
-        #     print(f"package={package}: done, skipping")
-        #     continue
+        if package in prev_packages:
+            print(f"package={package}: done, skipping")
+            continue
+
+        time.sleep(1)  # avoid rate limits FIXME:
 
         # parse repos URL from package metadata XX
         source_url = source_url.replace('$pkgname', package)  # package name
@@ -106,8 +100,9 @@ def main(dbpath):
             repos = repos_pat.search(source_url).group(1)
         except AttributeError:
             print(f"package={package}: source={source_url}, repos={repos} not found")
-            info = {package: {"error": "repos not found",
-                            source_url: source_url }}
+            # NOTE: will be re-scanned next time FIXME:
+            # info = {package: {"error": "repos not found",
+            #    source_url: source_url }}
             # XX save_tags(dbpath, info)
             continue
 
@@ -116,8 +111,8 @@ def main(dbpath):
         print(f"{package}: {len(tags)}")
         if not tags:
             print(f"package={package}: repos={repos}, tags not found")
-            info = {package: {"error": "tags not found"}}
-            # XX save_tags(dbpath, info)
+            # info = {package: {"error": "tags not found"}}
+            # XX FIXME: save_tags(dbpath, info)
             continue
         package_tags[package] = tags
 

@@ -3,3 +3,4 @@ aports
 venv
 __pycache__
 .pytest_cache
+temp.csv

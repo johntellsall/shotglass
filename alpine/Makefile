@@ -91,3 +91,7 @@ format:
 	; isort $${PY_SOURCE} \
 	; black $${PY_SOURCE}
 
+# :::::::: HELPERS
+
+update-alpine:
+	git clone --depth=1 https://gitlab.alpinelinux.org/alpine/aports.git
