@@ -23,34 +23,11 @@ def parse_semver(raw_tag):
 
 def main(dbpath):
     tag_pat = re.compile(r"([0-9]+.+)\^")
-    package_tags = defaultdict(list)
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
 
-        num_packages = query1(conn, table="package_tags")
-        if num_packages < 1:
-            sys.exit("No packages found in database -- run scan_releases.py")
-        print(f"{num_packages[0]} packages")
+        show_package_count(conn)
 
-        cursor = conn.execute(
-            """
-            select package, tag from package_tags
-            where
-            -- package='tmux'            and
-            tag like '%{}'
-            """
-        )
-        for package, raw_tag in cursor.fetchall():
-            try:
-                tag_value = tag_pat.search(raw_tag).group(1)
-            except AttributeError:
-                print(f"package={package}: {raw_tag=}, tag not recognized")
-                continue
-            try:
-                tag = parse_semver(tag_value)
-            except ValueError as err:
-                print(f"package={package}: {tag_value=} {err=}")
-                continue
-            package_tags[package].append(tag)
+        package_tags = make_package_tags(tag_pat, conn)
 
     def is_major(tag):
         return tag[1:] == (0, 0)
@@ -62,6 +39,39 @@ def main(dbpath):
             if is_major(tag):
                 major_min = tag[:2]
                 print(f"  {major_min} - major")
+
+
+def make_package_tags(tag_pat, conn):
+    package_tags = defaultdict(list)
+
+    cursor = conn.execute(
+            """
+            select package, tag from package_tags
+            where
+            -- package='tmux'            and
+            tag like '%{}'
+            """
+        )
+    for package, raw_tag in cursor.fetchall():
+        try:
+            tag_value = tag_pat.search(raw_tag).group(1)
+        except AttributeError:
+            print(f"package={package}: {raw_tag=}, tag not recognized")
+            continue
+        try:
+            tag = parse_semver(tag_value)
+        except ValueError as err:
+            print(f"package={package}: {tag_value=} {err=}")
+            continue
+        package_tags[package].append(tag)
+    return package_tags
+
+
+def show_package_count(conn):
+    num_packages = query1(conn, table="package_tags")
+    if num_packages < 1:
+        sys.exit("No packages found in database -- run scan_releases.py")
+    print(f"{num_packages[0]} packages")
 
 
 if __name__ == "__main__":
