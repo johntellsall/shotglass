@@ -4,3 +4,4 @@ black
 isort
 requests
 seaborn
+pdbpp

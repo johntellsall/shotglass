@@ -83,7 +83,7 @@ def main(dbpath):
 
     # per package, scrape the list of release tags
     package_tags = {}
-    limit = 50
+    limit = None # 50
     if limit:
         distro_packages = distro_packages[:limit]
     for package, source_url in distro_packages:

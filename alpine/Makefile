@@ -67,7 +67,7 @@ scan_packages:
 
 release-dates:
 	jq 'map(.name, .tag_name, .created_at)' < releases.json
-	
+
 # :::::::: UTILITIES
 
 test:  ## run Python tests (dev mode: exit on first error)
@@ -94,6 +94,12 @@ format:
 	; isort $${PY_SOURCE} \
 	; black $${PY_SOURCE}
 
+# :::::::: DEMOS
+
+plot_demo_scatter:
+	python3 plot_demo_scatter.py
+	imgcat plot_demo_scatter.png
+	
 # :::::::: HELPERS
 
 update-alpine:
