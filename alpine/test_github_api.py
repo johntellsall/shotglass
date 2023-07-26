@@ -1,11 +1,14 @@
 import json
 import pprint
 import github_api as api
+import pytest
+
 
 def test_get_api_data():
     response = api.get_api_data("https://jsonplaceholder.typicode.com/todos/1")
     assert 'title' in response
 
+@pytest.mark.skipif(not api.is_authorized(), reason="GitHub API key missing or invalid")
 def test_get_github_releases():
     response = api.get_github_releases("matplotlib/matplotlib")
     pprint.pprint(response)
@@ -14,6 +17,7 @@ def test_get_github_releases():
     assert type(response) is list
     assert 'assets_url' in response[0]
 
+@pytest.mark.skipif(not api.is_authorized(), reason="GitHub API key missing or invalid")
 def test_get_github_repos():
     response = api.get_github_repos("matplotlib/matplotlib")
     pprint.pprint(response)
