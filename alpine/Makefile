@@ -90,3 +90,4 @@ format:
 	PY_SOURCE=$$(git ls-files '*.py') \
 	; isort $${PY_SOURCE} \
 	; black $${PY_SOURCE}
+

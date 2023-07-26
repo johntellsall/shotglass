@@ -21,6 +21,20 @@ NUM OF GITHUB PACKAGES PER UPSTREAM
 
 ## All Commands with Examples
 
+### Index
+
+    alpine_stats.py
+    dbsetup.py
+    github_api.py
+    import_alpine.py
+    list_versions.py
+    plot.py
+    plot2.py
+    scan_lines.py
+    scan_packages.py
+    scan_releases.py
+    summarize_tags.py
+
 ### alpine_stats.py: show subset of package info
 
     python3 alpine_stats.py aports/main/*
@@ -31,6 +45,8 @@ NUM OF GITHUB PACKAGES PER UPSTREAM
 ### dbsetup.py: create database and tables
 
 ### import_alpine.py: import Alpine packages into database; show stats
+
+Store data in given Sqlite database file. Output selected stats, like "Number of Packages".
 
     python3 import_alpine.py ../shotglass.db
 

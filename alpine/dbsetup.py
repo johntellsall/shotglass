@@ -39,6 +39,13 @@ def queryall(conn, sql):
     return conn.execute(sql).fetchall()
 
 
+def query1(conn, sql=None, table=None):
+    assert sql or table
+    if sql is None:
+        sql = f"select count(*) from {table}"
+    return conn.execute(sql).fetchone()[0]
+
+
 def main(dbpath):
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
         for num, create_table in enumerate(CREATE_TABLES_SQL):

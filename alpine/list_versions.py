@@ -7,6 +7,8 @@ import sqlite3
 import sys
 from collections import defaultdict
 
+from dbsetup import query1
+
 
 def parse_semver(raw_tag):
     """Parse a semver tag value and return a tuple of (major, minor, patch)."""
@@ -20,9 +22,14 @@ def parse_semver(raw_tag):
 
 
 def main(dbpath):
+    print('DING')
     tag_pat = re.compile(r"([0-9]+.+)\^")
     package_tags = defaultdict(list)
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
+        num_packages = query1(conn, table="package_tags")
+        if num_packages < 1:
+            sys.exit("No packages found in database -- run scan_releases.py")
+        print(f"{num_packages[0]} packages")
         cursor = conn.execute(
             """
             select package, tag from package_tags
