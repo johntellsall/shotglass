@@ -65,6 +65,9 @@ scan_packages:
 	echo "SUMMARIZE: 'make list-pkg-tags.show'"
 # make list-pkg-tags.show
 
+release-dates:
+	jq 'map(.name, .tag_name, .created_at)' < releases.json
+	
 # :::::::: UTILITIES
 
 test:  ## run Python tests (dev mode: exit on first error)

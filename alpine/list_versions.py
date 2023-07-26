@@ -1,5 +1,5 @@
 # list_versions.py
-# List major versions of Alpine packages
+# List latest version, and latest major version, of Alpine packages
 
 import contextlib
 import re
@@ -10,6 +10,7 @@ from collections import defaultdict
 from dbsetup import query1
 
 
+# FIXME: too limited, use module?
 def parse_semver(raw_tag):
     """Parse a semver tag value and return a tuple of (major, minor, patch)."""
     tag = raw_tag.lstrip("v")
@@ -24,9 +25,7 @@ def parse_semver(raw_tag):
 def main(dbpath):
     tag_pat = re.compile(r"([0-9]+.+)\^")
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
-
         show_package_count(conn)
-
         package_tags = make_package_tags(tag_pat, conn)
 
     def is_major(tag):
@@ -71,7 +70,7 @@ def show_package_count(conn):
     num_packages = query1(conn, table="package_tags")
     if num_packages < 1:
         sys.exit("No packages found in database -- run scan_releases.py")
-    print(f"{num_packages[0]} packages")
+    print(f"{num_packages} packages")
 
 
 if __name__ == "__main__":
