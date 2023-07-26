@@ -56,7 +56,9 @@ Store data in given Sqlite database file. Output selected stats, like "Number of
     busybox,62,424,https://busybox.net/downloads/busybox-$pkgver.tar.bz2
     gcc,47,794,https://dev.alpinelinux.org/archive/gcc/${_pkgbase%%.*}-${_pkgsnap}/gcc-${_pkgbase%%.*}-${_pkgsnap}.tar.xz
 
-### list_versions: list major, minor, and latest versions of packages
+### list_versions: list major, minor, and latest versions of (Alpine) packages
+
+XXX TBD
 
     python3 ./list_versions.py ../shotglass.db
 
@@ -110,13 +112,13 @@ Updates database, "package_github" table.
 
 To run a report and output the results to the screen, type `make **myreport**.show` 
 
-### gh-package-list.sql: list GitHub packages
+### Report Index
 
-    make gh-package-list.show
+    gh-packages.sql
+    list-pkg-tags.sql
+    nongh-packages.sql
+    show.sql
 
-    abi-compliance-checker|$pkgname-$pkgver.tar.gz::https://github.com/lvc/abi-compliance-checker/archive/$pkgver.tar.gz
-    akms|https://github.com/jirutka/akms/archive/v$pkgver/$pkgname-$pkgver.tar.gz
-    
 ### gh-packages.sql: list details of GitHub packages
 
     make gh-packages.show

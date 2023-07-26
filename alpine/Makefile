@@ -1,5 +1,5 @@
-# DBPATH := ../shotglass.db
-DBPATH := alpine.db
+DBPATH := ../shotglass.db
+# DBPATH := alpine.db
 SAMPLE_REPOS := ../SOURCE/flask
 
 all:
