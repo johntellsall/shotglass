@@ -1,5 +1,23 @@
+# scan_packages.py -- find package description and topics
+# Note: GitHub only.
 # FIXME: needs work
 # FIXME: handle HTTP Error 403: rate limit exceeded
+#
+# Updates package_github table. Example:
+# package="jq", api_repos={
+#   "id": 5101141,
+#   "node_id": "MDEwOlJlcG9zaXRvcnk1MTAxMTQx",
+#   "name": "jq",
+#   "full_name": "jqlang/jq",
+#   "owner": {...}
+#   "description": "Command-line JSON processor",
+#   "git_tags_url": "https://api.github.com/repos/jqlang/jq/git/tags{/sha}",
+#   "created_at": "2012-07-18T19:57:25Z",
+#   "updated_at": "2023-07-26T19:22:13Z",
+#   "pushed_at": "2023-07-26T20:40:02Z",
+#   "git_url": "git://github.com/jqlang/jq.git",
+#   "homepage": "https://jqlang.github.io/jq/",
+# }
 
 import contextlib
 import json

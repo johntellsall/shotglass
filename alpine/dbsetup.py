@@ -23,9 +23,14 @@ create table package_tags (
 );""",
 # list of releases from GitHub API
 # https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28
+# FIXME: rename two following tables:
     """
-create table package_releases (
+create table package_raw_releases (
     package TEXT, releases_json TEXT
+);""",
+    """
+create table package_releases_new (
+    package TEXT, name TEXT, tag_name TEXT, created_at DATETIME
 );""",
     """
 create table package_github (

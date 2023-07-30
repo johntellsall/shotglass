@@ -32,15 +32,20 @@ def list_tags(repos):
 
 def save_tags(dbpath, tags):
     """
-    save the tags to database
+    save the tags to database - one row per package-tag pair
     INPUT:
     - tags: dict of package names and list of tags
     EXAMPLE:
-    {'abi-compliance-checker': ['1.98.7', '1.98.7^{}', '1.98.8'}}
+        {'abi-compliance-checker': ['1.98.7', '1.98.7^{}', '1.98.8'}}
+    OUTPUT:
+    - "package_tags" table, one row per package-tag pair:
+        abi-compliance-checker|1.98.7
+        abi-compliance-checker|1.98.7^{}
+        abi-compliance-checker|1.98.8
     """
     if type(tags) is not dict:
         raise TypeError("Only dict allowed")
-    sql_insert = "insert into package_tags values (?, ?)"
+    sql_insert = "insert into package_tags (package, tag) values (?, ?)"
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
         for package, tags in tags.items():
             for tag in tags:
@@ -49,8 +54,9 @@ def save_tags(dbpath, tags):
         conn.commit()
 
 
+# FIXME: rename package_raw_releases
 def save_releases(dbpath, package, releases):
-    "save the list of releases to database"
+    "save the list of releases to database -- whole JSON blob"
     if type(releases) is not list:
         raise TypeError("Only list allowed")
     sql_replace = "replace into package_releases values (?, ?)"

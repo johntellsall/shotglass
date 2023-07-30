@@ -1,4 +1,5 @@
-# plot_releases.py -- plot package releases from database
+# plot_tags.py -- plot package tags from database
+# FIXME: in development
 
 import json
 import sqlite3
@@ -8,8 +9,11 @@ import seaborn as sns
 sns.set_theme(style="white")
 
 conn = sqlite3.connect("../shotglass.db")  # FIXME:
+
+# skip tags like "1.2.3^{}" -- not real tags FIXME: clarify
 releases_df = pd.read_sql_query(
-    "select package,releases_json from package_releases", conn)
+    "select package, tag from package_tags where tag not like '%^%'", conn)
+assert 0, releases_df.head()
 
 # Release Keys:
 # ['assets', 'assets_url', 'author', 'body', 'created_at', 'draft', 'html_url',

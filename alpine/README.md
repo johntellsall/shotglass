@@ -197,3 +197,11 @@ To run a report and output the results to the screen, type `make **myreport**.sh
     gcc|47|794|https://dev.alpinelinux.org/archive/gcc/${_pkgbase%%.*}-${_pkgsnap}/gcc-${_pkgbase%%.*}-${_pkgsnap}.tar.xz
     xen|18|661|https://downloads.xenproject.org/release/xen/$pkgver/xen-$pkgver.tar.gz
     samba|17|612|
+
+
+## Database Schema
+
+GOAL: represent package releases over time. Example: 1,600 packages from Alpine Linux distro.
+
+
+

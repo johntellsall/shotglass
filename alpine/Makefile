@@ -14,8 +14,11 @@ plot:
 	
 # :::::::: DATABASE MANAGE
 
-dbsetup:  ## setup database with tables
+nuke_dbsetup:
 	-$(RM) $(DBPATH)
+	make dbsetup
+	
+dbsetup:  ## setup database with tables
 	python3 dbsetup.py $(DBPATH)
 	sqlite3 -echo $(DBPATH) '.tables'
 
@@ -70,6 +73,9 @@ release-dates:
 
 # :::::::: UTILITIES
 
+sql:
+	sqlite3 $(DBPATH)
+
 test:  ## run Python tests (dev mode: exit on first error)
 	pytest --exitfirst $$(git ls-files 'test*.py')
 
@@ -99,7 +105,7 @@ format:
 plot_demo_scatter:
 	python3 plot_demo_scatter.py
 	imgcat plot_demo_scatter.png
-	
+
 # :::::::: HELPERS
 
 update-alpine:
