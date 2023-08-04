@@ -18,7 +18,7 @@ from dbsetup import queryall
 
 def save_releases(dbpath, package, releases):
     "save the list of releases to database -- whole JSON blob"
-    if type(releases) is not list:
+    if not isinstance(releases, list):
         raise TypeError("Only list allowed")
     sql_replace = "replace into github_releases_blob values (?, ?)"
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
@@ -30,28 +30,18 @@ def save_releases(dbpath, package, releases):
 def main(dbpath):
     if not api.is_authorized():
         sys.exit("Unauthorized: set GITHUB_TOKEN and restart")
-     
+
     # TODO: note non-GitHub sources
-   
-    repos_pat = re.compile(r"https://github.com/(.+?/.+?)/")
-    
+
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
         # list of desired packages
         packages_list = query_github_repos(conn)
-    
+
         # get set of already-found release package names
         prev_packages = query_package_names(conn)
 
     # parse source URLs to get GitHub repos
-    repos_list = []
-    for package, source in packages_list:
-        if repos := repos_pat.search(source):
-            if package in prev_packages:
-                print(f"skipping {package}: already done")
-                continue
-            repos_list.append((package, repos.group(1)))
-        else:
-            print(f"? {source}")
+    repos_list = parse_github_repos(packages_list, prev_packages)
 
     for package, repos in repos_list:
         releases = api.get_github_releases(repos)
@@ -61,18 +51,36 @@ def main(dbpath):
 
         # error? show it and continue
         # TODO: save "no releases" to database?
-        if type(releases) is dict:
+        if isinstance(releases, dict):
             print(f"! {package}: {releases}")
             continue
         save_releases(dbpath, package, releases)
         print(f"{package}: {len(releases)}")
+    print("DONE")
+
+
+def parse_github_repos(packages_list, prev_packages):
+    """
+    return list of GitHub repos FIXME:
+    """
+    repos_pat = re.compile(r"https://github.com/(.+?/.+?)/")
+    repos_list = []
+    for package, source in packages_list:
+        if repos := repos_pat.search(source):
+            if package in prev_packages:
+                print(f"skipping {package}: already done")
+                continue
+            repos_list.append((package, repos.group(1)))
+        else:
+            print(f"? {source}")
+    return repos_list
 
 
 def query_github_repos(conn):
     query_packages = """
         select package, source from alpine where
         source like '%github.com/%'
-        limit 20
+        limit 40
     """
     return queryall(conn, query_packages)
 
