@@ -16,6 +16,7 @@ import sys
 import github_api as api
 from dbsetup import queryall
 
+
 def save_releases(dbpath, package, releases):
     "save the list of releases to database -- whole JSON blob"
     if type(releases) is not list:
@@ -35,21 +36,37 @@ def main(dbpath):
     query_packages = """
         select package, source from alpine where
         source like '%github.com/%'
-        limit 3
+        limit 20
     """
     repos_pat = re.compile(r"https://github.com/(.+?/.+?)/")
     
     with contextlib.closing(sqlite3.connect(dbpath)) as conn:
+        # list of desired packages
         packages_list = queryall(conn, query_packages)
     
+        # get set of already-found release package names
+        releases_list = queryall(conn, "select package from github_releases_blob")
+    prev_packages = set((row[0] for row in releases_list))
+
     # parse source URLs to get GitHub repos
     repos_list = []
-    for package,source in packages_list:
+    for package, source in packages_list:
         if repos := repos_pat.search(source):
+            # if '$' in source:
+            #     print(f"skipping {package}: {source} -- $ unsupported")
+            #     continue
+            if package in prev_packages:
+                print(f"skipping {package}: already done")
+                continue
             repos_list.append((package, repos.group(1)))
+        else:
+            print(f"? {source}")
 
     for package,repos in repos_list:
         releases = api.get_github_releases(repos)
+        # no releases? emit warning but save anyway
+        if not len(releases):
+            print(f"? {package}: no releases")
 
         # FIXME: handle errors e.g. {'message': 'Bad credentials'}
         save_releases(dbpath, package, releases)

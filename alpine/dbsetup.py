@@ -40,7 +40,7 @@ create table package_github (
 ]
 
 
-def queryall(conn, sql):
+def queryall(conn, sql: str):
     return conn.execute(sql).fetchall()
 
 
