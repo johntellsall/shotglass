@@ -87,7 +87,7 @@ distclean:
 	-$(RM) -rf venv .pytest_cache
 
 %.show: %.sql  ## run SQL report, send to screen (no output file)
-	sqlite3 -echo alpine.db < $<
+	sqlite3 -echo $(DBPATH) < $<
 
 show-all: $(patsubst %.sql,%.show,$(wildcard *.sql))
 
@@ -118,6 +118,6 @@ plot_demo_scatter:
 
 update-alpine:
 	cd aports && git pull
-	
+
 clone-alpine:
 	git clone --depth=1 https://gitlab.alpinelinux.org/alpine/aports.git
