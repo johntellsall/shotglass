@@ -13,7 +13,7 @@ import sqlite3
 import sys
 
 import github_api as api
-from dbsetup import queryall
+from dbsetup import dbopen, queryall
 
 
 def save_releases(dbpath, package, releases):
@@ -21,7 +21,7 @@ def save_releases(dbpath, package, releases):
     if not isinstance(releases, list):
         raise TypeError("Only list allowed")
     sql_replace = "replace into github_releases_blob values (?, ?)"
-    with contextlib.closing(sqlite3.connect(dbpath)) as conn:
+    with contextlib.closing(dbopen(dbpath, readonly=False)) as conn:
         releases_json = json.dumps(releases)
         conn.execute(sql_replace, (package, releases_json))
         conn.commit()
@@ -33,8 +33,11 @@ def main(dbpath):
 
     # TODO: note non-GitHub sources
 
-    with contextlib.closing(sqlite3.connect(dbpath)) as conn:
-        # list of desired packages
+    # connect sqlite3 readonly from file
+    x = sqlite3.connect(dbpath)
+
+    with contextlib.closing(dbopen(dbpath)) as conn:
+        # get list of desired packages
         packages_list = query_github_repos(conn)
 
         # get set of already-found release package names
@@ -46,7 +49,7 @@ def main(dbpath):
     for package, repos in repos_list:
         releases = api.get_github_releases(repos)
         # no releases? emit warning but save anyway
-        if not len(releases):
+        if not releases:
             print(f"? {package}: no releases")
 
         # error? show it and continue

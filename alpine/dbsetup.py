@@ -51,8 +51,14 @@ def query1(conn, sql=None, table=None):
     return conn.execute(sql).fetchone()[0]
 
 
+def dbopen(path, readonly=True):
+    if readonly:
+        return sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+    return sqlite3.connect(path)
+
+
 def main(dbpath):
-    with contextlib.closing(sqlite3.connect(dbpath)) as conn:
+    with contextlib.closing(dbopen(dbpath, readonly=True)) as conn:
         for num, create_table in enumerate(CREATE_TABLES_SQL):
             print(num, create_table)
             with conn:
