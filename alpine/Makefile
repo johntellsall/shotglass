@@ -26,8 +26,8 @@ dbimport:  ## import Alpine packages (APKBUILD) info into database
 	python3 import_alpine.py $(DBPATH)
 
 scan_releases:
-	python3 ./scan_releases.py $(DBPATH)
-	@echo "DONE: summarize with 'make list-pkg-tags.show'"
+	python3 ./scan_github_releases.py $(DBPATH)
+# @echo "DONE: summarize with 'make list-pkg-tags.show'"
 
 zap_releases:  ## delete contents of package_tags table
 	sqlite3 -echo $(DBPATH) 'delete from package_tags'

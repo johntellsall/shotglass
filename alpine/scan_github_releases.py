@@ -9,11 +9,12 @@
 #
 import contextlib
 import json
+import re
 import sqlite3
 import sys
 
 import github_api as api
-
+from dbsetup import queryall
 
 def save_releases(dbpath, package, releases):
     "save the list of releases to database -- whole JSON blob"
@@ -30,8 +31,23 @@ def main(dbpath):
     if not api.is_authorized():
         sys.exit("Unauthorized: set GITHUB_TOKEN and restart")
      
-    repos_list = [('jq', 'jqlang/jq')] # FIXME:
-   
+    # TODO: note non-GitHub sources
+    query_packages = """
+        select package, source from alpine where
+        source like '%github.com/%'
+        limit 3
+    """
+    repos_pat = re.compile(r"https://github.com/(.+?/.+?)/")
+    
+    with contextlib.closing(sqlite3.connect(dbpath)) as conn:
+        packages_list = queryall(conn, query_packages)
+    
+    # parse source URLs to get GitHub repos
+    repos_list = []
+    for package,source in packages_list:
+        if repos := repos_pat.search(source):
+            repos_list.append((package, repos.group(1)))
+
     for package,repos in repos_list:
         releases = api.get_github_releases(repos)
 
