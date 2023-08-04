@@ -3,6 +3,7 @@
 
 import json
 import sqlite3
+
 import pandas as pd
 import seaborn as sns
 
@@ -12,7 +13,8 @@ conn = sqlite3.connect("../shotglass.db")  # FIXME:
 
 # skip tags like "1.2.3^{}" -- not real tags FIXME: clarify
 releases_df = pd.read_sql_query(
-    "select package, tag from package_tags where tag not like '%^%'", conn)
+    "select package, tag from package_tags where tag not like '%^%'", conn
+)
 assert 0, releases_df.head()
 
 # Release Keys:

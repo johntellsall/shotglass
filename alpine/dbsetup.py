@@ -12,7 +12,7 @@ CREATE TABLE "alpine"(
   "source" TEXT
 );
 """,
-"""
+    """
 create table package_files_lines (
     package TEXT, path TEXT, num_lines INT
 )
@@ -21,13 +21,13 @@ create table package_files_lines (
 create table package_tags (
     package TEXT, tag TEXT
 );""",
-# list of releases from GitHub API
-# https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28
+    # list of releases from GitHub API
+    # https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28
     """
 create table github_releases_blob (
     package TEXT, releases_json TEXT
 );""",
-# FIXME: 
+    # FIXME:
     """
 create table package_releases_new (
     package TEXT, name TEXT, tag_name TEXT, created_at DATETIME

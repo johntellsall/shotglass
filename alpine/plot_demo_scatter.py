@@ -1,9 +1,10 @@
 import sqlite3
+
 import pandas as pd
 import seaborn as sns
 
 sns.set_theme(style="white")
-conn = sqlite3.connect('../shotglass.db')
+conn = sqlite3.connect("../shotglass.db")
 releases_df = pd.read_sql_query("select * from package_releases", conn)
 assert 0, releases_df.head()
 
@@ -22,4 +23,4 @@ plt = sns.relplot(
 
 # render to file
 plt.savefig("demo_scatter.png")
-print('DONE')
+print("DONE")

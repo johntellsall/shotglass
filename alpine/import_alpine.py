@@ -93,7 +93,7 @@ def calc_stats():
     """
     package_dir = pathlib.Path("aports/main")
     validate = False
-    
+
     with open("temp.csv", "w") as outf:
         print("package,num_files,build_num_lines,source", file=outf)
         packages = filter(lambda p: p.is_dir(), package_dir.iterdir())

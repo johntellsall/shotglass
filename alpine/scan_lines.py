@@ -6,11 +6,11 @@
 # OUTPUT database, "package_files_lines" table
 #
 import contextlib
-from pathlib import Path
 import re
 import sqlite3
 import subprocess
 import sys
+from pathlib import Path
 
 
 def list_files_lines(repos):
@@ -22,9 +22,11 @@ def list_files_lines(repos):
     # EX: cmd = "git ls-files -z | xargs -0 wc -l"
     cmd = "git ls-files | xargs wc -l"
     try:
-        result = subprocess.run(cmd, capture_output=True, check=True, cwd=repos, shell=True, text=True)
+        result = subprocess.run(
+            cmd, capture_output=True, check=True, cwd=repos, shell=True, text=True
+        )
     except subprocess.CalledProcessError as exc:
-        print('??', repos, exc)
+        print("??", repos, exc)
         return []
     count_path_pat = re.compile(r"^\s+(\d+) (.+)", re.MULTILINE)
     matches = count_path_pat.findall(result.stdout)
@@ -61,7 +63,7 @@ def main(args):
             for count, path in files_lines:
                 conn.execute(sql_insert, (repos_name, path, count))
             # check that "wc -l" last line is "total"
-            assert path=='total'
+            assert path == "total"
             conn.commit()
             num_files = len(files_lines)
             print(f"name={repos_name} {num_files=} total_lines={count}")

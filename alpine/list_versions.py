@@ -44,13 +44,13 @@ def make_package_tags(tag_pat, conn):
     package_tags = defaultdict(list)
 
     cursor = conn.execute(
-            """
+        """
             select package, tag from package_tags
             where
             -- package='tmux'            and
             tag like '%{}'
             """
-        )
+    )
     for package, raw_tag in cursor.fetchall():
         try:
             tag_value = tag_pat.search(raw_tag).group(1)
