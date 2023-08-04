@@ -5,3 +5,4 @@ isort
 requests
 seaborn
 pdbpp
+ruff

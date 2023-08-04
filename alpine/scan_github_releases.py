@@ -13,7 +13,6 @@ import sqlite3
 import sys
 
 import github_api as api
-from dbsetup import query1, queryall
 
 
 def save_releases(dbpath, package, releases):
