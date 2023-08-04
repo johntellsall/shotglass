@@ -10,13 +10,12 @@ Example:
 
 * needs a lot of work, lots of non-GitHub, non-GitLab sources
   * TODO: parse distinct upstream domains? Ex: cpan, nongnu.org
-  * TODO: abandon and code another direction
 
-* interesting stats
+* code archeology: interesting stats
   * package super old! 6 years!
     * https://gitlab.alpinelinux.org/acf/acf-freeswitch-vmail
 
-  * some packages are super simple -- see "SIMPLE PACKAGES" in "make show.show"
+  * some packages are super simple -- see "SIMPLE PACKAGES" in `make show.show`
 
 NUM OF PACKAGES PER UPSTREAM
 - total 1561
@@ -42,12 +41,18 @@ NUM OF PACKAGES PER UPSTREAM
 
 ### alpine_stats.py: show subset of package info
 
+Scan filesystem, to verify parsing code.
+
     python3 alpine_stats.py aports/main/*
 
     abi-compliance-checker $pkgname-$pkgver.tar.gz::https://github.com/lvc/abi-compliance-checker/archive/$pkgver.tar.gz
     alpine-git-mirror-syncd https://github.com/jirutka/$pkgname/archive/v$pkgver/$pkgname-$pkgver.tar.gz
 
 ### dbsetup.py: create database and tables
+
+Create Sqlite database and tables, storing in given file path.
+
+  python3 dbsetup.py temp.db
 
 ### import_alpine.py: import Alpine packages into database; show stats
 
@@ -61,20 +66,19 @@ Store data in given Sqlite database file. Output selected stats, like "Number of
     busybox,62,424,https://busybox.net/downloads/busybox-$pkgver.tar.bz2
     gcc,47,794,https://dev.alpinelinux.org/archive/gcc/${_pkgbase%%.*}-${_pkgsnap}/gcc-${_pkgbase%%.*}-${_pkgsnap}.tar.xz
 
-### list_versions: list major, minor, and latest versions of (Alpine) packages
+### list_versions: list major, minor, and latest versions of packages
 
-XXX TBD
+List latest version, and latest major version, of Alpine packages
 
     python3 ./list_versions.py ../shotglass.db
 
-    numactl: 35 tags/releases
-      (2, 0, 9) - latest
-      (2, 0) - major
+    jq: 4 tags/releases
+      (1, 3, 0) - latest
       (1, 0) - major
-    oniguruma: 1 tags/releases
-      (5, 9, 6) - latest
  
-### scan_releases.py: scrape package releases (Git tags)
+### scan_github_releases.py: scrape package releases from GitHub
+
+FIXME:
 
 Updates "package_tags" table
 
@@ -203,5 +207,10 @@ To run a report and output the results to the screen, type `make **myreport**.sh
 
 GOAL: represent package releases over time. Example: 1,600 packages from Alpine Linux distro.
 
+### Terms
 
+Package: name, like "jq"
+- related: Repos (full source code, often in GitHub)
+Release: Package release ID, often like "1.99.2" but no standard format
+Tag: Git version control tag, generally more than Releases
 
