@@ -9,11 +9,27 @@
 import contextlib
 import json
 import re
-import sqlite3
 import sys
 
 import github_api as api
 from dbsetup import dbopen, queryall
+
+
+def query_github_repos(conn):
+    """
+    get package names and GitHub repos from database
+    """
+    query_packages = """
+        select package, source from alpine where
+        source like '%github.com/%'
+        limit 40
+    """
+    return queryall(conn, query_packages)
+
+
+def query_package_names(conn):
+    releases_list = queryall(conn, "select distinct(package) from github_releases_blob")
+    return set((row[0] for row in releases_list))
 
 
 def save_releases(dbpath, package, releases):
@@ -32,9 +48,6 @@ def main(dbpath):
         sys.exit("Unauthorized: set GITHUB_TOKEN and restart")
 
     # TODO: note non-GitHub sources
-
-    # connect sqlite3 readonly from file
-    x = sqlite3.connect(dbpath)
 
     with contextlib.closing(dbopen(dbpath)) as conn:
         # get list of desired packages
@@ -64,7 +77,7 @@ def main(dbpath):
 
 def parse_github_repos(packages_list, prev_packages):
     """
-    return list of GitHub repos FIXME:
+    format list of GitHub repos where Releases not already fetched
     """
     repos_pat = re.compile(r"https://github.com/(.+?/.+?)/")
     repos_list = []
@@ -77,20 +90,6 @@ def parse_github_repos(packages_list, prev_packages):
         else:
             print(f"? {source}")
     return repos_list
-
-
-def query_github_repos(conn):
-    query_packages = """
-        select package, source from alpine where
-        source like '%github.com/%'
-        limit 40
-    """
-    return queryall(conn, query_packages)
-
-
-def query_package_names(conn):
-    releases_list = queryall(conn, "select distinct(package) from github_releases_blob")
-    return set((row[0] for row in releases_list))
 
 
 if __name__ == "__main__":

@@ -91,9 +91,17 @@ distclean:
 
 show-all: $(patsubst %.sql,%.show,$(wildcard *.sql))
 
-fastlint:
+fastlint-flake8:
 	PY_SOURCE=$$(git ls-files '*.py') \
 	; flake8 $${PY_SOURCE}
+
+fastlint:
+	PY_SOURCE=$$(git ls-files '*.py') \
+	; ruff check $${PY_SOURCE}
+
+fastlint-fix:
+	PY_SOURCE=$$(git ls-files '*.py') \
+	; ruff check --fix $${PY_SOURCE}
 
 format:
 	PY_SOURCE=$$(git ls-files '*.py') \
