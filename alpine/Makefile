@@ -117,4 +117,7 @@ plot_demo_scatter:
 # :::::::: HELPERS
 
 update-alpine:
+	cd aports && git pull
+	
+clone-alpine:
 	git clone --depth=1 https://gitlab.alpinelinux.org/alpine/aports.git
