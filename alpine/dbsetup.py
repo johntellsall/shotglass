@@ -9,7 +9,7 @@ CREATE_TABLES_SQL = [
     """
 -- create table to set int fields
 CREATE TABLE "alpine"(
-  "package" TEXT,
+  "package" TEXT PRIMARY KEY,
   "num_files" INT,
   "build_num_lines" INT,
   "source" TEXT
@@ -17,27 +17,26 @@ CREATE TABLE "alpine"(
 """,
 """
 create table package_files_lines (
-    package TEXT, path TEXT, num_lines INT
+    package TEXT PRIMARY KEY, path TEXT, num_lines INT
 )
 """,
 """
 create table package_tags (
-    package TEXT, tag TEXT
+    package TEXT PRIMARY KEY, tag TEXT
 );""",
 """
 create table github_releases_blob (
-    package TEXT, releases_json TEXT
+    package TEXT PRIMARY KEY, releases_json TEXT
 );""",
-    # FIXME:
-    """
-create table package_releases_new (
-    package TEXT, name TEXT, tag_name TEXT, created_at DATETIME
-);""",
-    """
-create table package_github (
-    package TEXT, api_repos TEXT
-);
-""",
+#     """
+# create table package_releases_new (
+#     package TEXT PRIMARY KEY, name TEXT, tag_name TEXT, created_at DATETIME
+# );""",
+#     """
+# create table package_github (
+#     package TEXT PRIMARY KEY, api_repos TEXT
+# );
+# """,
 ]
 
 
@@ -59,7 +58,7 @@ def dbopen(path, readonly=True):
 
 
 def main(dbpath):
-    with contextlib.closing(dbopen(dbpath, readonly=True)) as conn:
+    with contextlib.closing(dbopen(dbpath, readonly=False)) as conn:
         for num, create_table in enumerate(CREATE_TABLES_SQL):
             print(num, create_table)
             with conn:
