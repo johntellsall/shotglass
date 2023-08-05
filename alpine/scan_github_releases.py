@@ -1,6 +1,7 @@
 # scan_github_releases.py
 # Per Alpine package, scrape GitHub releases
 # TODO: use click to parse args
+# TODO: handle API limit
 # INPUT:
 # - "alpine" table with package names and source URLs
 # OUTPUT
@@ -15,6 +16,23 @@ import github_api as api
 from dbsetup import dbopen, queryall
 
 
+def parse_github_repos(packages_list, prev_packages):
+    """
+    format list of GitHub repos where Releases not already fetched
+    """
+    repos_pat = re.compile(r"https://github.com/(.+?/.+?)/")
+    repos_list = []
+    for package, source in packages_list:
+        if repos := repos_pat.search(source):
+            if package in prev_packages:
+                print(f"skipping {package}: already done")
+                continue
+            repos_list.append((package, repos.group(1)))
+        else:
+            print(f"? {source}")
+    return repos_list
+
+
 def query_github_repos(conn):
     """
     get package names and GitHub repos from database
@@ -22,7 +40,6 @@ def query_github_repos(conn):
     query_packages = """
         select package, source from alpine where
         source like '%github.com/%'
-        limit 40
     """
     return queryall(conn, query_packages)
 
@@ -73,23 +90,6 @@ def main(dbpath):
         save_releases(dbpath, package, releases)
         print(f"{package}: {len(releases)}")
     print("DONE")
-
-
-def parse_github_repos(packages_list, prev_packages):
-    """
-    format list of GitHub repos where Releases not already fetched
-    """
-    repos_pat = re.compile(r"https://github.com/(.+?/.+?)/")
-    repos_list = []
-    for package, source in packages_list:
-        if repos := repos_pat.search(source):
-            if package in prev_packages:
-                print(f"skipping {package}: already done")
-                continue
-            repos_list.append((package, repos.group(1)))
-        else:
-            print(f"? {source}")
-    return repos_list
 
 
 if __name__ == "__main__":

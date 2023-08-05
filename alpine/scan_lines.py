@@ -33,17 +33,6 @@ def list_files_lines(repos):
     return matches
 
 
-def query1(conn, sql=None, count=None):
-    if count:
-        sql = f"select count(*) from {count}"
-    cursor = conn.execute(sql)
-    return cursor.fetchone()[0]
-
-
-def queryall(conn, sql):
-    return conn.execute(sql).fetchall()
-
-
 def main(args):
     dbpath, repos_list = args[0], args[1:]
 

@@ -9,4 +9,4 @@ import scan_github_releases as scan
 def test_main():
     "ensure main at least tries to open the database"
     dbpath = ":memory:"
-    pytest.assertRaises(sqlite3.OperationalError, scan.main, dbpath)
+    pytest.raises(sqlite3.OperationalError, scan.main, dbpath)
