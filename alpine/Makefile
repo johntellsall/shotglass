@@ -76,8 +76,9 @@ release-dates:
 sql:
 	sqlite3 $(DBPATH)
 
-test:  ## run Python tests (dev mode: exit on first error)
-	pytest --exitfirst $$(git ls-files 'test*.py')
+test:  fastlint ## run Python tests (dev mode: exit on first error)
+	PY_SOURCE=$$(git ls-files '*.py') \
+	; pytest --exitfirst $${PY_SOURCE}
 
 setup:  ## setup Python virtualenv
 	test -d venv || python3 -m venv venv

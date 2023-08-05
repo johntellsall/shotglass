@@ -12,6 +12,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from dbsetup import query1
+
 
 def list_files_lines(repos):
     """
