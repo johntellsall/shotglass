@@ -115,6 +115,10 @@ plot_demo_scatter:
 	python3 plot_demo_scatter.py
 	imgcat plot_demo_scatter.png
 
+plot_github_releases:
+	python3 plot_github_releases.py
+	imgcat github_releases.png
+
 # :::::::: HELPERS
 
 update-alpine:

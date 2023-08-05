@@ -14,6 +14,7 @@ def parse_datetime(dt_str):
     return datetime.datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%SZ")
 
 
+# FIXME: move to dbsetup.py
 def setup(dbpath):
     "setup database"
     setup_list = ["""

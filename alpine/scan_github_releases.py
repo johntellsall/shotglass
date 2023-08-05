@@ -1,7 +1,6 @@
 # scan_github_releases.py
 # Per Alpine package, scrape GitHub releases
 # TODO: use click to parse args
-# TODO: handle API limit
 # INPUT:
 # - "alpine" table with package names and source URLs
 # OUTPUT
