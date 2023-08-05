@@ -15,12 +15,14 @@ import seaborn as sns
 sns.set_theme(style="white")
 label = "github_releases.png"
 
+SAMPLE = False
 
-tips = sns.load_dataset("tips")
-print(tips.head())
-plt = sns.relplot(data=tips, x="total_bill", y="tip", hue="day")
-plt.savefig(label)
-sys.exit(0)
+if SAMPLE:
+    tips = sns.load_dataset("tips")
+    print(tips.head())
+    plt = sns.relplot(data=tips, x="total_bill", y="tip", hue="day")
+    plt.savefig(label)
+    sys.exit(0)
 
 
 conn = sqlite3.connect("../shotglass.db")  # FIXME:
@@ -33,11 +35,13 @@ sql_package_release_count = """
 releases_df = pd.read_sql_query(
     sql_package_release_count, conn
 )
-assert 0, releases_df.head()
+print(releases_df.head())
 if 0: # FIXME: later
     releases_df['release_created_at'] = pd.to_datetime(releases_df['release_created_at'])
 
+releases_df['row_number'] = releases_df.index
 plt = sns.relplot(
+    x="row_number",
     y="release_count",
     data=releases_df
 )
