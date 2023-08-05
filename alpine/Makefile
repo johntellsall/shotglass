@@ -29,9 +29,9 @@ scan_releases:
 	python3 ./scan_github_releases.py $(DBPATH)
 # @echo "DONE: summarize with 'make list-pkg-tags.show'"
 
-zap_releases:  ## delete contents of package_tags table
-	sqlite3 -echo $(DBPATH) 'delete from package_tags'
-	sqlite3 -echo $(DBPATH) 'select count(*) from package_tags' | grep 0
+# zap_releases:  ## delete contents of package_tags table
+# 	sqlite3 -echo $(DBPATH) 'delete from package_tags'
+# 	sqlite3 -echo $(DBPATH) 'select count(*) from package_tags' | grep 0
 
 
 # :::::::: DATABASE QUERY / EXAMPLES

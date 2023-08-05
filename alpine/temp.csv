@@ -131,7 +131,7 @@ bdftopcf,1,31,https://www.x.org/releases/individual/util/bdftopcf-$pkgver.tar.xz
 bearssl,3,49,
 beep,4,32,$pkgname-$pkgver.tar.gz::https://github.com/spkr-beep/beep/archive/v$pkgver.tar.gz
 bind,9,285,
-binutils,5,147,https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz
+binutils,3,143,https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz
 bison,1,49,https://ftp.gnu.org/gnu/bison/bison-$pkgver.tar.xz
 bluez,14,198,https://www.kernel.org/pub/linux/bluetooth/bluez-$pkgver.tar.xz
 bluez-firmware,1,25,https://bluez.sourceforge.net/download/bluez-firmware-$pkgver.tar.gz
@@ -171,8 +171,8 @@ cjson,1,39,$pkgname-$pkgver.tar.gz::https://github.com/DaveGamble/cJSON/archive/
 ckbcomp,1,22,https://salsa.debian.org/installer-team/console-setup/-/archive/$pkgver/console-setup-$pkgver.tar.gz
 cksfv,1,31,http://zakalwe.fi/~shd/foss/cksfv/files/cksfv-$pkgver.tar.bz2
 clang14,3,341,https://github.com/llvm/llvm-project/releases/download/llvmorg-$pkgver/clang-$pkgver.src.tar.xz
-clang15,7,398,https://github.com/llvm/llvm-project/releases/download/llvmorg-$pkgver/clang-$pkgver.src.tar.xz
-clang16,10,482,https://github.com/llvm/llvm-project/releases/download/llvmorg-$pkgver/clang-$pkgver.src.tar.xz
+clang15,7,397,https://github.com/llvm/llvm-project/releases/download/llvmorg-$pkgver/clang-$pkgver.src.tar.xz
+clang16,10,491,https://github.com/llvm/llvm-project/releases/download/llvmorg-$pkgver/clang-$pkgver.src.tar.xz
 clucene,4,58,https://downloads.sourceforge.net/clucene/clucene-core-$pkgver.tar.gz
 cmake,1,96,https://www.cmake.org/files/$_v/cmake-$pkgver.tar.gz
 cmocka,2,40,https://cmocka.org/files/${pkgver%.*}/cmocka-$pkgver.tar.xz
@@ -190,7 +190,7 @@ crconf,1,23,https://downloads.sourceforge.net/project/crconf/crconf-$_realver.ta
 cryptsetup,3,90,https://www.kernel.org/pub/linux/utils/cryptsetup/v${pkgver%.*}/cryptsetup-$pkgver.tar.gz
 cunit,2,55,https://downloads.sourceforge.net/project/cunit/$_pkgname/$_pkgver/$_pkgname-$_pkgver.tar.bz2
 cups,7,166,$pkgname-$pkgver.tar.gz::https://github.com/OpenPrinting/cups/archive/v$pkgver.tar.gz
-curl,2,225,
+curl,1,223,
 cutter,2,26,http://dev.alpinelinux.org/archive/cutter/cutter-$pkgver.tgz
 cvechecker,3,52,$pkgname-$pkgver.zip::https://github.com/sjvermeu/cvechecker/archive/cvechecker-$pkgver.zip
 cyrus-sasl,2,126,https://github.com/cyrusimap/cyrus-sasl/releases/download/cyrus-sasl-$pkgver/cyrus-sasl-$pkgver.tar.gz
@@ -198,7 +198,7 @@ cython,1,40,cython-$pkgver.tar.gz::https://github.com/cython/cython/archive/$pkg
 czmq,1,45,$pkgname-$pkgver.tar.gz::https://github.com/zeromq/czmq/archive/v$pkgver.tar.gz
 d-feet,2,45,https://download.gnome.org/sources/d-feet/$_v/d-feet-$pkgver.tar.xz
 dansguardian,9,71,https://downloads.sourceforge.net/project/dansguardian/dansguardian-$pkgver.tar.bz2
-daq,2,53,https://www.snort.org/downloads/snort/daq-$pkgver.tar.gz
+daq,2,58,https://www.snort.org/downloads/snortplus/libdaq-$pkgver.tar.gz
 darkhttpd,5,41,darkhttpd-$pkgver.tar.gz::https://github.com/emikulic/darkhttpd/archive/v$pkgver.tar.gz
 dash,4,45,http://gondor.apana.org.au/~herbert/dash/files/dash-$pkgver.tar.gz
 datefudge,1,30,https://deb.debian.org/debian/pool/main/d/datefudge/datefudge_$pkgver.tar.xz
@@ -274,7 +274,7 @@ fcgi,1,42,$_pkgname-$pkgver.tar.gz::https://github.com/FastCGI-Archives/fcgi2/ar
 fcgiwrap,4,37,$pkgname-$pkgver.tar.gz::https://github.com/gnosek/fcgiwrap/archive/$pkgver.tar.gz
 ferm,3,55,
 fftw,2,102,http://www.fftw.org/fftw-$_pkgver.tar.gz
-file,2,55,$pkgname-$pkgver.tar.gz::https://github.com/file/file/archive/FILE${pkgver/./_}.tar.gz
+file,1,59,$pkgname-$pkgver.tar.gz::https://github.com/file/file/archive/FILE${pkgver/./_}.tar.gz
 findutils,2,61,https://ftp.gnu.org/pub/gnu/findutils/findutils-$pkgver.tar.xz
 fish,5,89,https://github.com/fish-shell/fish-shell/releases/download/$pkgver/fish-$pkgver.tar.xz
 flac,1,67,https://downloads.xiph.org/releases/flac/flac-$pkgver.tar.xz
@@ -331,7 +331,7 @@ fprobe,5,46,https://downloads.sourceforge.net/fprobe/fprobe-$pkgver.tar.bz2
 fprobe-ulog,6,47,https://github.com/opoplawski/fprobe-ulog/releases/download/v$pkgver/fprobe-ulog-$pkgver.tar.gz
 freeradius,18,409,ftp://ftp.freeradius.org/pub/freeradius/freeradius-server-$pkgver.tar.gz
 freeradius-client,1,35,$pkgname-$pkgver-release.tar.gz::https://github.com/FreeRADIUS/freeradius-client/archive/release_${pkgver//./_}.tar.gz
-freeswitch,13,244,https://files.freeswitch.org/freeswitch-releases/freeswitch-$pkgver.-release.tar.xz
+freeswitch,13,251,https://files.freeswitch.org/freeswitch-releases/freeswitch-$pkgver.-release.tar.xz
 freeswitch-sounds-en-us-callie-32000,1,25,https://files.freeswitch.org/freeswitch-sounds-en-us-callie-32000-$pkgver.tar.gz
 freeswitch-sounds-en-us-callie-8000,1,25,https://files.freeswitch.org/freeswitch-sounds-en-us-callie-8000-$pkgver.tar.gz
 freeswitch-sounds-es-mx-maria-44100,1,25,https://files.freeswitch.org/freeswitch-sounds-es-mx-maria-44100.tar.gz
@@ -386,7 +386,7 @@ graphene,2,46,https://github.com/ebassi/graphene/archive/$pkgver/graphene-$pkgve
 graphite2,2,58,$pkgname-$pkgver.tar.gz::https://github.com/silnrsi/$_realname/archive/$pkgver.tar.gz
 graphviz,3,129,$pkgname-$pkgver.tar.xz::https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/$pkgver/graphviz-$pkgver.tar.xz
 grep,1,41,https://mirrors.kernel.org/gnu/grep/grep-$pkgver.tar.xz
-groff,2,47,https://ftp.gnu.org/gnu/groff/groff-$pkgver.tar.gz
+groff,1,41,https://ftp.gnu.org/gnu/groff/groff-$pkgver.tar.gz
 gross,9,51,https://codeberg.org/bizdelnick/gross/releases/download/v$pkgver/gross-$pkgver.tar.xz
 grub,35,320,https://ftp.gnu.org/gnu/grub/grub-$pkgver.tar.xz
 gsm,3,62,https://www.quut.com/gsm/gsm-$pkgver.tar.gz
@@ -417,6 +417,7 @@ hunspell-pt,1,30,http://natura.di.uminho.pt/download/sources/Dictionaries/hunspe
 hunspell-pt-br,1,33,https://pt-br.libreoffice.org/assets/Uploads/PT-BR-Documents/VERO/VeroptBRV320AOC.oxt
 hvtools,4,48,https://kernel.org/pub/linux/kernel/v4.x/linux-$_kernver.tar.xz
 hwdata,1,73,$pkgname-$pkgver.tar.gz::https://github.com/vcrhonek/hwdata/archive/refs/tags/v$pkgver.tar.gz
+hwloc,1,57,https://www.open-mpi.org/software/hwloc/v${pkgver%.*}/downloads/hwloc-$pkgver.tar.bz2
 hylafax,7,104,ftp://ftp.hylafax.org/source/hylafax-$pkgver.tar.gz
 hylafaxplus,9,115,https://downloads.sourceforge.net/hylafax/$_pkgname-$pkgver.tar.gz
 hypermail,3,58,https://github.com/hypermail-project/hypermail/releases/download/v$pkgver/hypermail-$pkgver.tar.gz
@@ -425,14 +426,13 @@ icecast,4,49,https://downloads.xiph.org/releases/icecast/icecast-$pkgver.tar.gz
 icon-naming-utils,1,30,http://tango.freedesktop.org/releases/icon-naming-utils-$pkgver.tar.bz2
 icu,5,162,https://github.com/unicode-org/icu/releases/download/release-${pkgver//./-}/icu4c-${pkgver//./_}-src.tgz
 iftop,2,37,https://www.ex-parrot.com/~pdw/iftop/download/iftop-$pkgver.tar.gz
-ifupdown,6,40,https://deb.debian.org/debian/pool/main/i/ifupdown/ifupdown_$pkgver.tar.xz
 ifupdown-ng,2,128,https://distfiles.ariadne.space/ifupdown-ng/ifupdown-ng-$pkgver.tar.xz
 igmpproxy,1,40,https://github.com/pali/igmpproxy/releases/download/$pkgver/igmpproxy-$pkgver.tar.gz
 imake,1,26,https://ftp.x.org/pub/individual/util/imake-$pkgver.tar.xz
 imap,5,66,http://ftp.ntua.gr/pub/net/mail/imap/imap-$pkgver.tar.gz
 imlib2,1,57,https://downloads.sourceforge.net/enlightenment/imlib2-$pkgver.tar.gz
 in-sync,4,23,in-sync in-sync.conf in-sync.initd
-indent,1,43,https://ftp.gnu.org/gnu/indent/indent-$pkgver.tar.xz
+indent,1,42,https://ftp.gnu.org/gnu/indent/indent-$pkgver.tar.xz
 inih,1,68,$pkgname-$pkgver.tar.gz::https://github.com/benhoyt/inih/archive/r$pkgver.tar.gz
 iniparser,3,40,$pkgname-$pkgver.tar.gz::https://github.com/ndevilla/iniparser/archive/v$pkgver.tar.gz
 inotify-tools,3,43,$pkgname-$pkgver.tar.gz::https://github.com/inotify-tools/inotify-tools/archive/$pkgver.tar.gz
@@ -463,7 +463,6 @@ joe,3,44,https://downloads.sourceforge.net/project/joe-editor/JOE%20sources/joe-
 jpeg,1,28,None
 jq,1,44,https://github.com/stedolan/jq/archive/jq-$pkgver.tar.gz
 json-c,1,43,https://s3.amazonaws.com/json-c_releases/releases/json-c-$pkgver.tar.gz
-jwhois,4,42,https://ftp.gnu.org/gnu/jwhois/jwhois-$pkgver.tar.gz
 kamailio,5,561,kamailio-${pkgver}$_suffix.tar.gz::https://github.com/kamailio/kamailio/archive/$_gitcommit.tar.gz
 kbd,3,179,https://www.kernel.org/pub/linux/utils/kbd/kbd-$pkgver.tar.gz
 kea,11,286,https://ftp.isc.org/isc/kea/$pkgver/kea-$pkgver.tar.gz
@@ -547,7 +546,7 @@ libnetfilter_queue,1,33,https://www.netfilter.org/projects/libnetfilter_queue/fi
 libnfnetlink,1,32,https://www.netfilter.org/projects/libnfnetlink/files/libnfnetlink-$pkgver.tar.bz2
 libnftnl,1,43,https://netfilter.org/projects/libnftnl/files/libnftnl-$pkgver.tar.xz
 libnl3,2,61,https://github.com/thom311/libnl/releases/download/libnl${pkgver//./_}/libnl-$pkgver.tar.gz
-libnvme,2,58,https://github.com/linux-nvme/libnvme/archive/v$pkgver/libnvme-v$pkgver.tar.gz
+libnvme,2,57,https://github.com/linux-nvme/libnvme/archive/v$pkgver/libnvme-v$pkgver.tar.gz
 libogg,1,48,https://downloads.xiph.org/releases/ogg/libogg-$pkgver.tar.gz
 libotr,2,44,https://www.cypherpunks.ca/otr/libotr-$pkgver.tar.gz
 libpaper,1,36,https://github.com/rrthomas/libpaper/releases/download/v$pkgver/libpaper-$pkgver.tar.gz
@@ -677,7 +676,7 @@ lua-microlight,2,52,lua-microlight-$pkgver.tar.gz::https://github.com/stevedonov
 lua-mosquitto,3,72,lua-mosquitto-$pkgver.tar.gz::https://github.com/flukso/lua-mosquitto/archive/v$pkgver.tar.gz
 lua-mqtt-publish,1,42,lua-mqtt-publish-$pkgver.tar.gz::https://github.com/ncopa/lua-mqtt-publish/archive/v$pkgver.tar.gz
 lua-openrc,2,58,lua-openrc-$pkgver.tar.gz::https://github.com/ncopa/lua-openrc/archive/v$pkgver.tar.gz
-lua-optarg,1,45,$pkgname-$pkgver.tar.gz::https://github.com/ncopa/lua-optarg/archive/v$pkgver.tar.gz
+lua-optarg,1,45,$pkgname-$pkgver.tar.gz::https://github.com/ncopa/lua-optarg/archive/$pkgver.tar.gz
 lua-ossl,11,92,$_pkgname-$_ver.tar.gz::https://github.com/wahern/$_pkgname/archive/rel-$pkgver.tar.gz
 lua-pc,2,60,https://dev.alpinelinux.org/archive/lpc/lpc-$pkgver.tar.gz
 lua-penlight,1,60,https://github.com/lunarmodules/Penlight/archive/$pkgver/lua-penlight-$pkgver.tar.gz
@@ -722,7 +721,7 @@ mailcap,1,20,https://releases.pagure.org/mailcap/mailcap-$pkgver.tar.xz
 mailx,4,54,http://deb.debian.org/debian/pool/main/b/bsd-mailx/bsd-mailx_$_version-0.${_date}cvs.orig.tar.xz
 make,1,37,https://ftp.gnu.org/gnu/make/make-$pkgver.tar.gz
 makedepend,1,33,https://www.x.org/releases/individual/util/makedepend-$pkgver.tar.xz
-man-pages,3,53,https://cdn.kernel.org/pub/linux/docs/man-pages/man-pages-$pkgver.tar.xz
+man-pages,2,51,https://cdn.kernel.org/pub/linux/docs/man-pages/man-pages-$pkgver.tar.xz
 man-pages-posix,1,32,https://cdn.kernel.org/pub/linux/docs/man-pages/man-pages-posix/man-pages-posix-$_majorver-$_minorver.tar.xz
 mandoc,6,79,https://mandoc.bsd.lv/snapshots/mandoc-$pkgver.tar.gz
 mariadb,9,558,https://rsync.osuosl.org/pub/mariadb/mariadb-$pkgver/source/mariadb-$pkgver.tar.gz
@@ -757,9 +756,9 @@ mtd-utils,1,133,https://infraroot.at/pub/mtd/mtd-utils-$pkgver.tar.bz2
 mtools,2,39,https://ftp.gnu.org/gnu/mtools/mtools-$pkgver.tar.bz2
 mtx,1,34,https://downloads.sourceforge.net/mtx/mtx-$pkgver.tar.gz
 multipath-tools,5,57,$pkgname-$pkgver.tar.gz::https://github.com/opensvc/multipath-tools/archive/refs/tags/$pkgver.tar.gz
-musl,8,154,musl-$_commit.tar.gz::https://git.musl-libc.org/cgit/musl/snapshot/$_commit.tar.gz
-musl-fts,1,48,$pkgname-$pkgver.tar.gz::https://github.com/void-linux/musl-fts/archive/refs/tags/v$pkgver.tar.gz
-musl-legacy-error,2,22,error.h
+musl,7,158,musl-$_commit.tar.gz::https://git.musl-libc.org/cgit/musl/snapshot/$_commit.tar.gz
+musl-fts,1,47,$pkgname-$pkgver.tar.gz::https://github.com/void-linux/musl-fts/archive/refs/tags/v$pkgver.tar.gz
+musl-legacy-error,2,21,error.h
 musl-locales,2,40,https://git.adelielinux.org/adelie/musl-locales/-/archive/$pkgver/musl-locales-$pkgver.tar.bz2
 musl-nscd,3,43,
 musl-obstack,1,30,$pkgname-$pkgver.tar.gz::https://github.com/void-linux/musl-obstack/archive/v$pkgver.tar.gz
@@ -816,7 +815,7 @@ openresolv,2,33,$pkgname-$pkgver.tar.gz::https://github.com/NetworkConfiguration
 opensbi,1,27,$pkgname-$pkgver.tar.gz::https://github.com/riscv/opensbi/archive/refs/tags/v$pkgver.tar.gz
 opensp,3,58,https://prdownloads.sourceforge.net/openjade/$_realname-$pkgver.tar.gz
 openssh,12,302,https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-$_myver.tar.gz
-openssl,4,212,https://www.openssl.org/source/openssl-$pkgver.tar.gz
+openssl,2,210,https://www.openssl.org/source/openssl-$pkgver.tar.gz
 openvpn,6,91,https://build.openvpn.net/downloads/releases/openvpn-$pkgver.tar.gz
 openvpn-ad-check,1,22,https://sourceforge.net/projects/openvpnadcheck/files/openvpn-ad-check-$pkgver.tgz
 openvpn-auth-ldap,4,56,https://github.com/threerings/openvpn-auth-ldap/archive/auth-ldap-$pkgver.tar.gz
@@ -837,7 +836,7 @@ pax-utils,1,59,https://dev.gentoo.org/~sam/distfiles/app-misc/pax-utils/pax-util
 pciutils,2,43,$pkgname-$pkgver.tar.gz::https://github.com/pciutils/pciutils/archive/refs/tags/v$pkgver.tar.gz
 pcmciautils,3,28,https://sources.archlinux.org/other/pcmciautils/pcmciautils-$pkgver.tar.xz
 pcre,1,100,https://downloads.sourceforge.net/project/pcre/pcre/$pkgver/pcre-$pkgver.tar.bz2
-pcre2,1,71,https://github.com/PhilipHazel/pcre2/releases/download/pcre2-$pkgver/pcre2-$pkgver.tar.bz2
+pcre2,1,73,https://github.com/PhilipHazel/pcre2/releases/download/pcre2-$pkgver/pcre2-$pkgver.tar.bz2
 pcsc-lite,4,93,https://pcsclite.apdu.fr/files/pcsc-lite-$pkgver.tar.bz2
 perdition,4,53,http://horms.net/projects/perdition/download/$pkgver/perdition-$pkgver.tar.xz
 perl,5,193,https://www.cpan.org/src/5.0/perl-$pkgver.tar.xz
@@ -1046,7 +1045,7 @@ perl-module-scandeps,1,36,https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Modu
 perl-module-util,1,36,https://cpan.metacpan.org/authors/id/M/MA/MATTLAW/Module-Util-$pkgver.tar.gz
 perl-module-versions-report,1,32,https://cpan.metacpan.org/authors/id/J/JE/JESSE/Module-Versions-Report-$pkgver.tar.gz
 perl-moo,1,34,https://cpan.metacpan.org/authors/id/H/HA/HAARG/Moo-$pkgver.tar.gz
-perl-mozilla-ca,1,37,https://cpan.metacpan.org/authors/id/H/HA/HAARG/Mozilla-CA-$pkgver.tar.gz
+perl-mozilla-ca,1,37,https://cpan.metacpan.org/authors/id/L/LW/LWP/Mozilla-CA-$pkgver.tar.gz
 perl-mro-compat,1,37,https://cpan.metacpan.org/authors/id/H/HA/HAARG/MRO-Compat-$pkgver.tar.gz
 perl-namespace-autoclean,1,35,https://cpan.metacpan.org/authors/id/E/ET/ETHER/namespace-autoclean-$pkgver.tar.gz
 perl-namespace-clean,1,37,https://cpan.metacpan.org/authors/id/R/RI/RIBASUSHI/namespace-clean-$pkgver.tar.gz
@@ -1245,7 +1244,7 @@ py3-charset-normalizer,1,38,https://files.pythonhosted.org/packages/source/c/cha
 py3-coverage,1,33,https://files.pythonhosted.org/packages/source/c/coverage/coverage-$pkgver.tar.gz
 py3-cparser,1,35,https://files.pythonhosted.org/packages/source/${_pkgname:0:1}/$_pkgname/$_pkgname-$pkgver.tar.gz
 py3-dbus,1,40,https://dbus.freedesktop.org/releases/dbus-python/$_pkgname-$pkgver.tar.gz
-py3-distlib,1,35,$pkgname-$pkgver.tar.gz::https://github.com/pypa/distlib/archive/refs/tags/$pkgver.tar.gz
+py3-distlib,2,39,
 py3-dnspython,2,34,https://github.com/rthalley/dnspython/archive/v$pkgver/dnspython-$pkgver.tar.gz
 py3-docutils,1,40,https://files.pythonhosted.org/packages/source/d/docutils/docutils-$pkgver.tar.gz
 py3-elementpath,1,42,$pkgname-$pkgver.tar.gz::https://github.com/sissaschool/elementpath/archive/refs/tags/v$pkgver.tar.gz
@@ -1256,7 +1255,7 @@ py3-flit-core,1,39,https://files.pythonhosted.org/packages/source/f/flit/flit-$p
 py3-funcsigs,1,30,https://files.pythonhosted.org/packages/source/${_pkgname:0:1}/$_pkgname/$_pkgname-$pkgver.tar.gz
 py3-future,2,39,$pkgname-$pkgver.tar.gz::https://pypi.io/packages/source/f/future/future-$pkgver.tar.gz
 py3-gobject3,1,52,https://download.gnome.org/sources/pygobject/${pkgver%.*}/pygobject-$pkgver.tar.xz
-py3-gpep517,2,34,https://github.com/mgorny/gpep517/archive/v$pkgver/gpep517-v$pkgver.tar.gz
+py3-gpep517,2,33,https://github.com/mgorny/gpep517/archive/v$pkgver/gpep517-v$pkgver.tar.gz
 py3-idna,1,43,$_pkgname-$pkgver.tar.gz::https://github.com/kjd/idna/archive/v$pkgver.tar.gz
 py3-imagesize,1,34,https://files.pythonhosted.org/packages/source/i/imagesize/imagesize-$pkgver.tar.gz
 py3-iniconfig,1,37,https://files.pythonhosted.org/packages/source/i/$_pyname/$_pyname-$pkgver.tar.gz
@@ -1308,7 +1307,7 @@ py3-wheel,2,49,https://files.pythonhosted.org/packages/source/w/wheel/wheel-$pkg
 py3-xmlschema,1,33,$pkgname-$pkgver.tar.gz::https://github.com/sissaschool/xmlschema/archive/refs/tags/v$pkgver.tar.gz
 py3-yaml,2,60,$_pkgname-$pkgver.tar.gz::https://github.com/yaml/pyyaml/archive/$pkgver.tar.gz
 pyc,1,12,None
-python3,4,258,https://www.python.org/ftp/python/$pkgver/Python-$pkgver.tar.xz
+python3,4,267,https://www.python.org/ftp/python/$pkgver/Python-$pkgver.tar.xz
 quagga,10,81,https://github.com/Quagga/quagga/releases/download/quagga-$pkgver/quagga-$pkgver.tar.gz
 rabbitmq-c,1,45,$pkgname-$pkgver.tar.gz::https://github.com/alanxz/rabbitmq-c/archive/v$pkgver.tar.gz
 radvd,5,53,http://www.litech.org/radvd/dist/radvd-$pkgver.tar.xz
@@ -1359,7 +1358,7 @@ ruby-test-unit,2,54,https://github.com/test-unit/test-unit/archive/$pkgver/$_gem
 ruby-test-unit-rr,2,53,https://github.com/test-unit/test-unit-rr/archive/$pkgver/$_gemname-$pkgver.tar.gz
 ruby-typeprof,2,57,https://github.com/ruby/typeprof/archive/v$pkgver/$_gemname-$pkgver.tar.gz
 run-parts,1,28,https://deb.debian.org/debian/pool/main/d/debianutils/debianutils_$pkgver.tar.xz
-rust,17,484,https://static.rust-lang.org/dist/rustc-$pkgver-src.tar.xz
+rust,18,488,https://static.rust-lang.org/dist/rustc-$pkgver-src.tar.xz
 rust-bindgen,1,30,$pkgname-$pkgver.tar.gz::https://github.com/rust-lang/rust-bindgen/archive/v$pkgver.tar.gz
 s390-tools,20,83,$pkgname-$pkgver.tar.gz::https://github.com/ibm-s390-tools/s390-tools/archive/v$pkgver.tar.gz
 s6,6,52,https://skarnet.org/software/s6/s6-$pkgver.tar.gz s6-svscanboot s6.initd
@@ -1404,7 +1403,8 @@ smokeping,8,130,https://oss.oetiker.ch/smokeping/pub/smokeping-$pkgver.tar.gz
 snappy,4,64,$pkgname-$pkgver.tar.gz::https://github.com/google/snappy/archive/$pkgver.tar.gz
 sngtc_client,6,53,https://ftp.sangoma.com/linux/transcoding/sng-tc-linux-$pkgver.x86_64.tgz
 snmptt,4,44,https://downloads.sourceforge.net/snmptt/snmptt_$pkgver.tgz
-snort,4,80,https://www.snort.org/downloads/archive/snort/snort-$pkgver.tar.gz
+snort,7,85,https://www.snort.org/downloads/snortplus/snort3-$pkgver.tar.gz
+snort-extra,1,34,https://www.snort.org/downloads/snortplus/snort3_extra-$pkgver.tar.gz
 sntpc,5,35,https://dev.alpinelinux.org/archive/sntpc/sntpc-$pkgver.tar.xz
 socat,3,47,http://www.dest-unreach.org/socat/download/socat-$pkgver.tar.gz
 sofia-sip,1,54,$pkgname-$pkgver.tar.gz::https://github.com/freeswitch/sofia-sip/archive/v$pkgver.tar.gz
@@ -1504,10 +1504,10 @@ vlan,5,31,mvlan.post-down
 vulkan-headers,1,34,https://github.com/khronosgroup/vulkan-headers/archive/refs/tags/sdk-$pkgver/vulkan-headers-v$pkgver.tar.gz
 vulkan-loader,1,45,https://github.com/khronosgroup/vulkan-loader/archive/refs/tags/sdk-$pkgver/vulkan-loader-sdk-$pkgver.tar.gz
 vulkan-tools,1,49,https://github.com/KhronosGroup/Vulkan-Tools/archive/refs/tags/sdk-$pkgver/vulkan-tools-sdk-$pkgver.tar.gz
-wasi-compiler-rt,1,66,https://github.com/llvm/llvm-project/releases/download/llvmorg-$pkgver/llvm-project-$pkgver.src.tar.xz
-wasi-libc,2,38,wasi-libc-$_gitrev.tar.gz::https://github.com/WebAssembly/wasi-libc/archive/$_gitrev.tar.gz
-wasi-libcxx,1,137,
-wasi-sdk,1,20,None
+wasi-compiler-rt,1,65,https://github.com/llvm/llvm-project/releases/download/llvmorg-$pkgver/llvm-project-$pkgver.src.tar.xz
+wasi-libc,2,37,wasi-libc-$_gitrev.tar.gz::https://github.com/WebAssembly/wasi-libc/archive/$_gitrev.tar.gz
+wasi-libcxx,1,136,
+wasi-sdk,1,19,None
 wayland,1,73,https://gitlab.freedesktop.org/wayland/wayland/-/releases/$pkgver/downloads/wayland-$pkgver.tar.xz
 wayland-protocols,1,37,https://gitlab.freedesktop.org/wayland/wayland-protocols/-/releases/$pkgver/downloads/wayland-protocols-$pkgver.tar.xz
 wget,1,59,https://ftp.gnu.org/gnu/wget/wget-$pkgver.tar.gz
@@ -1519,7 +1519,7 @@ wireless-tools,2,33,https://hewlettpackard.github.io/wireless-tools/wireless_too
 wpa_supplicant,11,118,https://w1.fi/releases/wpa_supplicant-$pkgver.tar.gz
 xcb-proto,1,28,https://xorg.freedesktop.org/archive/individual/proto/xcb-proto-$pkgver.tar.xz
 xcb-util,1,35,https://xorg.freedesktop.org/archive/individual/lib/xcb-util-$pkgver.tar.xz
-xen,20,693,https://downloads.xenproject.org/release/xen/$pkgver/xen-$pkgver.tar.gz
+xen,22,699,https://downloads.xenproject.org/release/xen/$pkgver/xen-$pkgver.tar.gz
 xfsprogs,4,61,https://mirrors.edge.kernel.org/pub/linux/utils/fs/xfs/xfsprogs/xfsprogs-$pkgver.tar.xz
 xkbcomp,1,35,https://www.x.org/releases/individual/app/xkbcomp-$pkgver.tar.xz
 xkeyboard-config,1,30,https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config/-/archive/xkeyboard-config-$pkgver/xkeyboard-config-xkeyboard-config-$pkgver.tar.gz

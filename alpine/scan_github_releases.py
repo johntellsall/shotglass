@@ -76,6 +76,10 @@ def main(dbpath):
     # parse source URLs to get GitHub repos
     repos_list = parse_github_repos(packages_list, prev_packages)
 
+    limit = None # 3
+    if limit:
+        repos_list = repos_list[:limit]
+
     for package, repos in repos_list:
         releases = api.get_github_releases(repos)
         # no releases? emit warning but save anyway
