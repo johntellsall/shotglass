@@ -92,7 +92,7 @@ distclean:
 
 %.plot: %.py  ## run Seaborn plot, send to screen and file
 	python3 $<
-	echo imgcat $(subst plot_,,$(patsubst %.py,%.png,$<))
+	imgcat $(subst plot_,,$(patsubst %.py,%.png,$<))
 
 
 show-all: $(patsubst %.sql,%.show,$(wildcard *.sql))

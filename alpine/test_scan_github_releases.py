@@ -2,7 +2,9 @@
 # NOTE: this is very tiny test, add more when needed
 
 import sqlite3
+
 import pytest
+
 import scan_github_releases as scan
 
 

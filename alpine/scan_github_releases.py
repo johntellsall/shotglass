@@ -75,7 +75,7 @@ def main(dbpath):
     # parse source URLs to get GitHub repos
     repos_list = parse_github_repos(packages_list, prev_packages)
 
-    limit = None # 3
+    limit = None  # 3
     if limit:
         repos_list = repos_list[:limit]
 

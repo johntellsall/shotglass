@@ -15,28 +15,28 @@ CREATE TABLE "alpine"(
   "source" TEXT
 );
 """,
-"""
+    """
 create table package_files_lines (
     package TEXT PRIMARY KEY, path TEXT, num_lines INT
 )
 """,
-"""
+    """
 create table package_tags (
     package TEXT PRIMARY KEY, tag TEXT
 );""",
-"""
+    """
 create table github_releases_blob (
     package TEXT PRIMARY KEY, releases_json TEXT
 );""",
-#     """
-# create table package_releases_new (
-#     package TEXT PRIMARY KEY, name TEXT, tag_name TEXT, created_at DATETIME
-# );""",
-#     """
-# create table package_github (
-#     package TEXT PRIMARY KEY, api_repos TEXT
-# );
-# """,
+    #     """
+    # create table package_releases_new (
+    #     package TEXT PRIMARY KEY, name TEXT, tag_name TEXT, created_at DATETIME
+    # );""",
+    #     """
+    # create table package_github (
+    #     package TEXT PRIMARY KEY, api_repos TEXT
+    # );
+    # """,
 ]
 
 

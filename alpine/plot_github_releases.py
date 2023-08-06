@@ -27,10 +27,8 @@ where release_created_at >= '2010-01-01'
 and release_created_at < '2023-08-01' -- FIXME:
 group by year_month
 """
-releases_df = pd.read_sql_query(
-    sql_releases, conn
-)
-releases_df['year_month'] = pd.to_datetime(releases_df['year_month'])
+releases_df = pd.read_sql_query(sql_releases, conn)
+releases_df["year_month"] = pd.to_datetime(releases_df["year_month"])
 
 print(releases_df.describe())
 print(releases_df.head())
@@ -38,19 +36,21 @@ print(releases_df.tail())
 
 
 # plot number of monthly releases
-plt = sns.relplot(x='year_month', y="count", data=releases_df, marker="+")
+plt = sns.relplot(x="year_month", y="count", data=releases_df, marker="+")
 
 # resample the data over 3 months and calculate the mean
-releases_df.set_index('year_month', inplace=True)
-resampled_data = releases_df.resample('3M').mean()
+releases_df.set_index("year_month", inplace=True)
+resampled_data = releases_df.resample("3M").mean()
 
 # add a line plot with x-axis as the resampled date and y-axis as the mean value
-plt.map(sns.lineplot, data=resampled_data, x=resampled_data.index, y='count', color='red')
+plt.map(
+    sns.lineplot, data=resampled_data, x=resampled_data.index, y="count", color="red"
+)
 
-pyplot.title('Alpine Packages')
-pyplot.xlabel('Date')
-pyplot.ylabel('Monthly Release Count')
+pyplot.title("Alpine Packages")
+pyplot.xlabel("Date")
+pyplot.ylabel("Monthly Release Count")
 
 # render to file
 plt.savefig(label)
-print('DONE')
+print("DONE")

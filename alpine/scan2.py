@@ -1,12 +1,14 @@
-# scan2.py 
+# scan2.py
 # scan/plot multiple releases for many packages
 # FIXME: this is a placeholder
 
 import contextlib
+import datetime
 import json
 import sys
+
 from dbsetup import dbopen, query1, queryall
-import datetime
+
 
 # parse datetime from this format "2015-01-01T21:15:10Z"
 # TODO: simplify?
@@ -17,14 +19,15 @@ def parse_datetime(dt_str):
 # FIXME: move to dbsetup.py
 def setup(dbpath):
     "setup database"
-    setup_list = ["""
+    setup_list = [
+        """
     create table if not exists github_releases (
         package TEXT, -- not unique
         release_name TEXT,
         release_created_at TEXT -- datetime in ISO 8601
                   )
         """,
-        """delete from github_releases"""  # FIXME: <===
+        """delete from github_releases""",  # FIXME: <===
     ]
     with contextlib.closing(dbopen(dbpath, readonly=False)) as conn:
         for sql in setup_list:
@@ -55,7 +58,7 @@ def main(dbpath):
         print(package)
         orig_releases = json.loads(releases_json)
         if not orig_releases:
-            print('- (no releases)')
+            print("- (no releases)")
             continue
 
         with contextlib.closing(dbopen(dbpath, readonly=False)) as conn:
