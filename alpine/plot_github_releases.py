@@ -8,7 +8,6 @@
 #         release_created_at TEXT -- datetime in ISO 8601
 
 import sqlite3
-import sys
 
 import pandas as pd
 import seaborn as sns
@@ -18,12 +17,14 @@ sns.set_theme(style="white")
 label = "github_releases.png"
 conn = sqlite3.connect("../shotglass.db")  # FIXME:
 
+# FIXME: plot only complete months
 sql_releases = """
 select
     strftime('%Y-%m', release_created_at) AS year_month,
     COUNT(*) AS count
 from github_releases 
 where release_created_at >= '2010-01-01'
+and release_created_at < '2023-08-01'
 group by year_month
 """
 releases_df = pd.read_sql_query(
@@ -35,7 +36,8 @@ print(releases_df.describe())
 print(releases_df.head())
 print(releases_df.tail())
 
-plt = sns.relplot(x='year_month', y="count", data=releases_df)
+# plot number of monthly releases
+plt = sns.relplot(x='year_month', y="count", data=releases_df, marker="+")
 
 
 # Set 'date' column as the DataFrame index (optional, but can be helpful for time-based resampling)
