@@ -90,6 +90,11 @@ distclean:
 %.show: %.sql  ## run SQL report, send to screen (no output file)
 	sqlite3 -echo $(DBPATH) < $<
 
+%.plot: %.py  ## run Seaborn plot, send to screen and file
+	python3 $<
+	echo imgcat $(subst plot_,,$(patsubst %.py,%.png,$<))
+
+
 show-all: $(patsubst %.sql,%.show,$(wildcard *.sql))
 
 fastlint-flake8:
@@ -118,6 +123,10 @@ plot_demo_scatter:
 plot_github_releases:
 	python3 plot_github_releases.py
 	imgcat github_releases.png
+
+plot_github_releases2:
+	python3 plot_github_releases2.py
+	imgcat github_releases2.png
 
 # :::::::: HELPERS
 
