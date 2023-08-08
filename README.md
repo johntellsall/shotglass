@@ -9,6 +9,26 @@ Computers are useful, but they can only answer questions. The goal of this proje
 
 Computers answer "what" and "when" but never "why".
 
+## Example: Packages Release Faster over Time
+
+    Warning: this is a prelimiary result [August 2023],
+    data and code needs to be checked.
+
+Recently we scanned _an entire Linux distro_ for package data.
+Specifically, the minimal [Alpine distribution](https://www.alpinelinux.org/), often used for containers.
+
+Result: packages tend to release faster over time.
+
+That is, across ~250 of 1600 packages in Alpine Linux, the number of monthly updates goes **up 8x** from ~10 to ~80 releases per month.
+
+Alternate explanations:
+- bugs in data or plotting layers
+- packages take a while to enable GitHub Releases
+- packages exist for a while, then have more official Releases when they're added to Linux distros, like Alpine or others
+- new packages are created later, then added to Alpine
+
+![Alpine GitHub Releases](alpine/images/github_releases-2.png)
+
 
 ## Example: Flask: hires rendering of codebase at present
 
