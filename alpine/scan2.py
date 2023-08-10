@@ -1,6 +1,11 @@
 # scan2.py
 # scan/plot multiple releases for many packages
-# FIXME: this is a placeholder
+# FIXME: add docs
+# FIXME: rename to be consistent
+# DATABASE:
+# - github_releases_blob
+# - github_releases
+
 
 import contextlib
 import datetime
@@ -16,17 +21,9 @@ def parse_datetime(dt_str):
     return datetime.datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%SZ")
 
 
-# FIXME: move to dbsetup.py
 def setup(dbpath):
     "setup database"
     setup_list = [
-        """
-    create table if not exists github_releases (
-        package TEXT, -- not unique
-        release_name TEXT,
-        release_created_at TEXT -- datetime in ISO 8601
-                  )
-        """,
         """delete from github_releases""",  # FIXME: <===
     ]
     with contextlib.closing(dbopen(dbpath, readonly=False)) as conn:
@@ -49,11 +46,12 @@ def main(dbpath):
     # query += " where package='jq'"
     # query += " limit 30"
 
+    # grab cached GitHub Releases
+    # - this is a list of GH Release details, including name and created_at
     with contextlib.closing(dbopen(dbpath)) as conn:
         package_releases = queryall(conn, query)
 
-    # grab cached GitHub Releases
-    # - this is a list of GH Release details, including name and created_at
+    # import all Releases parsed from a Package's JSON blob
     for package, releases_json in package_releases:
         print(package)
         orig_releases = json.loads(releases_json)
@@ -61,14 +59,19 @@ def main(dbpath):
             print("- (no releases)")
             continue
 
+        def format_release(release):
+            created_at = parse_datetime(release["created_at"])
+            return (package, release["name"], created_at)
+        
         with contextlib.closing(dbopen(dbpath, readonly=False)) as conn:
-            for release in orig_releases:
-                created_at = parse_datetime(release["created_at"])
-                new_release = (package, release["name"], created_at)
-                add_releases(conn, [new_release])
+            add_releases(conn, map(format_release, orig_releases))
             conn.commit()
 
+    # validate import by showing summary
     with contextlib.closing(dbopen(dbpath)) as conn:
+        num_packages = query1(conn, "select count(distinct(package)) from github_releases")
+        print(f"{num_packages=}")
+
         num_releases = query1(conn, "select count(*) from github_releases")
         print(f"{num_releases=}")
 

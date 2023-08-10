@@ -7,12 +7,11 @@ import sys
 
 CREATE_TABLES_SQL = [
     """
--- create table to set int fields
-CREATE TABLE "alpine"(
-  "package" TEXT PRIMARY KEY,
-  "num_files" INT,
-  "build_num_lines" INT,
-  "source" TEXT
+CREATE TABLE alpine (
+  package TEXT PRIMARY KEY,
+  num_files INT,
+  build_num_lines INT,
+  source TEXT
 );
 """,
     """
@@ -28,15 +27,12 @@ create table package_tags (
 create table github_releases_blob (
     package TEXT PRIMARY KEY, releases_json TEXT
 );""",
-    #     """
-    # create table package_releases_new (
-    #     package TEXT PRIMARY KEY, name TEXT, tag_name TEXT, created_at DATETIME
-    # );""",
-    #     """
-    # create table package_github (
-    #     package TEXT PRIMARY KEY, api_repos TEXT
-    # );
-    # """,
+  """
+create table github_releases (
+    package TEXT, -- not unique
+    release_name TEXT,
+    release_created_at TEXT -- datetime in ISO 8601
+);"""
 ]
 
 
