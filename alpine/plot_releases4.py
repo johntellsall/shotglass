@@ -1,4 +1,5 @@
-# plot_releases4.py
+# plot_releases4.py -- line plot of total monthly releases
+#
 # FIXME: in development
 # create table if not exists github_releases (
 #         package TEXT, -- not unique
