@@ -42,5 +42,4 @@ plt.xlabel("Year")
 plt.ylabel("Count")
 
 plt.savefig(image_filename)
-print(releases_df.head())
-sys.exit(0)
+

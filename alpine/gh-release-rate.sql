@@ -3,23 +3,40 @@
 --     release_name TEXT,
 --     release_created_at TEXT -- datetime in ISO 8601
 
--- RELEASE COUNT [tmux]
-select count(*) from github_releases where package='tmux';
+-- TOTAL PACKAGES
+select count(distinct(package)) from alpine;
 
--- DATE STATS [tmux]
-select min(release_created_at), max(release_created_at) from github_releases where package='tmux';
+-- COUNT OF PACKAGES WITH ANY GITHUB RELEASES
+select count(distinct(package)) from github_releases;
 
--- DATE RANGE [tmux]
-select cast(
-    julianday(max(release_created_at)) - julianday(min(release_created_at))
-    as integer) as days
-from github_releases where package='tmux';
+-- COUNT OF PACKAGES WITH 5+ GITHUB RELEASES
+ select count(*) from (
+    select 
+    count(*) as num_releases
+    from github_releases
+    group by package
+    having num_releases > 5
+ );
 
--- AVERAGE DAYS PER RELEASE [tmux]
-select cast(
-    julianday(max(release_created_at)) - julianday(min(release_created_at))
-    as integer) / count(*) as days_per_release
-    from github_releases where package='tmux';
+.quit
+
+-- -- RELEASE COUNT [tmux]
+-- select count(*) from github_releases where package='tmux';
+
+-- -- DATE STATS [tmux]
+-- select min(release_created_at), max(release_created_at) from github_releases where package='tmux';
+
+-- -- DATE RANGE [tmux]
+-- select cast(
+--     julianday(max(release_created_at)) - julianday(min(release_created_at))
+--     as integer) as days
+-- from github_releases where package='tmux';
+
+-- -- AVERAGE DAYS PER RELEASE [tmux]
+-- select cast(
+--     julianday(max(release_created_at)) - julianday(min(release_created_at))
+--     as integer) / count(*) as days_per_release
+--     from github_releases where package='tmux';
 
 
 .headers on
