@@ -69,7 +69,8 @@ def main(dbpath):
 
     # validate import by showing summary
     with contextlib.closing(dbopen(dbpath)) as conn:
-        num_packages = query1(conn, "select count(distinct(package)) from github_releases")
+        sql = "select count(distinct(package)) from github_releases"
+        num_packages = query1(conn, sql)
         print(f"{num_packages=}")
 
         num_releases = query1(conn, "select count(*) from github_releases")
