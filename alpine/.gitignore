@@ -5,3 +5,5 @@ __pycache__
 .pytest_cache
 temp.csv
 old_scan.py
+*.png
+*.json

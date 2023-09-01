@@ -1,41 +1,42 @@
+# releases_strip.py -- show Alpine releases over time as points
+
 import altair as alt
 import streamlit as st
 
 import sqlite3
 
 import pandas as pd
-import altair as alt
 import numpy as np
 import pandas as pd
 
-if 0:
+if 1:
     # Create some example data for a heatmap
-    data = pd.DataFrame({
-        'x': np.repeat(range(5), 5),
-        'y': np.tile(range(5), 5),
-        'value': np.random.randint(1, 10, size=25)
-    })
-    heatmap = alt.Chart(data).mark_rect().encode(
-        x='x:O',  # Ordinal scale for x-axis
-        y='y:O',  # Ordinal scale for y-axis
-        color='value:Q'  # Quantitative scale for color
+    from vega_datasets import data
+
+    source = data.cars()
+    print(source.info())
+    print(source.columns)
+    # print(source.loc['Horsepower'])
+
+    plot = alt.Chart(source).mark_tick().encode(
+        x='Weight_in_lbs:Q',
+        y='Cylinders:O'
     )
-    st.altair_chart(heatmap, use_container_width=True)
+    st.altair_chart(plot, use_container_width=True)
 
 conn = sqlite3.connect("../shotglass.db")  # FIXME:
 
 
 sql_releases = """
 select
-    strftime('%Y', release_created_at) AS year,
-    strftime('%m', release_created_at) AS month,
-    strftime('%Y-%m', release_created_at) AS year_month,
-    release_created_at AS release_datetime,
-    count(*) AS count
+    package,
+    release_created_at
 from github_releases
-group by year, month
+where package='tmux'
 """
 data = pd.read_sql_query(sql_releases, conn)
+print(data.head())
+assert 0
 
 # only render full years worth of data
 data = data[data.release_datetime < '2023-01-01']  # FIXME:

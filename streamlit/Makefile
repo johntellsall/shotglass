@@ -7,3 +7,6 @@ setup:
 .PHONY: %.plot
 %.plot: %.py setup
 	venv/bin/streamlit run $<
+
+loop:
+	git ls-files | entr -c make releases_strip.plot
