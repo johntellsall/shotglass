@@ -17,15 +17,15 @@ Open browser to the Streamlit instance, http://localhost:8501/
 
 ## Shotglass apps
 
-Generally works in progress
-
 <dl>
 <dt>releases_heatmap.py</dt>
-<dd>WIP: heatmap of Alpine packages releases over time
+<dd>heatmap of Alpine packages releases over time
+</dd>
 <dt>releases_strip.py</dt>
 <dd>Releases over time, rendered as strips.</dd>
 </dl>
 
+![releases_strip](media/releases_strip.png)
 ![releases_strip](media/releases_strip.png)
 
 ## List of Demos
