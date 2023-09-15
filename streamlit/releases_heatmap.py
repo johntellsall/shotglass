@@ -22,8 +22,10 @@ if 0:
     )
     st.altair_chart(heatmap, use_container_width=True)
 
-conn = sqlite3.connect("../shotglass.db")  # FIXME:
+"## Shotglass: release heatmap"
+"Alpine package releases over time"
 
+conn = sqlite3.connect("../shotglass.db")  # FIXME:
 
 sql_releases = """
 select
@@ -42,14 +44,26 @@ data = data[data.release_datetime < '2023-01-01']  # FIXME:
 
 data['year'] = pd.to_datetime(data['year'], format='%Y')
 data['month'] = pd.to_datetime(data['month'], format='%m')
+
+if st.checkbox('Show raw data'):
+    st.subheader('Raw data')
+    st.write(data)
+
+if st.checkbox("Show summary"):
+    st.write(data.describe())
+
 print(data.dtypes)
 # data['month'] = data['month'].dt.strftime('%b')
 
 print(data.head())
+print(data.describe())
 
+# T=time, O=ordinal, Q=quantitative
 heatmap = alt.Chart(data).mark_rect().encode(
-        x='year:T',
-        y=alt.Y('month:T', sort=None),
-        color='count:Q'  # Quantitative scale for color
+        x=alt.X('year', title='Year', timeUnit='year'),
+        y=alt.Y('month:O', sort=None),
+        color=alt.Color('count')
     )
 st.altair_chart(heatmap, use_container_width=True)
+
+"## 832"
