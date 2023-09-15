@@ -1,12 +1,9 @@
 DBPATH := ../shotglass.db
-# DBPATH := alpine.db
 SAMPLE_REPOS := ../SOURCE/flask
 
 all:
 
 
-# help:
-# 	awk '/^[a-z]/ && {print $$1}' Makefile
 # :::::::: RENDER
 
 plot:
@@ -27,11 +24,6 @@ dbimport:  ## import Alpine packages (APKBUILD) info into database
 
 scan_releases:
 	python3 ./scan_github_releases.py $(DBPATH)
-# @echo "DONE: summarize with 'make list-pkg-tags.show'"
-
-# zap_releases:  ## delete contents of package_tags table
-# 	sqlite3 -echo $(DBPATH) 'delete from package_tags'
-# 	sqlite3 -echo $(DBPATH) 'select count(*) from package_tags' | grep 0
 
 
 # :::::::: DATABASE QUERY / EXAMPLES
@@ -48,7 +40,7 @@ schema:
 show:
 	sqlite3 -echo $(DBPATH) '.read show.sql'
 
-ex-list-tags:  ## list remote tags
+ex-list-tags:  ## example: list remote Git tags
 	git ls-remote --tags https://github.com/tmux/tmux
 
 # :::::::: FILESYSTEM
