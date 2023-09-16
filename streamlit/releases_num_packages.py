@@ -5,8 +5,7 @@ import pandas as pd
 import sqlite3
 
 
-
-"## Shotglass: release heatmap"
+# "## Shotglass: release heatmap"
 "Alpine package releases over time"
 
 conn = sqlite3.connect("../shotglass.db")  # FIXME:
@@ -29,20 +28,9 @@ data = data[data.release_datetime < '2023-01-01']  # FIXME:
 data['year'] = pd.to_datetime(data['year'], format='%Y')
 data['month'] = pd.to_datetime(data['month'], format='%m')
 
-print(data.dtypes)
-print(data.head())
-print(data.describe())
-
-# T=time, O=ordinal, Q=quantitative
-heatmap = alt.Chart(data).mark_rect().encode(
-        x=alt.X('year(year)', title='Year', timeUnit='year'),
-        y=alt.Y('month(month)', timeUnit='month', title='Month'),
-        # y=alt.Y('month:O', timeUnit='month', title='Month'),
-        # y=alt.Y('month(month)', title='Month'),
-        color=alt.Color('count')
-    )
-st.altair_chart(heatmap, use_container_width=True)
-"---"
+# print(data.dtypes)
+# print(data.head())
+# print(data.describe())
 
 "## Number of releases over time"
 st.line_chart(data, y='count')
