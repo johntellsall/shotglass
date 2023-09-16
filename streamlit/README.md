@@ -20,13 +20,17 @@ Open browser to the Streamlit instance, http://localhost:8501/
 <dl>
 <dt>releases_heatmap.py</dt>
 <dd>heatmap of Alpine packages releases over time
+
+TODO: plot average releases _per package_ vs total for all packages
+
+![releases_heatmap](media/releases_heatmap.png)
 </dd>
 <dt>releases_strip.py</dt>
-<dd>Releases over time, rendered as strips.</dd>
+<dd>Releases over time, rendered as strips.
+
+![releases_strip](media/releases_strip.png)</dd>
 </dl>
 
-![releases_strip](media/releases_strip.png)
-![releases_strip](media/releases_strip.png)
 
 ## List of Demos
 
