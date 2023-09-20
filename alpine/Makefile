@@ -141,3 +141,8 @@ update-alpine:
 
 clone-alpine:
 	git clone --depth=1 https://gitlab.alpinelinux.org/alpine/aports.git
+
+# :::::::: ALSO
+
+zoot:
+	python3 ./git_log_remote.py https://github.com/tmux/tmux
