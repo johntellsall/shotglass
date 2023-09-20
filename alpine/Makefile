@@ -43,6 +43,20 @@ show:
 ex-list-tags:  ## example: list remote Git tags
 	git ls-remote --tags https://github.com/tmux/tmux
 
+ex-list-tags2:
+	git --git-dir=/tmp/tmux log --date=iso --pretty=format:'%ad %S %s' 1.0 2.0
+
+ex-list-tags-all:
+	git --git-dir=/tmp/tmux tag -l > z
+	git --git-dir=/tmp/tmux log --date=iso --pretty=format:'%ad %S %s' \
+		$$(cat z)
+
+ex-fetch-tags:
+	git --git-dir=/tmp/tmux init
+	git --git-dir=/tmp/tmux fetch --tags --prune \
+		https://github.com/tmux/tmux
+	git --git-dir=/tmp/tmux tag -l
+
 # :::::::: FILESYSTEM
 
 alpine_stats:  ## show subset of package info
