@@ -29,10 +29,18 @@ select * from symbol limit 3;
 select count(*) from file;
 select * from file limit 3;
 
--- min, max symbols per file
--- select min(count), max(count) from (
-    select file_id, count(*) as count from symbol group by file_id;
--- );
+-- MIN, MAX SYMBOLS PER FILE
+select path, count from (
+    select path, count(*) as count from symbol
+    where path not like '%/__init__.py'
+    group by file_id
+) order by count limit 3;
+select path, count from (
+    select path, count(*) as count from symbol
+    where path not like '%/__init__.py'
+    group by file_id
+) order by count desc limit 3;
+
 
 -- TEST: FILES FOR POSTGRESQL
 select * from file where path like '%postgresql%' limit 3;

@@ -123,6 +123,7 @@ def db_add_symbols(con, project_path, filehash, path):
     # print(f"{path=} {file_ids=}")
 
     # copy file from Git to filesystem (uncompress if needed)
+    # FIXME: support other languages
     run.run_blob(f"git -C {project_path} show {filehash} > .temp.py")
 
     # parse symbols from source file
@@ -133,8 +134,10 @@ def db_add_symbols(con, project_path, filehash, path):
 
     # insert symbols into database
     insert_sym = f"""
-    insert into symbol (name, path, line_start, line_end, kind) values (
-        :name, '{path}', :line, :end, :kind)
+    insert into symbol (
+        name, path, line_start, line_end, kind, file_id
+    ) values (
+        :name, '{path}', :line, :end, :kind, {file_id})
     """
     con.executemany(insert_sym, IterFixedFields(items))
 

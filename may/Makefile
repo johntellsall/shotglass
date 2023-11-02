@@ -10,7 +10,10 @@ all:
 demo:
 	./main.py reset-db
 	./main.py add-project ../SOURCE/sqlalchemy
+	@echo
 	make pysummary
+	@echo
+	make summary-symbols.show
 
 # demo3:
 # 	./main.py reset-db

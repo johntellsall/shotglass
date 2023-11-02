@@ -52,8 +52,8 @@ def is_interesting(path):
         first, _ = path.split("/", 1)
         if first in DULL_DIRS:
             return False
-    if path.endswith("__init__.py"):
-        return False
+    # if path.endswith("__init__.py"):
+    #     return False
     if "/testsuite/" in path:
         return False
     return True
