@@ -10,6 +10,7 @@ import tempfile
 def run(args):
     return subprocess.check_output(args).decode('utf-8')
 
+
 # FIXME: create new tempdir if cache is for different repos
 # - check git_url inside FETCH_HEAD header
 def get_tag_info(git_url, datadir):
@@ -23,10 +24,12 @@ def get_tag_info(git_url, datadir):
     out = run(['git', temp_gitdir, 'tag', '-l', tag_format])
     return out
 
+# NOTE: download contents of one version:
+# curl --silent -L https://sourceforge.net/projects/zsh/files/zsh/5.9/zsh-5.9.tar.xz | tar xvf -
 
 def main(repos_url):
     print(repos_url)
-    cached = False
+    cached = True
     if cached:
         tmpdir = '/tmp/test_remote'
         tag_lines = get_tag_info(repos_url, tmpdir)
@@ -35,6 +38,7 @@ def main(repos_url):
             tag_lines = get_tag_info(repos_url, tmpdir)
     print(tag_lines)
 
+# NOTE: here's the "git log" version:
 # 	git --git-dir=/tmp/tmux log --date=iso --pretty=format:'%ad %S %s' \
 # 		$$(cat z)
 

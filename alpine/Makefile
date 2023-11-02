@@ -146,3 +146,6 @@ clone-alpine:
 
 zoot:
 	python3 ./git_log_remote.py https://github.com/tmux/tmux
+zoot2:
+	python3 ./git_log_remote.py \
+	https://sourceforge.net/projects/zsh/files/zsh/5.9/zsh-5.9.tar.xz
