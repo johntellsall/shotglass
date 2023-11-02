@@ -47,7 +47,7 @@ def is_source(path):
 # TODO: make flexible
 # TODO: add "+package+"
 def is_interesting(path):
-    DULL_DIRS = set(["docs", "examples", "scripts", "tests"])
+    DULL_DIRS = set([".github", "docs", "examples", "scripts", "tests"])
     if "/" in path:
         first, _ = path.split("/", 1)
         if first in DULL_DIRS:
@@ -60,6 +60,10 @@ def is_interesting(path):
 
 
 def filter_goodsource(items):
+    """
+    iterate over source files that are 'interesting'
+    E.g.: only source files; skip tests, docs, examples
+    """
     for item in items:
         path = item["path"]
         if is_source(path) and is_interesting(path):
@@ -69,7 +73,7 @@ def filter_goodsource(items):
 # TODO: make flexible
 is_good_tag = re.compile(r"^[0-9]+\.[0-9]+$").match
 
-
+# FIXME: conflicts with GoodSourceConfig
 def get_good_tags(path):
     raw_tags = git_tag_list(path)
     tags = list(filter(is_good_tag, raw_tags))

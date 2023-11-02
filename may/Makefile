@@ -2,6 +2,7 @@
 SAMPLE := ../SOURCE/flask
 # PY_SOURCE := $(shell git ls-files './*.py')
 PY_SOURCE := $(shell ls -1 *.py)
+DBPATH := main.db
 
 
 all:
@@ -40,10 +41,12 @@ summary: summary.csv
 pysummary:
 	./main.py summary
 
+
 %.csv: %.sql
-	sqlite3 main.db ".read $<"
+	sqlite3 $(DBPATH) ".read $<"
 
-
+%.show: %.sql  ## run SQL report, send to screen (no output file)
+	sqlite3 -echo $(DBPATH) < $<
 
 # TODO: skip sample_code and test_*.py
 coverage:
