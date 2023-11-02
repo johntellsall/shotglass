@@ -31,5 +31,10 @@ select * from file limit 3;
 
 -- min, max symbols per file
 -- select min(count), max(count) from (
-    select file_id, count(*) as count from symbol group by file_id
+    select file_id, count(*) as count from symbol group by file_id;
 -- );
+
+-- TEST: FILES FOR POSTGRESQL
+select * from file where path like '%postgresql%' limit 3;
+-- TEST: SYMBOLS FOR POSTGRESQL
+select * from symbol where path like '%postgresql%' limit 3;

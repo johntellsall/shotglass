@@ -47,7 +47,7 @@ def is_source(path):
 # TODO: make flexible
 # TODO: add "+package+"
 def is_interesting(path):
-    DULL_DIRS = set([".github", "docs", "examples", "scripts", "tests"])
+    DULL_DIRS = set([".github", "doc", "docs", "examples", "scripts", "test", "tests"])
     if "/" in path:
         first, _ = path.split("/", 1)
         if first in DULL_DIRS:

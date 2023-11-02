@@ -115,6 +115,13 @@ def db_add_symbols(con, project_path, filehash, path):
         click.echo(f"{path=}: unsupported language")
         return
 
+    # get file ID TODO: better way?
+    sql = "select id from file where hash=?"
+    file_id = query1(con, sql=sql, args=[filehash])
+    # file_ids = [row[0] for row in con.execute(sql, [filehash])]
+    # assert len(file_ids) == 1
+    # print(f"{path=} {file_ids=}")
+
     # copy file from Git to filesystem (uncompress if needed)
     run.run_blob(f"git -C {project_path} show {filehash} > .temp.py")
 
