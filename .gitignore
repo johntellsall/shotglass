@@ -12,3 +12,4 @@ tags
 *.dat
 *.db
 SOURCE
+.temp.py
