@@ -8,9 +8,9 @@ DBPATH := main.db
 all:
 
 demo:
-	python3 plot_sunburst.py $(DBPATH)
+	python3 plot_sunburst.py
 
-OLD-demo:
+build:
 	./main.py reset-db
 	./main.py add-project ../SOURCE/sqlalchemy
 	@echo
