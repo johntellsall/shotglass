@@ -43,6 +43,6 @@ select path, count from (
 
 
 -- TEST: FILES FOR POSTGRESQL
-select * from file where path like '%postgresql%' limit 3;
+-- select * from file where path like '%postgresql%' limit 3;
 -- TEST: SYMBOLS FOR POSTGRESQL
-select * from symbol where path like '%postgresql%' limit 3;
+-- select * from symbol where path like '%postgresql%' limit 3;

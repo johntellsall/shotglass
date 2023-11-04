@@ -111,16 +111,15 @@ def db_add_symbols(con, project_path, filehash, path):
     """
     Parse symbols from file, add to database
     """
+    def is_dull(path):
+        return path.endswith("__init__.py")
+
     if not path.endswith(".py"):  # TODO:
         click.echo(f"{path=}: unsupported language")
         return
 
-    # get file ID TODO: better way?
     sql = "select id from file where hash=?"
     file_id = query1(con, sql=sql, args=[filehash])
-    # file_ids = [row[0] for row in con.execute(sql, [filehash])]
-    # assert len(file_ids) == 1
-    # print(f"{path=} {file_ids=}")
 
     # copy file from Git to filesystem (uncompress if needed)
     # FIXME: support other languages
@@ -128,7 +127,7 @@ def db_add_symbols(con, project_path, filehash, path):
 
     # parse symbols from source file
     items = list(run.run_ctags(".temp.py"))
-    if not items:
+    if not items and not is_dull(path):
         click.secho(f"- {path=}: no symbols")
         return
 
@@ -229,8 +228,9 @@ def add_project(project_path):
     db_add_project(con, project_path)
     con.commit()
 
-    if 0:
+    if 1:
         proj_config = goodsource.GoodSourceConfig(project_path)
+        proj_config.set_good_pat('latest')
     else:
 
         class SqlAlchemyConfig(goodsource.GoodSourceConfig):

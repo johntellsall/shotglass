@@ -70,16 +70,6 @@ def filter_goodsource(items):
             yield item
 
 
-# TODO: make flexible
-is_good_tag = re.compile(r"^[0-9]+\.[0-9]+$").match
-
-# FIXME: conflicts with GoodSourceConfig
-def get_good_tags(path):
-    raw_tags = git_tag_list(path)
-    tags = list(filter(is_good_tag, raw_tags))
-    return tags
-
-
 class SourceConfig:
     def __init__(self, path):
         self.path = path
@@ -88,16 +78,46 @@ class SourceConfig:
         return git_tag_list(self.path)
 
 
+# FIXME: remove unused?
 class AllSourceConfig(SourceConfig):
     pass
 
 
+# TODO: make flexible
 class GoodSourceConfig(SourceConfig):
-    # TODO: make flexible
-    is_good_tag = re.compile(r"^[0-9]+\.[0-9]+$").match
+    GOOD_PATS = {
+        'major_minor': r"^[0-9]+\.[0-9]+$",
+        'numbers': r"^[0-9.]+$"  # exclude "2.0.0rc1"
+    }
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.good_pat = None
+
+    def set_good_pat(self, pat):
+        if pat.startswith('^'):
+            self.good_pat = pat # regex
+        elif pat in (None, 'latest'):
+            self.good_pat = pat # None=all tags; latest=latest
+        else:
+            self.good_pat = self.GOOD_PATS[pat]
+
+    def _get_tags_latest(self, raw_tags):
+        tags = list(git_tag_list(self.path))
+        return tags[-1:]
 
     def get_tags(self):
         raw_tags = git_tag_list(self.path)
-        tags = list(filter(self.is_good_tag, raw_tags))
-        # tags = tags[:10]
+        if self.good_pat == 'latest':
+            return self._get_tags_latest(raw_tags)
+        elif self.good_pat is None:
+            return list(raw_tags)
+
+        is_good_tag = re.compile(self.good_pat).match
+        tags = list(filter(is_good_tag, raw_tags))
         return tags
+
+
+def get_good_tags(path):
+    good_source = GoodSourceConfig(path)
+    return good_source.get_tags()

@@ -10,13 +10,17 @@ all:
 demo:
 	python3 plot_sunburst.py
 
-build:
-	./main.py reset-db
-	./main.py add-project ../SOURCE/sqlalchemy
-	@echo
-	make pysummary
-	@echo
-	make summary-symbols.show
+# flask			  20K LOC Python library
+# zulip			 300K LOC Python application
+# sqlalchemy	 463K LOC Python library
+# odoo			1547K LOC Python office suite
+
+stats:
+	wc -l $$(rg -g '*.py' --files) | tail -1
+
+build-tiny:
+	./build.sh flask
+
 
 # demo3:
 # 	./main.py reset-db
