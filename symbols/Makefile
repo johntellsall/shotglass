@@ -8,6 +8,9 @@ DBPATH := main.db
 all:
 
 demo:
+	python3 plot_sunburst.py $(DBPATH)
+
+OLD-demo:
 	./main.py reset-db
 	./main.py add-project ../SOURCE/sqlalchemy
 	@echo
@@ -70,12 +73,12 @@ run:
 	./main.py ls-tags $(SAMPLE)
 
 test:
-	.venv/bin/pytest -v
+	venv/bin/pytest -v
 
 setup:
-	python3 -m venv .venv
-	.venv/bin/pip install wheel
-	.venv/bin/pip install -r requirements.txt
+	test -d venv || python3 -m venv venv
+	venv/bin/pip install wheel
+	venv/bin/pip install -r requirements.txt
 
 fmt:
 	isort .

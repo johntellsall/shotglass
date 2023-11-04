@@ -8,3 +8,5 @@ pytest-cov
 isort
 ipdb
 pyright
+plotly
+pandas
