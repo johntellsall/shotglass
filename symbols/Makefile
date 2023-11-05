@@ -9,10 +9,11 @@ DBPATH := main.db
 
 all:
 
-demo:
+demo0:
 	./main.py add-project --reset-db ../SOURCE/flask
 	make summary-symbols.show
-# python3 plot_sunburst2.py
+demo:
+	python3 plot_sunburst2.py
 
 # flask			  20K LOC Python library
 # zulip			 300K LOC Python application

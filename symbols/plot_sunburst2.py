@@ -1,3 +1,4 @@
+import sys
 import plotly.express as px
 import pandas as pd
 import state
@@ -9,21 +10,21 @@ sql = """
 select f.path as path, count(*) as count
 from symbol s, file f
 where s.file_id = f.id
-order by path
+group by f.path
+order by f.path
 """
 paths_df = pd.read_sql_query(sql, db)
 if len(paths_df) <= 1:
-    print("No data")
-    assert 0
+    sys.exit("No data")
+
 if 1:
     print(paths_df.head())
     print(paths_df.describe())
-    breakpoint()
-#     assert 0
+    # breakpoint()
 
 # remove boring paths
 # FIXME: merge with goodsource.py?
-paths_df = paths_df[~paths_df['path'].str.contains('__init__')]
+# paths_df = paths_df[~paths_df['path'].str.contains('__init__')]
 # TODO: loop and remove other boring directories
 
 
@@ -37,7 +38,7 @@ for index, row in paths_df.iterrows():
     elif parts[:2] == ('src', 'flask'):
         parts = tuple(parts[2:])
     data.append([parts, row['count']])
-    breakpoint()
+    # breakpoint()
 
 plot_df = pd.DataFrame(data, columns=['path', 'count'])
 print(paths_df.head())
