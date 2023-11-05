@@ -154,24 +154,24 @@ def db_add_symbols(con, project_path, filehash, path):
     con.executemany(insert_sym, IterFixedFields(items))
 
 
-def do_add_symbols(con, project_path, limit=False):
+def do_add_symbols(con, project_path):
     """
     list files from database (one project only)
     - parse each file for symbols
     - add symbols to database
     """
-    # limit = True # FIXME: debugging, remove
 
     # Per file: extract symbols
-    # TODO: restrict to interesting releases+files
+    # TODO: restrict to interesting releases+files?
     project_id = db_get_project_id(con, project_path)
     project_name = Path(project_path).name
 
+    sql = f"select count(distinct release) from file where project_id={project_id}"
+    assert query1(con, sql=sql) == 1, "FIXME: handle multiple releases"
+
+
     click.secho(f"{project_name}: adding file info", fg="cyan")
     sql = f"select path, hash, release from file where project_id={project_id}"
-    if limit:
-        click.secho(f"WARNING: limit 5", fg="red")
-        sql += " LIMIT 5"
     batch = 5
 
     for num, (path, filehash, _release) in enumerate(con.execute(sql)):
