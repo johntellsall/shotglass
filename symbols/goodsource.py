@@ -44,19 +44,13 @@ def is_source(path):
     return PurePath(path).suffix in [".c", ".py"]
 
 
-# TODO: make flexible
+# FIXME: make flexible
 # TODO: add "+package+"
+# TODO: merge interesting *files* with interesting *releases*?
+DULL_DIRS = set([".github", "doc", "docs", "examples", "scripts", "test", "tests", "testsuite"])
 def is_interesting(path):
-    DULL_DIRS = set([".github", "doc", "docs", "examples", "scripts", "test", "tests"])
-    if "/" in path:
-        first, _ = path.split("/", 1)
-        if first in DULL_DIRS:
-            return False
-    # if path.endswith("__init__.py"):
-    #     return False
-    if "/testsuite/" in path:
-        return False
-    return True
+    parts = set(PurePath(path).parts)
+    return not DULL_DIRS.intersection(parts)
 
 
 def filter_goodsource(items):

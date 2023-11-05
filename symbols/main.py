@@ -112,7 +112,8 @@ def db_add_symbols(con, project_path, filehash, path):
     Parse symbols from file, add to database
     """
     def is_dull(path):
-        return path.endswith("__init__.py")
+        # __init__.py and __manifest__.py
+        return path.endswith("__.py")
 
     if not path.endswith(".py"):  # TODO:
         click.echo(f"{path=}: unsupported language")
@@ -160,7 +161,8 @@ def do_add_symbols(con, project_path, limit=False):
     for num, (path, filehash, _release) in enumerate(con.execute(sql)):
         if not num or (num + 1) % batch == 0:
             click.secho(f"- {num+1:03d} {path=} {filehash=}")
-            batch *= 2
+            batch = min(batch*2, 50)
+            
         # TODO: more work here
         db_add_symbols(con, project_path, filehash=filehash, path=path)
     con.commit()
@@ -180,6 +182,11 @@ def do_add_files(con, project_path):
     release_sql = f"select label from release where project_id={project_id}"
     releases = [label for (label,) in con.execute(release_sql)]
     goodsource.sort_versions(releases)
+
+    # FIXME: handle this better!
+    if releases == ['']:
+        logging.warning("%s: no release tags -- using HEAD", project_name)
+        releases = ['HEAD']
 
     for label in releases:
         click.echo(f"{project_id=} release {label}")

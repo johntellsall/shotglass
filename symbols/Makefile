@@ -13,13 +13,15 @@ demo:
 # flask			  20K LOC Python library
 # zulip			 300K LOC Python application
 # sqlalchemy	 463K LOC Python library
-# odoo			1547K LOC Python office suite
+# odoo			1547K LOC Python office suite	682K files
 
 stats:
 	wc -l $$(rg -g '*.py' --files) | tail -1
 
 build-tiny:
 	./build.sh flask
+build-huge:
+	./build.sh odoo
 
 
 # demo3:
