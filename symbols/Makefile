@@ -1,3 +1,5 @@
+# export PYTHONASYNCIODEBUG=1
+# export PYTHONBREAKPOINT=ipdb.set_trace
 
 SAMPLE := ../SOURCE/flask
 # PY_SOURCE := $(shell git ls-files './*.py')
@@ -8,7 +10,7 @@ DBPATH := main.db
 all:
 
 demo:
-	python3 plot_sunburst.py
+	python3 plot_sunburst2.py
 
 # flask			  20K LOC Python library
 # zulip			 300K LOC Python application

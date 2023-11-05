@@ -204,6 +204,16 @@ def do_add_files(con, project_path):
         result = list(con.execute(sql, [label]))
         click.secho(f"rel {label}: num files: {result[0][0]}")
 
+    symbol_count_sql = """
+    select f.path as path, count(*) as count
+from symbol s, file f
+where s.file_id = f.id
+order by path
+limit 3
+"""
+    result = list(con.execute(symbol_count_sql))
+    click.echo(f"symbol count: {result}")
+
 
 # :::::::::::::::::::: COMMANDS
 
