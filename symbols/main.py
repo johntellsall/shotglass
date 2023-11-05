@@ -126,6 +126,10 @@ def db_add_symbols(con, project_path, filehash, path):
         click.echo(f"{path=}: unsupported language")
         return
 
+    # don't warn if __init__ or __manifest__ files are empty
+    def is_dull(path):
+        return path.endswith('__.py')
+    
     sql = "select id from file where hash=?"
     file_id = query1(con, sql=sql, args=[filehash])
 
@@ -136,7 +140,8 @@ def db_add_symbols(con, project_path, filehash, path):
     # parse symbols from source file
     items = list(run.run_ctags(".temp.py"))
     if not items:
-        click.secho(f"- {path=}: no symbols")
+        if not is_dull(path):
+            click.secho(f"- {path=}: no symbols")
         return
 
     # insert symbols into database
@@ -215,15 +220,15 @@ def do_add_files(con, project_path):
         result = list(con.execute(sql, [label]))
         click.secho(f"rel {label}: num files: {result[0][0]}")
 
-    symbol_count_sql = """
-    select f.path as path, count(*) as count
-from symbol s, file f
-where s.file_id = f.id
-order by path
-limit 3
-"""
-    result = list(con.execute(symbol_count_sql))
-    click.echo(f"symbol count: {result}")
+#     symbol_count_sql = """
+#     select f.path as path, count(*) as count
+# from symbol s, file f
+# where s.file_id = f.id
+# order by path
+# limit 3
+# """
+#     result = query1(con, sql=symbol_count_sql)
+#     click.echo(f"symbol count: {result}")
 
 
 # :::::::::::::::::::: COMMANDS
