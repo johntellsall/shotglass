@@ -20,6 +20,8 @@ stats:
 
 build-tiny:
 	./build.sh flask
+build-medium:
+	./build.sh zulip
 build-huge:
 	./build.sh odoo
 
