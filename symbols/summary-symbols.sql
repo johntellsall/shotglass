@@ -35,21 +35,8 @@ select name,path,file_id from symbol order by file_id desc limit 3;
 
 select count(distinct file_id) from symbol;
 
-select f.path as path, count(*) as count
+-- SYMBOLS: COUNT BY FILE
+select f.path, count(*) as count
 from symbol s, file f
 where s.file_id = f.id
-order by path
-limit 3;
-
-
-
--- PER FILE, COUNT OF SYMBOLS
-select f.id, f.path as path, count(*) as count
-from symbol s, file f
-where s.file_id = f.id
-order by path;
-
--- TEST: FILES FOR POSTGRESQL
--- select * from file where path like '%postgresql%' limit 3;
--- TEST: SYMBOLS FOR POSTGRESQL
--- select * from symbol where path like '%postgresql%' limit 3;
+group by f.path;
