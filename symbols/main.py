@@ -122,10 +122,6 @@ def db_add_symbols(con, project_path, filehash, path):
     """
     Parse symbols from file, add to database
     """
-    # def is_dull(path):
-    #     # __init__.py and __manifest__.py
-    #     return path.endswith("__.py")
-
     if not path.endswith(".py"):  # TODO:
         click.echo(f"{path=}: unsupported language")
         return
@@ -139,7 +135,7 @@ def db_add_symbols(con, project_path, filehash, path):
 
     # parse symbols from source file
     items = list(run.run_ctags(".temp.py"))
-    if not items: #  and not is_dull(path):
+    if not items:
         click.secho(f"- {path=}: no symbols")
         return
 
@@ -150,7 +146,6 @@ def db_add_symbols(con, project_path, filehash, path):
     ) values (
         :name, '{path}', :line, :end, :kind, {file_id})
     """
-    click.echo(f"{file_id=} {items[:5]}")
     con.executemany(insert_sym, IterFixedFields(items))
 
 

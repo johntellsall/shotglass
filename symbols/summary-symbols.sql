@@ -39,4 +39,5 @@ select count(distinct file_id) from symbol;
 select f.path, count(*) as count
 from symbol s, file f
 where s.file_id = f.id
-group by f.path;
+group by f.path
+limit 3;
