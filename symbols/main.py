@@ -122,9 +122,9 @@ def db_add_symbols(con, project_path, filehash, path):
     """
     Parse symbols from file, add to database
     """
-    def is_dull(path):
-        # __init__.py and __manifest__.py
-        return path.endswith("__.py")
+    # def is_dull(path):
+    #     # __init__.py and __manifest__.py
+    #     return path.endswith("__.py")
 
     if not path.endswith(".py"):  # TODO:
         click.echo(f"{path=}: unsupported language")
@@ -139,7 +139,7 @@ def db_add_symbols(con, project_path, filehash, path):
 
     # parse symbols from source file
     items = list(run.run_ctags(".temp.py"))
-    if not items and not is_dull(path):
+    if not items: #  and not is_dull(path):
         click.secho(f"- {path=}: no symbols")
         return
 
@@ -150,6 +150,7 @@ def db_add_symbols(con, project_path, filehash, path):
     ) values (
         :name, '{path}', :line, :end, :kind, {file_id})
     """
+    click.echo(f"{file_id=} {items[:5]}")
     con.executemany(insert_sym, IterFixedFields(items))
 
 
@@ -159,7 +160,7 @@ def do_add_symbols(con, project_path, limit=False):
     - parse each file for symbols
     - add symbols to database
     """
-    limit = True # FIXME: debugging, remove
+    # limit = True # FIXME: debugging, remove
 
     # Per file: extract symbols
     # TODO: restrict to interesting releases+files
@@ -169,6 +170,7 @@ def do_add_symbols(con, project_path, limit=False):
     click.secho(f"{project_name}: adding file info", fg="cyan")
     sql = f"select path, hash, release from file where project_id={project_id}"
     if limit:
+        click.secho(f"WARNING: limit 5", fg="red")
         sql += " LIMIT 5"
     batch = 5
 
