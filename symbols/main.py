@@ -23,6 +23,17 @@ logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 # :::::::::::::::::::: APP-CENTRIC FUNCTIONS
 
 
+
+def db_reset():
+    """
+    delete database
+    """
+    try:
+        Path("main.db").unlink()  # FIXME: take dbpath from args
+    except FileNotFoundError:
+        pass
+
+
 def db_add_project(con, project_path):
     """
     add single project record into database
@@ -148,6 +159,8 @@ def do_add_symbols(con, project_path, limit=False):
     - parse each file for symbols
     - add symbols to database
     """
+    limit = True # FIXME: debugging, remove
+
     # Per file: extract symbols
     # TODO: restrict to interesting releases+files
     project_id = db_get_project_id(con, project_path)
@@ -158,6 +171,7 @@ def do_add_symbols(con, project_path, limit=False):
     if limit:
         sql += " LIMIT 5"
     batch = 5
+
     for num, (path, filehash, _release) in enumerate(con.execute(sql)):
         if not num or (num + 1) % batch == 0:
             click.secho(f"- {num+1:03d} {path=} {filehash=}")
@@ -234,11 +248,11 @@ def summary():
 
 
 @cli.command()
+@click.option("--reset-db", is_flag=True)
 @click.argument("project_path")
-def add_project(project_path):
-    """
-    list project Releases, and stats for each release
-    """
+def add_project(project_path, reset_db=False):
+    if reset_db:
+        db_reset()
 
     con = state.get_db(temporary=False)
 
@@ -284,17 +298,6 @@ def ls_tags(path):
     click.echo(f"List Tags {path}")
     tags = goodsource.git_tag_list(path)
     pprint.pprint(tags)
-
-
-@cli.command()
-def reset_db():
-    """
-    delete database
-    """
-    try:
-        Path("main.db").unlink()
-    except FileNotFoundError:
-        pass
 
 
 @cli.command()

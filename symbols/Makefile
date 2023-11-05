@@ -10,7 +10,9 @@ DBPATH := main.db
 all:
 
 demo:
-	python3 plot_sunburst2.py
+	./main.py add-project --reset-db ../SOURCE/flask
+
+	# python3 plot_sunburst2.py
 
 # flask			  20K LOC Python library
 # zulip			 300K LOC Python application
