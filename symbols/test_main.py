@@ -16,11 +16,18 @@ def test_ls_tags():
     assert result.exit_code == 0
     assert "'0.10.1'," in result.output
 
+# FIXME: this is slow, disable for for most runs
 def test_main_interesting():
+    """
+    acceptance test for "interesting" source files vs "all" source files
+    For Flask, this is 22 vs 80.
+    """
     con = main.raw_add_project('../SOURCE/flask', is_testing=True, only_interesting=True)
-    print('interesting file count: ', query1(con, table='file'))
+    interesting_count = query1(con, table='file')
+    
     con = main.raw_add_project('../SOURCE/flask', is_testing=True, only_interesting=False)
-    print('full file count: ', query1(con, table='file'))
+    full_count = query1(con, table='file')
+    assert interesting_count < full_count
 
 def test_main_add_project():
     con = main.raw_add_project('../SOURCE/flask', is_testing=True, only_interesting=True)
