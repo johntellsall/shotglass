@@ -7,7 +7,7 @@ Given a Git tag/release, is it interesting enough to capture?
 
 import re
 import subprocess
-from distutils.version import LooseVersion
+from packaging.version import Version
 from pathlib import PurePath
 
 import run
@@ -37,7 +37,7 @@ def git_tag_list(project_path):
 
 
 def sort_versions(mylist):
-    mylist.sort(key=LooseVersion)
+    mylist.sort(key=Version)
 
 
 # TODO: make flexible
