@@ -251,19 +251,8 @@ def add_project(project_path, reset_db=False):
     db_add_project(con, project_path)
     con.commit()
 
-    if 1:
-        proj_config = goodsource.GoodSourceConfig(project_path)
-        proj_config.set_good_pat('latest')
-    else:
-
-        class SqlAlchemyConfig(goodsource.GoodSourceConfig):
-            is_good_tag = re.compile(r"^rel[0-9_]+_0$").match
-            # TODO:
-
-            def is_good_tag(_self, s):
-                return s == "rel_1_4_0"
-
-        proj_config = SqlAlchemyConfig(project_path)
+    proj_config = goodsource.GoodSourceConfig(project_path)
+    proj_config.set_good_pat('latest')
 
     # Git releases -> database; show count
     db_add_releases(con, proj_config)
