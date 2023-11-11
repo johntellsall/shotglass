@@ -26,7 +26,7 @@ def cmd_list_git():
         all_items = list(goodsource.git_ls_tree(path, release=tag))
         click.secho(f"= {len(all_items)} total files", fg="yellow")
 
-        items = list(goodsource.filter_goodsource(all_items))
+        items = list(goodsource.filter_good_paths(all_items))
         click.secho(f"= {len(items)} source files", fg="yellow")
 
         changed_items = []

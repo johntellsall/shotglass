@@ -49,20 +49,26 @@ def is_source(path):
 # TODO: add "+package+"
 # TODO: merge interesting *files* with interesting *releases*?
 DULL_DIRS = set([".github", "doc", "docs", "examples", "migrations", "scripts", "test", "tests", "testsuite"])
-def is_interesting(path):
+def is_interesting_path(path):
     parts = set(PurePath(path).parts)
     return not DULL_DIRS.intersection(parts)
 
 
-def filter_goodsource(items):
+def filter_good_paths(items, only_interesting=True):
     """
-    iterate over source files that are 'interesting'
-    E.g.: only source files; skip tests, docs, examples
+    iterate over files, returning source files.
+    Optionally keep only those that are 'interesting'
+    E.g.: skip tests, docs, examples
     """
-    for item in items:
-        path = item["path"]
-        if is_source(path) and is_interesting(path):
-            yield item
+    def source_filter(item):
+        return is_source(item["path"])
+    def interesting_filter(item):
+        return is_interesting_path(item["path"])
+    
+    source_items = filter(source_filter, items)
+    if only_interesting:
+        return filter(interesting_filter, source_items)
+    return source_items
 
 
 # TODO: make flexible

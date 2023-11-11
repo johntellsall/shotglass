@@ -92,8 +92,13 @@ check-types:
 run:
 	./main.py ls-tags $(SAMPLE)
 
+
+# "make test" runs all tests
+# "KEYWORD=foo make testk " runs only tests matching "foo"
 test:
-	venv/bin/pytest -v
+	venv/bin/pytest -v 
+testk:
+	venv/bin/pytest -v -k $(KEYWORD)
 
 setup:
 	test -d venv || python3 -m venv venv

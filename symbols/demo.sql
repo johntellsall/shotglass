@@ -12,3 +12,6 @@ from symbol s, file f
 where s.file_id = f.id
 and f.path like '%test_logging%'
 limit 1;
+
+-- COUNT
+select count(*) from file;

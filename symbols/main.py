@@ -70,12 +70,12 @@ def db_get_project_id(con, path):
 
 
 # TODO: add via *hash* not path
-def db_add_files(con, path, project_id, release):
+def db_add_files(con, path, project_id, release, only_interesting):
     """
     for project and release/tag, add interesting files into db
     """
     all_items = list(goodsource.git_ls_tree(path, release=release))
-    items = list(goodsource.filter_goodsource(all_items))
+    items = list(goodsource.filter_good_paths(all_items, only_interesting=only_interesting))
     if not items:
         click.secho(f"{path}: {release=}: no files")
         return
@@ -85,6 +85,8 @@ def db_add_files(con, path, project_id, release):
         f" values ({project_id}, '{release}', :path, :hash, :size_bytes)"
     )
     con.executemany(insert_file, items)
+
+
 
 
 # CTAGS
@@ -183,11 +185,10 @@ def do_add_symbols(con, project_path):
     con.commit()
 
 
-def do_add_files(con, project_path):
+def do_add_files(con, project_path, only_interesting=False):
     """
     for each project's releases, add those files into database
     """
-
     # Per project-release: add release files -> database
     project_id = db_get_project_id(con, project_path)
     project_name = Path(project_path).name
@@ -205,7 +206,7 @@ def do_add_files(con, project_path):
 
     for label in releases:
         click.echo(f"{project_id=} release {label}")
-        db_add_files(con, project_id=project_id, path=project_path, release=label)
+        db_add_files(con, project_id=project_id, path=project_path, release=label, only_interesting=only_interesting)
     con.commit()
 
     # Per project-release: show count of files
@@ -238,7 +239,7 @@ def summary():
     commands.cmd_summary()
 
 
-def raw_add_project(project_path, reset_db=False, is_testing=False):
+def raw_add_project(project_path, reset_db=False, is_testing=False, only_interesting=True):
     if reset_db:
         db_reset()
 
@@ -256,7 +257,7 @@ def raw_add_project(project_path, reset_db=False, is_testing=False):
     con.commit()
 
     # per release -> add files to db
-    do_add_files(con, project_path)
+    do_add_files(con, project_path, only_interesting=only_interesting)
     con.commit()
 
     # per file -> add symbols to db
@@ -273,7 +274,8 @@ def raw_add_project(project_path, reset_db=False, is_testing=False):
 @click.option("--reset-db", is_flag=True)
 @click.argument("project_path")
 def add_project(project_path, reset_db=False):
-    return raw_add_project(project_path, reset_db=reset_db)
+    only_interesting = False
+    return raw_add_project(project_path, reset_db=reset_db, only_interesting=only_interesting)
 
 
 @cli.command()
