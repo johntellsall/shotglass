@@ -6,7 +6,7 @@ set -euo pipefail # strict mode
 
 source=$1
 
-./main.py add-project --reset-db "../SOURCE/${source}"
+time ./main.py add-project --reset-db "../SOURCE/${source}"
 echo
 make pysummary
 echo
