@@ -170,7 +170,7 @@ def do_add_symbols(con, project_path):
     assert query1(con, sql=sql) == 1, "FIXME: handle multiple releases"
 
 
-    click.secho(f"{project_name}: adding file info", fg="cyan")
+    click.secho(f"{project_name}: adding symbols", fg="cyan")
     sql = f"select path, hash, release from file where project_id={project_id}"
     batch = 5
 
@@ -219,16 +219,6 @@ def do_add_files(con, project_path):
         )
         result = list(con.execute(sql, [label]))
         click.secho(f"rel {label}: num files: {result[0][0]}")
-
-#     symbol_count_sql = """
-#     select f.path as path, count(*) as count
-# from symbol s, file f
-# where s.file_id = f.id
-# order by path
-# limit 3
-# """
-#     result = query1(con, sql=symbol_count_sql)
-#     click.echo(f"symbol count: {result}")
 
 
 # :::::::::::::::::::: COMMANDS

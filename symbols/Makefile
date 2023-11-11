@@ -84,6 +84,7 @@ pre-push: sniff check-types
 check-types:
 	pyright
 
+# FIXME:
 run:
 	./main.py ls-tags $(SAMPLE)
 
