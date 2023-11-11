@@ -2,6 +2,7 @@
 """
 Given a Git tag/release, is it interesting enough to capture?
 - likewise, files and directories
+- TODO: likewise, symbols/functions
 """
 
 import re
@@ -64,28 +65,15 @@ def filter_goodsource(items):
             yield item
 
 
-class SourceConfig:
-    def __init__(self, path):
-        self.path = path
-
-    def get_tags(self):
-        return git_tag_list(self.path)
-
-
-# FIXME: remove unused?
-class AllSourceConfig(SourceConfig):
-    pass
-
-
 # TODO: make flexible
-class GoodSourceConfig(SourceConfig):
+class GoodSourceConfig:
     GOOD_PATS = {
         'major_minor': r"^[0-9]+\.[0-9]+$",
         'numbers': r"^[0-9.]+$"  # exclude "2.0.0rc1"
     }
 
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, path):
+        self.path = path
         self.good_pat = None
 
     def set_good_pat(self, pat):
@@ -97,7 +85,7 @@ class GoodSourceConfig(SourceConfig):
             self.good_pat = self.GOOD_PATS[pat]
 
     def _get_tags_latest(self, raw_tags):
-        tags = list(git_tag_list(self.path))
+        tags = list(raw_tags)
         return tags[-1:]
 
     def get_tags(self):
