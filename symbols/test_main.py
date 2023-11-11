@@ -3,6 +3,7 @@
 from click.testing import CliRunner
 
 import main
+from state import queryall
 
 FLASK_DIR = "../SOURCE/flask/src/flask"
 SAMPLE = "sample_code/test_code.py"
@@ -15,6 +16,16 @@ def test_ls_tags():
     assert result.exit_code == 0
     assert "'0.10.1'," in result.output
 
+def test_main_add_project():
+    con = main.raw_add_project('../SOURCE/flask', is_testing=True)
+    first_symbol_query = '''
+        select s.name, f.path 
+        from symbol s, file f 
+        where s.file_id = f.id
+        limit 1
+'''
+    result = queryall(con, first_symbol_query)
+    assert dict(result[0]) == {'name': 'Blueprint', 'path': 'src/flask/__init__.py'}
 
 def test_ctags():
     "test list Ctags e.g. symbol/function information"

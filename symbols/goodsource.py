@@ -66,7 +66,7 @@ def filter_goodsource(items):
 
 
 # TODO: make flexible
-class GoodSourceConfig:
+class GoodTagFilter:
     GOOD_PATS = {
         'major_minor': r"^[0-9]+\.[0-9]+$",
         'numbers': r"^[0-9.]+$"  # exclude "2.0.0rc1"
@@ -101,5 +101,5 @@ class GoodSourceConfig:
 
 
 def get_good_tags(path):
-    good_source = GoodSourceConfig(path)
+    good_source = GoodTagFilter(path)
     return good_source.get_tags()

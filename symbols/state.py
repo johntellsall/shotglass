@@ -42,6 +42,8 @@ def query1(con, sql=None, table=None, args=None):
     res = list(con.execute(sql, args or []))
     return res[0][0]
 
+def queryall(con, sql):
+    return list(con.execute(sql))
 
 def setup(con):
     for sql in SETUP_SQL:

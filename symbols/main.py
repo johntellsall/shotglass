@@ -6,7 +6,6 @@ Shotglass: info about codebases over time
 
 import logging
 import pprint
-import re
 from pathlib import Path, PurePath
 
 import click
@@ -239,19 +238,16 @@ def summary():
     commands.cmd_summary()
 
 
-@cli.command()
-@click.option("--reset-db", is_flag=True)
-@click.argument("project_path")
-def add_project(project_path, reset_db=False):
+def raw_add_project(project_path, reset_db=False, is_testing=False):
     if reset_db:
         db_reset()
 
-    con = state.get_db(temporary=False)
+    con = state.get_db(temporary=is_testing)
 
     db_add_project(con, project_path)
     con.commit()
 
-    proj_config = goodsource.GoodSourceConfig(project_path)
+    proj_config = goodsource.GoodTagFilter(project_path)
     proj_config.set_good_pat('latest')
 
     # Git releases -> database; show count
@@ -267,7 +263,17 @@ def add_project(project_path, reset_db=False):
     do_add_symbols(con, project_path=project_path)
     con.commit()
 
+    if is_testing:
+        return con
+
     con.close()
+
+
+@cli.command()
+@click.option("--reset-db", is_flag=True)
+@click.argument("project_path")
+def add_project(project_path, reset_db=False):
+    return raw_add_project(project_path, reset_db=reset_db)
 
 
 @cli.command()
