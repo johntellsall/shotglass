@@ -1,5 +1,8 @@
 import run
 
+# TODO: can "roles" track function calls?
+# Not in Python?
+
 CTAGS_KEYS = {
     "_type",
     "name",
@@ -9,7 +12,7 @@ CTAGS_KEYS = {
     "language",
     "line",
     "kind",
-    "roles",
+    "roles", # how a tag is referenced; "def" = defined
     "end",
 }
 

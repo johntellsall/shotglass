@@ -105,3 +105,8 @@ lintv:
 	$(PYLINT) $(PY_SOURCE)
 	@echo DONE
 
+# show Ctags
+demo_ctags:
+	ctags -o - --extras=+r --fields=+r sample_code/sample.py
+demo_ctags_support:
+	ctags --list-roles | grep -Ew '^(C|Python)'
