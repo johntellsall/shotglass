@@ -27,9 +27,11 @@ from symbol s, file f
 where s.file_id = f.id
 and f.path like '%test_logging%';
 
--- DEFINITION
+
+-- DEFINITION of "route"
+-- FIXME: BUG: shows as src/flask/scaffold.py, actually in src/flask/sansio/scaffold.py -- tagging issue?
+-- moved in 6/2023 to src/flask/sansio/scaffold.py
 select f.path, s.line_start, s.name
 from symbol s, file f 
 where s.file_id = f.id
 and s.name='route';
-
