@@ -1,17 +1,27 @@
 -- "loopm demo.show" -- re-run this file when source changes
+--
+--   """create table if not exists file (
+--         id integer primary key, release, path, hash, size_bytes,
+--         project_id,
+--         foreign key (project_id) references project (id)
+--         )""",
+--     """create table if not exists symbol (
+--         name, path, line_start, line_end, kind,
+--         file_id int,
+--         project_id int,
+--         foreign key (file_id) references file (id),
+--         foreign key (project_id) references project (id)
+--         )""",
 
--- FIRST SYMBOL WITH FILE
-select s.name, f.path 
-from symbol s, file f 
-where s.file_id = f.id
-limit 1;
+
+.mode tabs
+.headers on
 
 -- TESTS
-select s.name, f.path 
+select f.path, s.line_start, s.name
 from symbol s, file f 
 where s.file_id = f.id
-and f.path like '%test_logging%'
-limit 1;
+and f.path like '%test_logging%';
 
 -- COUNT
 select count(*) from file;

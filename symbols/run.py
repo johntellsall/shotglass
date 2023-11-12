@@ -54,5 +54,5 @@ def git_ls_tree(project_path, release):
 
 
 def git_tag_list(project_path):
-    "list tags (~ releases)"
+    "list Git tags (~ releases)"
     return run(f"git -C {project_path} tag --list")

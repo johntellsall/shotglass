@@ -10,16 +10,13 @@ DBPATH := main.db
 all:
 
 demo:
-	./main.py add-project --reset-db ../SOURCE/flask
+	./main.py add-project --reset-db --all ../SOURCE/flask
 	make demo.show
 
 demo-plot:
 	./main.py add-project --reset-db ../SOURCE/flask
 	make summary-symbols.show
 	python3 plot_sunburst2.py
-
-# demo:
-# 	time ./main.py add-project --reset-db ../SOURCE/zulip
 
 # flask			  20K LOC Python library
 # zulip			 300K LOC Python application
@@ -35,24 +32,6 @@ build-medium:
 	./build.sh zulip
 build-huge:
 	./build.sh odoo
-
-
-# demo3:
-# 	./main.py reset-db
-# 	./main.py add-project ../SOURCE/pyramid
-# 	make pysummary
-# 	./main.py add-project ../SOURCE/sqlalchemy
-# 	make pysummary
-# 	./main.py add-project ../SOURCE/requests
-# 	make pysummary
-
-
-# demo2:
-# 	./main.py reset-db
-# 	./main.py add-project ../SOURCE/flask
-# 	make pysummary
-# 	./main.py add-project ../SOURCE/pyramid
-# 	make pysummary
 
 demo2b:
 	./main.py add-project --reset-db --all ../SOURCE/flask
@@ -91,15 +70,17 @@ check-types:
 run:
 	./main.py ls-tags $(SAMPLE)
 
+PYTEST := venv/bin/pytest -vv --showlocals
+# --tb=long
 
 # "make test" runs all tests
 # "KEYWORD=foo make testk " runs only tests matching "foo"
 test:
-	venv/bin/pytest -v 
+	$(PYTEST)
 testk:
-	venv/bin/pytest -v -k $(KEYWORD)
+	$(PYTEST) -k $(KEYWORD)
 test-all:
-	TEST_ALL=1 venv/bin/pytest -v
+	TEST_ALL=1 $(PYTEST)
 	
 setup:
 	test -d venv || python3 -m venv venv
