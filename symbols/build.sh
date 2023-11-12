@@ -9,5 +9,5 @@ source=$1
 time ./main.py add-project --reset-db "../SOURCE/${source}"
 echo
 make pysummary
-echo
-make summary-symbols.show
+# echo
+# make summary-symbols.show

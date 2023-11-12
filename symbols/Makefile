@@ -18,13 +18,15 @@ demo-plot:
 	make summary-symbols.show
 	python3 plot_sunburst2.py
 
-# flask			  20K LOC Python library
-# zulip			 300K LOC Python application
-# sqlalchemy	 463K LOC Python library
-# odoo			1547K LOC Python office suite	682K files
+# NAME			#FILES	#PYTHON	KLOC	DESCRIPTION
+# flask			246		80		17		Python library		
+# zulip		 	6421	1468	282K	Python chat application
+# sqlalchemy	810		589		463K	Python library
+# odoo			36540	5425	682K	Python office suite
 
-stats:
-	wc -l $$(rg -g '*.py' --files) | tail -1
+stats-some:
+	ls -1d ../SOURCE/{flask,sqlalchemy,zulip,odoo} \
+		| xargs -I {} ./stats.sh {}
 
 build-tiny:
 	./build.sh flask
