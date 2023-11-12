@@ -21,8 +21,7 @@ def test_ls_tags():
     assert result.exit_code == 0
     assert "'0.10.1'," in result.output
 
-# FIXME: this is slow, disable for for most runs
-# skip unless explicitly requested
+
 @pytest.mark.skipif(not TEST_ALL, reason="slow")
 def test_main_interesting():
     """
@@ -36,6 +35,7 @@ def test_main_interesting():
     full_count = query1(con, table='file')
     assert interesting_count < full_count
 
+
 def test_main_add_project():
     con = main.raw_add_project('../SOURCE/flask', is_testing=True, only_interesting=True)
     first_symbol_query = '''
@@ -48,6 +48,7 @@ def test_main_add_project():
     # "boring" aka not interesting result:
     # assert dict(result[0]) == {'name': 'author', 'path': 'docs/conf.py'}
     assert dict(result[0]) == {'name': 'Blueprint', 'path': 'src/flask/__init__.py'}
+
 
 def test_ctags():
     "test list Ctags e.g. symbol/function information"
