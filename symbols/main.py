@@ -15,6 +15,7 @@ import goodsource
 import run
 import state
 from state import query1
+import run
 
 logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
@@ -74,7 +75,7 @@ def db_add_files(con, path, project_id, release, only_interesting):
     """
     for project and release/tag, add interesting files into db
     """
-    all_items = list(goodsource.git_ls_tree(path, release=release))
+    all_items = list(run.git_ls_tree(path, release=release))
     items = list(goodsource.filter_good_paths(all_items, only_interesting=only_interesting))
     if not items:
         click.secho(f"{path}: {release=}: no files")
@@ -285,7 +286,7 @@ def ls_tags(path):
     list tags in Git repos
     """
     click.echo(f"List Tags {path}")
-    tags = goodsource.git_tag_list(path)
+    tags = run.git_tag_list(path)
     pprint.pprint(tags)
 
 

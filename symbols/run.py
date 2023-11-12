@@ -1,8 +1,9 @@
 # run.py
-"run commands, espectially Ctags"
+"run commands, especially Ctags"
 
 import json
 import subprocess
+
 
 # Universal Ctags
 CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()
@@ -32,3 +33,26 @@ def run(cmd):
     out_blob = run_blob(cmd)
     out_lines = out_blob.rstrip("\n").split("\n")
     return out_lines
+
+
+def git_ls_tree(project_path, release):
+    """
+    get Git info about all files in given release
+    """
+
+    def to_item(row):
+        pre, path = row.split("\t")
+        _mode, _type, filehash, size_bytes = pre.split()
+        return dict(hash=filehash, path=path, size_bytes=size_bytes)
+
+    cmd = f"git -C {project_path} ls-tree  -r --long '{release}'"
+    try:
+        return map(to_item, run(cmd))
+    except subprocess.CalledProcessError as error:
+        print(f"?? {cmd} -- {error}")
+        return []
+
+
+def git_tag_list(project_path):
+    "list tags (~ releases)"
+    return run(f"git -C {project_path} tag --list")

@@ -6,6 +6,7 @@ import click
 
 import goodsource
 import state
+import run
 
 
 # TODO: remove?
@@ -23,7 +24,7 @@ def cmd_list_git():
     # for each release
     for tag in tags:
         click.secho(f"release: {tag}", fg="black", bg="yellow")
-        all_items = list(goodsource.git_ls_tree(path, release=tag))
+        all_items = list(run.git_ls_tree(path, release=tag))
         click.secho(f"= {len(all_items)} total files", fg="yellow")
 
         items = list(goodsource.filter_good_paths(all_items))

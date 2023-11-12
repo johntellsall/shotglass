@@ -1,4 +1,5 @@
 # goodsource.py
+# FIXME: delete this and replace with single filter manager
 """
 Given a Git tag/release, is it interesting enough to capture?
 - likewise, files and directories
@@ -6,34 +7,10 @@ Given a Git tag/release, is it interesting enough to capture?
 """
 
 import re
-import subprocess
 from packaging.version import Version
 from pathlib import PurePath
 
-import run
-
-
-def git_ls_tree(project_path, release):
-    """
-    get Git info about all files in given release
-    """
-
-    def to_item(row):
-        pre, path = row.split("\t")
-        _mode, _type, filehash, size_bytes = pre.split()
-        return dict(hash=filehash, path=path, size_bytes=size_bytes)
-
-    cmd = f"git -C {project_path} ls-tree  -r --long '{release}'"
-    try:
-        return map(to_item, run.run(cmd))
-    except subprocess.CalledProcessError as error:
-        print(f"?? {cmd} -- {error}")
-        return []
-
-
-def git_tag_list(project_path):
-    "list tags (~ releases)"
-    return run.run(f"git -C {project_path} tag --list")
+from run import git_tag_list
 
 
 def sort_versions(mylist):
