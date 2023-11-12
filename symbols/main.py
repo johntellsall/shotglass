@@ -129,6 +129,7 @@ def db_add_symbols(con, project_path, filehash, path):
         return
 
     # don't warn if __init__ or __manifest__ files are empty
+    # - symbols always added, this just suppresses warning
     def is_dull(path):
         return path.endswith('__.py')
     

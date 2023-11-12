@@ -10,7 +10,7 @@ DBPATH := main.db
 all:
 
 demo:
-	./main.py add-project --reset-db --all ../SOURCE/flask
+	./main.py add-project --reset-db ../SOURCE/flask
 	make demo.show
 
 demo-plot:
@@ -57,7 +57,7 @@ coverage:
 
 # sniff -- find stinky code that shouldn't make a PR
 sniff:
-	git grep breakpoint '*.py'  && false
+	! git grep breakpoint '*.py'
 
 pre-commit: fmt fastlint
 
