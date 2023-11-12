@@ -13,11 +13,15 @@ demo:
 	./main.py add-project --reset-db ../SOURCE/flask
 	make demo.show
 
-demo-plot:
+demo-plot0:
 	./main.py add-project --reset-db ../SOURCE/flask
 	make summary-symbols.show
-	python3 plot_sunburst2.py
+	python3 plot_sunburst3.py
 
+demo-plot:
+	./main.py add-project --reset-db --all ../SOURCE/flask
+	make summary-symbols.show
+	python3 plot_sunburst3.py
 # NAME			#FILES	#PYTHON	KLOC	DESCRIPTION
 # flask			246		80		17		Python library		
 # zulip		 	6421	1468	282K	Python chat application
