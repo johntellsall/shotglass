@@ -99,7 +99,9 @@ test:
 	venv/bin/pytest -v 
 testk:
 	venv/bin/pytest -v -k $(KEYWORD)
-
+test-all:
+	TEST_ALL=1 venv/bin/pytest -v
+	
 setup:
 	test -d venv || python3 -m venv venv
 	venv/bin/pip install wheel

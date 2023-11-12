@@ -1,12 +1,17 @@
 "test main -- outer-level commands"
 
+import os
 from click.testing import CliRunner
+
+import pytest
 
 import main
 from state import query1, queryall
 
+
 FLASK_DIR = "../SOURCE/flask/src/flask"
 SAMPLE = "sample_code/test_code.py"
+TEST_ALL = os.environ.get('TEST_ALL') # enable slow tests
 
 
 def test_ls_tags():
@@ -17,6 +22,8 @@ def test_ls_tags():
     assert "'0.10.1'," in result.output
 
 # FIXME: this is slow, disable for for most runs
+# skip unless explicitly requested
+@pytest.mark.skipif(not TEST_ALL, reason="slow")
 def test_main_interesting():
     """
     acceptance test for "interesting" source files vs "all" source files
@@ -24,7 +31,7 @@ def test_main_interesting():
     """
     con = main.raw_add_project('../SOURCE/flask', is_testing=True, only_interesting=True)
     interesting_count = query1(con, table='file')
-    
+
     con = main.raw_add_project('../SOURCE/flask', is_testing=True, only_interesting=False)
     full_count = query1(con, table='file')
     assert interesting_count < full_count
