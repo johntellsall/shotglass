@@ -17,11 +17,19 @@
 .mode tabs
 .headers on
 
--- TESTS
+-- COUNT
+select count(*) from file as file_count;
+select count(*) from symbol as symbol_count;
+
+-- TEST
 select f.path, s.line_start, s.name
 from symbol s, file f 
 where s.file_id = f.id
 and f.path like '%test_logging%';
 
--- COUNT
-select count(*) from file;
+-- DEFINITION
+select f.path, s.line_start, s.name
+from symbol s, file f 
+where s.file_id = f.id
+and s.name='route';
+
