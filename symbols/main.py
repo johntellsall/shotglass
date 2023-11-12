@@ -272,10 +272,11 @@ def raw_add_project(project_path, reset_db=False, is_testing=False, only_interes
 
 
 @cli.command()
+@click.option("--all", is_flag=True)
 @click.option("--reset-db", is_flag=True)
 @click.argument("project_path")
-def add_project(project_path, reset_db=False):
-    only_interesting = False
+def add_project(project_path, all=False, reset_db=False):
+    only_interesting = not all
     return raw_add_project(project_path, reset_db=reset_db, only_interesting=only_interesting)
 
 

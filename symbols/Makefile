@@ -55,10 +55,9 @@ build-huge:
 # 	make pysummary
 
 demo2b:
-	./main.py reset-db
-	./main.py add-project ../SOURCE/flask
+	./main.py add-project --reset-db --all ../SOURCE/flask
 	make summary
-	./main.py add-project ../SOURCE/pyramid
+	./main.py add-project --all ../SOURCE/pyramid
 	make summary
 
 summary: summary.csv
