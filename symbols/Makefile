@@ -18,10 +18,18 @@ demo-plot0:
 	make summary-symbols.show
 	python3 plot_sunburst3.py
 
-demo-plot:
+demo-plot-flask:
 	./main.py add-project --reset-db --all ../SOURCE/flask
 	make summary-symbols.show
 	python3 plot_sunburst3.py
+
+build-sqla:
+	./main.py add-project --reset-db ../SOURCE/sqlalchemy
+	make summary-symbols.show
+
+demo-plot:
+	python3 plot_sunburst3.py
+
 # NAME			#FILES	#PYTHON	KLOC	DESCRIPTION
 # flask			246		80		17		Python library		
 # zulip		 	6421	1468	282K	Python chat application

@@ -6,15 +6,25 @@ Given a Git tag/release, is it interesting enough to capture?
 - TODO: likewise, symbols/functions
 """
 
+import logging
 import re
-from packaging.version import Version
+import packaging.version as pv
 from pathlib import PurePath
 
 from run import git_tag_list
 
-
+def parse_hacky(version_str):
+   
+    # split by ranges of numbers
+    nums = re.findall(r'\d+', version_str)
+    return nums
+      
 def sort_versions(mylist):
-    mylist.sort(key=Version)
+    try:
+        mylist.sort(key=pv.parse)
+    except pv.InvalidVersion as error:
+        logging.warning("Invalid version -- switching to hacky sort: %s", error)
+        mylist.sort(key=parse_hacky)
 
 
 # TODO: make flexible

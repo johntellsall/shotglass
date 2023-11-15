@@ -22,12 +22,11 @@
 --         )""",
 
 
--- FILES: COUNT, SAMPLE
-select count(*) from file;
-select * from file limit 3;
+.headers on
 
--- SYMBOLS: COUNT, SAMPLE
-select count(*) from symbol;
+select count(*) from file as num_files;
+select count(*) from symbol as num_symbols;
+select * from file limit 3;
 select * from symbol limit 3;
 
 select name,path,file_id from symbol order by file_id asc limit 3;
