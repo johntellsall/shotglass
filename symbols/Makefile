@@ -9,6 +9,10 @@ DBPATH := main.db
 
 all:
 
+show-recent: ## run most recent SQL report
+	RECENT=$$(ls -1t *.sql | head -1 | sed -e 's/.sql/.show/') \
+	; make $${RECENT}
+
 demo:
 	./main.py add-project --reset-db ../SOURCE/flask
 	make demo.show
