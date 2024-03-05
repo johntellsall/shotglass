@@ -3,6 +3,11 @@ SQL:=sqlite3 db.sqlite3
 
 all:
 
+setup:
+	test -d venv && python3 -m venv venv
+	venv/bin/pip install -r requirements.txt
+	@echo DONE
+
 fmt:
 	black .
 

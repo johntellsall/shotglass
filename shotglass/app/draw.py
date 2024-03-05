@@ -24,7 +24,7 @@ COLOR_CC_UNKNOWN = "gray"
 logger = logging.getLogger(__name__)
 
 
-# X RGB values are off by one
+# NOTE: RGB values are off by one
 def color_hsl_hex(hue, saturation, lightness):
     hsl = hue / 99.0, lightness / 99.0, saturation / 99.0
     r, g, b = colorsys.hls_to_rgb(*hsl)
