@@ -10,3 +10,4 @@ ipdb
 pyright
 plotly
 pandas
+isort

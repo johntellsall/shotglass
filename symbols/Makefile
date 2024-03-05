@@ -100,6 +100,7 @@ setup:
 	test -d venv || python3 -m venv venv
 	venv/bin/pip install wheel
 	venv/bin/pip install -r requirements.txt
+	@echo DONE
 
 fmt:
 	isort .
@@ -124,3 +125,6 @@ demo_ctags:
 	ctags -o - --extras=+r --fields=+r sample_code/sample.py
 demo_ctags_support:
 	ctags --list-roles | grep -Ew '^(C|Python)'
+
+clean:
+	-$(RM) -r venv

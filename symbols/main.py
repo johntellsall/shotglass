@@ -15,13 +15,11 @@ import goodsource
 import run
 import state
 from state import query1
-import run
 
 logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
 
 # :::::::::::::::::::: APP-CENTRIC FUNCTIONS
-
 
 
 def db_reset():
@@ -76,7 +74,9 @@ def db_add_files(con, path, project_id, release, only_interesting):
     for project and release/tag, add interesting files into db
     """
     all_items = list(run.git_ls_tree(path, release=release))
-    items = list(goodsource.filter_good_paths(all_items, only_interesting=only_interesting))
+    items = list(
+        goodsource.filter_good_paths(all_items, only_interesting=only_interesting)
+    )
     if not items:
         click.secho(f"{path}: {release=}: no files")
         return
@@ -86,8 +86,6 @@ def db_add_files(con, path, project_id, release, only_interesting):
         f" values ({project_id}, '{release}', :path, :hash, :size_bytes)"
     )
     con.executemany(insert_file, items)
-
-
 
 
 # CTAGS
@@ -131,8 +129,8 @@ def db_add_symbols(con, project_path, filehash, path):
     # don't warn if __init__ or __manifest__ files are empty
     # - symbols always added, this just suppresses warning
     def is_dull(path):
-        return path.endswith('__.py')
-    
+        return path.endswith("__.py")
+
     sql = "select id from file where hash=?"
     file_id = query1(con, sql=sql, args=[filehash])
 
@@ -172,7 +170,6 @@ def do_add_symbols(con, project_path):
     sql = f"select count(distinct release) from file where project_id={project_id}"
     assert query1(con, sql=sql) == 1, "FIXME: handle multiple releases"
 
-
     click.secho(f"{project_name}: adding symbols", fg="cyan")
     sql = f"select path, hash, release from file where project_id={project_id}"
     batch = 5
@@ -180,8 +177,8 @@ def do_add_symbols(con, project_path):
     for num, (path, filehash, _release) in enumerate(con.execute(sql)):
         if not num or (num + 1) % batch == 0:
             click.secho(f"- {num+1:03d} {path=} {filehash=}")
-            batch = min(batch*2, 50)
-            
+            batch = min(batch * 2, 50)
+
         # TODO: more work here
         db_add_symbols(con, project_path, filehash=filehash, path=path)
     con.commit()
@@ -202,13 +199,19 @@ def do_add_files(con, project_path, only_interesting=False):
     goodsource.sort_versions(releases)
 
     # FIXME: handle this better!
-    if releases == ['']:
+    if releases == [""]:
         logging.warning("%s: no release tags -- using HEAD", project_name)
-        releases = ['HEAD']
+        releases = ["HEAD"]
 
     for label in releases:
         click.echo(f"{project_id=} release {label}")
-        db_add_files(con, project_id=project_id, path=project_path, release=label, only_interesting=only_interesting)
+        db_add_files(
+            con,
+            project_id=project_id,
+            path=project_path,
+            release=label,
+            only_interesting=only_interesting,
+        )
     con.commit()
 
     # Per project-release: show count of files
@@ -241,7 +244,9 @@ def summary():
     commands.cmd_summary()
 
 
-def raw_add_project(project_path, reset_db=False, is_testing=False, only_interesting=True):
+def raw_add_project(
+    project_path, reset_db=False, is_testing=False, only_interesting=True
+):
     if reset_db:
         db_reset()
 
@@ -251,7 +256,7 @@ def raw_add_project(project_path, reset_db=False, is_testing=False, only_interes
     con.commit()
 
     proj_config = goodsource.GoodTagFilter(project_path)
-    proj_config.set_good_pat('latest')
+    proj_config.set_good_pat("latest")
 
     # Git releases -> database; show count
     db_add_releases(con, proj_config)
@@ -278,7 +283,9 @@ def raw_add_project(project_path, reset_db=False, is_testing=False, only_interes
 @click.argument("project_path")
 def add_project(project_path, all=False, reset_db=False):
     only_interesting = not all
-    return raw_add_project(project_path, reset_db=reset_db, only_interesting=only_interesting)
+    return raw_add_project(
+        project_path, reset_db=reset_db, only_interesting=only_interesting
+    )
 
 
 @cli.command()

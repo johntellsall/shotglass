@@ -4,7 +4,6 @@
 import json
 import subprocess
 
-
 # Universal Ctags
 CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()
 

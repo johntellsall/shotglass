@@ -5,8 +5,8 @@ from distutils.version import LooseVersion
 import click
 
 import goodsource
-import state
 import run
+import state
 
 
 # TODO: remove?

@@ -12,7 +12,7 @@ CTAGS_KEYS = {
     "language",
     "line",
     "kind",
-    "roles", # how a tag is referenced; "def" = defined
+    "roles",  # how a tag is referenced; "def" = defined
     "end",
 }
 

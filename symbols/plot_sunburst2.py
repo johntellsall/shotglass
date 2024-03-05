@@ -1,10 +1,12 @@
 # FIXME: BROKEN: doesn't show paths with parent directories
 
 import sys
-import plotly.express as px
-import pandas as pd
-import state
 from pathlib import Path
+
+import pandas as pd
+import plotly.express as px
+
+import state
 
 db = state.get_db()
 
@@ -28,16 +30,16 @@ if 1:
 # FIXME: make this more flexible
 data = []
 for index, row in paths_df.iterrows():
-    parts = Path(row['path']).parts
-    if parts[:2] == ('lib', 'sqlalchemy'):
+    parts = Path(row["path"]).parts
+    if parts[:2] == ("lib", "sqlalchemy"):
         parts = tuple(parts[2:])
-    elif parts[:2] == ('src', 'flask'):
+    elif parts[:2] == ("src", "flask"):
         parts = tuple(parts[2:])
     # data.append([parts, row['count']])
     data.append([parts])
 
 
-plot_df = pd.DataFrame(data, columns=['path'])
+plot_df = pd.DataFrame(data, columns=["path"])
 print(paths_df.head())
 print(paths_df.describe())
 
