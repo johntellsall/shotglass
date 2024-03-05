@@ -106,6 +106,8 @@ fmt:
 	isort .
 	black .
 
+# FIXME: use ruff
+# FIXME: skip venv!
 fastlint:
 	flake8 .
 	@echo DONE
