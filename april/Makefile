@@ -5,7 +5,9 @@ SOURCE_MED := ../SOURCE/nginx
 
 all:
 
-run: ## run on simplest/shortest project
+run: run-min run-all
+
+run-min: ## run on simplest/shortest project
 	venv/bin/python3 ./shotglass.py $(SOURCE_MIN)
 
 run-medium:

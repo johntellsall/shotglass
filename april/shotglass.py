@@ -1,6 +1,7 @@
 # shotglass.py -- count source lines, render simply
 
 import glob
+from pprint import pprint
 import sqlite3
 import sys
 from itertools import filterfalse, islice
@@ -25,15 +26,45 @@ def find_source(root_dir):
     no_tests = filterfalse(is_test, sources)
     return no_tests
 
-def scan(source_dirs):
+from collections import Counter
+
+import subprocess
+def run_ctags(path):
+    cmd = "ctags --fields=* --output-format=json".split()
+    cmd += [path]
+    proc = subprocess.run(cmd + [path], stdout=subprocess.PIPE, text=True)
+    return proc.stdout.split(r'\n')
+
+def scan_file_tags(con, path):
+    lines = run_ctags(path)
+    assert 0, lines[:5]
+                   
+# TODO: optimize with executemany?
+def scan_project(con, source_dir):
+    sources = list(find_source(source_dir))
+    source_count = len(sources)
+    line_counter = Counter()
+    linecount_sql = 'insert into shotglass (path, line_count) values (?, ?)'
+    for source in sources:
+        scan_file_tags(con, source)
+    for source in sources:
+        line_counter[source] = count_lines(source)
+    for source, lines in line_counter.items():
+        con.execute(linecount_sql, (source, lines))
+    total_lines = sum(line_counter.values())
+    info = {
+        'source_count': source_count,
+        'total_lines': total_lines,
+        'source_dir': source_dir,
+    }
+    return info
+
+def scan_projects(con, source_dirs):
     for source_dir in source_dirs:
         print(f'{source_dir=}')
-        sources = list(find_source(source_dir))
-        source_count = len(sources)
-        print(f'\t{source_count=}')
-
-        total_lines = sum(map(count_lines, sources))
-        print(f'\t{total_lines=}')
+        info = scan_project(con, source_dir)
+        print('\t', end='')
+        pprint(info)
 
 def count_lines(path):
     return sum(1 for _ in open(path))
@@ -51,6 +82,10 @@ def dbopen():
         with open(sqlpath) as sqlfile:
             con.executescript(sqlfile.read())
 
+    print('WARNING: resetting database')
+    con.execute('delete from shotglass')
+    con.commit()
+
     return con
 
 
@@ -61,10 +96,10 @@ def main():
     if len(sys.argv) < 2:
         sys.exit("Usage: python shotglass.py <filename>")
 
-    db = dbopen()
+    con = dbopen()
 
     source_dirs = sys.argv[1:]
-    scan(source_dirs)
+    scan_projects(con, source_dirs)
 
 if __name__ == "__main__":
     main()
