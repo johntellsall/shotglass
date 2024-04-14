@@ -13,7 +13,7 @@ create table
     tag (
         id integer primary key autoincrement,
         --     shotglass_project text,
-        --     shotglass_path text,
+        shotglass_path text,
         _type text,
         name text,
         path text

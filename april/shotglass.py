@@ -36,19 +36,28 @@ def run_ctags(path):
     proc = subprocess.run(cmd + [path], stdout=subprocess.PIPE, text=True)
     return proc.stdout.splitlines()
 
+# FIXME: make clearer and simpler
 def scan_file_tags(con, path):
-    tag_sql = 'insert into tag (_type, name) values (?, ?)'
+    fields = '_type name path'.split()
+    fields_sql = ', '.join(fields)
+    num_fields = len(fields) + 1 # +1 for shotglass_path
+    values_sql = '?,' * (num_fields-1) + '?'
+    tag_sql = f'insert into tag (shotglass_path, {fields_sql}) values ({values_sql})'
+    shotglass_values = [path]
+
     lines = list(run_ctags(path))
     for tag in map(json.loads, lines):
-        print("TAG")
-        con.execute(tag_sql, tag)
+        tag_values = [tag.get(field, 'UNKNOWN') for field in fields]
+        con.execute(tag_sql, shotglass_values + tag_values)
     con.commit()
 
     if 1:
-        print(con.execute('select * from tag'))
-
-    # breakpoint()
-    assert 0, lines[0]
+        print('SAMPLE:')
+        print(f'\t{fields=}')
+        sample = con.execute('select * from tag limit 3').fetchall()
+        for item in sample:
+            print(f'\t{item=}')
+    assert 0
                    
 # TODO: optimize with executemany?
 def scan_project(con, source_dir):
