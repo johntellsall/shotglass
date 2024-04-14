@@ -1,8 +1,9 @@
 # shotglass.py -- count source lines, render simply
 
 import glob
+from pathlib import Path
 import sys
-from itertools import filterfalse, islice
+from itertools import accumulate, filterfalse, islice
 
 SOURCE_EXTENSIONS = ('.py', '.c', '.cpp')
 
@@ -16,24 +17,26 @@ def is_test(path):
 
 # FIXME: make configurable
 def find_source(root_dir):
+    if not Path(root_dir).is_dir():
+        raise ValueError(f'{root_dir} is not a directory')
     file_paths = glob.iglob(root_dir + '/**', recursive=True)
     sources = filter(is_source, file_paths)
     no_tests = filterfalse(is_test, sources)
     return no_tests
 
-def scan(source_dir):
-    sources = find_source(source_dir)
-    # sources = islice(find_source(source_dir), 3)
-    source_count = len(list(sources))
-    print(f'{source_dir=}')
-    print(f'{source_count=}')
+def scan(source_dirs):
+    for source_dir in source_dirs:
+        print(f'{source_dir=}')
+        sources = find_source(source_dir)
+        source_count = len(list(sources))
+        print(f'\t{source_count=}')
 
 def main():
     if len(sys.argv) < 2:
         sys.exit("Usage: python shotglass.py <filename>")
 
-    source_dir = sys.argv[1]
-    scan(source_dir)
+    source_dirs = sys.argv[1:]
+    scan(source_dirs)
 
 if __name__ == "__main__":
     main()
