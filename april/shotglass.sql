@@ -16,13 +16,13 @@ create table
         shotglass_path text,
         _type text,
         name text,
-        path text
-        -- pattern text,
-        -- language text,
-        -- line integer,
-        -- kind text,
-        -- access text,
-        -- signature text,
-        -- roles text,
-        -- end integer
+        path text, -- FIXME: compare with shotglass_path
+        -- pattern text, -- don't care about pattern
+        language text,
+        line integer,
+        kind text,
+        access text,
+        signature text,
+        roles text,
+        end integer
     );

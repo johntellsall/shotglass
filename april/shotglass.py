@@ -38,7 +38,9 @@ def run_ctags(path):
 
 # FIXME: make clearer and simpler
 def scan_file_tags(con, path):
-    fields = '_type name path'.split()
+    fields = '''
+_type name path language line
+kind access signature roles end'''.split()
     fields_sql = ', '.join(fields)
     num_fields = len(fields) + 1 # +1 for shotglass_path
     values_sql = '?,' * (num_fields-1) + '?'
@@ -47,7 +49,7 @@ def scan_file_tags(con, path):
 
     lines = list(run_ctags(path))
     for tag in map(json.loads, lines):
-        tag_values = [tag.get(field, 'UNKNOWN') for field in fields]
+        tag_values = [tag.get(field, f'UNKNOWN-{field}') for field in fields]
         con.execute(tag_sql, shotglass_values + tag_values)
     con.commit()
 
