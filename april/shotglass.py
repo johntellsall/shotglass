@@ -37,10 +37,15 @@ def run_ctags(path):
     return proc.stdout.splitlines()
 
 def scan_file_tags(con, path):
-    tag_sql = 'insert into tag (path, line_count) values (?, ?)'
-    lines = run_ctags(path)
-    # for tag in map(json.loads, lines):
-    #     con.execute(linecount_sql, (source, lines))
+    tag_sql = 'insert into tag (_type, name) values (?, ?)'
+    lines = list(run_ctags(path))
+    for tag in map(json.loads, lines):
+        print("TAG")
+        con.execute(tag_sql, tag)
+    con.commit()
+
+    if 1:
+        print(con.execute('select * from tag'))
 
     # breakpoint()
     assert 0, lines[0]
@@ -51,8 +56,8 @@ def scan_project(con, source_dir):
     source_count = len(sources)
     line_counter = Counter()
     linecount_sql = 'insert into shotglass (path, line_count) values (?, ?)'
-    # for source in sources:
-    #     scan_file_tags(con, source)
+    for source in sources:
+        scan_file_tags(con, source)
     for source in sources:
         line_counter[source] = count_lines(source)
     for source, lines in line_counter.items():
@@ -81,17 +86,23 @@ def dbopen():
     dbpath = 'shotglass.db'
     sqlpath = 'shotglass.sql'
 
-    con = sqlite3.connect(dbpath)
+    # con = sqlite3.connect(dbpath)
+    con = sqlite3.connect(':memory:')
 
-    tables = con.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    if not tables:
+    # print('WARNING: resetting database')
+    # con.execute('delete from shotglass')
+    # con.commit()
+
+    # tables = con.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    if 1: # not tables:
         print(f'{dbpath}: No tables, creating from {sqlpath}')
         with open(sqlpath) as sqlfile:
             con.executescript(sqlfile.read())
+        con.commit()
 
-    print('WARNING: resetting database')
-    con.execute('delete from shotglass')
-    con.commit()
+    if 1:
+        tables = con.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        print(tables.fetchall())
 
     return con
 
