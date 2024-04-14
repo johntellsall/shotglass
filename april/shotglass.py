@@ -1,9 +1,10 @@
 # shotglass.py -- count source lines, render simply
 
 import glob
-from pathlib import Path
+import sqlite3
 import sys
-from itertools import accumulate, filterfalse, islice
+from itertools import filterfalse, islice
+from pathlib import Path
 
 SOURCE_EXTENSIONS = ('.py', '.c', '.cpp')
 
@@ -37,9 +38,30 @@ def scan(source_dirs):
 def count_lines(path):
     return sum(1 for _ in open(path))
 
+# FIXME: make more flexible
+def dbopen():
+    dbpath = 'shotglass.db'
+    sqlpath = 'shotglass.sql'
+
+    con = sqlite3.connect(dbpath)
+
+    tables = con.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    if not tables:
+        print(f'{dbpath}: No tables, creating from {sqlpath}')
+        with open(sqlpath) as sqlfile:
+            con.executescript(sqlfile.read())
+
+    return con
+
+
+def dbclose(con):
+    con.close()
+
 def main():
     if len(sys.argv) < 2:
         sys.exit("Usage: python shotglass.py <filename>")
+
+    db = dbopen()
 
     source_dirs = sys.argv[1:]
     scan(source_dirs)
