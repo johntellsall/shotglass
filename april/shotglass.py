@@ -1,6 +1,7 @@
 # shotglass.py -- count source lines, render simply
 
 import glob
+import json
 from pprint import pprint
 import sqlite3
 import sys
@@ -33,11 +34,16 @@ def run_ctags(path):
     cmd = "ctags --fields=* --output-format=json".split()
     cmd += [path]
     proc = subprocess.run(cmd + [path], stdout=subprocess.PIPE, text=True)
-    return proc.stdout.split(r'\n')
+    return proc.stdout.splitlines()
 
 def scan_file_tags(con, path):
+    tag_sql = 'insert into tag (path, line_count) values (?, ?)'
     lines = run_ctags(path)
-    assert 0, lines[:5]
+    # for tag in map(json.loads, lines):
+    #     con.execute(linecount_sql, (source, lines))
+
+    # breakpoint()
+    assert 0, lines[0]
                    
 # TODO: optimize with executemany?
 def scan_project(con, source_dir):
@@ -45,12 +51,13 @@ def scan_project(con, source_dir):
     source_count = len(sources)
     line_counter = Counter()
     linecount_sql = 'insert into shotglass (path, line_count) values (?, ?)'
-    for source in sources:
-        scan_file_tags(con, source)
+    # for source in sources:
+    #     scan_file_tags(con, source)
     for source in sources:
         line_counter[source] = count_lines(source)
     for source, lines in line_counter.items():
         con.execute(linecount_sql, (source, lines))
+    con.commit()
     total_lines = sum(line_counter.values())
     info = {
         'source_count': source_count,
@@ -87,7 +94,6 @@ def dbopen():
     con.commit()
 
     return con
-
 
 def dbclose(con):
     con.close()
