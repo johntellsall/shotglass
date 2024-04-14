@@ -1,16 +1,18 @@
-SOURCE := ../SOURCE/flask
-SOURCE2 := ../SOURCE/dnsmasq
+# flask 10 KLOC
+# nginx 186 KLOC
+SOURCE_MIN := ../SOURCE/flask
+SOURCE_MED := ../SOURCE/nginx
 
 all:
 
-run:
-	venv/bin/python3 ./shotglass.py $(SOURCE)
+run: ## run on simplest/shortest project
+	venv/bin/python3 ./shotglass.py $(SOURCE_MIN)
 
-run-real:
-	venv/bin/python3 ./shotglass.py $(SOURCE2)
+run-medium:
+	venv/bin/python3 ./shotglass.py $(SOURCE_MED)
 
 run-all:
-	venv/bin/python3 ./shotglass.py ../SOURCE/{coreutils,dnsmasq,nginx,iproute2}
+	venv/bin/python3 ./shotglass.py ../SOURCE/{coreutils,dnsmasq,flask,nginx,iproute2}
 
 setup:
 	python3 -m venv venv

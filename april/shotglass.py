@@ -27,9 +27,15 @@ def find_source(root_dir):
 def scan(source_dirs):
     for source_dir in source_dirs:
         print(f'{source_dir=}')
-        sources = find_source(source_dir)
-        source_count = len(list(sources))
+        sources = list(find_source(source_dir))
+        source_count = len(sources)
         print(f'\t{source_count=}')
+
+        total_lines = sum(map(count_lines, sources))
+        print(f'\t{total_lines=}')
+
+def count_lines(path):
+    return sum(1 for _ in open(path))
 
 def main():
     if len(sys.argv) < 2:
