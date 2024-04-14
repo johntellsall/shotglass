@@ -34,13 +34,13 @@ build-sqla:
 demo-plot:
 	python3 plot_sunburst3.py
 
-# NAME			#FILES	#PYTHON	KLOC	DESCRIPTION
-# flask			246		80		17		Python library		
+# NAME			#FILES	#PYTHON	LOC	DESCRIPTION
+# flask			246		80		17K		Python library		
 # zulip		 	6421	1468	282K	Python chat application
 # sqlalchemy	810		589		463K	Python library
 # odoo			36540	5425	682K	Python office suite
 
-stats-some:
+stats-some:  ## show stats for few representative projects
 	ls -1d ../SOURCE/{flask,sqlalchemy,zulip,odoo} \
 		| xargs -I {} ./stats.sh {}
 
