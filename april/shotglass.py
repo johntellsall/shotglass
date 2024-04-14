@@ -1,5 +1,8 @@
 # shotglass.py -- count source lines, render simply
 
+from collections import Counter
+
+import subprocess
 import glob
 import json
 from pprint import pprint
@@ -27,9 +30,6 @@ def find_source(root_dir):
     no_tests = filterfalse(is_test, sources)
     return no_tests
 
-from collections import Counter
-
-import subprocess
 def run_ctags(path):
     cmd = "ctags --fields=* --output-format=json".split()
     cmd += [path]
@@ -53,13 +53,17 @@ kind access signature roles end'''.split()
         con.execute(tag_sql, shotglass_values + tag_values)
     con.commit()
 
-    if 1:
-        print('SAMPLE:')
-        print(f'\t{fields=}')
-        sample = con.execute('select * from tag limit 3').fetchall()
-        for item in sample:
-            print(f'\t{item=}')
-    assert 0
+def show_sample(con):
+    print('SAMPLE:')
+    sample = con.execute('select * from tag limit 3').fetchall()
+    for item in sample:
+        print(f'\t{item=}')
+
+def show_stats(con):
+    print('STATS:')
+    sample = con.execute('select count(*) from tag').fetchall()
+    for item in sample:
+        print(f'\t{item=}')
                    
 # TODO: optimize with executemany?
 def scan_project(con, source_dir):
@@ -111,9 +115,9 @@ def dbopen():
             con.executescript(sqlfile.read())
         con.commit()
 
-    if 1:
-        tables = con.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        print(tables.fetchall())
+    # if 1:
+    #     tables = con.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    #     print(tables.fetchall())
 
     return con
 
@@ -124,10 +128,12 @@ def main():
     if len(sys.argv) < 2:
         sys.exit("Usage: python shotglass.py <filename>")
 
-    con = dbopen()
-
     source_dirs = sys.argv[1:]
-    scan_projects(con, source_dirs)
+    with dbopen() as con:
+        scan_projects(con, source_dirs)
+
+        show_sample(con)
+        show_stats(con)
 
 if __name__ == "__main__":
     main()
