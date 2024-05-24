@@ -20,3 +20,9 @@ run-all:
 setup:
 	test -d venv || python3 -m venv venv
 	venv/bin/pip install -r requirements.txt
+
+clean:
+	$(RM) -r __pycache__
+
+test:
+	pytest
