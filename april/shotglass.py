@@ -121,8 +121,8 @@ def dbopen():
 
     return con
 
-def dbclose(con):
-    con.close()
+# def dbclose(con):
+#     con.close()
 
 def main():
     if len(sys.argv) < 2:
