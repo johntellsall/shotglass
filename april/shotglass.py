@@ -2,13 +2,14 @@
 
 from collections import Counter
 
+import os
 import subprocess
 import glob
 import json
 from pprint import pprint
 import sqlite3
 import sys
-from itertools import filterfalse, islice
+from itertools import filterfalse
 from pathlib import Path
 
 SOURCE_EXTENSIONS = ('.py', '.c', '.cpp')
@@ -62,8 +63,8 @@ def show_sample(con):
 def show_stats(con):
     print('STATS:')
     sample = con.execute('select count(*) from tag').fetchall()
-    for item in sample:
-        print(f'\t{item=}')
+    for tag_count in sample:
+        print(f'\t{tag_count=}')
                    
 # TODO: optimize with executemany?
 def scan_project(con, source_dir):
@@ -96,33 +97,28 @@ def scan_projects(con, source_dirs):
 def count_lines(path):
     return sum(1 for _ in open(path))
 
+SQL_LIST_TABLES = "SELECT name FROM sqlite_master WHERE type='table';"
+
 # FIXME: make more flexible
 def dbopen():
     dbpath = 'shotglass.db'
     sqlpath = 'shotglass.sql'
 
-    # con = sqlite3.connect(dbpath)
-    con = sqlite3.connect(':memory:')
+    if dbpath:
+        print('WARNING: resetting database')
+        os.remove(dbpath)
+        con = sqlite3.connect(dbpath)
+    else:
+        con = sqlite3.connect(':memory:')
 
-    # print('WARNING: resetting database')
-    # con.execute('delete from shotglass')
-    # con.commit()
-
-    # tables = con.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    if 1: # not tables:
+    tables = list(con.execute(SQL_LIST_TABLES))
+    if not tables:
         print(f'{dbpath}: No tables, creating from {sqlpath}')
         with open(sqlpath) as sqlfile:
             con.executescript(sqlfile.read())
         con.commit()
 
-    # if 1:
-    #     tables = con.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    #     print(tables.fetchall())
-
     return con
-
-# def dbclose(con):
-#     con.close()
 
 def main():
     if len(sys.argv) < 2:
