@@ -6,6 +6,9 @@ SOURCE_ALL := ../SOURCE/{coreutils,dnsmasq,flask,nginx,iproute2}
 
 all:
 
+render:
+	venv/bin/python3 ./shotglass.py render
+
 run: run-min run-all
 
 run-min: ## run on simplest/shortest project
