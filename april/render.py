@@ -3,6 +3,7 @@
 import sqlite3
 from math import sqrt
 from itertools import islice
+from PIL import Image, ImageDraw
 
 # FIXME: define xy as list of two numbers
 class Cursor:
@@ -45,13 +46,17 @@ def render():
         print(f'{total} LOC, {image_size=}')
         cursor = Cursor(image_size)
         rows = conn.execute(sql)
-        if 1:
-            rows = islice(rows, 3)
-        for row in rows:
-            print(cursor.xy, end=' ')
-            print('{size}\t{name} {path}'.format(**row))
-            cursor.skip(row['size'])
+
+    if 1:
+        rows = islice(rows, 3)
+    image = Image.new('RGB', (image_size, image_size), color='gray')
+    for row in rows:
+        print(cursor.xy, end=' ')
+        print('{size}\t{name} {path}'.format(**row))
+        cursor.skip(row['size'])
     print(f"{cursor.xy} end")
+    image.show()
+    image.save('out.png')
 
 def get_total_lines(conn):
     res = conn.execute(SQL_TOTAL)
