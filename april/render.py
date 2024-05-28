@@ -70,15 +70,14 @@ def render():
         tags = islice(tags, 3)
     image = Image.new('RGB', (image_size, image_size), color='gray')
     draw = ImageDraw.Draw(image)
-    colors = [ImageColor.getrgb('red'), ImageColor.getrgb('white')]
+    colors = list(get_colors(8))
     for tag in tags:
         size = tag['size']
         print(cursor.xy, end=' ')
         print('{size}\t{name} {path}'.format(**tag))
         slices = cursor.skip(size)
         for num,slice in enumerate(slices):
-            color = colors[num % 2]
-            # assert 0, slice
+            color = colors[num % len(colors)]
             draw.line(slice, fill=color, width=1)
 
     print(f"{cursor.xy} end")
@@ -90,4 +89,9 @@ def get_total_lines(conn):
     total = res.fetchone()['total']
     image_size = 1 + int(sqrt(total))
     return total,image_size
-    
+
+def get_colors(count):
+    for i in range(count):
+        hue = i*360/count
+        color = ImageColor.getrgb(f'hsl({hue}, 50%, 50%)')
+        yield color
