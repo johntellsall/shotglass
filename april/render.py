@@ -3,19 +3,38 @@
 import sqlite3
 from math import sqrt
 from itertools import islice
-from PIL import Image, ImageDraw
+from PIL import Image, ImageColor, ImageDraw
 
-# FIXME: define xy as list of two numbers
+# TODO: define xy as list of two numbers? Position?
 class Cursor:
     def __init__(self, width):
         self.xy = [0, 0]
         self.width = int(width)
 
     def skip(self, num):
+        """emit slices of consumed area
+        Note: slice endpoints are *exclusive*
+        Ex: 3-wide row, consume 2:
+        - start at 0,0
+        - move to 2,0 -- two spots consumed
+        -> slice is ([0,0], [2,0]) -- end is exclusive
+        -> draw [0,0] and [1,0] (two spots) don't draw [2,0]
+        FIXME: slices are lists of tuples
+        """
+        slices = []
+        old = tuple(self.xy)
         self.xy[0] += int(num)
         while self.xy[0] >= self.width:
+            oldy = self.xy[1]
+            # consume whole rest of row
+            slices.append([old, (self.width - 1, oldy)])
+            # move to left col of next row
             self.xy[0] -= self.width
             self.xy[1] += 1
+            old = (0, self.xy[1])
+        if old != self.xy:
+            slices.append([old, tuple(self.xy)])
+        return slices
        
 
 def dbopen():
@@ -45,15 +64,23 @@ def render():
         total, image_size = get_total_lines(conn)
         print(f'{total} LOC, {image_size=}')
         cursor = Cursor(image_size)
-        rows = conn.execute(sql)
+        tags = conn.execute(sql)
 
-    if 1:
-        rows = islice(rows, 3)
+    if 0:
+        tags = islice(tags, 3)
     image = Image.new('RGB', (image_size, image_size), color='gray')
-    for row in rows:
+    draw = ImageDraw.Draw(image)
+    colors = [ImageColor.getrgb('red'), ImageColor.getrgb('white')]
+    for tag in tags:
+        size = tag['size']
         print(cursor.xy, end=' ')
-        print('{size}\t{name} {path}'.format(**row))
-        cursor.skip(row['size'])
+        print('{size}\t{name} {path}'.format(**tag))
+        slices = cursor.skip(size)
+        for num,slice in enumerate(slices):
+            color = colors[num % 2]
+            # assert 0, slice
+            draw.line(slice, fill=color, width=1)
+
     print(f"{cursor.xy} end")
     image.show()
     image.save('out.png')

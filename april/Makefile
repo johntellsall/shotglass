@@ -28,4 +28,8 @@ clean:
 	$(RM) -r __pycache__
 
 test:
-	pytest
+	pytest -s
+
+# usage: make test TEST=slice2
+ktest:
+	pytest -sk ${TEST}
