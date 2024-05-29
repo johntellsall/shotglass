@@ -27,7 +27,8 @@ where end != 'UNKNOWN-end'
 '''
 def render():
     sql = SQL_LIST_TAGS
-    sql += ' and size >= 9' # limit to larger tags
+    if 1:
+        sql += ' and size >= 9' # limit to larger tags
 
     with dbopen() as conn:
         total, image_size = get_total_lines(conn)
@@ -37,16 +38,19 @@ def render():
 
     if 0:
         tags = islice(tags, 3)
+
     image = Image.new('RGB', (image_size, image_size), color='gray')
     draw = ImageDraw.Draw(image)
     colors = list(get_colors(8))
+    color_num = 0
     for tag in tags:
         size = tag['size']
         print(cursor.xy, end=' ')
         print('{size}\t{name} {path}'.format(**tag))
         slices = cursor.skip(size)
-        for num,slice in enumerate(slices):
-            color = colors[num % len(colors)]
+        for slice in slices:
+            color = colors[color_num % len(colors)]
+            color_num += 1
             draw.line(slice, fill=color, width=1)
 
     print(f"{cursor.xy} end")
