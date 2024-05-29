@@ -4,38 +4,7 @@ import sqlite3
 from math import sqrt
 from itertools import islice
 from PIL import Image, ImageColor, ImageDraw
-
-# TODO: define xy as list of two numbers? Position?
-class Cursor:
-    def __init__(self, width):
-        self.xy = [0, 0]
-        self.width = int(width)
-
-    def skip(self, num):
-        """emit slices of consumed area
-        Note: slice endpoints are *exclusive*
-        Ex: 3-wide row, consume 2:
-        - start at 0,0
-        - move to 2,0 -- two spots consumed
-        -> slice is ([0,0], [2,0]) -- end is exclusive
-        -> draw [0,0] and [1,0] (two spots) don't draw [2,0]
-        FIXME: slices are lists of tuples
-        """
-        slices = []
-        old = tuple(self.xy)
-        self.xy[0] += int(num)
-        while self.xy[0] >= self.width:
-            oldy = self.xy[1]
-            # consume whole rest of row
-            slices.append([old, (self.width - 1, oldy)])
-            # move to left col of next row
-            self.xy[0] -= self.width
-            self.xy[1] += 1
-            old = (0, self.xy[1])
-        if old != self.xy:
-            slices.append([old, tuple(self.xy)])
-        return slices
-       
+from cursor import Cursor
 
 def dbopen():
     conn = sqlite3.connect('shotglass.db')
