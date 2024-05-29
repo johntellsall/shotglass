@@ -1,3 +1,32 @@
+# running tests
+
+Flask, with tox, only Python 3.11:
+
+    tox run -e py311
+
+Pass args to Pytest:
+
+    tox run -e py311 -- tests/test_basic.py
+
+
+
+# git info on tags and releases
+
+    git tag -n --format='%(refname) %(objecttype)'
+
+Example: Flask
+
+    refs/tags/1.1.0 commit
+    refs/tags/1.1.1 commit
+    refs/tags/1.1.2 commit
+    refs/tags/1.1.3 tag
+    refs/tags/1.1.4 tag
+    refs/tags/2.0.0 tag
+
+Can use `objectsize` to show rough amount of change... but of tag only? How can we show e.g. "huge code change here / small tweak there"?
+
+
+
 # language-agnostic complexity
 
 * https://github.com/thoughtbot/complexity
