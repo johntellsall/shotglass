@@ -28,7 +28,7 @@ clean:
 	$(RM) -r __pycache__
 
 test:
-	pytest -s
+	pytest -s --exitfirst --last-failed
 
 # usage: make test TEST=slice2
 ktest:
