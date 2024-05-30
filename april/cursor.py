@@ -1,5 +1,4 @@
 
-# TODO: define xy as list of two numbers? Position?
 class Cursor:
     def __init__(self, width):
         self.xy = [0, 0]
