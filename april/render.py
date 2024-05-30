@@ -11,10 +11,13 @@ def dbopen():
     conn.row_factory = sqlite3.Row
     return conn
 
-SQL_TOTAL = '''
-select sum(end - line) as total
+SQL_PATH_NUMLINES = '''
+select path, sum(end - line) as numlines
 from tag
 where end != 'UNKNOWN-end'
+group by path
+order by numlines desc
+limit 10
 '''
 
 SQL_LIST_TAGS = '''
@@ -24,14 +27,12 @@ from tag
 where end != 'UNKNOWN-end'
 '''
 
-def get_total_lines(conn, suffix_sql=None):
-    sql = SQL_TOTAL
-    if suffix_sql:
-        sql += ' and {suffix_sql}'
-    res = conn.execute(sql)
-    total = res.fetchone()['total']
-    image_size = 1 + int(sqrt(total))
-    return total,image_size
+def get_path_numlines(conn):
+    sql = SQL_PATH_NUMLINES
+    return conn.execute(sql)
+
+def get_image_size(num_lines):
+    return 1 + int(sqrt(num_lines))
 
 def get_colors(count):
     for i in range(count):
@@ -56,12 +57,17 @@ def render_tags(image, tags):
 
 def render():
     sql = SQL_LIST_TAGS
-    if 0:
+    if 1:
         sql += ' and size >= 9' # limit to larger tags
 
     with dbopen() as conn:
-        total, image_size = get_total_lines(conn)
-        print(f'{total} LOC, {image_size=}')
+        path_numlines = list(get_path_numlines(conn))
+        total_numlines = sum(d['numlines'] for d in path_numlines)
+        assert 0, total_numlines
+        # assert 0, iter(path_numlines)
+        for temp in path_numlines:
+            print(dict(temp))
+        # print(f'{total} LOC, {image_size=}')
         tags = conn.execute(sql)
 
     if 0:
