@@ -25,6 +25,18 @@ Example: Flask
 
 Can use `objectsize` to show rough amount of change... but of tag only? How can we show e.g. "huge code change here / small tweak there"?
 
+Most recent tags
+
+    git for-each-ref refs/tags --sort=-taggerdate --format='%(refname:short)' --count=3
+
+Exclude boring directories
+
+    git diff --stat 3.0.2..3.0.3 | grep -Ev '(.github|requirements|docs)/'
+
+MISC
+
+    git diff --stat 3.0.2..3.0.3
+
 
 
 # language-agnostic complexity
