@@ -12,8 +12,9 @@ def build(paths):
     build_cmd.build(paths)
 
 @cli.command()
-def render():
-    render_cmd.render()
+@click.option('--out', type=click.Path())
+def render(out):
+    render_cmd.render(image_name=out)
 
 if __name__ == "__main__":
     cli()

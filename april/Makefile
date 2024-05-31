@@ -6,6 +6,12 @@ SOURCE_ALL := ../SOURCE/{coreutils,dnsmasq,flask,nginx,iproute2}
 
 all:
 
+beer:
+	make build-min
+	venv/bin/python3 ./shotglass.py render --out=flask.png
+	# make build-medium
+	# venv/bin/python3 ./shotglass.py render --out=nginx.png
+
 render:
 	venv/bin/python3 ./shotglass.py render
 

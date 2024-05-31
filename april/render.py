@@ -5,6 +5,7 @@ from math import sqrt
 from itertools import islice
 from PIL import Image, ImageColor, ImageDraw
 from cursor import Cursor
+from rectpack import newPacker
 
 def dbopen():
     conn = sqlite3.connect('shotglass.db')
@@ -17,8 +18,8 @@ from tag
 where end != 'UNKNOWN-end'
 group by path
 order by numlines desc
-limit 10
 '''
+# limit 10
 
 SQL_LIST_TAGS = '''
 select path,name,line,end,
@@ -55,29 +56,9 @@ def render_tags(image, tags):
             color_num += 1
             draw.line(slice, fill=color, width=1)
 
-from rectpack import newPacker
 
-def render():
-    sql = SQL_LIST_TAGS
-    if 1:
-        sql += ' and size >= 9' # limit to larger tags
-
-    with dbopen() as conn:
-        path_numlines = list(get_path_numlines(conn))
-
-    total_numlines = sum(info['numlines'] for info in path_numlines)
-    image_size = calc_image_size(total_numlines)
-    print(f'{total_numlines} LOC, {image_size=}')
-
-    image = Image.new('RGB', (image_size, image_size), color='gray')
-    rectangles = []
-    for info in path_numlines:
-        # print(info)
-        # assert 0, dict(info)
-        box_size = calc_image_size(info['numlines'])
-        rectangles.append((box_size, box_size))
+def make_packer(rectangles, image_size):
     bins = [(image_size, image_size)]
-
     packer = newPacker()
     for r in rectangles:
         packer.add_rect(*r)
@@ -86,26 +67,49 @@ def render():
     for b in bins:
         packer.add_bin(*b)
     packer.pack()
+    return packer
 
+def render_project():
+    """show each file as a colored square
+    Size proportional to the number of lines in the file.
+    NOTE: actually, number of lines in the defined symbols, e.g. functions and classes.
+    """
+
+    with dbopen() as conn:
+        path_numlines = list(get_path_numlines(conn))
+
+    total_numlines = sum(info['numlines'] for info in path_numlines)
+    image_size = calc_image_size(total_numlines)
+    print(f'{total_numlines} LOC, {image_size=}')
+
+    # add one rectangle for each file
+    rectangles = []
+    for info in path_numlines:
+        box_size = calc_image_size(info['numlines'])
+        rectangles.append((box_size, box_size, info))
+
+    packer = make_packer(rectangles, image_size)
+    assert len(packer) == 1
+
+    image = Image.new('RGB', (image_size, image_size), color='gray')
     draw = ImageDraw.Draw(image)
     colors = list(get_colors(8))
     color_num = 0
-    # TODO: pay attention to 2nd bin
+
     for rect in packer[0].rect_list():
-        x, y, w, h, _rid = rect
+        x, y, w, h, info = rect
         color = colors[color_num % len(colors)]
+        print(f'{x=}, {y=}, {w=}, {h=} \t {color=} \t {info["path"]}')
         color_num += 1
         draw.rectangle((x, y, x+w, y+h), fill=color)
-    # assert 0, iter(path_numlines)
-        # for temp in path_numlines:
-        #     print(dict(temp))
-        # # print(f'{total} LOC, {image_size=}')
-        # tags = conn.execute(sql)
+    # image.show()
+    return image
+   
 
-    # if 0:
-    #     tags = islice(tags, 3)
-
-    # render_tags(image, tags)
-
-    image.show()
-    image.save('out.png')
+def render(image_name=None):
+    image = render_project()
+    name = 'project.png'
+    if image_name:
+        name = f'{image_name}.png'
+    image.save(name)
+    print(f'render written to {name}')
