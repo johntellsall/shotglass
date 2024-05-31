@@ -141,21 +141,39 @@ def render_tags():
                 file_tags[path] = []
             file_tags[path].append(info)
 
-    print(f'{len(file_tags)} files')
-
-    image = Image.new('RGB', (image_size, image_size), color='gray')
-    draw = ImageDraw.Draw(image)
+    # print(f'{len(file_tags)} files')
 
     # different color per file -- symbol will be variations of this color
     colors = list(get_colors(8))
     color_num = 0
 
+    file_rectangles = {}
     for rect in packer[0].rect_list():
         x, y, w, h, info = rect
         color = colors[color_num % len(colors)]
-        # print(f'{x=}, {y=}, {w=}, {h=} \t {color=} \t {info["path"]}')
         color_num += 1
-        draw.rectangle((x, y, x+w, y+h), fill=color)
+        file_rectangles[info['path']] = (x, y, w, h, color)
+
+    # FIXME: this is probably a bug / poor assumption
+    print(f'files: {len(file_rectangles)} tags: {len(file_tags)}')
+
+    # draw each tag in its file's box
+    image = Image.new('RGB', (image_size, image_size), color='gray')
+    draw = ImageDraw.Draw(image)
+    for path, tags in file_tags.items():
+        try:
+            x, y, w, h, color = file_rectangles[path]
+        except KeyError:
+            print(f'no rectangle for {path=}')
+            continue
+        draw.rectangle((x, y, x+w, y+h), fill='green')
+
+        # for tag in tags:
+        #     size = tag['size']
+        #     print(f'{x=}, {y=}, {w=}, {h=} \t {color=} \t {tag["name"]} {tag["path"]}')
+            # draw.rectangle((x, y, x+w, y+h), fill=color)
+            # draw.line(slice, fill=color, width=1)
+
     return image
    
 def render(image_name=None, show=False):
