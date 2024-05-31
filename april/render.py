@@ -26,6 +26,7 @@ select path,name,line,end,
 end - line AS size
 from tag
 where end != 'UNKNOWN-end'
+order by path, line
 '''
 
 def get_path_numlines(conn):
@@ -41,12 +42,10 @@ def get_colors(count):
         color = ImageColor.getrgb(f'hsl({hue}, 50%, 50%)')
         yield color
 
-def render_image_tags(image, tags, color=None):
+def render_image_tags(image, tags, colors=None):
     cursor = Cursor(image.width)
     draw = ImageDraw.Draw(image)
-    colors = list(get_colors(8)) # TODO: pass in
-    if color:
-        colors = [ImageColor.getrgb(color)]
+    colors = colors or list(get_colors(8))
     color_num = 0
     for tag in tags:
         size = tag['size']
@@ -172,6 +171,8 @@ def render_tags():
         draw.rectangle((x, y, x+w, y+h), fill='green')
 
         file_image = Image.new('RGB', (w, h), color='white')
+        file_colors = list(get_colors(8)) # FIXME:
+        render_image_tags(file_image, tags, colors=file_colors)
         image.paste(file_image, (x, y))
         # for tag in tags:
         #     size = tag['size']
