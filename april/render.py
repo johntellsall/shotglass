@@ -21,6 +21,7 @@ group by path
 order by numlines desc
 '''
 
+# TODO: order?
 SQL_LIST_TAGS = '''
 select path,name,line,end,
 end - line AS size
@@ -163,6 +164,7 @@ def render_tags():
     image = Image.new('RGB', (image_size, image_size), color='gray')
     draw = ImageDraw.Draw(image)
     for path, tags in file_tags.items():
+        print(path)
         try:
             x, y, w, h, color = file_rectangles[path]
         except KeyError:
@@ -174,6 +176,7 @@ def render_tags():
         file_colors = list(get_colors(8)) # FIXME:
         render_image_tags(file_image, tags, colors=file_colors)
         image.paste(file_image, (x, y))
+        break # FIXME:
         # for tag in tags:
         #     size = tag['size']
         #     print(f'{x=}, {y=}, {w=}, {h=} \t {color=} \t {tag["name"]} {tag["path"]}')
@@ -182,7 +185,7 @@ def render_tags():
 
     return image
    
-def render(image_name=None, show=False):
+def render(image_name=None, show=False, show_iterm=False, show_macos=False):
     # image = render_files()
     image = render_tags()
     if show:
@@ -190,3 +193,9 @@ def render(image_name=None, show=False):
     name = image_name or 'project.png'
     image.save(name)
     print(f'render written to {name}')
+    if show_iterm:
+        import subprocess
+        subprocess.run(['imgcat', name])
+    if show_macos:
+        import subprocess
+        subprocess.run(['open', '-n', name])
