@@ -41,15 +41,17 @@ def get_colors(count):
         color = ImageColor.getrgb(f'hsl({hue}, 50%, 50%)')
         yield color
 
-def render_image_tags(image, tags):
+def render_image_tags(image, tags, color=None):
     cursor = Cursor(image.width)
     draw = ImageDraw.Draw(image)
-    colors = list(get_colors(8))
+    colors = list(get_colors(8)) # TODO: pass in
+    if color:
+        colors = [ImageColor.getrgb(color)]
     color_num = 0
     for tag in tags:
         size = tag['size']
-        print(cursor.xy, end=' ')
-        print('{size}\t{name} {path}'.format(**tag))
+        # print(cursor.xy, end=' ')
+        # print('{size}\t{name} {path}'.format(**tag))
         slices = cursor.skip(size)
         for slice in slices:
             color = colors[color_num % len(colors)]
@@ -108,7 +110,7 @@ def render_files():
 
 
 def render_tags():
-    """show each tag/symbol as a colored square
+    """show each tag/symbol as a colored line within its file's box
     
     Size proportional to the number of lines in the tag.
     Folders ignored. XX files?
@@ -147,6 +149,7 @@ def render_tags():
     colors = list(get_colors(8))
     color_num = 0
 
+    # create rectangle for each file
     file_rectangles = {}
     for rect in packer[0].rect_list():
         x, y, w, h, info = rect
@@ -168,6 +171,8 @@ def render_tags():
             continue
         draw.rectangle((x, y, x+w, y+h), fill='green')
 
+        file_image = Image.new('RGB', (w, h), color='white')
+        image.paste(file_image, (x, y))
         # for tag in tags:
         #     size = tag['size']
         #     print(f'{x=}, {y=}, {w=}, {h=} \t {color=} \t {tag["name"]} {tag["path"]}')
