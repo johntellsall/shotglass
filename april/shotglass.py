@@ -13,8 +13,9 @@ def build(paths):
 
 @cli.command()
 @click.option('--out', type=click.Path())
-def render(out):
-    render_cmd.render(image_name=out)
+@click.option('--show', is_flag=True)
+def render(out, show):
+    render_cmd.render(image_name=out, show=show)
 
 if __name__ == "__main__":
     cli()

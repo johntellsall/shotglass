@@ -2,7 +2,7 @@
 
 import sqlite3
 from math import sqrt
-from itertools import islice
+# from itertools import islice
 from PIL import Image, ImageColor, ImageDraw
 from cursor import Cursor
 from rectpack import newPacker
@@ -102,14 +102,13 @@ def render_project():
         print(f'{x=}, {y=}, {w=}, {h=} \t {color=} \t {info["path"]}')
         color_num += 1
         draw.rectangle((x, y, x+w, y+h), fill=color)
-    # image.show()
     return image
    
 
-def render(image_name=None):
+def render(image_name=None, show=False):
     image = render_project()
-    name = 'project.png'
-    if image_name:
-        name = f'{image_name}.png'
+    if show:
+        image.show()
+    name = image_name or 'project.png'
     image.save(name)
     print(f'render written to {name}')
