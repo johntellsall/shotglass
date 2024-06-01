@@ -6,6 +6,11 @@ SOURCE_ALL := ../SOURCE/{coreutils,dnsmasq,flask,nginx,iproute2}
 
 all:
 
+# sort imports and format by calling the Ruff linter and then the formatter
+format:
+	ruff check --select I --fix .
+	ruff format .
+	
 run-show:
 	venv/bin/python3 ./shotglass.py render --show-macos
 

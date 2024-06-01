@@ -1,12 +1,10 @@
-
 class Cursor:
     def __init__(self, width):
         self.xy = [0, 0]
         self.width = int(width)
 
     def skip(self, num):
-        """emit slices of consumed area
-         """
+        """emit slices of consumed area"""
         slices = []
         while num + self.xy[0] >= self.width:
             # consume full row
@@ -23,4 +21,3 @@ class Cursor:
             slices.append([old, tuple(self.xy)])
 
         return slices
-       

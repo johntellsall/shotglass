@@ -2,3 +2,4 @@ click
 Pillow
 pytest
 rectpack
+ruff

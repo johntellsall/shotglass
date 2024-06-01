@@ -7,7 +7,8 @@ from cursor import Cursor
 # -> slice is ([0,0], [2,0]) -- end is exclusive
 # -> draw [0,0] and [1,0] (two spots) don't draw [2,0]
 # - next spot is [2,0]
-      
+
+
 def test_same_row():
     "move in same row"
     cursor = Cursor(3)
@@ -16,12 +17,14 @@ def test_same_row():
     assert cursor.xy == [2, 0]
     assert slices == [[(0, 0), (2, 0)]]
 
+
 def test_next_row():
     "jump to next row"
     cursor = Cursor(3)
     slices = cursor.skip(3)
     assert cursor.xy == [0, 1]
     assert slices == [[(0, 0), (3, 0)]]
+
 
 def test_next_row_and_col():
     "move in X and Y"
