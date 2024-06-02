@@ -3,6 +3,7 @@
 import sqlite3
 from math import sqrt
 import colorsys
+import subprocess
 
 from PIL import Image, ImageColor, ImageDraw
 from rectpack import newPacker
@@ -56,12 +57,13 @@ def get_colors(count):
 def tweak_color(color):
     color_float = [c / 255 for c in color]
     hsl_color = colorsys.rgb_to_hls(*color_float)
-    print(f'{color=} {hsl_color=}')
     hue, _sat, _light = hsl_color
-    return colorsys.hls_to_rgb(hue, 0.35, 0.35)
+    color2_float = colorsys.hls_to_rgb(hue, 0.35, 0.35)
+    color2 = tuple(int(c * 255) for c in color2_float)
+    return color2
 
 
-def render_image_tags(image, tags, colors=None):
+def draw_image_tags(image, tags, colors=None):
     cursor = Cursor(image.width)
     draw = ImageDraw.Draw(image)
     colors = colors or list(get_colors(8))
@@ -77,7 +79,7 @@ def render_image_tags(image, tags, colors=None):
         slices = cursor.skip(size)
         for slice in slices:
             draw.line(slice, fill=color, width=1)
-    print(f"- end render_image_tags: {cursor.xy} {image.size=}")
+    # print(f"- end render_image_tags: {cursor.xy} {image.size=}")
 
 
 def make_packer(rectangles, image_size):
@@ -126,7 +128,6 @@ def render_files():
     for rect in packer[0].rect_list():
         x, y, w, h, info = rect
         color = colors[color_num % len(colors)]
-        print(f'{x=}, {y=}, {w=}, {h=} \t {color=} \t {info["path"]}')
         color_num += 1
         draw.rectangle((x, y, x + w, y + h), fill=color)
     return image
@@ -169,7 +170,7 @@ def render_tags():
 
     # print(f'{len(file_tags)} files')
 
-    # different color per file -- symbol will be variations of this color
+    # different color per file -- symbols will be variations of this color
     colors = list(get_colors(8))
     color_num = 0
 
@@ -190,17 +191,16 @@ def render_tags():
     if verbose:
         file_bg = 'pink'
     for path, tags in file_tags.items():
-        print(path)
         try:
             x, y, w, h, color = file_rectangles[path]
         except KeyError:
             print(f"no rectangle for {path=}")
             continue
 
-        # render file into a new image, paste into main (project) image
+        # render file tags into a new image, paste into main (project) image
         file_image = Image.new("RGB", (w, h), color=file_bg)
         file_colors = [color, tweak_color(color)]
-        render_image_tags(file_image, tags, colors=file_colors)
+        draw_image_tags(file_image, tags, colors=file_colors)
         image.paste(file_image, (x, y))
 
     return image
@@ -215,10 +215,6 @@ def render(image_name=None, show=False, show_iterm=False, show_macos=False):
     image.save(name)
     print(f"render written to {name}")
     if show_iterm:
-        import subprocess
-
         subprocess.run(["imgcat", name])
     if show_macos:
-        import subprocess
-
         subprocess.run(["open", name])
