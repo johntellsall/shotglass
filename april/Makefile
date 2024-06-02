@@ -6,6 +6,9 @@ SOURCE_ALL := ../SOURCE/{coreutils,dnsmasq,flask,nginx,iproute2}
 
 all:
 
+render-all:
+	./build-render-all.sh $(SOURCE_ALL)
+	
 # sort imports and format by calling the Ruff linter and then the formatter
 format:
 	ruff check --select I --fix .
@@ -28,9 +31,6 @@ build-min: ## run on simplest/shortest project
 
 build-medium:
 	venv/bin/python3 ./shotglass.py build $(SOURCE_MED)
-
-# build-all:
-# 	venv/bin/python3 ./shotglass.py build $(SOURCE_ALL)
 
 setup:
 	test -d venv || python3 -m venv venv
