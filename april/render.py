@@ -2,6 +2,7 @@
 
 import sqlite3
 from math import sqrt
+import colorsys
 
 from PIL import Image, ImageColor, ImageDraw
 from rectpack import newPacker
@@ -53,11 +54,11 @@ def get_colors(count):
 
 
 def tweak_color(color):
-    import colorsys
-
-    hsl_color = colorsys.rgb_to_hls(*color)
+    color_float = [c / 255 for c in color]
+    hsl_color = colorsys.rgb_to_hls(*color_float)
+    print(f'{color=} {hsl_color=}')
     hue, _sat, _light = hsl_color
-    return ImageColor.getrgb(f"hsl({hue}, 25%, 35%)")
+    return colorsys.hls_to_rgb(hue, 0.35, 0.35)
 
 
 def render_image_tags(image, tags, colors=None):
@@ -138,6 +139,8 @@ def render_tags():
     Folders ignored. XX files?
     """
 
+    verbose = False
+
     # calc overall image size, also size of each file's box
     with dbopen() as conn:
         path_numlines = list(get_path_numlines(conn))
@@ -183,7 +186,9 @@ def render_tags():
 
     # draw each tag in its file's box
     image = Image.new("RGB", (image_size, image_size), color="gray")
-    draw = ImageDraw.Draw(image)
+    file_bg = None
+    if verbose:
+        file_bg = 'pink'
     for path, tags in file_tags.items():
         print(path)
         try:
@@ -191,19 +196,12 @@ def render_tags():
         except KeyError:
             print(f"no rectangle for {path=}")
             continue
-        draw.rectangle((x, y, x + w, y + h), fill="green")
 
         # render file into a new image, paste into main (project) image
-        file_image = Image.new("RGB", (w, h), color="white")
+        file_image = Image.new("RGB", (w, h), color=file_bg)
         file_colors = [color, tweak_color(color)]
         render_image_tags(file_image, tags, colors=file_colors)
         image.paste(file_image, (x, y))
-
-        # for tag in tags:
-        #     size = tag['size']
-        #     print(f'{x=}, {y=}, {w=}, {h=} \t {color=} \t {tag["name"]} {tag["path"]}')
-        #     draw.rectangle((x, y, x+w, y+h), fill=color)
-        #     draw.line(slice, fill=color, width=1)
 
     return image
 

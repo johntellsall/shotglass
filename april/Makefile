@@ -18,12 +18,6 @@ min.png: *.py
 	make build-min
 	venv/bin/python3 ./shotglass.py render --show --out=$@
 
-beer:
-	make build-min
-	venv/bin/python3 ./shotglass.py render --out=flask.png
-	make build-medium
-	venv/bin/python3 ./shotglass.py render --out=nginx.png
-
 render:
 	venv/bin/python3 ./shotglass.py render
 
@@ -45,9 +39,12 @@ setup:
 clean:
 	$(RM) -r __pycache__
 
+# usage: make test -> all tests
+# usage: make test TEST=test_render.py
+# usage: make test TESTK=tweak2 -> Keyword: run only tests with tweak2 in the name
 test:
-	pytest -s --exitfirst --last-failed
-
-# usage: make test TEST=slice2
-ktest:
-	pytest -sk ${TEST}
+ifeq ($(TESTK),)
+	pytest -s --exitfirst --last-failed $(TEST)
+else
+	pytest -s --exitfirst --last-failed -k '$(TESTK)' $(TEST)
+endif
