@@ -39,9 +39,9 @@ setup:
 clean:
 	$(RM) -r __pycache__
 
-# usage: make test -> all tests
-# usage: make test TEST=test_render.py
-# usage: make test TESTK=tweak2 -> Keyword: run only tests with tweak2 in the name
+# run all tests: 				make test
+# run tests in file: 			make test TEST=test_render.py
+# run keyword-matching tests:	make test TESTK=tweak2
 test:
 ifeq ($(TESTK),)
 	pytest -s --exitfirst --last-failed $(TEST)
