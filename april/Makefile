@@ -6,6 +6,9 @@ SOURCE_ALL := ../SOURCE/{coreutils,dnsmasq,flask,nginx,iproute2}
 
 all:
 
+.PHONY:
+demo: min.png
+
 render-all:
 	./build-render-all.sh $(SOURCE_ALL)
 	
@@ -19,7 +22,7 @@ run-show:
 
 min.png: *.py
 	make build-min
-	venv/bin/python3 ./shotglass.py render --show --out=$@
+	venv/bin/python3 ./shotglass.py render --show=macos --out=$@
 
 render:
 	venv/bin/python3 ./shotglass.py render
