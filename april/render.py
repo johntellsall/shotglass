@@ -1,5 +1,6 @@
 # render.py
 
+import json
 import sqlite3
 from math import sqrt
 import colorsys
@@ -205,10 +206,83 @@ def render_tags():
 
     return image
 
+# format:
+# src/flask/wrappers.py {"covered_lines":30,"num_statements":57,"percent_covered":49.382716049382715,"percent_covered_display":"49","missing_lines":27,"excluded_lines":2,"num_branches":24,"num_partial_branches":0,"covered_branches":10,"missing_branches":14}
+
+def render_coverage():
+    """show source files annotated with test code coverage
+    """
+    # TODO: reconcile ctags-based database w/ coverage.json
+    coverage = json.load(open("coverage.json"))
+    files = coverage["files"]
+    # assert "test/x.py" not in files
+    file_numlines = {path: info['summary']['num_statements'] for path, info in files.items()}
+    total_numlines = sum(file_numlines.values())
+
+    # NOTE: statements, not lines
+    image_size = calc_image_size(total_numlines)
+    print(f"{total_numlines} LOC, {image_size=}")
+
+    # add one rectangle for each file
+    rectangles = []
+    for numlines in file_numlines.values():
+        box_size = calc_image_size(numlines)
+        info = {} # FIXME:
+        rectangles.append((box_size, box_size, info))
+
+    packer = make_packer(rectangles, image_size)
+    assert len(packer) == 1
+
+    # # get info for all tags, all files
+    # file_tags = {}
+    # with dbopen() as conn:
+    #     for info in conn.execute(SQL_LIST_TAGS):
+    #         path = info["path"]
+    #         if path not in file_tags:
+    #             file_tags[path] = []
+    #         file_tags[path].append(info)
+
+    # # print(f'{len(file_tags)} files')
+
+    # # different color per file -- symbols will be variations of this color
+    # colors = list(get_colors(8))
+    # color_num = 0
+
+    # # create rectangle for each file
+    # file_rectangles = {}
+    # for rect in packer[0].rect_list():
+    #     x, y, w, h, info = rect
+    #     color = colors[color_num % len(colors)]
+    #     color_num += 1
+    #     file_rectangles[info["path"]] = (x, y, w, h, color)
+
+    # # FIXME: this is probably a bug / poor assumption
+    # print(f"files: {len(file_rectangles)} tags: {len(file_tags)}")
+
+    # # draw each tag in its file's box
+    # image = Image.new("RGB", (image_size, image_size), color="gray")
+    # file_bg = None
+    # if verbose:
+    #     file_bg = 'pink'
+    # for path, tags in file_tags.items():
+    #     try:
+    #         x, y, w, h, color = file_rectangles[path]
+    #     except KeyError:
+    #         print(f"no rectangle for {path=}")
+    #         continue
+
+    #     # render file tags into a new image, paste into main (project) image
+    #     file_image = Image.new("RGB", (w, h), color=file_bg)
+    #     file_colors = [color, tweak_color(color)]
+    #     draw_image_tags(file_image, tags, colors=file_colors)
+    #     image.paste(file_image, (x, y))
+
+    return image
 
 def render(image_name=None, show=False, show_iterm=False, show_macos=False):
     # image = render_files()
-    image = render_tags()
+    # image = render_tags()
+    image = render_coverage()
     if show:
         image.show()
     name = image_name or "project.png"
