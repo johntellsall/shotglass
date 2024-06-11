@@ -207,6 +207,7 @@ def render_tags():
     return image
 
 # format: key='src/flask/wrappers.py'
+# "summary" key:
 # {
 #     "covered_lines": 30,
 #     "num_statements": 57,
@@ -226,19 +227,21 @@ def render_coverage():
     # TODO: reconcile ctags-based database w/ coverage.json
     coverage = json.load(open("coverage.json"))
     files = coverage["files"]
-    # assert "test/x.py" not in files
-    file_numlines = {path: info['summary']['num_statements'] for path, info in files.items()}
-    total_numlines = sum(file_numlines.values())
 
+    file_coverage = {path: info['summary'] for path, info in files.items()}
+    # assert "test/x.py" not in files
+    file_numlines = {path: info['num_statements'] for path, info in file_coverage.items()}
+
+    total_numlines = sum(file_numlines.values())
     # NOTE: statements, not lines
     image_size = calc_image_size(total_numlines)
-    print(f"{total_numlines} LOC, {image_size=}")
+    print(f"{total_numlines} LOC (statements), {image_size=}")
 
     # add one rectangle for each file
     rectangles = []
     for path,numlines in file_numlines.items():
         box_size = calc_image_size(numlines)
-        info = {"path":path} # TODO:
+        info = {"path": path}
         rectangles.append((box_size, box_size, info))
 
     packer = make_packer(rectangles, image_size)
@@ -246,7 +249,7 @@ def render_coverage():
 
     print(f'{len(file_numlines)} files')
 
-    # different color per file -- symbols will be variations of this color
+    # different color per file
     colors = list(get_colors(8))
     color_num = 0
 
@@ -256,7 +259,12 @@ def render_coverage():
         x, y, w, h, info = rect
         color = colors[color_num % len(colors)]
         color_num += 1
-        file_rectangles[info["path"]] = (x, y, w, h, color)
+        path = info["path"]
+        cov = file_coverage[path]
+        if cov['percent_covered'] < 50:
+            print(f"{path} {cov['percent_covered']:.1f}%")
+            color = (255, 0, 0)
+        file_rectangles[path] = (x, y, w, h, color)
 
     image = Image.new("RGB", (image_size, image_size), color="gray")
     draw = ImageDraw.Draw(image)
