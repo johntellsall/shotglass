@@ -206,7 +206,7 @@ def render_tags():
 
     return image
 
-# format: src/flask/wrappers.py
+# format: key='src/flask/wrappers.py'
 # {
 #     "covered_lines": 30,
 #     "num_statements": 57,
@@ -236,9 +236,9 @@ def render_coverage():
 
     # add one rectangle for each file
     rectangles = []
-    for numlines in file_numlines.values():
+    for path,numlines in file_numlines.items():
         box_size = calc_image_size(numlines)
-        info = {} # FIXME:
+        info = {"path":path} # TODO:
         rectangles.append((box_size, box_size, info))
 
     packer = make_packer(rectangles, image_size)
@@ -258,26 +258,13 @@ def render_coverage():
         color_num += 1
         file_rectangles[info["path"]] = (x, y, w, h, color)
 
-    # # FIXME: this is probably a bug / poor assumption
-    # print(f"files: {len(file_rectangles)} tags: {len(file_tags)}")
+    image = Image.new("RGB", (image_size, image_size), color="gray")
+    draw = ImageDraw.Draw(image)
 
-    # # draw each tag in its file's box
-    # image = Image.new("RGB", (image_size, image_size), color="gray")
-    # file_bg = None
-    # if verbose:
-    #     file_bg = 'pink'
-    # for path, tags in file_tags.items():
-    #     try:
-    #         x, y, w, h, color = file_rectangles[path]
-    #     except KeyError:
-    #         print(f"no rectangle for {path=}")
-    #         continue
-
-    #     # render file tags into a new image, paste into main (project) image
-    #     file_image = Image.new("RGB", (w, h), color=file_bg)
-    #     file_colors = [color, tweak_color(color)]
-    #     draw_image_tags(file_image, tags, colors=file_colors)
-    #     image.paste(file_image, (x, y))
+    # draw rectangle for each file
+    for path, rect in file_rectangles.items():
+        (x, y, w, h, color) = rect
+        draw.rectangle((x, y, x + w, y + h), fill=color)
 
     return image
 
