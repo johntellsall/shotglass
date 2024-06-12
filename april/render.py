@@ -284,9 +284,9 @@ def render_coverage():
     return image
 
 def render(image_name=None, show=False, show_iterm=False, show_macos=False):
-    # image = render_files()
+    image = render_files()
     # image = render_tags()
-    image = render_coverage()
+    # image = render_coverage()
     if show:
         image.show()
     name = image_name or "project.png"
