@@ -48,9 +48,12 @@ def calc_image_size(num_lines):
     return 1 + int(sqrt(num_lines))
 
 
-def get_colors(count):
+def get_colors(count, style=None):
+    hue_min, hue_max = 0, 360
+    if style == 'cool':
+        hue_min, hue_max = 180, 300
     for i in range(count):
-        hue = i * 360 / count
+        hue = hue_min + (hue_max - hue_min) * i / count
         color = ImageColor.getrgb(f"hsl({hue}, 50%, 50%)")
         yield color
 
@@ -250,7 +253,7 @@ def render_coverage():
     print(f'{len(file_numlines)} files')
 
     # different color per file
-    colors = list(get_colors(8))
+    colors = list(get_colors(8, 'cool'))
     color_num = 0
 
     # create rectangle for each file
@@ -261,9 +264,9 @@ def render_coverage():
         color_num += 1
         path = info["path"]
         cov = file_coverage[path]
-        if cov['percent_covered'] < 50:
-            print(f"{path} {cov['percent_covered']:.1f}%")
-            color = (255, 0, 0)
+        # if cov['percent_covered'] < 50:
+        #     print(f"{path} {cov['percent_covered']:.1f}%")
+        #     color = (255, 0, 0)
         file_rectangles[path] = (x, y, w, h, color)
 
     image = Image.new("RGB", (image_size, image_size), color="gray")
