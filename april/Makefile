@@ -1,5 +1,7 @@
-# flask 10 KLOC
-# nginx 186 KLOC
+# flask 10 KLOC Python
+# nginx 186 KLOC C
+# zulip 282 KLOC Python
+# odoo 682 KLOC Python
 SOURCE_MIN := ../SOURCE/flask
 SOURCE_MED := ../SOURCE/nginx
 SOURCE_ALL := ../SOURCE/{coreutils,dnsmasq,flask,nginx,iproute2}

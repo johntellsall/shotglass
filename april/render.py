@@ -273,8 +273,11 @@ def render_coverage():
     colors = list(get_colors(8, 'cool'))
 
     # draw rectangle for each file
-    for color_num, (_path, rect) in enumerate(file_rectangles.items()):
+    for color_num, (path, rect) in enumerate(file_rectangles.items()):
+        cov_info = file_coverage[path]
         color = colors[color_num % len(colors)]
+        if cov_info["percent_covered"] < 50:
+            color = (255, 0, 0)
         (x, y, w, h, _info) = rect
         draw.rectangle((x, y, x + w, y + h), fill=color)
 
