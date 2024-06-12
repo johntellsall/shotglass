@@ -209,6 +209,28 @@ def render_tags():
 
     return image
 
+
+def pack_files(file_numlines, image_size):
+    # add one rectangle for each file
+    rectangles = []
+    for path,numlines in file_numlines.items():
+        box_size = calc_image_size(numlines)
+        info = {"path": path}
+        rectangles.append((box_size, box_size, info))
+
+    packer = make_packer(rectangles, image_size)
+    assert len(packer) == 1
+
+    # print(f'{len(file_numlines)} files')
+
+    # create rectangle for each file
+    file_rectangles = {}
+    for rect in packer[0].rect_list():
+        x, y, w, h, info = rect
+        path = info["path"]
+        file_rectangles[path] = (x, y, w, h, info)
+    return file_rectangles
+
 # format: key='src/flask/wrappers.py'
 # "summary" key:
 # {
@@ -240,41 +262,20 @@ def render_coverage():
     image_size = calc_image_size(total_numlines)
     print(f"{total_numlines} LOC (statements), {image_size=}")
 
-    # add one rectangle for each file
-    rectangles = []
-    for path,numlines in file_numlines.items():
-        box_size = calc_image_size(numlines)
-        info = {"path": path}
-        rectangles.append((box_size, box_size, info))
-
-    packer = make_packer(rectangles, image_size)
-    assert len(packer) == 1
-
-    print(f'{len(file_numlines)} files')
-
-    # different color per file
-    colors = list(get_colors(8, 'cool'))
-    color_num = 0
-
-    # create rectangle for each file
-    file_rectangles = {}
-    for rect in packer[0].rect_list():
-        x, y, w, h, info = rect
-        color = colors[color_num % len(colors)]
-        color_num += 1
-        path = info["path"]
-        cov = file_coverage[path]
-        # if cov['percent_covered'] < 50:
-        #     print(f"{path} {cov['percent_covered']:.1f}%")
-        #     color = (255, 0, 0)
-        file_rectangles[path] = (x, y, w, h, color)
+    file_rectangles = pack_files(file_numlines, image_size)
+   
+    print(f'{len(file_rectangles)} files')
 
     image = Image.new("RGB", (image_size, image_size), color="gray")
     draw = ImageDraw.Draw(image)
 
+    # different color per file
+    colors = list(get_colors(8, 'cool'))
+
     # draw rectangle for each file
-    for path, rect in file_rectangles.items():
-        (x, y, w, h, color) = rect
+    for color_num, (_path, rect) in enumerate(file_rectangles.items()):
+        color = colors[color_num % len(colors)]
+        (x, y, w, h, _info) = rect
         draw.rectangle((x, y, x + w, y + h), fill=color)
 
     return image
