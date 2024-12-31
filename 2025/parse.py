@@ -15,5 +15,10 @@ def parse(lines):
         if match := name_equals_pat.match(line):
             name = match.group(1)
             value = match.group(2)
-            info[name] = value
+            if value.startswith('"') and value.endswith('"'):
+                info[name] = value.strip('"')
+            elif value == '"':
+                pass # FIXME: multiline strings
+            else:
+                info[name] = value
     return info
