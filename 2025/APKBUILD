@@ -1,0 +1,193 @@
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+# Contributor: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=dnsmasq
+pkgver=2.90
+pkgrel=3
+pkgdesc="A lightweight DNS, DHCP, RA, TFTP and PXE server"
+url="https://www.thekelleys.org.uk/dnsmasq/"
+arch="all"
+license="GPL-2.0-or-later"
+depends="$pkgname-common=$pkgver-r$pkgrel"
+makedepends="
+	coreutils
+	dbus-dev
+	linux-headers
+	nettle-dev
+	nftables-dev
+	"
+install="
+	$pkgname.pre-install
+	$pkgname.pre-upgrade
+	$pkgname-dnssec.pre-install
+	$pkgname-dnssec.pre-upgrade
+	$pkgname-dnssec-nftset.pre-install
+	$pkgname-dnssec-nftset.pre-upgrade
+	$pkgname-dnssec-dbus.pre-install
+	$pkgname-dnssec-dbus.pre-upgrade
+	"
+subpackages="
+	$pkgname-doc
+	$pkgname-dnssec
+	$pkgname-dnssec-nftset
+	$pkgname-dnssec-dbus
+	$pkgname-openrc
+	$pkgname-common::noarch
+	$pkgname-utils
+	$pkgname-utils-doc:utils_doc:noarch
+	"
+source="https://www.thekelleys.org.uk/dnsmasq/dnsmasq-$pkgver.tar.xz
+	0000-underflow.patch
+	0001-Fix-infinite-loop-when-invoking-SetFilterA-dbus-meth.patch
+	0002-Fix-breakage-in-DBus-FilterA-and-FilterAAAA-methods.patch
+
+	config.h.patch
+	dnsmasq.conf.patch
+	$pkgname.initd
+	$pkgname.confd
+	"
+
+# secfixes:
+#   2.90-r0:
+#     - CVE-2023-50387
+#     - CVE-2023-50868
+#   2.89-r3:
+#     - CVE-2023-28450
+#   2.86-r1:
+#     - CVE-2022-0934
+#   2.85-r0:
+#     - CVE-2021-3448
+#   2.83-r0:
+#     - CVE-2020-25681
+#     - CVE-2020-25682
+#     - CVE-2020-25683
+#     - CVE-2020-25684
+#     - CVE-2020-25685
+#     - CVE-2020-25686
+#     - CVE-2020-25687
+#   2.80-r5:
+#     - CVE-2019-14834
+#   2.79-r0:
+#     - CVE-2017-15107
+#   2.78-r0:
+#     - CVE-2017-13704
+#     - CVE-2017-14491
+#     - CVE-2017-14492
+#     - CVE-2017-14493
+#     - CVE-2017-14494
+#     - CVE-2017-14495
+#     - CVE-2017-14496
+
+build() {
+	export CFLAGS="$CFLAGS -flto=auto"
+	make LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" COPTS="-DHAVE_DNSSEC" all
+	mv src/dnsmasq src/dnsmasq~dnssec
+
+	make LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" COPTS="-DHAVE_DNSSEC -DHAVE_NFTSET" all
+	mv src/dnsmasq src/dnsmasq~nftset
+
+	make LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" COPTS="-DHAVE_DNSSEC -DHAVE_DBUS" all
+	mv src/dnsmasq src/dnsmasq~dbus
+
+	make LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" clean all
+
+	cd contrib/lease-tools/
+	make LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" clean all
+}
+
+# dnsmasq doesn't provide any test suite (shame on them!), so just check that
+# the binary isn't totally broken...
+check() {
+	./src/dnsmasq --help >/dev/null
+}
+
+package() {
+	provider_priority=100  # highest (other providers are dnsmasq-dnssec, dnsmasq-dnssec-nftset, dnsmasq-dnssec-dbus)
+
+	make PREFIX=/usr DESTDIR="$pkgdir" install
+
+	install -D -m755 "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
+	install -D -m644 "$srcdir"/$pkgname.confd "$pkgdir"/etc/conf.d/$pkgname
+}
+
+dnssec() {
+	pkgdesc="$pkgdesc with DNSSEC support"
+	provides="$pkgname=$pkgver-r$pkgrel"
+	provider_priority=20  # middle (other providers are dnsmasq, dnsmasq-dnssec-nftset, dnsmasq-dnssec-dbus)
+
+	install -D -m 755 "$builddir"/src/dnsmasq~dnssec "$subpkgdir"/usr/sbin/dnsmasq
+}
+
+nftset() {
+	pkgdesc="$pkgdesc with DNSSEC and nftables set support"
+	provides="
+		$pkgname=$pkgver-r$pkgrel
+		$pkgname-dnssec=$pkgver-r$pkgrel
+		"
+	provider_priority=15  # lower (other providers are dnsmasq, dnsmasq-dnssec, dnsmasq-dnssec-nftset)
+
+	cd "$builddir"
+	install -D -m755 src/dnsmasq~nftset "$subpkgdir"/usr/sbin/dnsmasq
+}
+
+dbus() {
+	pkgdesc="$pkgdesc with DNSSEC and D-Bus support"
+	provides="
+		$pkgname=$pkgver-r$pkgrel
+		$pkgname-dbus=$pkgver-r$pkgrel
+		$pkgname-dnssec=$pkgver-r$pkgrel
+		"
+	provider_priority=10  # lowest (other providers are dnsmasq, dnsmasq-dnssec, dnsmasq-dnssec-nftset)
+
+	cd "$builddir"
+	install -D -m755 src/dnsmasq~dbus "$subpkgdir"/usr/sbin/dnsmasq
+	install -D -m644 dbus/dnsmasq.conf -t "$subpkgdir"/usr/share/dbus-1/system.d/
+}
+
+common() {
+	pkgdesc="$pkgdesc (common files)"
+	depends=""
+	replaces="$pkgname<2.86-r1 $pkgname-dnssec<2.86-r3"
+
+	install -D -m644 "$builddir"/dnsmasq.conf.example "$subpkgdir"/etc/dnsmasq.conf
+	install -d -m755 "$subpkgdir"/etc/dnsmasq.d
+
+	install -D -m644 "$builddir"/trust-anchors.conf \
+		"$subpkgdir"/usr/share/$pkgname/trust-anchors.conf
+}
+
+openrc() {
+	default_openrc
+	install_if="openrc $pkgname-common=$pkgver-r$pkgrel"
+}
+
+utils() {
+	pkgdesc="$pkgdesc - contrib utilities"
+	depends="$pkgname=$pkgver-r$pkgrel"
+
+	install -Dm755 -t "$subpkgdir"/usr/bin/ \
+		"$builddir"/contrib/lease-tools/dhcp_release \
+		"$builddir"/contrib/lease-tools/dhcp_release6 \
+		"$builddir"/contrib/lease-tools/dhcp_lease_time
+}
+
+utils_doc() {
+	pkgdesc="$pkgdesc - contrib utilities (documentation)"
+	install_if="$pkgname-utils=$pkgver-r$pkgrel docs"
+
+	install -Dm644 -t "$subpkgdir"/usr/share/man/man1/ \
+		"$builddir"/contrib/lease-tools/dhcp_release.1 \
+		"$builddir"/contrib/lease-tools/dhcp_release6.1 \
+		"$builddir"/contrib/lease-tools/dhcp_lease_time.1
+	gzip -9 "$subpkgdir"/usr/share/man/man1/*.1
+}
+
+sha512sums="
+e169de1892f935e219b0f49d90107f95cba42b40bca20bd3c973313c2cd4df58b929af6628cd988419051d81c3b4ccf8e9f816274df7d0840e79f5bf49602442  dnsmasq-2.90.tar.xz
+5083bbe7150276d2226ba4b5bab73c513fe7baf4843b85d83d1ab16cb50e2dcc1dbd9ed04a89e2f9ea61796b12ea36206cc49a2574ce75abb37cb46279bd9aeb  0000-underflow.patch
+b4ced1017f7157f4b363e642d84b3e100ae1a4927f2de39f5d165bcb4df85b1c562f9e47ec66123703134c15adf90695e8b08baaa791d32889f6933ade22357a  0001-Fix-infinite-loop-when-invoking-SetFilterA-dbus-meth.patch
+e8f75c903d97898bf5d42cbd8712eac355922b80809a410ac5b295c70d5c5642a4108a3ae3d665b18e492470badbe29b2676735d1554dc79439d909cfd9a4be5  0002-Fix-breakage-in-DBus-FilterA-and-FilterAAAA-methods.patch
+d0274417019af84911f3f4a850e785797bdc77732fd93504fe21db7317a874d2ab54bf7a211d000a751cdc43e225a30be4c1a315ab2383fc3fcc619e436aed97  config.h.patch
+41679e0e889607896dcf7fdeb179b9b7a79095c9f86aebda131ac09c12e3ef2a94cece0018ab33ea08d3e6f6bbae44379e9d6fb8987fae29e68ecad952ccdd45  dnsmasq.conf.patch
+0c609a55ca0140d8f31f8f6eb4cb96eca7bc76385d48739998bea926b409f3d72cbfdffc30ad3f9e3a62db4ea3280f7fe6a60a12fc091164814a7cdf6a14b307  dnsmasq.initd
+c6ecec498f07916cd3c5ff183ff2a2ec478cf95ee43c0082d164b548d72b13fc9ba7cfbca9fb50e919e146708b5ce7f3b3a6565b36223c4efe1481172214ad93  dnsmasq.confd
+"
