@@ -10,15 +10,21 @@ def parse(lines):
     name_equals_pat = re.compile(r'^(.*)=(.*)$')
     info = {}
     # NOTE: ignores comments in multiline strings, but close enough
-    lines = [line for line in lines if not is_comment(line)]
+    lines = (line for line in lines if not is_comment(line))
     for line in lines:
         if match := name_equals_pat.match(line):
             name = match.group(1)
             value = match.group(2)
-            if value.startswith('"') and value.endswith('"'):
+            if value == '"':
+                value_list = []
+                while True:
+                    item = next(lines).strip()
+                    if item == '"':
+                        break
+                    value_list.append(item)
+                info[name] = value_list
+            elif value.startswith('"') and value.endswith('"'):
                 info[name] = value.strip('"')
-            elif value == '"':
-                pass # FIXME: multiline strings
             else:
                 info[name] = value
     return info

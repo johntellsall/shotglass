@@ -11,3 +11,9 @@ def test_simple():
 def test_string():
     info = parse(LINES)
     assert info['pkgdesc'] == "A lightweight DNS, DHCP, RA, TFTP and PXE server"
+
+def test_multiline():
+    info = parse(LINES)
+    value = info['makedepends']
+    assert value[:2] == ['coreutils', 'dbus-dev']
+    assert value[-2:] == ['nettle-dev', 'nftables-dev']
