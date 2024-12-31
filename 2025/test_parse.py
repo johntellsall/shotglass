@@ -1,5 +1,8 @@
-LINES = open('APKBUILD').readlines()
+from parse import parse
+
+LINES = list(open('APKBUILD').readlines())[:10]
+
 
 def test_parse():
-    lines = LINES.copy()
-    assert 0, lines[0]
+    info = parse(LINES)
+    assert 0, info
