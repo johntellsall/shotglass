@@ -17,3 +17,7 @@ def test_multiline():
     value = info['makedepends']
     assert value[:2] == ['coreutils', 'dbus-dev']
     assert value[-2:] == ['nettle-dev', 'nftables-dev']
+
+def test_function():
+    info = parse(LINES)
+    assert(info['_parse_functions'] == ['build', 'check', 'package', 'dnssec', 'nftset', 'dbus', 'common', 'openrc', 'utils', 'utils_doc'])
