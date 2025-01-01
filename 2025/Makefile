@@ -1,5 +1,8 @@
 all:
 
+run:
+	venv/bin/python3 -m main aports/main/dn*
+	
 test:
 	pytest -sv
 	
