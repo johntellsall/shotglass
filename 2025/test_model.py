@@ -18,6 +18,21 @@ ALPINE = {'_commit': '67c11662510f5e2db6e6517228e80b794950c43f',
  'source': '"$pkgname-$pkgver.tar.gz::https://github.com/iana-org/get-trust-anchor/archive/$_commit.tar.gz',
  'url': 'https://www.iana.org/dnssec/'}
 
+ALPINE2 = {'_parse_functions': ['build', 'package'],
+          'pkgdesc': 'A DNS traffic capture utility',
+          'pkgname': 'dnstop',
+          'pkgrel': '7',
+          'pkgver': '20140915',
+          'sha512sums': ['902cf96f7366983cae4bf684e44fbe12f6e982cee8ff489329e25e1a13de60870d356906a99fee56c6da2258c4a39074a504389549c6c2e239a4ea94d8b9a65d  '
+                         'dnstop-20140915.tar.gz',
+                         '8b1bcfb73f7acf8ab264f44a9fb3bb5bdc7b6beec3ea87ecf9d82898e83c5bd6e43bb12f6d72a9fe362c21210c4c2461c32bb23de03a938f20e2d7f0629f3a3d  '
+                         'musl-fix.patch'],
+          'source': '"http://dns.measurement-factory.com/tools/dnstop/src/dnstop-$pkgver.tar.gz',
+          'subpackages': '$pkgname-doc',
+          'url': 'http://dns.measurement-factory.com/tools/dnstop/'
+          }
+
+
 @pytest.fixture
 def memdb():
     sqlite_url = "sqlite:///:memory:"
@@ -28,7 +43,9 @@ def memdb():
 
 
 def test_model(memdb):
-    package = SGAlpinePackage(**ALPINE)
+    data = ALPINE.copy()
+    data['sg_complexity'] = 123
+    package = SGAlpinePackage(**data)
     memdb.add(package)
     memdb.commit()
 
@@ -37,4 +54,23 @@ def test_model(memdb):
     results = memdb.exec(statement)
     result = results.one()
     assert result.pkgname == "dnssec-root"
+    assert result.sg_complexity == 123
+
+
+def test_annotate():
+    data = ALPINE2.copy()
+    data = SGAlpinePackage.annotate(data)
+    assert data['sg_len_subpackages'] == 1
+
+
+def test_annotate_db(memdb):
+    data = SGAlpinePackage.annotate(ALPINE2)
+    package = SGAlpinePackage(**data)
+    memdb.add(package)
+    memdb.commit()
+
+    statement = select(SGAlpinePackage).where(SGAlpinePackage.pkgname == "dnstop")
+    results = memdb.exec(statement)
+    result = results.one()
+    assert result.sg_len_subpackages == 1
 

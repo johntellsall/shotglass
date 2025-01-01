@@ -4,7 +4,7 @@ run:
 	venv/bin/python3 -m main aports/main/dn*
 
 test:
-	pytest -sv test_model.py
+	pytest -sv
 	
 clone-alpine:
 	git clone --depth=1 https://gitlab.alpinelinux.org/alpine/aports.git

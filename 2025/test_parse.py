@@ -1,5 +1,4 @@
 import pprint
-# from pprint import pprint
 from parse import parse
 
 LINES = list(open('APKBUILD').readlines())
