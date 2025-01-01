@@ -24,5 +24,11 @@ def show_summary(args):
         # print(list(zip(fields, [info.get(f, 'N/A') for f in fields])))
         print([info.get(f, 'N/A') for f in fields])
 
+# def insert(args):
+#     for topdir in args:
+#         path = Path(topdir) / 'APKBUILD'
+#         info = parse(open(path))
+#         print(info)
+
 if __name__ == '__main__':
     show_summary(sys.argv[1:])
