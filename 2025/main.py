@@ -24,11 +24,35 @@ def show_summary(args):
         # print(list(zip(fields, [info.get(f, 'N/A') for f in fields])))
         print([info.get(f, 'N/A') for f in fields])
 
-# def insert(args):
-#     for topdir in args:
-#         path = Path(topdir) / 'APKBUILD'
-#         info = parse(open(path))
-#         print(info)
+from model import SGAlpinePackage
+from sqlmodel import Field, Session, SQLModel, create_engine
+
+def insert(args):
+    sqlite_file_name = "database.db"
+    sqlite_url = f"sqlite:///{sqlite_file_name}"
+    engine = create_engine(sqlite_url, echo=True)
+    SQLModel.metadata.create_all(engine)
+
+    with Session(engine) as session:
+        for topdir in args:
+            path = Path(topdir) / 'APKBUILD'
+            info = parse(open(path))
+            info = SGAlpinePackage.annotate(info)
+            package = SGAlpinePackage(**info)
+            session.add(package)
+            session.commit()
+
+    with Session(engine) as session:
+        result = session.exec("SELECT COUNT(*) FROM sgalpinepackage")
+        row_count = result.one()[0]
+        print(f"Total rows in sgalpinepackage: {row_count}")
+
+    # for topdir in args:
+    #     path = Path(topdir) / 'APKBUILD'
+    #     info = parse(open(path))
+    #     info = SGAlpinePackage.annotate(info)
+    #     package = SGAlpinePackage(**info)
 
 if __name__ == '__main__':
-    show_summary(sys.argv[1:])
+    # show_summary(sys.argv[1:])
+    insert(sys.argv[1:])
