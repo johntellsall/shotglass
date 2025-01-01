@@ -3,7 +3,7 @@ from pprint import pprint
 import sys
 from parse import parse
 from model import SGAlpinePackage
-from sqlmodel import select, func
+from sqlmodel import select, delete, func
 
 
 def show_info(args):
@@ -36,14 +36,20 @@ def insert(args):
     engine = create_engine(sqlite_url) # , echo=True)
     SQLModel.metadata.create_all(engine)
 
+    # WARNING: Remove all existing SGAlpinePackage entries
+    with Session(engine) as session:
+        session.exec(delete(SGAlpinePackage))
+        session.commit()
+
     with Session(engine) as session:
         for topdir in args:
+            print(topdir)
             path = Path(topdir) / 'APKBUILD'
             info = parse(open(path))
             info = SGAlpinePackage.annotate(info)
             package = SGAlpinePackage(**info)
             session.add(package)
-            session.commit()
+        session.commit()
 
     with Session(engine) as session:
         count = session.scalar(select(func.count()).select_from(SGAlpinePackage))

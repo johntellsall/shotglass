@@ -3,6 +3,9 @@ all:
 run:
 	venv/bin/python3 -m main aports/main/dn*
 
+run-all:
+	venv/bin/python3 -m main aports/main/*
+
 test:
 	pytest -sv
 	
