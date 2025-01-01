@@ -32,20 +32,9 @@ def test_model(memdb):
     memdb.add(package)
     memdb.commit()
 
-    # query style:
-    if 0:
-        result = memdb.query(SGAlpinePackage).filter(SGAlpinePackage.pkgname == "dnssec-root").first()
-        assert result.pkgname == "dnssec-root"
-
     # select-exec style:
     statement = select(SGAlpinePackage).where(SGAlpinePackage.pkgname == "dnssec-root")
     results = memdb.exec(statement)
     result = results.one()
     assert result.pkgname == "dnssec-root"
 
-    # SQL style:
-    # result = memdb.exec(
-    #     "SELECT * FROM sgalpinepackage WHERE pkgname = :pkgname",
-    #     {"pkgname": "dnssec-root"}
-    # ).first()
-    # assert result.pkgname == "dnssec-root"
