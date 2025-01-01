@@ -7,8 +7,8 @@ def parse(lines):
     def is_comment(line):
         return line.startswith('#')
     
-    name_equals_pat = re.compile(r'^(.*)=(.*)$')
-    function_pat = re.compile(r'^(.*)\(\)') # NOTE: maybe too strict
+    name_equals_pat = re.compile(r'(\w+)=(.*)$')
+    function_pat = re.compile(r'(\w+)\(\)') # NOTE: maybe too strict
     info = {'_parse_functions': []}
     # NOTE: ignores comments in multiline strings, but close enough
     lines = (line for line in lines if not is_comment(line))

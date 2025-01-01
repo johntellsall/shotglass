@@ -1,3 +1,5 @@
+import pprint
+# from pprint import pprint
 from parse import parse
 
 LINES = list(open('APKBUILD').readlines())
@@ -21,3 +23,8 @@ def test_multiline():
 def test_function():
     info = parse(LINES)
     assert(info['_parse_functions'] == ['build', 'check', 'package', 'dnssec', 'nftset', 'dbus', 'common', 'openrc', 'utils', 'utils_doc'])
+
+# def test_alt():
+#     lines = open('aports/main/dnstop/APKBUILD')
+#     info = parse(lines)
+#     assert 0, pprint.pformat(info)
