@@ -14,12 +14,21 @@
     git tag -l --sort=-v:refname | egrep -v '(rc|test)'
 
 
-# Git diff stat, two versions, only C source
+## Git
+
+### Git diff stat
+
+Show number of changes for APKBUILD files from previous stable version (Alpine Linux)
+- "main" packages only
+
+  git diff --stat ..remotes/origin/3.14-stable 'main/**/APKBUILD'
+
+### Git diff stat, two versions, only C source
 
     gds v2.77 v2.78 '*.[ch]'
 
 
-# Git diff, words only
+### Git diff, words only
 
     gd --word-diff v2.77 v2.78 src/edns0.c
     => [-memcpy(p,-]{+memmove(p,+} p+len+4, rdlen - i);

@@ -3,11 +3,11 @@ all:
 import:
 	venv/bin/python3 -m main import aports/main/*
 
-run:
+run1:
 	LIMIT=1 venv/bin/python3 -m main report
 
 
-run-all:
+run run-all:
 	venv/bin/python3 -m main report
 
 test:
