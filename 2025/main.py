@@ -4,9 +4,7 @@ import sys
 from sqlmodel import select, delete, func, Field, Session, SQLModel, create_engine
 from model import SGAlpinePackage
 from parse import parse
-
-
-DEBUG = False # True
+from lib import get_engine
 
 
 def show_info(paths):
@@ -31,12 +29,6 @@ def show_summary(paths):
         print([info.get(f, 'N/A') for f in fields])
 
 
-def get_engine():
-    sqlite_file_name = "database.db"
-    sqlite_url = f"sqlite:///{sqlite_file_name}"
-    engine = create_engine(sqlite_url, echo=DEBUG)
-    return engine
-
 
 def cmd_import(paths):
     engine = get_engine()
@@ -44,21 +36,23 @@ def cmd_import(paths):
     # WARNING: Remove all existing SGAlpinePackage entries
     with Session(engine) as session:
         statement = delete(SGAlpinePackage)
-        result = session.exec(statement)
+        session.exec(statement)
         session.commit()
         # print(result.rowcount) -- num of deleted rows
 
     SQLModel.metadata.create_all(engine)
 
-    with Session(engine) as session:
-        statement = select(SGAlpinePackage)
-        results = session.exec(statement)
-        for package in results:
-            print(package.__fields__.keys())
+    # with Session(engine) as session:
+    #     statement = select(SGAlpinePackage)
+    #     results = session.exec(statement)
+    #     for package in results:
+    #         print(package.__fields__.keys())
 
     with Session(engine) as session:
         for num,topdir in enumerate(paths):
-            print(topdir)
+            dirname = Path(topdir).name
+            if (num % 10 == 1):
+                print(dirname, end=' ')
             path = Path(topdir) / 'APKBUILD'
             info = parse(open(path))
             info = SGAlpinePackage.annotate(info)
@@ -67,13 +61,9 @@ def cmd_import(paths):
             # commit the first item to find errors more quickly
             if num == 0:
                 session.commit()
-                # SGAlpinePackage.model_fields()
-                # query it and show fields
-                # statement = select(SGAlpinePackage)
-                # results = session.exec(statement)
-                # for package in results:
-                #     print(package.__fields__.keys())
+
         session.commit()
+        print()
 
     with Session(engine) as session:
         count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
@@ -81,11 +71,13 @@ def cmd_import(paths):
 
 
 def cmd_report(paths):
+    limit = False
     engine = get_engine()
-    with Session(engine) as session:
-        query = select(SGAlpinePackage)
+    query = select(SGAlpinePackage)
+    if limit:
         query = query.where(SGAlpinePackage.pkgname.startswith('d'))
-        results = session.exec(query)
+    with Session(engine) as session:
+        results = session.exec(query).all()
 
     rows = []
     for package in results:
@@ -95,7 +87,7 @@ def cmd_report(paths):
         rows.append(row)
 
     rows.sort(key=lambda row: row['_rank'], reverse=True)
-    for row in rows:
+    for row in rows[:10]:
         print(row['_rank'], row['pkgname'])
 
 

@@ -6,7 +6,8 @@ run:
 
 
 run-all:
-	venv/bin/python3 -m main aports/main/*
+	venv/bin/python3 -m main import aports/main/*
+	venv/bin/python3 -m main report
 
 test:
 	pytest -sv
