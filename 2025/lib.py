@@ -1,7 +1,7 @@
 import os
 from sqlmodel import select, delete, func, Field, Session, SQLModel, create_engine
 
-DEBUG = os.environ.has_key('DEBUG')
+DEBUG = 'DEBUG' in os.environ
 
 def get_engine():
     sqlite_file_name = "database.db"

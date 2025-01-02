@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from pprint import pprint
 import sys
@@ -5,6 +6,7 @@ from sqlmodel import select, delete, func, Field, Session, SQLModel, create_engi
 from model import SGAlpinePackage
 from parse import parse
 from lib import get_engine
+import render
 
 
 def show_info(paths):
@@ -42,12 +44,6 @@ def cmd_import(paths):
 
     SQLModel.metadata.create_all(engine)
 
-    # with Session(engine) as session:
-    #     statement = select(SGAlpinePackage)
-    #     results = session.exec(statement)
-    #     for package in results:
-    #         print(package.__fields__.keys())
-
     with Session(engine) as session:
         for num,topdir in enumerate(paths):
             dirname = Path(topdir).name
@@ -71,24 +67,8 @@ def cmd_import(paths):
 
 
 def cmd_report(paths):
-    limit = False
-    engine = get_engine()
-    query = select(SGAlpinePackage)
-    if limit:
-        query = query.where(SGAlpinePackage.pkgname.startswith('d'))
-    with Session(engine) as session:
-        results = session.exec(query).all()
-
-    rows = []
-    for package in results:
-        rank = sum([package.sg_len_install, package.sg_len_parse_funcs, package.sg_len_subpackages])
-        row = dict(package)
-        row['_rank'] = rank
-        rows.append(row)
-
-    rows.sort(key=lambda row: row['_rank'], reverse=True)
-    for row in rows[:10]:
-        print(row['_rank'], row['pkgname'])
+    limit = 'LIMIT' in os.environ
+    render.render1(limit)
 
 
 if __name__ == '__main__':

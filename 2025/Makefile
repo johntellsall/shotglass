@@ -1,12 +1,13 @@
 all:
 
+import:
+	venv/bin/python3 -m main import aports/main/*
+
 run:
-	venv/bin/python3 -m main import aports/main/dn*
-	venv/bin/python3 -m main report
+	LIMIT=1 venv/bin/python3 -m main report
 
 
 run-all:
-	venv/bin/python3 -m main import aports/main/*
 	venv/bin/python3 -m main report
 
 test:

@@ -1,6 +1,6 @@
 from sqlmodel import select, delete, func, Field, Session, SQLModel, create_engine
-from .models import SGAlpinePackage
-from .database import get_engine
+from model import SGAlpinePackage
+from lib import get_engine
 
 
 def render1(limit=False):
@@ -11,6 +11,8 @@ def render1(limit=False):
     with Session(engine) as session:
         results = session.exec(query).all()
 
+    package_count = len(results)
+
     # FIXME: rewrite in SQL
     rows = []
     for package in results:
@@ -19,6 +21,8 @@ def render1(limit=False):
         row['_rank'] = rank
         rows.append(row)
 
+    print(f"Total packages: {package_count}")
+    print('Top 10 packages:')
     rows.sort(key=lambda row: row['_rank'], reverse=True)
     for row in rows[:10]:
         print(row['_rank'], row['pkgname'])
