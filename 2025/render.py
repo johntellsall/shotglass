@@ -11,25 +11,28 @@ def format1(result):
         print(row['_rank'], row['pkgname'])
 
 
-def render1(limit=False):
-    engine = get_engine()
+def query(engine, limit=False):
     query = select(SGAlpinePackage)
     if limit:
         query = query.where(SGAlpinePackage.pkgname.startswith('d'))
     with Session(engine) as session:
-        packages = session.exec(query).all()
+        return session.exec(query).all()
+
+
+def annotate_rank_result(packages):
+    for package in packages:
+        rank = sum([package.sg_len_install, package.sg_len_parse_funcs, package.sg_len_subpackages])
+        item = dict(package)
+        item['_rank'] = rank
+        yield item
+
+
+def render1(limit=False):
+    engine = get_engine()
+    packages = query(engine, limit=limit)
 
     result = {}
     result['package_count'] = len(packages)
-
-    # FIXME: rewrite in SQL
-    rows = []
-    for package in packages:
-        rank = sum([package.sg_len_install, package.sg_len_parse_funcs, package.sg_len_subpackages])
-        row = dict(package)
-        row['_rank'] = rank
-        rows.append(row)
-
-    result['rows'] = rows
+    result['rows'] = list(annotate_rank_result(packages))
 
     format1(result)
