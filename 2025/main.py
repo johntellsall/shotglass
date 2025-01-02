@@ -6,18 +6,18 @@ from model import SGAlpinePackage
 from sqlmodel import select, delete, func
 
 
-def show_info(args):
-    for topdir in args:
+def show_info(paths):
+    for topdir in paths:
         print(topdir)
         path = Path(topdir) / 'APKBUILD'
         info = parse(open(path))
         pprint(info)
         print()
 
-def show_summary(args):
+def show_summary(paths):
     fields = ['pkgname', 'pkgver', 'pkgrel', 'len_install', 'len_parse_funcs', 'len_subpackages']
     print(fields)
-    for topdir in args:
+    for topdir in paths:
         path = Path(topdir) / 'APKBUILD'
         info = parse(open(path))
         #'pkgdesc'
@@ -30,37 +30,66 @@ def show_summary(args):
 from model import SGAlpinePackage
 from sqlmodel import Field, Session, SQLModel, create_engine
 
-def insert(args):
+DEBUG = True
+
+def get_engine():
     sqlite_file_name = "database.db"
     sqlite_url = f"sqlite:///{sqlite_file_name}"
-    engine = create_engine(sqlite_url) # , echo=True)
-    SQLModel.metadata.create_all(engine)
+    engine = create_engine(sqlite_url, echo=DEBUG)
+    return engine
+
+
+def cmd_import(paths):
+    engine = get_engine()
 
     # WARNING: Remove all existing SGAlpinePackage entries
     with Session(engine) as session:
-        session.exec(delete(SGAlpinePackage))
+        statement = delete(SGAlpinePackage)
+        result = session.exec(statement)
         session.commit()
+        # print(result.rowcount) -- num of deleted rows
+
+    SQLModel.metadata.create_all(engine)
 
     with Session(engine) as session:
-        for topdir in args:
+        statement = select(SGAlpinePackage)
+        results = session.exec(statement)
+        for package in results:
+            print(package.__fields__.keys())
+
+    with Session(engine) as session:
+        for num,topdir in enumerate(paths):
             print(topdir)
             path = Path(topdir) / 'APKBUILD'
             info = parse(open(path))
             info = SGAlpinePackage.annotate(info)
             package = SGAlpinePackage(**info)
             session.add(package)
+            # commit the first item to find errors more quickly
+            if num == 0:
+                session.commit()
         session.commit()
 
     with Session(engine) as session:
         count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
         print(count)
-    # for topdir in args:
-    #     path = Path(topdir) / 'APKBUILD'
-    #     info = parse(open(path))
-    #     info = SGAlpinePackage.annotate(info)
-    #     package = SGAlpinePackage(**info)
+
+
+def cmd_report(paths):
+    engine = get_engine()
+    with Session(engine) as session:
+        statement = select(SGAlpinePackage)
+        results = session.exec(statement)
+        for package in results:
+            print(package.pkgname, package.pkgver, package.pkgrel, package.sg_len_install, package.sg_len_parse_funcs, package.sg_len_subpackages)
 
 
 if __name__ == '__main__':
+    cmdfunc = globals().get(f'cmd_{sys.argv[1]}')
+    if not cmdfunc:
+        sys.exit(f"Unknown command: {sys.argv[1]}")
+    cmdfunc(sys.argv[2:])
     # show_summary(sys.argv[1:])
-    insert(sys.argv[1:])
+    # insert(sys.argv[1:])
+    # report([])
+
