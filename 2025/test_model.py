@@ -36,7 +36,7 @@ ALPINE2 = {'_parse_functions': ['build', 'package'],
 @pytest.fixture
 def memdb():
     sqlite_url = "sqlite:///:memory:"
-    engine = create_engine(sqlite_url, echo=True)
+    engine = create_engine(sqlite_url) # FIXME: , echo=True)
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
         yield session
@@ -45,6 +45,7 @@ def memdb():
 def test_model(memdb):
     data = ALPINE.copy()
     data['sg_complexity'] = 123
+    data['alpine_release'] = 'mytest'
     package = SGAlpinePackage(**data)
     memdb.add(package)
     memdb.commit()
@@ -65,6 +66,7 @@ def test_annotate():
 
 def test_annotate_db(memdb):
     data = SGAlpinePackage.annotate(ALPINE2)
+    data['alpine_release'] = 'mytest'
     package = SGAlpinePackage(**data)
     memdb.add(package)
     memdb.commit()

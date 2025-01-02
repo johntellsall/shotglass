@@ -1,5 +1,9 @@
 all:
 
+# FIXME:
+test-loop:
+	pytest -s --maxfail=1 --verbose test_model.py
+
 import:
 	venv/bin/python3 -m main import aports/main/*
 

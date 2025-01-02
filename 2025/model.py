@@ -3,6 +3,7 @@ from sqlmodel import Field, SQLModel, create_engine
 
 class SGAlpinePackage(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
+    alpine_release: str
     pkgname: str
     pkgdesc: str
     pkgver: str
