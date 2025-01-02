@@ -1,5 +1,19 @@
 all:
 
+zoot:
+	-$(RM) database.db
+	@echo
+	git -C aports sparse-checkout set main/
+	@echo
+	git -C aports checkout remotes/origin/3.15-stable
+	RELEASE=3.15-stable venv/bin/python3 -m main import aports/main/d*
+	@echo
+	git -C aports checkout remotes/origin/3.14-stable
+	RELEASE=3.14-stable venv/bin/python3 -m main import aports/main/d*
+	@echo
+	venv/bin/python3 -m main report
+
+
 # FIXME:
 test-loop:
 	pytest -s --maxfail=1 --verbose test_model.py

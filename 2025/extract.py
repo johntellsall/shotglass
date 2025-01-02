@@ -33,7 +33,8 @@ def extract_apk_dir(topdir, release, session):
 def extract(paths, release):
     engine = get_engine()
 
-    db_delete_all(engine) # FIXME:
+    if 0:
+        db_delete_all(engine) # FIXME:
 
     SQLModel.metadata.create_all(engine)
 
@@ -50,7 +51,6 @@ def extract(paths, release):
         session.commit()
         print()
 
-
     with Session(engine) as session:
         count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
-        print(f"Total packages: {count}")
+        print(f"Release: {release} -- Total packages: {count}")

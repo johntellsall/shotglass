@@ -33,8 +33,8 @@ def show_summary(paths):
 
 
 def cmd_import(paths):
-    extract.extract(paths, release='123')
-    
+    extract.extract(paths, release=os.environ['RELEASE'])
+                    
 
 def cmd_report(paths):
     limit = 'LIMIT' in os.environ

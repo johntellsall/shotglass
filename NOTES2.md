@@ -16,11 +16,21 @@
 
 ## Git
 
+### show tags close to current commit
+
+X: doesn't play nice with sparse-checkout
+
+    git describe --tags
+
 ### sparse checkout
 
 NOTE: Filter mode has drawbacks
 
     git sparse-checkout set --no-cone "**/APKBUILD"
+
+* standard, directory mode
+
+    git sparse-checkout set main/
 
 
 ### Git diff stat
