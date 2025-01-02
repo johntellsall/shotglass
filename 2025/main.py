@@ -33,7 +33,7 @@ def show_summary(paths):
 
 
 def cmd_import(paths):
-    extract.extract(paths)
+    extract.extract(paths, release='123')
     
 
 def cmd_report(paths):

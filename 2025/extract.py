@@ -22,15 +22,15 @@ def db_delete_all(engine):
         print(f"OperationalError: {e}") # FIXME:
 
 
-def extract_apk_dir(topdir, session):
+def extract_apk_dir(topdir, release, session):
     path = Path(topdir) / 'APKBUILD'
     info = parse(open(path), label=path)
     info = SGAlpinePackage.annotate(info)
-    package = SGAlpinePackage(**info)
+    package = SGAlpinePackage(alpine_release=release, **info)
     session.add(package)
 
 
-def extract(paths):
+def extract(paths, release):
     engine = get_engine()
 
     db_delete_all(engine) # FIXME:
@@ -42,7 +42,7 @@ def extract(paths):
             dirname = Path(topdir).name
             if (num % 10 == 1):
                 print(dirname, end=' ')
-            extract_apk_dir(topdir, session)
+            extract_apk_dir(topdir, release, session)
             # commit the first item to find errors more quickly
             if num == 0:
                 session.commit()
