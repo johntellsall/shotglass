@@ -1,9 +1,12 @@
 from pathlib import Path
 from pprint import pprint
 import sys
-from parse import parse
+from sqlmodel import select, delete, func, Field, Session, SQLModel, create_engine
 from model import SGAlpinePackage
-from sqlmodel import select, delete, func
+from parse import parse
+
+
+DEBUG = False # True
 
 
 def show_info(paths):
@@ -27,10 +30,6 @@ def show_summary(paths):
         # print(list(zip(fields, [info.get(f, 'N/A') for f in fields])))
         print([info.get(f, 'N/A') for f in fields])
 
-from model import SGAlpinePackage
-from sqlmodel import Field, Session, SQLModel, create_engine
-
-DEBUG = True
 
 def get_engine():
     sqlite_file_name = "database.db"
@@ -68,6 +67,12 @@ def cmd_import(paths):
             # commit the first item to find errors more quickly
             if num == 0:
                 session.commit()
+                # SGAlpinePackage.model_fields()
+                # query it and show fields
+                # statement = select(SGAlpinePackage)
+                # results = session.exec(statement)
+                # for package in results:
+                #     print(package.__fields__.keys())
         session.commit()
 
     with Session(engine) as session:

@@ -21,7 +21,7 @@ class SGAlpinePackage(SQLModel, table=True):
                 return len(obj)
             return 1
         data['sg_len_install'] = listlen(data.get('install', []))
-        # data['sg_len_parse_funcs'] = listlen(data.get('_parse_functions', []))
+        data['sg_len_parse_funcs'] = listlen(data.get('_parse_functions', []))
         data['sg_len_subpackages'] = listlen(data.get('subpackages', []))
         return data
 
