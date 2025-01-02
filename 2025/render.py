@@ -6,9 +6,8 @@ from lib import get_engine
 def format1(result):
     print(f"Total packages: {result['package_count']}")
     print('Top 10 packages:')
-    # FIXME: don't modify arg
-    result['rows'].sort(key=lambda row: row['_rank'], reverse=True)
-    for row in result['rows'][:10]:
+    ranked_rows = sorted(result['rows'], key=lambda row: row['_rank'], reverse=True)
+    for row in ranked_rows[:10]:
         print(row['_rank'], row['pkgname'])
 
 

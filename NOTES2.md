@@ -16,6 +16,13 @@
 
 ## Git
 
+### sparse checkout
+
+NOTE: Filter mode has drawbacks
+
+    git sparse-checkout set --no-cone "**/APKBUILD"
+
+
 ### Git diff stat
 
 Show number of changes for APKBUILD files from previous stable version (Alpine Linux)
