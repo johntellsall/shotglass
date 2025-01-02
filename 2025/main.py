@@ -7,6 +7,7 @@ from model import SGAlpinePackage
 from parse import parse
 from lib import get_engine
 import render
+import extract
 
 
 def show_info(paths):
@@ -31,40 +32,9 @@ def show_summary(paths):
         print([info.get(f, 'N/A') for f in fields])
 
 
-
 def cmd_import(paths):
-    engine = get_engine()
-
-    # WARNING: Remove all existing SGAlpinePackage entries
-    with Session(engine) as session:
-        statement = delete(SGAlpinePackage)
-        session.exec(statement)
-        session.commit()
-        # print(result.rowcount) -- num of deleted rows
-
-    SQLModel.metadata.create_all(engine)
-
-    with Session(engine) as session:
-        for num,topdir in enumerate(paths):
-            dirname = Path(topdir).name
-            if (num % 10 == 1):
-                print(dirname, end=' ')
-            path = Path(topdir) / 'APKBUILD'
-            info = parse(open(path))
-            info = SGAlpinePackage.annotate(info)
-            package = SGAlpinePackage(**info)
-            session.add(package)
-            # commit the first item to find errors more quickly
-            if num == 0:
-                session.commit()
-
-        session.commit()
-        print()
-
-    with Session(engine) as session:
-        count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
-        print(count)
-
+    extract.extract(paths)
+    
 
 def cmd_report(paths):
     limit = 'LIMIT' in os.environ

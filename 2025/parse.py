@@ -1,9 +1,10 @@
 # parse.py
 
 import re
+import sys
 
 
-def parse(lines):
+def parse(lines, label=None):
     def is_comment(line):
         return line.startswith('#')
     
@@ -19,7 +20,11 @@ def parse(lines):
             if value == '"':
                 value_list = []
                 while True:
-                    item = next(lines).strip()
+                    try:
+                        item = next(lines).strip()
+                    except StopIteration:
+                        print(f'BUG: Unterminated string: {label}', file=sys.stderr)
+                        break
                     if item == '"':
                         break
                     value_list.append(item)

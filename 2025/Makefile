@@ -10,6 +10,10 @@ run1:
 run run-all:
 	venv/bin/python3 -m main report
 
+run-full:
+	-$(RM) database.db
+	make import run-all
+
 test:
 	pytest -sv
 	

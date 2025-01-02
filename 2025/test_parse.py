@@ -1,5 +1,6 @@
 import pprint
 from parse import parse
+import pytest
 
 LINES = list(open('APKBUILD').readlines())
 
@@ -27,3 +28,9 @@ def test_function():
 #     lines = open('aports/main/dnstop/APKBUILD')
 #     info = parse(lines)
 #     assert 0, pprint.pformat(info)
+
+@pytest.mark.xfail
+def test_list_quote():
+    lines = open('test-data/list-quote.dat')
+    info = parse(lines)
+    assert 0, pprint.pformat(info)
