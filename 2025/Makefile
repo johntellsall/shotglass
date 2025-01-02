@@ -2,7 +2,7 @@ all:
 
 run:
 	venv/bin/python3 -m main import aports/main/dn*
-# venv/bin/python3 -m main query
+	venv/bin/python3 -m main report
 
 
 run-all:
