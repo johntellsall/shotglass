@@ -85,17 +85,18 @@ def cmd_report(paths):
     with Session(engine) as session:
         query = select(SGAlpinePackage)
         query = query.where(SGAlpinePackage.pkgname.startswith('d'))
-        rows = []
         results = session.exec(query)
-        for package in results:
-            rank = sum([package.sg_len_install, package.sg_len_parse_funcs, package.sg_len_subpackages])
-            row = dict(package)
-            row['_rank'] = rank
-            rows.append(row)
 
-        rows.sort(key=lambda row: row['_rank'], reverse=True)
-        for row in rows:
-            print(row['_rank'], row['pkgname'])
+    rows = []
+    for package in results:
+        rank = sum([package.sg_len_install, package.sg_len_parse_funcs, package.sg_len_subpackages])
+        row = dict(package)
+        row['_rank'] = rank
+        rows.append(row)
+
+    rows.sort(key=lambda row: row['_rank'], reverse=True)
+    for row in rows:
+        print(row['_rank'], row['pkgname'])
 
 
 if __name__ == '__main__':
