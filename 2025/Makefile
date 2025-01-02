@@ -14,6 +14,11 @@ run-full:
 	-$(RM) database.db
 	make import run-all
 
+# full1 -- full import, short run
+run-full1:
+	-$(RM) database.db
+	make import run1
+
 test:
 	pytest -sv
 	
