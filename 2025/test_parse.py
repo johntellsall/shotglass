@@ -36,13 +36,18 @@ def test_list_quote():
     assert 0, pprint.pformat(info)
 
 
-def test_parse_popcon():
-    data = '''#<no-files> is the number of people whose entry didn't contain enough
+raw_popcon_data = '''#<no-files> is the number of people whose entry didn't contain enough
 #           information (atime and ctime were 0).
 #rank name                            inst  vote   old recent no-files (maintainer)
 1     libacl1                        138898 126117     2 12764    15 (Guillem Jover)                 
 2     libpcre2-8-0                   138890 126112     3 12762    13 (Matthew Vernon)'''
 
-    packages = parse.parse_debian_popcon(data)
+def test_parse_popcon_raw():
+    packages = parse.parse_debian_popcon_raw(raw_popcon_data)
     assert packages[0] == {'rank': 1, 'name': 'libacl1', 'inst': 138898, 'vote': 126117, 'old': 2, 'recent': 12764, 'no_files': 15, 'maintainer': 'Guillem Jover'}
     assert len(packages) == 2
+
+
+def test_parse_popcon():
+    raw = "1     libacl1                        138898 126117     2 12764    15 (Guillem Jover)   "              
+    assert parse.parse_debian_popcon(raw) == {'libacl1': 126117}

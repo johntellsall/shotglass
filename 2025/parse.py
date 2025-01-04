@@ -42,7 +42,7 @@ def parse(lines, label=None):
     return info
 
 
-def parse_debian_popcon(data):
+def parse_debian_popcon_raw(data):
     # Skip comment lines and prepare data for parsing
     lines = [line for line in data.splitlines() if line and not line.startswith('#')]
     
@@ -68,3 +68,9 @@ def parse_debian_popcon(data):
         packages.append(package)
     
     return packages
+
+# package ={'rank': 1, 'name': 'libacl1', 'inst': 138898, 'vote': 126117, 'old': 2, 'recent': 12764, 'no_files': 15, 'maintainer': 'Guillem Jover'}
+
+def parse_debian_popcon(data):
+    packages = parse_debian_popcon_raw(data)
+    return dict((pkg['name'], pkg['vote']) for pkg in packages)
