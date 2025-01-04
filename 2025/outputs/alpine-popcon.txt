@@ -1,0 +1,21 @@
+Top 20 Alpine packages by Debian popularity:
+- dpkg                   122941 The Debian Package Manager
+- tar                    122748 Utility used to store, backup, and transport files
+- e2fsprogs              122426 Standard Ext2/3/4 filesystem utilities
+- udev                   121747 Compatility package. Use udev instead
+- coreutils              120211 The basic file, shell and text manipulation utilities
+- dash                   119755 Small and fast POSIX-compliant shell
+- gzip                   119680 A popular data compression program
+- bash                   119463 The GNU Bourne Again shell
+- util-linux             118427 Random collection of Linux utilities
+- debian-archive-keyring 118326 GnuPG archive keys of the Debian archive
+- openssl                116816 Toolkit for Transport Layer Security (TLS)
+- diffutils              116225 Show differences among files
+- procps                 115510 Utilities for monitoring your system and processes on your system
+- iproute2               110759 IP Routing Utilities
+- sed                    110690 GNU stream editor
+- perl                   110546 Larry Wall's Practical Extraction and Report Language
+- sudo                   104922 Give certain users the ability to run some commands as root
+- libxml2                104678 XML parsing library, version 2
+- grep                   103140 Searches input files for lines containing a match to a specified pattern
+- python3                102728 A high-level scripting language

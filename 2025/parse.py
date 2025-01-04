@@ -46,13 +46,11 @@ def parse_debian_popcon_raw(data):
     def is_dull(ln):
         return not (ln and ln[0] not in '-#' and ' Total ' not in ln)
     lines = [line for line in data.splitlines() if not is_dull(line)]
-    assert 0, lines[-10:]
-    # Create a list to store results
+
     packages = []
     
     # Parse each line
     for line in lines:
-        print(line)
         # Split on variable whitespace
         fields = [field for field in line.split() if field]
         
