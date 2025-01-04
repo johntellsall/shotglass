@@ -27,6 +27,19 @@ class SGAlpinePackage(SQLModel, table=True):
         data['sg_len_subpackages'] = listlen(data.get('subpackages', []))
         return data
 
+# popcon ={'rank': 1, 'name': 'libacl1', 'inst': 138898, 'vote': 126117, 'old': 2, 'recent': 12764, 'no_files': 15,
+# 'maintainer': 'Guillem Jover'}
+
+class DebianPopContest(SQLModel, table=True):
+    rank: int
+    name: str | None = Field(default=None, primary_key=True)
+    inst: int
+    vote: int
+    old: int
+    recent: int
+    no_files: int
+    maintainer: str
+
 # def setup():
 #     sqlite_file_name = "database.db"
 #     sqlite_url = f"sqlite:///{sqlite_file_name}"

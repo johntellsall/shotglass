@@ -71,6 +71,8 @@ def parse_debian_popcon_raw(data):
 
 # package ={'rank': 1, 'name': 'libacl1', 'inst': 138898, 'vote': 126117, 'old': 2, 'recent': 12764, 'no_files': 15, 'maintainer': 'Guillem Jover'}
 
-def parse_debian_popcon(data):
+def parse_debian_popcon(data=None):
+    if data is None:
+        data = open('dist/by_vote').read()
     packages = parse_debian_popcon_raw(data)
     return dict((pkg['name'], pkg['vote']) for pkg in packages)

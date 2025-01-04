@@ -7,7 +7,7 @@ fix-ruff:
 	ruff check --output-format=concise --fix .
 
 popcon:
-	python3 -m main popcon
+	python3 -m main extract_popcon
 
 test-cov:
 	coverage run -m pytest *.py

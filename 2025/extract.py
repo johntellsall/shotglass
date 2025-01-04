@@ -91,3 +91,8 @@ def extract2():
         with Session(engine) as session:
             count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
         print(f'- {count} total packages')
+
+def extract_popcon():
+    engine = get_engine()
+    with Session(engine) as session:
+        pass

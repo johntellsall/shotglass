@@ -47,6 +47,9 @@ def cmd_extract2(paths):
 def cmd_popcon(paths):
     print(render.report_popcon())
 
+def cmd_extract_popcon(paths):
+    print(extract.extract_popcon())
+
 
 if __name__ == '__main__':
     cmdfunc = globals().get(f'cmd_{sys.argv[1]}')
