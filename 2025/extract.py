@@ -77,7 +77,7 @@ def git_list_branches():
     # FIXME:
     if 1:
         releases = [rel for rel in releases if rel.startswith('3.')]
-        return releases[-3:]
+        return releases
     return releases
 
 
