@@ -1,7 +1,14 @@
 all:
 
+extract2:
+	-$(RM) database.db
+	venv/bin/python3 -m main extract2
+
 table.html:
 	venv/bin/python3 -m main table > $@
+
+%.show: %.sql
+	sqlite3 database.db < $<
 
 import-full:
 	-$(RM) database.db

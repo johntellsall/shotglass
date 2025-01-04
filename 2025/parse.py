@@ -23,7 +23,7 @@ def parse(lines, label=None):
                     try:
                         item = next(lines).strip()
                     except StopIteration:
-                        print(f'BUG: Unterminated string: {label}', file=sys.stderr)
+                        # FIXME: print(f'BUG: Unterminated string: {label}', file=sys.stderr)
                         break
                     if item == '"':
                         break

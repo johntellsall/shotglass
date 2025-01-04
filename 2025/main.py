@@ -43,6 +43,9 @@ def cmd_import(paths):
 def cmd_table(paths):
     print(render.format_html_table())
 
+def cmd_extract2(paths):
+    print(extract.extract2())
+
 
 if __name__ == '__main__':
     cmdfunc = globals().get(f'cmd_{sys.argv[1]}')
