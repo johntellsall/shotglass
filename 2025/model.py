@@ -1,9 +1,10 @@
 from sqlmodel import Field, SQLModel, create_engine
 
+# Shotglass-specific fields prefixed with "sg_"
 
 class SGAlpinePackage(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    alpine_release: str
+    alpine_release: str  # FIXME: rename -> sg_alpine_release
     pkgname: str
     pkgdesc: str
     pkgver: str
@@ -26,10 +27,10 @@ class SGAlpinePackage(SQLModel, table=True):
         data['sg_len_subpackages'] = listlen(data.get('subpackages', []))
         return data
 
-def setup():
-    sqlite_file_name = "database.db"
-    sqlite_url = f"sqlite:///{sqlite_file_name}"
+# def setup():
+#     sqlite_file_name = "database.db"
+#     sqlite_url = f"sqlite:///{sqlite_file_name}"
 
-    engine = create_engine(sqlite_url, echo=True)
+#     engine = create_engine(sqlite_url, echo=True)
 
-    SQLModel.metadata.create_all(engine)
+#     SQLModel.metadata.create_all(engine)

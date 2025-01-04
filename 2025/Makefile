@@ -1,5 +1,8 @@
 all:
 
+table:
+	venv/bin/python3 -m main table
+
 zoot:
 	-$(RM) database.db
 	@echo
@@ -13,6 +16,8 @@ zoot:
 	@echo
 	venv/bin/python3 -m main report
 
+dbshell:
+	sqlite3 database.db
 
 # FIXME:
 test-loop:

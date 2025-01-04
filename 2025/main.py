@@ -36,9 +36,12 @@ def cmd_import(paths):
     extract.extract(paths, release=os.environ['RELEASE'])
                     
 
-def cmd_report(paths):
-    limit = 'LIMIT' in os.environ
-    render.render1(limit)
+# def cmd_report(paths):
+#     limit = 'LIMIT' in os.environ
+#     render.render1(limit)
+
+def cmd_table(paths):
+    print(render.format_html_table())
 
 
 if __name__ == '__main__':
