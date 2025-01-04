@@ -2,10 +2,8 @@ import os
 from pathlib import Path
 from pprint import pprint
 import sys
-from sqlmodel import select, delete, func, Field, Session, SQLModel, create_engine
-from model import SGAlpinePackage
+from sqlmodel import select, delete, func, Field, Session, SQLModel
 from parse import parse
-from lib import get_engine
 import render
 import extract
 

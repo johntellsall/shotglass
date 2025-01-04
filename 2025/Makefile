@@ -3,6 +3,9 @@ all:
 lint:
 	ruff check --output-format=concise .
 
+fix-ruff:
+	ruff check --output-format=concise --fix .
+
 popcon:
 	python3 -m main popcon
 

@@ -1,7 +1,6 @@
 # parse.py
 
 import re
-import sys
 
 
 def parse(lines, label=None):

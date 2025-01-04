@@ -1,4 +1,4 @@
-from sqlmodel import select, delete, func, Field, Session, SQLModel, create_engine
+from sqlmodel import select, Session
 from model import SGAlpinePackage
 import parse
 from lib import get_engine
@@ -75,5 +75,5 @@ def format_html_table():
 
 
 def report_popcon():
-    popcon = parse.parse_debian_popcon(open('dist/by_vote').read()):
+    popcon = parse.parse_debian_popcon(open('dist/by_vote').read())
 
