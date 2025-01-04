@@ -1,5 +1,9 @@
 all:
 
+test-cov:
+	coverage run -m pytest *.py
+	coverage report -m
+
 extract2:
 	-$(RM) database.db
 	venv/bin/python3 -m main extract2

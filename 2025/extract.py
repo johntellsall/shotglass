@@ -69,7 +69,6 @@ def git_checkout(branch):
         print(f"Failed to checkout branch {branch}: {result.stderr}", file=sys.stderr)
 
 
-# TODO: ignore stderr
 def git_list_branches():
     cmd = ["git", "-C", "aports", "branch", "-a"]
     result = subprocess.run(cmd, capture_output=True, text=True)
