@@ -1,5 +1,11 @@
 all:
 
+lint:
+	ruff check --output-format=concise .
+
+popcon:
+	python3 -m main popcon
+
 test-cov:
 	coverage run -m pytest *.py
 	coverage report -m

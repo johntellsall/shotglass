@@ -1,8 +1,8 @@
-from collections import defaultdict
-import re
 from sqlmodel import select, delete, func, Field, Session, SQLModel, create_engine
 from model import SGAlpinePackage
+import parse
 from lib import get_engine
+
 
 def equery(engine, query):
     with Session(engine) as session:
@@ -72,4 +72,8 @@ def format_html_table():
         html.append(format_row(row))
     html.append('</table>')
     return '\n'.join(html)
-    
+
+
+def report_popcon():
+    popcon = parse.parse_debian_popcon(open('dist/by_vote').read()):
+
