@@ -1,5 +1,13 @@
 # NOTES
 
+## Alpine
+
+estimate package size before installing (X: check)
+
+    apk search -v --size <package_name>
+
+    apk info --size <package_name>
+
 ## Git
 
 Checkout branch, put in worktree directory "beer", keep original Git repos
