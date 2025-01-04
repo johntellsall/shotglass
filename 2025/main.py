@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 from pprint import pprint
 import sys
-from sqlmodel import select, delete, func, Field, Session, SQLModel
 from parse import parse
 import render
 import extract
