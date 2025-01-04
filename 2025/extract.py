@@ -24,6 +24,9 @@ def db_delete_all(engine):
 
 def extract_apk_dir(topdir, release, session):
     path = Path(topdir) / 'APKBUILD'
+    if not path.exists():
+        print(f"{path}: path not found", file=sys.stderr)
+        return
     info = parse(open(path), label=path)
     info = SGAlpinePackage.annotate(info)
     package = SGAlpinePackage(alpine_release=release, **info)

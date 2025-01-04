@@ -1,20 +1,21 @@
 all:
 
-table:
-	venv/bin/python3 -m main table
+table.html:
+	venv/bin/python3 -m main table > $@
 
-zoot:
+import-full:
 	-$(RM) database.db
 	@echo
 	git -C aports sparse-checkout set main/
 	@echo
 	git -C aports checkout remotes/origin/3.15-stable
-	RELEASE=3.15-stable venv/bin/python3 -m main import aports/main/d*
+	RELEASE=3.15-stable venv/bin/python3 -m main import aports/main/*
 	@echo
 	git -C aports checkout remotes/origin/3.14-stable
-	RELEASE=3.14-stable venv/bin/python3 -m main import aports/main/d*
+	RELEASE=3.14-stable venv/bin/python3 -m main import aports/main/*
 	@echo
-	venv/bin/python3 -m main report
+	git -C aports checkout remotes/origin/3.10-stable
+	RELEASE=3.10-stable venv/bin/python3 -m main import aports/main/*
 
 dbshell:
 	sqlite3 database.db

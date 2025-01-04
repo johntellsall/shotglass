@@ -4,6 +4,10 @@ from sqlmodel import select, delete, func, Field, Session, SQLModel, create_engi
 from model import SGAlpinePackage
 from lib import get_engine
 
+def equery(engine, query):
+    with Session(engine) as session:
+        return session.exec(query).all()
+
 
 def raw_query(engine, release, limit=False):
     query = select(SGAlpinePackage)
@@ -49,8 +53,9 @@ def format_html_table():
     def format_row(row):
         middle = ''.join(f"<td>{value}</td>" for value in row)
         return f"<tr>{middle}</tr>"
-    
-    releases = ['3.14-stable', '3.15-stable']
+
+    # engine = get_engine()
+    releases = ['3.10-stable', '3.14-stable', '3.15-stable']
     data = {}
     for release in releases:
         raw_rows = query(release)['rows']
