@@ -3,8 +3,8 @@ import re
 import subprocess
 import sys
 from sqlmodel import select, delete, func, Session, SQLModel
-from model import SGAlpinePackage
-from parse import parse
+from model import DebianPopContest, SGAlpinePackage
+import parse
 from lib import get_engine
 from sqlalchemy.exc import OperationalError
 
@@ -92,7 +92,19 @@ def extract2():
             count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
         print(f'- {count} total packages')
 
+
 def extract_popcon():
     engine = get_engine()
+    SQLModel.metadata.create_all(engine)
+    popcon = parse.parse_debian_popcon()
     with Session(engine) as session:
-        pass
+        for num,package in enumerate(popcon.values()):
+            deb_pkg = DebianPopContest(**package)
+            session.add(deb_pkg)
+            if num == 0: # make bugs show early
+                session.commit()
+        session.commit()
+
+    with Session(engine) as session:
+        count = session.scalar(select(func.count()).select_from(DebianPopContest))
+    print(f"DebianPopContest packages: {count}")

@@ -75,4 +75,4 @@ def parse_debian_popcon(data=None):
     if data is None:
         data = open('dist/by_vote').read()
     packages = parse_debian_popcon_raw(data)
-    return dict((pkg['name'], pkg['vote']) for pkg in packages)
+    return dict((pkg['name'], pkg) for pkg in packages)
