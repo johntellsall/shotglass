@@ -152,18 +152,7 @@ def query_sqlfile(engine, path):
     with Session(engine) as session:
         return session.exec(text(sql)).all()
 
-
-def report_popcon2():
-    """
-    track popular packages across multiple Alpine releases
-    """
-    engine = get_engine()
-    # query = select(SGAlpinePackage.alpine_release).distinct()
-    # with Session(engine) as session:
-    #     releases = session.exec(query).all()
-    # print(f'Available releases: {releases}')
-    releases = ['3.0-stable', '3.10-stable', '3.21-stable']
-    # popular = query_popular(engine)
+def query_popcon2(engine, releases):
     data = query_sqlfile(engine, 'pop_over_time.sql')
 
     # the row is determined by the latest release
@@ -182,6 +171,17 @@ def report_popcon2():
         else:
             if debug: print(f'- item {item} -> row {row_num}')  
             grid[row_num][drelease] = item
+    return grid
+
+
+def report_popcon2():
+    """
+    track popular packages across multiple Alpine releases
+    """
+    engine = get_engine()
+    # FIXME: must match with pop_over_time.sql
+    releases = ['3.0-stable', '3.10-stable', '3.21-stable']
+    grid = query_popcon2(engine, releases)
     
     last_release = releases[-1]
     for num,row in enumerate(grid):

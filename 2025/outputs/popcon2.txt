@@ -1,0 +1,317 @@
+python3 -m main popcon2
+--- tar
+--- e2fsprogs
+--- coreutils
+NEW: dash -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'dash'}}
+--- gzip
+--- bash
+--- util-linux
+--- openssl
+--- diffutils
+--- iproute2
+--- sed
+--- perl
+--- libxml2
+--- grep
+NEW: python3 -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'python3'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'python3'}}
+--- kmod
+--- dbus
+--- findutils
+NEW: apparmor -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'apparmor'}}
+--- kbd
+--- tzdata
+--- gnupg
+--- shared-mime-info
+--- fontconfig
+--- lsof
+--- parted
+NEW: mawk -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'mawk'}}
+NEW: psmisc -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'psmisc'}}
+--- acl
+NEW: fuse3 -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'fuse3'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'fuse3'}}
+--- bc
+--- dmidecode
+NEW: bubblewrap -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'bubblewrap'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'bubblewrap'}}
+--- ca-certificates
+--- at-spi2-core
+--- hicolor-icon-theme
+--- p11-kit
+--- bluez
+--- logrotate
+--- git
+--- alsa-utils
+--- iso-codes
+--- iptables
+--- mailcap
+NEW: rpcsvc-proto -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'rpcsvc-proto'}}
+--- rsyslog
+--- dosfstools
+--- lvm2
+--- apg
+--- gawk
+--- pciutils
+NEW: wireless-regdb -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'wireless-regdb'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'wireless-regdb'}}
+--- less
+--- file
+--- smartmontools
+--- wireless-tools
+--- busybox
+NEW: lm-sensors -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'lm-sensors'}}
+--- curl
+--- wget
+NEW: zstd -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'zstd'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'zstd'}}
+--- rsync
+--- bzip2
+--- binutils
+--- apache2
+--- rpcbind
+--- nano
+--- ghostscript
+NEW: nftables -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'nftables'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'nftables'}}
+--- make
+--- ntfs-3g
+--- sshfs
+NEW: iucode-tool -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'iucode-tool'}}
+--- hwdata
+--- hdparm
+--- samba
+NEW: unzip -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'unzip'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'unzip'}}
+--- aspell
+--- ruby
+--- net-tools
+--- cups
+--- vim
+--- postfix
+--- ethtool
+--- patch
+--- mdadm
+--- socat
+--- openvpn
+--- usbutils
+--- squashfs-tools
+--- htop
+--- nginx
+--- fail2ban
+--- usb-modeswitch
+--- aspell-en
+NEW: pigz -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'pigz'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'pigz'}}
+--- graphviz
+NEW: postgresql-common -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'postgresql-common'}}
+NEW: jq -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'jq'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'jq'}}
+--- gettext
+NEW: acpid -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'acpid'}}
+--- tmux
+--- zip
+--- bridge-utils
+--- m4
+--- chrony
+--- ppp
+--- zsh
+--- btrfs-progs
+--- nodejs
+--- screen
+--- mc
+--- iw
+--- pkgconf
+--- autoconf
+--- keyutils
+--- automake
+--- lynx
+--- cifs-utils
+--- ipset
+--- bash-completion
+--- libtool
+--- gdb
+--- fakeroot
+--- netcat-openbsd
+--- haveged
+--- atop
+NEW: etckeeper -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'etckeeper'}}
+NEW: nmap -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'nmap'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'nmap'}}
+NEW: perl-tk -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'perl-tk'}}
+--- tree
+NEW: powertop -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'powertop'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'powertop'}}
+NEW: wireguard-tools -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'wireguard-tools'}}
+NEW: efibootmgr -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'efibootmgr'}}
+--- tcl
+--- irqbalance
+NEW: nvme-cli -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'nvme-cli'}}
+--- cmake
+--- cryptsetup
+--- xfsprogs
+--- dnsmasq
+--- lockfile-progs
+NEW: open-iscsi -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'open-iscsi'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'open-iscsi'}}
+NEW: tk -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'tk'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'tk'}}
+NEW: iperf3 -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'iperf3'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'iperf3'}}
+--- fping
+NEW: gyp -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'gyp'}}
+--- patchutils
+--- docbook-xml
+--- lighttpd
+--- docbook-xsl
+--- tcpdump
+--- memcached
+--- monit
+--- pwgen
+--- rrdtool
+--- unbound
+--- ncdu
+--- lxc
+--- fish
+--- spamassassin
+NEW: gpm -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'gpm'}}
+--- subversion
+--- mosquitto
+NEW: command-not-found -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'command-not-found'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'command-not-found'}}
+--- haproxy
+--- squid
+--- strace
+--- xl2tpd
+--- rtmpdump
+--- dialog
+--- mtools
+--- attr
+NEW: 7zip -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': '7zip'}}
+--- bison
+NEW: acpi -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'acpi'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'acpi'}}
+--- beep
+--- flex
+--- pcmciautils
+--- texinfo
+--- valgrind
+--- lame
+--- cdparanoia
+--- iftop
+--- gpsd
+--- sshpass
+NEW: logtail -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'logtail'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'logtail'}}
+NEW: ruby-augeas -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'ruby-augeas'}}
+NEW: vulkan-tools -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'vulkan-tools'}}
+--- apcupsd
+--- logcheck
+--- sshguard
+NEW: ed -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'ed'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'ed'}}
+--- mosh
+--- acct
+--- aspell-de
+--- privoxy
+--- byobu
+--- f2fs-tools
+--- awstats
+--- inotify-tools
+NEW: meson -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'meson'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'meson'}}
+NEW: supervisor -- {'3.21-stable': {'release': '3.21-stable', 'pkgname': 'supervisor'}, '3.10-stable': {'release': '3.10-stable', 'pkgname': 'supervisor'}}
+--- flac
+REMOVED: procps -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'procps'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'procps'}}
+REMOVED: sudo -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'sudo'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'sudo'}}
+REMOVED: ifupdown -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'ifupdown'}}
+REMOVED: upower -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'upower'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'upower'}}
+REMOVED: adwaita-icon-theme -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'adwaita-icon-theme'}}
+REMOVED: gcr -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'gcr'}}
+REMOVED: desktop-file-utils -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'desktop-file-utils'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'desktop-file-utils'}}
+REMOVED: libxfont2 -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'libxfont2'}}
+REMOVED: xdg-utils -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'xdg-utils'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'xdg-utils'}}
+REMOVED: xauth -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'xauth'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'xauth'}}
+REMOVED: sysstat -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'sysstat'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'sysstat'}}
+REMOVED: java-common -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'java-common'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'java-common'}}
+REMOVED: duplicity -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'duplicity'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'duplicity'}}
+REMOVED: xbitmaps -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'xbitmaps'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'xbitmaps'}}
+REMOVED: xinit -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'xinit'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'xinit'}}
+REMOVED: xrdp -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'xrdp'}}
+REMOVED: thin-provisioning-tools -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'thin-provisioning-tools'}}
+REMOVED: p7zip -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'p7zip'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'p7zip'}}
+REMOVED: openbox -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'openbox'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'openbox'}}
+REMOVED: xclip -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'xclip'}}
+REMOVED: vsftpd -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'vsftpd'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'vsftpd'}}
+REMOVED: procmail -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'procmail'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'procmail'}}
+REMOVED: lxpolkit -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'lxpolkit'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'lxpolkit'}}
+REMOVED: lxsession -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'lxsession'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'lxsession'}}
+REMOVED: imagemagick -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'imagemagick'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'imagemagick'}}
+REMOVED: lxterminal -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'lxterminal'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'lxterminal'}}
+REMOVED: clang -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'clang'}}
+REMOVED: clamav -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'clamav'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'clamav'}}
+REMOVED: cpufrequtils -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'cpufrequtils'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'cpufrequtils'}}
+REMOVED: feh -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'feh'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'feh'}}
+REMOVED: fuse -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'fuse'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'fuse'}}
+REMOVED: cabextract -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'cabextract'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'cabextract'}}
+REMOVED: msmtp -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'msmtp'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'msmtp'}}
+REMOVED: aria2 -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'aria2'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'aria2'}}
+REMOVED: xinput -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'xinput'}}
+REMOVED: flashrom -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'flashrom'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'flashrom'}}
+REMOVED: gnupg1 -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'gnupg1'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'gnupg1'}}
+REMOVED: gpicview -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'gpicview'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'gpicview'}}
+REMOVED: galculator -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'galculator'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'galculator'}}
+REMOVED: geeqie -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'geeqie'}}
+REMOVED: ansible -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'ansible'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'ansible'}}
+REMOVED: figlet -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'figlet'}}
+REMOVED: rxvt-unicode -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'rxvt-unicode'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'rxvt-unicode'}}
+REMOVED: speedtest-cli -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'speedtest-cli'}}
+REMOVED: mercurial -- {'3.10-stable': {'release': '3.10-stable', 'pkgname': 'mercurial'}, '3.0-stable': {'release': '3.0-stable', 'pkgname': 'mercurial'}}
+REMOVED: udev -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'udev'}}
+REMOVED: udisks2 -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'udisks2'}}
+REMOVED: gnome-keyring -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'gnome-keyring'}}
+REMOVED: glib-networking -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'glib-networking'}}
+REMOVED: gvfs -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'gvfs'}}
+REMOVED: nautilus -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'nautilus'}}
+REMOVED: gnome-disk-utility -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'gnome-disk-utility'}}
+REMOVED: gnome-terminal -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'gnome-terminal'}}
+REMOVED: gnome-menus -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'gnome-menus'}}
+REMOVED: cups-filters -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'cups-filters'}}
+REMOVED: evince -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'evince'}}
+REMOVED: xfconf -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfconf'}}
+REMOVED: open-vm-tools -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'open-vm-tools'}}
+REMOVED: zenity -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'zenity'}}
+REMOVED: thunar -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'thunar'}}
+REMOVED: xfwm4 -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfwm4'}}
+REMOVED: xfce4-notifyd -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfce4-notifyd'}}
+REMOVED: xfce4-settings -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfce4-settings'}}
+REMOVED: xfce4-session -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfce4-session'}}
+REMOVED: xfce4-panel -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfce4-panel'}}
+REMOVED: xfce4-power-manager -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfce4-power-manager'}}
+REMOVED: tumbler -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'tumbler'}}
+REMOVED: gimp -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'gimp'}}
+REMOVED: thunar-archive-plugin -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'thunar-archive-plugin'}}
+REMOVED: ffmpeg -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'ffmpeg'}}
+REMOVED: xfce4-terminal -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfce4-terminal'}}
+REMOVED: thunar-volman -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'thunar-volman'}}
+REMOVED: gnome-system-monitor -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'gnome-system-monitor'}}
+REMOVED: xscreensaver -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xscreensaver'}}
+REMOVED: mpv -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'mpv'}}
+REMOVED: mousepad -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'mousepad'}}
+REMOVED: xarchiver -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xarchiver'}}
+REMOVED: xfce4-screenshooter -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfce4-screenshooter'}}
+REMOVED: shotwell -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'shotwell'}}
+REMOVED: xfce4-appfinder -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfce4-appfinder'}}
+REMOVED: gparted -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'gparted'}}
+REMOVED: remmina -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'remmina'}}
+REMOVED: ristretto -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'ristretto'}}
+REMOVED: wine -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'wine'}}
+REMOVED: ebtables -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'ebtables'}}
+REMOVED: inkscape -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'inkscape'}}
+REMOVED: pcmanfm -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'pcmanfm'}}
+REMOVED: virt-manager -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'virt-manager'}}
+REMOVED: firefox -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'firefox'}}
+REMOVED: xfce4-taskmanager -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfce4-taskmanager'}}
+REMOVED: parole -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'parole'}}
+REMOVED: audacity -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'audacity'}}
+REMOVED: mutt -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'mutt'}}
+REMOVED: virtinst -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'virtinst'}}
+REMOVED: php -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'php'}}
+REMOVED: geany -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'geany'}}
+REMOVED: audacious -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'audacious'}}
+REMOVED: audacious-plugins -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'audacious-plugins'}}
+REMOVED: mpd -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'mpd'}}
+REMOVED: mplayer -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'mplayer'}}
+REMOVED: lsscsi -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'lsscsi'}}
+REMOVED: sox -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'sox'}}
+REMOVED: xfburn -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfburn'}}
+REMOVED: reiserfsprogs -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'reiserfsprogs'}}
+REMOVED: phpmyadmin -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'phpmyadmin'}}
+REMOVED: xfce4-cpugraph-plugin -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfce4-cpugraph-plugin'}}
+REMOVED: scrot -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'scrot'}}
+REMOVED: xfce4-xkb-plugin -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'xfce4-xkb-plugin'}}
+REMOVED: pidgin -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'pidgin'}}
+REMOVED: gnumeric -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'gnumeric'}}
+REMOVED: hexchat -- {'3.0-stable': {'release': '3.0-stable', 'pkgname': 'hexchat'}}
+None
