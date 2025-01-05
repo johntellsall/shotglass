@@ -131,4 +131,9 @@ def report_popcon2():
     """
     track popular packages across multiple Alpine releases
     """
-    pass
+    engine = get_engine()
+    # query = select(SGAlpinePackage.alpine_release).distinct()
+    # with Session(engine) as session:
+    #     releases = session.exec(query).all()
+    # print(f'Available releases: {releases}')
+    releases = ['3.0-stable', '3.10-stable', '3.21-stable']

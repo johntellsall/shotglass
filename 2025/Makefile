@@ -22,6 +22,10 @@ table.html:
 
 %.show: %.sql
 	sqlite3 database.db < $<
+	
+%.show4: %.sql
+	sqlite3 database.db < $< \
+	| pr --width=100 --omit-header -4
 
 import-full:
 	-$(RM) database.db

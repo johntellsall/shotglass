@@ -25,8 +25,16 @@
 
 -- select distinct(a.alpine_release) from sgalpinepackage a;
 
-SELECT a.pkgname 
+select "ALPINE PACKAGES POPULAR IN DEBIAN";
+-- with Debian-specific ones removed
+
+SELECT a.pkgname, d.rank -- , a.pkgdesc
 FROM sgalpinepackage a 
 JOIN debianpopcontest d 
 ON a.pkgname = d.name 
 WHERE a.alpine_release = '3.20-stable'
+and d.rank <= 5000
+and a.pkgname not in ('dpkg', 'debian-archive-keyring', 'debootstrap')
+order by d.rank;
+
+
