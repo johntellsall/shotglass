@@ -47,6 +47,10 @@ def cmd_extract2(paths):
 def cmd_popcon(paths):
     print(render.report_popcon())
 
+def cmd_popcon2(paths):
+    print(render.report_popcon2())
+
+
 def cmd_extract_popcon(paths):
     print(extract.extract_popcon())
 

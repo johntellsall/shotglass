@@ -6,8 +6,8 @@ lint:
 fix-ruff:
 	ruff check --output-format=concise --fix .
 
-popcon:
-	python3 -m main extract_popcon
+popcon2:
+	python3 -m main popcon2
 
 test-cov:
 	coverage run -m pytest *.py

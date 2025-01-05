@@ -50,4 +50,5 @@ def test_parse_popcon_raw():
 
 def test_parse_popcon():
     raw = "1     libacl1                        138898 126117     2 12764    15 (Guillem Jover)   "              
-    assert parse.parse_debian_popcon(raw) == {'libacl1': 126117}
+    value = {'libacl1': {'rank': 1, 'name': 'libacl1', 'inst': 138898, 'vote': 126117, 'old': 2, 'recent': 12764, 'no_files': 15, 'maintainer': 'Guillem Jover'}}
+    assert parse.parse_debian_popcon(raw) == value
