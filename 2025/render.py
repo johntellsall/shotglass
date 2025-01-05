@@ -183,5 +183,13 @@ def report_popcon2():
             if debug: print(f'- item {item} -> row {row_num}')  
             grid[row_num][drelease] = item
     
+    last_release = releases[-1]
     for num,row in enumerate(grid):
-        print(num, row)
+        item = list(row.values())[0]
+        if len(row) == len(releases):
+            print(f'--- {item["pkgname"]}')
+        else:
+            if last_release in row:
+                print(f'NEW: {item["pkgname"]} -- {row}')
+            else: 
+                print(f'REMOVED: {item["pkgname"]} -- {row}')
