@@ -1,3 +1,4 @@
+import re
 from sqlmodel import select, Session
 from model import SGAlpinePackage
 import parse
@@ -126,6 +127,7 @@ def report_popcon():
         desc = alpine_pkgdesc.get(pkgname, 'N/A')
         print(f'- {pkgname:22} {vote:6} {desc}')
 
+from sqlalchemy import text
 
 def report_popcon2():
     """
@@ -137,3 +139,13 @@ def report_popcon2():
     #     releases = session.exec(query).all()
     # print(f'Available releases: {releases}')
     releases = ['3.0-stable', '3.10-stable', '3.21-stable']
+    with open('popular-packages.sql', 'r') as file:
+        popular_sql = file.read()
+    # strip header
+    select_index = popular_sql.index("SELECT ")
+    popular_sql = popular_sql[select_index:]
+
+    # assert 0, popular_sql
+    with Session(engine) as session:
+        popular = session.exec(text(popular_sql)).all()
+    breakpoint()
