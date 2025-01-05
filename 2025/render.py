@@ -1,5 +1,6 @@
 from collections import defaultdict
 from email.policy import default
+from pprint import pprint
 import re
 from sqlmodel import select, Session
 from model import SGAlpinePackage
@@ -166,5 +167,21 @@ def report_popcon2():
     data = query_sqlfile(engine, 'pop_over_time.sql')
 
     # the row is determined by the latest release
+    # column is release
+    package_row_num = {}
+    grid = []
+    debug = False
     for drelease, dpkgname, _ in data:
-        print(f'{drelease} {dpkgname}')
+        item = {'release': drelease, 'pkgname': dpkgname}
+        if debug: print(f'{drelease} {dpkgname}')
+        row_num = package_row_num.get(dpkgname)
+        if row_num is None:
+            package_row_num[dpkgname] = len(grid)
+            grid.append({drelease: item})
+            if debug: print(f'new row {grid[-1]}')
+        else:
+            if debug: print(f'- item {item} -> row {row_num}')  
+            grid[row_num][drelease] = item
+    
+    for num,row in enumerate(grid):
+        print(num, row)
