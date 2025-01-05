@@ -50,6 +50,9 @@ def cmd_popcon(paths):
 def cmd_popcon2(paths):
     print(render.report_popcon2())
 
+def cmd_popcon3(paths):
+    print(render.report_popcon3())
+
 
 def cmd_extract_popcon(paths):
     print(extract.extract_popcon())

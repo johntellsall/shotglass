@@ -1,11 +1,11 @@
 from collections import defaultdict
 from email.policy import default
 from pprint import pprint
-import re
 from sqlmodel import select, Session
 from model import SGAlpinePackage
 import parse
 from lib import get_engine
+from sqlalchemy import text
 
 
 def equery(engine, query):
@@ -53,18 +53,19 @@ def print_stats(result):
         print(row['_rank'], row['pkgname'])
 
 
-def format_html_table():
-    def format_row(row):
-        middle = ''.join(f"<td>{value}</td>" for value in row)
-        return f"<tr>{middle}</tr>"
+def format_html_row(row):
+    middle = ''.join(f"<td>{value}</td>" for value in row)
+    return f"<tr>{middle}</tr>"
 
-    # engine = get_engine()
+
+def format_html_table():
+    # engine = get_engine() NOTE:
     releases = ['3.10-stable', '3.14-stable', '3.15-stable']
     data = {}
     for release in releases:
         raw_rows = query(release)['rows']
         rows = sorted(raw_rows, key=lambda row: row['_rank'], reverse=True)
-        data[release] = rows[:10]
+        data[release] = rows[:10] 
 
     html = []
     html.append('<table>')
@@ -73,35 +74,9 @@ def format_html_table():
         def format_rel_package(pkg):
             return f"{pkg['pkgname']} ({pkg['_rank']})"
         row = [format_rel_package(data[rel][i]) for rel in releases]
-        html.append(format_row(row))
+        html.append(format_html_row(row))
     html.append('</table>')
     return '\n'.join(html)
-
-
-def OLD_report_popcon():
-    debian_popcon = parse.parse_debian_popcon(open('dist/by_vote').read())
-    print(f'Debian packages: {len(debian_popcon)}')
-
-    engine = get_engine()
-    query = select(SGAlpinePackage.pkgname).distinct()
-    with Session(engine) as session:
-        alpine_packages = session.exec(query).all()
-
-    query = select(SGAlpinePackage.pkgname, SGAlpinePackage.pkgdesc)
-    with Session(engine) as session:
-        result = session.exec(query).all()
-    alpine_pkgdesc = {pkgname: pkgdesc for pkgname, pkgdesc in result}
-
-    print(f'Alpine packages (main only): {len(alpine_packages)}')
-
-    raw_alpine_popcon = {pkgname: debian_popcon.get(pkgname) for pkgname in alpine_packages}
-    alpine_popcon = {pkgname: vote for pkgname, vote in raw_alpine_popcon.items() if vote}
-    print(f'Common packages: {len(alpine_popcon)}')
-
-    print('Top 20 Alpine packages by Debian popularity:')
-    for pkgname, vote in sorted(alpine_popcon.items(), key=lambda item: item[1], reverse=True)[:20]:
-        desc = alpine_pkgdesc.get(pkgname, 'N/A')
-        print(f'- {pkgname:22} {vote:6} {desc}')
 
 
 # FIXME: use database version of popcon
@@ -130,7 +105,6 @@ def report_popcon():
         desc = alpine_pkgdesc.get(pkgname, 'N/A')
         print(f'- {pkgname:22} {vote:6} {desc}')
 
-from sqlalchemy import text
 
 def query_popular(engine):
     with open('popular-packages.sql', 'r') as file:
@@ -151,6 +125,7 @@ def query_sqlfile(engine, path):
 
     with Session(engine) as session:
         return session.exec(text(sql)).all()
+
 
 def query_popcon2(engine, releases):
     data = query_sqlfile(engine, 'pop_over_time.sql')
@@ -193,3 +168,32 @@ def report_popcon2():
                 print(f'NEW: {item["pkgname"]} -- {row}')
             else: 
                 print(f'REMOVED: {item["pkgname"]} -- {row}')
+
+
+def report_popcon3():
+    """
+    track popular packages across multiple Alpine releases
+    - output HTML table
+    - grid shows versions
+    """
+    engine = get_engine()
+    # FIXME: must match with pop_over_time.sql
+    releases = ['3.0-stable', '3.10-stable', '3.21-stable']
+    grid = query_popcon2(engine, releases)
+    
+    table = []
+    last_release = releases[-1]
+    for row in grid:
+        item = list(row.values())[0]
+        cells = [item["pkgname"]]
+        if len(row) == len(releases):
+            cells += ['-'] * len(releases)
+            table.append(format_html_row(cells))
+        else:
+            if last_release in row:
+                print(f'NEW: {item["pkgname"]} -- {row}')
+            else: 
+                print(f'REMOVED: {item["pkgname"]} -- {row}')
+
+    for row in table:
+        print(row)

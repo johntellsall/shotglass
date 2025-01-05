@@ -8,6 +8,8 @@ fix-ruff:
 
 popcon2:
 	python3 -m main popcon2
+popcon3:
+	python3 -m main popcon3
 
 test-cov:
 	coverage run -m pytest *.py
