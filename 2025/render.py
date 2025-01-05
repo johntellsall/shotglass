@@ -190,8 +190,10 @@ def report_popcon3():
             cells += ['-'] * len(releases)
             table.append(format_html_row(cells))
         else:
+            raise NotImplementedError
+            timeline = [row.get(rel) for rel in releases]
             if last_release in row:
-                print(f'NEW: {item["pkgname"]} -- {row}')
+                label = 'NEW'
             else: 
                 print(f'REMOVED: {item["pkgname"]} -- {row}')
 
