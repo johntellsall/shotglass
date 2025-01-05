@@ -74,6 +74,33 @@ def format_html_table():
     return '\n'.join(html)
 
 
+def OLD_report_popcon():
+    debian_popcon = parse.parse_debian_popcon(open('dist/by_vote').read())
+    print(f'Debian packages: {len(debian_popcon)}')
+
+    engine = get_engine()
+    query = select(SGAlpinePackage.pkgname).distinct()
+    with Session(engine) as session:
+        alpine_packages = session.exec(query).all()
+
+    query = select(SGAlpinePackage.pkgname, SGAlpinePackage.pkgdesc)
+    with Session(engine) as session:
+        result = session.exec(query).all()
+    alpine_pkgdesc = {pkgname: pkgdesc for pkgname, pkgdesc in result}
+
+    print(f'Alpine packages (main only): {len(alpine_packages)}')
+
+    raw_alpine_popcon = {pkgname: debian_popcon.get(pkgname) for pkgname in alpine_packages}
+    alpine_popcon = {pkgname: vote for pkgname, vote in raw_alpine_popcon.items() if vote}
+    print(f'Common packages: {len(alpine_popcon)}')
+
+    print('Top 20 Alpine packages by Debian popularity:')
+    for pkgname, vote in sorted(alpine_popcon.items(), key=lambda item: item[1], reverse=True)[:20]:
+        desc = alpine_pkgdesc.get(pkgname, 'N/A')
+        print(f'- {pkgname:22} {vote:6} {desc}')
+
+
+# FIXME: use database version of popcon
 def report_popcon():
     debian_popcon = parse.parse_debian_popcon(open('dist/by_vote').read())
     print(f'Debian packages: {len(debian_popcon)}')
@@ -98,3 +125,10 @@ def report_popcon():
     for pkgname, vote in sorted(alpine_popcon.items(), key=lambda item: item[1], reverse=True)[:20]:
         desc = alpine_pkgdesc.get(pkgname, 'N/A')
         print(f'- {pkgname:22} {vote:6} {desc}')
+
+
+def report_popcon2():
+    """
+    track popular packages across multiple Alpine releases
+    """
+    pass
