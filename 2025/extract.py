@@ -79,6 +79,9 @@ def git_list_branches():
 
 
 def extract2():
+    """
+    import all Alpine packages from all branches/releases
+    """
     engine = get_engine()
     releases = git_list_branches()
     print(f'Found {len(releases)} releases')
