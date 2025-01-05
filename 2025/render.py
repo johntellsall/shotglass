@@ -1,3 +1,5 @@
+from collections import defaultdict
+from email.policy import default
 import re
 from sqlmodel import select, Session
 from model import SGAlpinePackage
@@ -129,6 +131,27 @@ def report_popcon():
 
 from sqlalchemy import text
 
+def query_popular(engine):
+    with open('popular-packages.sql', 'r') as file:
+        popular_sql = file.read()
+    # strip header
+    select_index = popular_sql.index("SELECT ")
+    popular_sql = popular_sql[select_index:]
+
+    with Session(engine) as session:
+        popular_ranked = session.exec(text(popular_sql)).all()
+    popular_names = set(name for name,_ in popular_ranked)
+    return popular_names
+
+
+def query_sqlfile(engine, path):
+    with open(path) as f:
+        sql = f.read()
+
+    with Session(engine) as session:
+        return session.exec(text(sql)).all()
+
+
 def report_popcon2():
     """
     track popular packages across multiple Alpine releases
@@ -139,13 +162,9 @@ def report_popcon2():
     #     releases = session.exec(query).all()
     # print(f'Available releases: {releases}')
     releases = ['3.0-stable', '3.10-stable', '3.21-stable']
-    with open('popular-packages.sql', 'r') as file:
-        popular_sql = file.read()
-    # strip header
-    select_index = popular_sql.index("SELECT ")
-    popular_sql = popular_sql[select_index:]
+    # popular = query_popular(engine)
+    data = query_sqlfile(engine, 'pop_over_time.sql')
 
-    # assert 0, popular_sql
-    with Session(engine) as session:
-        popular = session.exec(text(popular_sql)).all()
-    breakpoint()
+    # the row is determined by the latest release
+    for drelease, dpkgname, _ in data:
+        print(f'{drelease} {dpkgname}')
