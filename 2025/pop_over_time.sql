@@ -1,4 +1,4 @@
-SELECT a.alpine_release, a.pkgname, d.rank
+SELECT a.alpine_release, a.pkgname, a.pkgver, a.pkgrel, d.rank
 FROM sgalpinepackage a 
 JOIN debianpopcontest d 
 ON a.pkgname = d.name 

@@ -135,8 +135,9 @@ def query_popcon2(engine, releases):
     package_row_num = {}
     grid = []
     debug = False
-    for drelease, dpkgname, _ in data:
-        item = {'release': drelease, 'pkgname': dpkgname}
+    # assert 0, data[0]
+    for drelease, dpkgname, dpkgver, dpkgrel, _rank in data:
+        item = {'release': drelease, 'pkgname': dpkgname, 'pkgver': dpkgver, 'pkgrel': dpkgrel}
         if debug: print(f'{drelease} {dpkgname}')
         row_num = package_row_num.get(dpkgname)
         if row_num is None:
@@ -176,28 +177,34 @@ def report_popcon3():
     - output HTML table
     - grid shows versions
     """
+    def format_cells(timeline):
+        def format_cell(val):
+            if val is None:
+                return '-'
+            return f'{val["pkgver"]}-{val["pkgrel"]}'
+        return [format_cell(val) for val in timeline]
+
+    def format_note(releases):
+        if timeline[0] and not timeline[-1]:
+            note = 'REMOVED'
+        elif not timeline[0] and timeline[-1]:
+            note = 'NEW'
+        else:
+            note = 'INCOMPLETE'
+        return note
+    
     engine = get_engine()
     # FIXME: must match with pop_over_time.sql
     releases = ['3.0-stable', '3.10-stable', '3.21-stable']
     grid = query_popcon2(engine, releases)
-    
     table = []
     for row in grid:
         item = list(row.values())[0]
         timeline = [row.get(rel) for rel in releases]
         note = ''
         if len(row) != len(releases):
-            if timeline[0] and not timeline[-1]:
-                note = 'REMOVED'
-            elif not timeline[0] and timeline[-1]:
-                note = 'NEW'
-            else:
-                note = 'INCOMPLETE'
-        def format_cell(val):
-            if val is None:
-                return '-'
-            return 'XX'
-        cells = [item["pkgname"]] + [format_cell(val) for val in timeline] + [note]
+            note = format_note(timeline)
+        cells = [item["pkgname"]] + format_cells(timeline) + [note]
         table.append(format_html_row(cells))
 
     html = ['<table>']
