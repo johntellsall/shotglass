@@ -182,20 +182,26 @@ def report_popcon3():
     grid = query_popcon2(engine, releases)
     
     table = []
-    last_release = releases[-1]
     for row in grid:
         item = list(row.values())[0]
-        cells = [item["pkgname"]]
-        if len(row) == len(releases):
-            cells += ['-'] * len(releases)
-            table.append(format_html_row(cells))
-        else:
-            raise NotImplementedError
-            timeline = [row.get(rel) for rel in releases]
-            if last_release in row:
-                label = 'NEW'
-            else: 
-                print(f'REMOVED: {item["pkgname"]} -- {row}')
+        timeline = [row.get(rel) for rel in releases]
+        note = ''
+        if len(row) != len(releases):
+            if timeline[0] and not timeline[-1]:
+                note = 'REMOVED'
+            elif not timeline[0] and timeline[-1]:
+                note = 'NEW'
+            else:
+                note = 'INCOMPLETE'
+        def format_cell(val):
+            if val is None:
+                return '-'
+            return 'XX'
+        cells = [item["pkgname"]] + [format_cell(val) for val in timeline] + [note]
+        table.append(format_html_row(cells))
 
-    for row in table:
-        print(row)
+    html = ['<table>']
+    html += table
+    html += ['</table>']
+    return '\n'.join(html)
+
