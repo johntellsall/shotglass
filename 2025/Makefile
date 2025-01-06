@@ -1,5 +1,8 @@
 all:
 
+stats:
+	wc -l *.py
+	
 lint:
 	ruff check --output-format=concise .
 
