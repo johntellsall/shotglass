@@ -214,12 +214,11 @@ def query_popcon3():
             note = format_note(timeline)
         cells = [item["pkgname"]] + format_cells(timeline) + [note]
         table.append(cells)
-    pprint(table)
-    return table
+    return table, grid
 
 
 def report_popcon3():
-    table = query_popcon3()
+    table, _grid = query_popcon3()
     return format_html_table(table)
 
 def format_html_table(table_data):
@@ -230,6 +229,10 @@ def format_html_table(table_data):
 
 
 def report_popcon4():
-    data = query_popcon3()
-    for packagename, *cells, note in data:
-        print(packagename)
+    data, grid = query_popcon3()
+    for num, (packagename, *cells, note) in enumerate(data):
+        if note in ('INCOMPLETE', 'REMOVED'):
+            continue
+        if note in ('NEW',):
+            continue
+        print(num, packagename, note)
