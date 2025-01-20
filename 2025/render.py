@@ -135,7 +135,7 @@ def query_popcon2(engine, releases):
     package_row_num = {}
     grid = []
     debug = False
-    # assert 0, data[0]
+
     for drelease, dpkgname, dpkgver, dpkgrel, _rank in data:
         item = {'release': drelease, 'pkgname': dpkgname, 'pkgver': dpkgver, 'pkgrel': dpkgrel}
         if debug: print(f'{drelease} {dpkgname}')
@@ -169,7 +169,7 @@ def report_popcon2():
                 print(f'NEW: {item["pkgname"]} -- {row}')
             else: 
                 print(f'REMOVED: {item["pkgname"]} -- {row}')
-
+# FIXME:
 
 
 def query_popcon3():
@@ -199,6 +199,13 @@ def query_popcon3():
     releases = ['3.0-stable', '3.10-stable', '3.21-stable']
     grid = query_popcon2(engine, releases)
     table = []
+
+    # package row:
+    # - package name
+    # - versions across releases
+    # - note
+    # Example: "bash" "3.0.0-r0" "3.10.0-r0" "3.21.0-r0" "NEW"
+
     for row in grid:
         item = list(row.values())[0]
         timeline = [row.get(rel) for rel in releases]
@@ -207,6 +214,7 @@ def query_popcon3():
             note = format_note(timeline)
         cells = [item["pkgname"]] + format_cells(timeline) + [note]
         table.append(cells)
+    pprint(table)
     return table
 
 
@@ -220,3 +228,8 @@ def format_html_table(table_data):
     html += ['</table>']
     return '\n'.join(html)
 
+
+def report_popcon4():
+    data = query_popcon3()
+    for packagename, *cells, note in data:
+        print(packagename)
