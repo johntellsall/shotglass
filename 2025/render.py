@@ -212,3 +212,45 @@ def report_popcon3():
     html += ['</table>']
     return '\n'.join(html)
 
+
+def report_popcon3():
+    """
+    track popular packages across multiple Alpine releases
+    - output HTML table
+    - grid shows versions
+    """
+    def format_cells(timeline):
+        def format_cell(val):
+            if val is None:
+                return '-'
+            return f'{val["pkgver"]}-{val["pkgrel"]}'
+        return [format_cell(val) for val in timeline]
+
+    def format_note(releases):
+        if timeline[0] and not timeline[-1]:
+            note = 'REMOVED'
+        elif not timeline[0] and timeline[-1]:
+            note = 'NEW'
+        else:
+            note = 'INCOMPLETE'
+        return note
+    
+    engine = get_engine()
+    # FIXME: must match with pop_over_time.sql
+    releases = ['3.0-stable', '3.10-stable', '3.21-stable']
+    grid = query_popcon2(engine, releases)
+    table = []
+    for row in grid:
+        item = list(row.values())[0]
+        timeline = [row.get(rel) for rel in releases]
+        note = ''
+        if len(row) != len(releases):
+            note = format_note(timeline)
+        cells = [item["pkgname"]] + format_cells(timeline) + [note]
+        table.append(format_html_row(cells))
+
+    html = ['<table>']
+    html += table
+    html += ['</table>']
+    return '\n'.join(html)
+
