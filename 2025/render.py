@@ -1,14 +1,23 @@
-from collections import defaultdict
-from email.policy import default
-from pprint import pprint
+from pathlib import Path
 from sqlmodel import select, Session
 from model import SGAlpinePackage
 import parse
 from lib import get_engine
-from sqlalchemy import text
+# from sqlalchemy import text
+from lib import format_html_row
 
 
-def equery(engine, query):
+def equery(query, engine=None):
+    if engine is None:
+        engine = get_engine()
+    if path := Path(query).isfile():
+        query = path.read_text()
+
+    # strip header
+    # FIXME: support lowercase
+    select_index = query.index("SELECT ")
+    query = query[select_index:]
+
     with Session(engine) as session:
         return session.exec(query).all()
 
@@ -51,11 +60,6 @@ def print_stats(result):
     ranked_rows = sorted(result['rows'], key=lambda row: row['_rank'], reverse=True)
     for row in ranked_rows[:10]:
         print(row['_rank'], row['pkgname'])
-
-
-def format_html_row(row):
-    middle = ''.join(f"<td>{value}</td>" for value in row)
-    return f"<tr>{middle}</tr>"
 
 
 def format_html_table():
@@ -106,29 +110,26 @@ def report_popcon():
         print(f'- {pkgname:22} {vote:6} {desc}')
 
 
-def query_popular(engine):
-    with open('popular-packages.sql', 'r') as file:
-        popular_sql = file.read()
-    # strip header
-    select_index = popular_sql.index("SELECT ")
-    popular_sql = popular_sql[select_index:]
-
-    with Session(engine) as session:
-        popular_ranked = session.exec(text(popular_sql)).all()
-    popular_names = set(name for name,_ in popular_ranked)
-    return popular_names
+# def query_popular(engine):
+#     popular_ranked = equery('popular-packages.sql', engine)
+#     popular_names = set(name for name,_ in popular_ranked)
+#     return popular_names
 
 
-def query_sqlfile(engine, path):
-    with open(path) as f:
-        sql = f.read()
+# def query_sqlfile(path,  engine=None):
+#     assert type(path) == str
+#     if engine is None:
+#         engine = get_engine()
 
-    with Session(engine) as session:
-        return session.exec(text(sql)).all()
+#     with open(path) as f:
+#         sql = f.read()
+
+#     with Session(engine) as session:
+#         return session.exec(text(sql)).all()
 
 
 def query_popcon2(engine, releases):
-    data = query_sqlfile(engine, 'pop_over_time.sql')
+    data = equery('pop_over_time.sql', engine)
 
     # the row is determined by the latest release
     # column is release
@@ -138,14 +139,17 @@ def query_popcon2(engine, releases):
 
     for drelease, dpkgname, dpkgver, dpkgrel, _rank in data:
         item = {'release': drelease, 'pkgname': dpkgname, 'pkgver': dpkgver, 'pkgrel': dpkgrel}
-        if debug: print(f'{drelease} {dpkgname}')
+        if debug:
+            print(f'{drelease} {dpkgname}')
         row_num = package_row_num.get(dpkgname)
         if row_num is None:
             package_row_num[dpkgname] = len(grid)
             grid.append({drelease: item})
-            if debug: print(f'new row {grid[-1]}')
+            if debug:
+                print(f'new row {grid[-1]}')
         else:
-            if debug: print(f'- item {item} -> row {row_num}')  
+            if debug:
+                print(f'- item {item} -> row {row_num}')  
             grid[row_num][drelease] = item
     return grid
 
@@ -169,7 +173,7 @@ def report_popcon2():
                 print(f'NEW: {item["pkgname"]} -- {row}')
             else: 
                 print(f'REMOVED: {item["pkgname"]} -- {row}')
-# FIXME:
+# FIXME: no return?
 
 
 def query_popcon3():
@@ -221,18 +225,13 @@ def report_popcon3():
     table, _grid = query_popcon3()
     return format_html_table(table)
 
-def format_html_table(table_data):
-    html = ['<table>']
-    html += [format_html_row(row) for row in table_data]
-    html += ['</table>']
-    return '\n'.join(html)
 
+# def report_popcon4():
+#     data = equery('pop_over_time.sql')
 
-def report_popcon4():
-    data, grid = query_popcon3()
-    for num, (packagename, *cells, note) in enumerate(data):
-        if note in ('INCOMPLETE', 'REMOVED'):
-            continue
-        if note in ('NEW',):
-            continue
-        print(num, packagename, note)
+#     for num, (packagename, *cells, note) in enumerate(data):
+#         if note in ('INCOMPLETE', 'REMOVED'):
+#             continue
+#         if note in ('NEW',):
+#             continue
+#         print(num, packagename, note)
