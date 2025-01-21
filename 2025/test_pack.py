@@ -1,18 +1,6 @@
 from math import sqrt
-from pathlib import Path
 import rpack
-import subprocess
 
-# # Create a bunch of rectangles (width, height)
-# >>> sizes = [(58, 206), (231, 176), (35, 113), (46, 109)]
-
-# # Pack
-# >>> positions = rpack.pack(sizes)
-
-# # The result will be a list of (x, y) positions:
-# >>> positions
-# [(0, 0), (58, 0), (289, 0), (289, 113)]
-import srcgrid
 
 DATA = {
     'src/outpacket.c': 118,

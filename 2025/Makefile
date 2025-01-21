@@ -1,5 +1,12 @@
 all:
 
+run:
+	python3 -m srcgrid
+
+# FIXME: more here
+format:
+	ruff check --select=E,W,F --fix --ignore E501 test_pack.py
+
 stats:
 	wc -l *.py
 	
@@ -58,8 +65,8 @@ test-loop:
 import:
 	venv/bin/python3 -m main import aports/main/*
 
-run run-all:
-	venv/bin/python3 -m main report
+# run run-all:
+# 	venv/bin/python3 -m main report
 
 import1:
 	venv/bin/python3 -m main import aports/main/d*

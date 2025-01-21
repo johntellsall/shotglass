@@ -3,3 +3,4 @@ sqlmodel
 coverage
 ruff
 rectangle-packer
+Pillow
