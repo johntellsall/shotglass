@@ -2,3 +2,4 @@ pytest
 sqlmodel
 coverage
 ruff
+rectangle-packer
