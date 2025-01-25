@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from lib import equery
+
+# import matplotlib
+# import matplotlib as mpl
 
 
 vegetables = ["cucumber", "tomato", "lettuce", "asparagus",
@@ -16,25 +18,9 @@ harvest = np.array([[0.8, 2.4, 2.5, 3.9, 0.0, 4.0, 0.0],
                     [1.3, 1.2, 0.0, 0.0, 0.0, 3.2, 5.1],
                     [0.1, 2.0, 0.0, 1.4, 0.0, 1.9, 6.3]])
 
-title = "Package Versions over Time"
-
-sql = """
-SELECT a.alpine_release, a.pkgname, a.pkgver, a.pkgrel, d.rank
-FROM sgalpinepackage a 
-JOIN debianpopcontest d 
-ON a.pkgname = d.name 
-WHERE a.alpine_release in ('3.0-stable', '3.10-stable', '3.21-stable')
-AND d.rank <= 50
--- remove Debian-isms
-AND a.pkgname not in ('dpkg', 'debian-archive-keyring', 'debootstrap')
-ORDER BY a.alpine_release DESC, d.rank;
-"""
+title = "BEER"
 
 def grid():
-
-    data = equery(sql)
-    print(len(data))
-
     fig, ax = plt.subplots()
     _im = ax.imshow(harvest)
 

@@ -4,22 +4,7 @@ from model import SGAlpinePackage
 import parse
 from lib import get_engine
 # from sqlalchemy import text
-from lib import format_html_row
-
-
-def equery(query, engine=None):
-    if engine is None:
-        engine = get_engine()
-    if path := Path(query).isfile():
-        query = path.read_text()
-
-    # strip header
-    # FIXME: support lowercase
-    select_index = query.index("SELECT ")
-    query = query[select_index:]
-
-    with Session(engine) as session:
-        return session.exec(query).all()
+from lib import equery, format_html_row
 
 
 def raw_query(engine, release, limit=False):

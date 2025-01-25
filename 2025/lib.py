@@ -1,8 +1,32 @@
 import os
-from sqlmodel import create_engine
+from pathlib import Path
+from sqlmodel import Session, create_engine, text
 
 DEBUG = 'DEBUG' in os.environ
 
+
+
+def equery(arg, engine=None):
+    if engine is None:
+        engine = get_engine()
+
+    if 'SELECT' in arg:
+        query = arg
+    else:
+        # get SQL from file
+        query = Path(arg).read_text()
+        # strip header
+        # FIXME: support lowercase
+        select_index = query.index("SELECT ")
+        if select_index >= 0:
+            query = query[select_index:]
+        else:
+            raise ValueError("No SELECT in query file")
+
+    query = text(query)
+
+    with Session(engine) as session:
+        return session.exec(query).all()
 
 
 def format_html_row(row):
