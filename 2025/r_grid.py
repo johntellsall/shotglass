@@ -1,3 +1,4 @@
+import sys
 import matplotlib.pyplot as plt
 import numpy as np
 from lib import equery
@@ -30,10 +31,25 @@ AND a.pkgname not in ('dpkg', 'debian-archive-keyring', 'debootstrap')
 ORDER BY a.alpine_release DESC, d.rank;
 """
 
+sql = """
+SELECT a.alpine_release, a.pkgname, a.pkgver
+FROM sgalpinepackage a
+JOIN debianpopcontest d 
+ON a.pkgname = d.name 
+WHERE a.alpine_release in ('3.0-stable', '3.10-stable', '3.21-stable')
+AND d.rank <= 500
+AND a.pkgname not in ('dash', 'dpkg', 'debian-archive-keyring', 'debootstrap')
+ORDER BY a.alpine_release DESC, d.rank
+LIMIT 5
+"""
+
 def grid():
 
     data = equery(sql)
+    print(data)
+    sys.exit('DING')
     print(len(data))
+    breakpoint()
 
     fig, ax = plt.subplots()
     _im = ax.imshow(harvest)
