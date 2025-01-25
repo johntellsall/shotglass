@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-import matplotlib
-import matplotlib as mpl
+# import matplotlib
+# import matplotlib as mpl
 
 
 vegetables = ["cucumber", "tomato", "lettuce", "asparagus",
               "potato", "wheat", "barley"]
-farmers = ["Farmer Joe", "Upland Bros.", "Smith Gardening",
-           "Agrifun", "Organiculture", "BioGoods Ltd.", "Cornylee Corp."]
+farmers = ["Joe", "Bros.", "Smith",
+           "Agrifun", "Organic", "Ltd.", "Corp."]
 
 harvest = np.array([[0.8, 2.4, 2.5, 3.9, 0.0, 4.0, 0.0],
                     [2.4, 0.0, 4.0, 1.0, 2.7, 0.0, 0.0],
@@ -18,7 +18,7 @@ harvest = np.array([[0.8, 2.4, 2.5, 3.9, 0.0, 4.0, 0.0],
                     [1.3, 1.2, 0.0, 0.0, 0.0, 3.2, 5.1],
                     [0.1, 2.0, 0.0, 1.4, 0.0, 1.9, 6.3]])
 
-
+title = "BEER"
 
 def grid():
     fig, ax = plt.subplots()
@@ -29,13 +29,14 @@ def grid():
                 rotation=45, ha="right", rotation_mode="anchor")
     ax.set_yticks(range(len(vegetables)), labels=vegetables)
 
+    tstyle = dict(ha="center", va="center", color="white", fontweight="bold")
+
     # Loop over data dimensions and create text annotations.
     for i in range(len(vegetables)):
         for j in range(len(farmers)):
-            text = ax.text(j, i, harvest[i, j],
-                        ha="center", va="center", color="w")
+            text = ax.text(j, i, harvest[i, j], **tstyle)
 
-    ax.set_title("Harvest of local farmers (in tons/year)")
+    ax.set_title(title)
     fig.tight_layout()
-    plt.show()
+    plt.savefig("beer.png")
     print('DING')
