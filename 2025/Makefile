@@ -1,7 +1,7 @@
 all:
 
 run:
-	python3 -m srcgrid
+	python3 -m main grid
 
 # FIXME: more here
 format:

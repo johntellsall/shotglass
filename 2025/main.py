@@ -4,6 +4,7 @@ from pprint import pprint
 import sys
 from parse import parse
 import render
+import r_grid
 import extract
 
 
@@ -58,6 +59,9 @@ def cmd_popcon4(paths):
 
 def cmd_extract_popcon(paths):
     print(extract.extract_popcon())
+
+def cmd_grid(paths):
+    print(r_grid.grid())
 
 
 if __name__ == '__main__':
