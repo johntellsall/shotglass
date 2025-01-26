@@ -5,6 +5,7 @@ import sys
 from parse import parse
 import render
 import r_grid
+import r_scatter
 import extract
 
 
@@ -62,6 +63,9 @@ def cmd_extract_popcon(paths):
 
 def cmd_grid(paths):
     print(r_grid.grid())
+
+def cmd_scatter(paths):
+    print(r_scatter.scatter())
 
 
 if __name__ == '__main__':

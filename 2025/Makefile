@@ -5,7 +5,8 @@ all:
 	imgcat --width=50 $(<:.py=.png)
 
 run:
-	python3 -m main grid
+	python3 -m main scatter
+	imgcat --width=50 r_scatter.png
 
 # FIXME: more here
 format:
