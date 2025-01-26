@@ -5,3 +5,4 @@ ruff
 rectangle-packer
 Pillow
 matplotlib
+pytest-mock

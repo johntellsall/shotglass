@@ -1,5 +1,8 @@
 all:
 
+testx:  # Run tests, stop after first failure
+	pytest -sv --maxfail=1
+
 %.show: %.py
 	python3  $<
 	imgcat --width=50 $(<:.py=.png)
