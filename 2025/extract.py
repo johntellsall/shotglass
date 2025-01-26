@@ -46,6 +46,8 @@ def extract(paths, release, verbose=True):
             if (verbose and num % 10 == 1):
                 print(dirname, end=' ')
             try:
+                # if topdir.endswith('/bash'):
+                #     breakpoint()
                 extract_apk_dir(topdir, release, session)
             except ValueError as e:
                 print(f"{dirname}: {e}")

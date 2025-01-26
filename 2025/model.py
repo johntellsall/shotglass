@@ -10,8 +10,8 @@ class SGAlpinePackage(SQLModel, table=True):
     pkgver: str
     pkgrel: str
     sg_complexity: int | None = None
+    sg_len_build: int | None = None
     sg_len_install: int | None = None
-    sg_len_parse_funcs: int | None = None
     sg_len_subpackages: int | None = None
 
     # NOTE: move to 3rd library? vs parse or model
@@ -22,8 +22,9 @@ class SGAlpinePackage(SQLModel, table=True):
             if type(obj) is list:
                 return len(obj)
             return 1
+        data['sg_len_build'] = listlen(data.get('build', []))
         data['sg_len_install'] = listlen(data.get('install', []))
-        data['sg_len_parse_funcs'] = listlen(data.get('_parse_functions', []))
+        # data['sg_len_parse_funcs'] = listlen(data.get('_parse_functions', []))
         data['sg_len_subpackages'] = listlen(data.get('subpackages', []))
         return data
 
