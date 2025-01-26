@@ -1,3 +1,4 @@
 aports
 venv
 dist
+*.png

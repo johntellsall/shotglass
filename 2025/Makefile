@@ -1,5 +1,9 @@
 all:
 
+%.show: %.py
+	python3  $<
+	imgcat --width=50 $(<:.py=.png)
+
 run:
 	python3 -m main grid
 
