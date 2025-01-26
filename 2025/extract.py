@@ -45,7 +45,11 @@ def extract(paths, release, verbose=True):
             dirname = Path(topdir).name
             if (verbose and num % 10 == 1):
                 print(dirname, end=' ')
-            extract_apk_dir(topdir, release, session)
+            try:
+                extract_apk_dir(topdir, release, session)
+            except ValueError as e:
+                print(f"{dirname}: {e}")
+                continue
             # commit the first item to find errors more quickly
             if num == 0:
                 session.commit()
