@@ -12,7 +12,9 @@ def parse(lines, label=None):
     info = {'_parse_functions': []}
     # NOTE: ignores comments in multiline strings, but close enough
     lines = (line for line in lines if not is_comment(line))
-    for line in lines:
+    parse_func_state = {}
+    for line_num,line in enumerate(lines):
+        # VARIABLE: NAME=VALUE
         if match := name_equals_pat.match(line):
             name = match.group(1)
             value = match.group(2)
@@ -33,9 +35,18 @@ def parse(lines, label=None):
             else:
                 info[name] = value
             continue
-        if match := function_pat.match(line):
+        # FUNCTION START
+        elif match := function_pat.match(line):
             name = match.group(1)
             info['_parse_functions'].append(name)
+            parse_func_state = {'name': name, 'start': line_num}
+            continue
+        # FUNCTION END
+        elif line.strip() == '}' and parse_func_state:
+            name = parse_func_state['name']
+            length = line_num - parse_func_state['start']
+            info[f'_parse_function_{name}'] = dict(length=length)
+            parse_func_state = {}
             continue
 
     return info

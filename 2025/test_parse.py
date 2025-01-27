@@ -24,10 +24,20 @@ def test_function():
     info = parse.parse(LINES)
     assert(info['_parse_functions'] == ['build', 'check', 'package', 'dnssec', 'nftset', 'dbus', 'common', 'openrc', 'utils', 'utils_doc'])
 
-# def test_alt():
-#     lines = open('aports/main/dnstop/APKBUILD')
-#     info = parse(lines)
-#     assert 0, pprint.pformat(info)
+
+def dict_subset(dict1, dict2):
+    return all(key in dict2 and dict2[key] == value for key, value in dict1.items())
+
+
+def test_parse_functions():
+    lines = open('test-data/bash.apkbuild')
+    info = parse.parse(lines)
+    ref = {'_parse_function_build': {'length': 17},
+          '_parse_function_package': {'length': 5},
+          '_parse_function_prepare': {'length': 12},
+          '_parse_functions': ['prepare', 'build', 'package']}
+    assert dict_subset(ref, info)
+
 
 @pytest.mark.xfail
 def test_list_quote():

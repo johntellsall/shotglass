@@ -22,6 +22,8 @@ class SGAlpinePackage(SQLModel, table=True):
             if type(obj) is list:
                 return len(obj)
             return 1
+        if data['pkgname'] == 'bash':
+            breakpoint()
         data['sg_len_build'] = listlen(data.get('build', []))
         data['sg_len_install'] = listlen(data.get('install', []))
         # data['sg_len_parse_funcs'] = listlen(data.get('_parse_functions', []))

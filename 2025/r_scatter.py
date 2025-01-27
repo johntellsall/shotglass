@@ -13,8 +13,8 @@ from lib import equery
 #         pkgver VARCHAR NOT NULL, 
 #         pkgrel VARCHAR NOT NULL, 
 #         sg_complexity INTEGER,  -- XX: not used?
+#         sg_len_build INTEGER, 
 #         sg_len_install INTEGER, 
-#         sg_len_parse_funcs INTEGER, 
 #         sg_len_subpackages INTEGER
 
 def query_data():
