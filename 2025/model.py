@@ -22,11 +22,17 @@ class SGAlpinePackage(SQLModel, table=True):
             if type(obj) is list:
                 return len(obj)
             return 1
-        if data['pkgname'] == 'bash':
-            breakpoint()
-        data['sg_len_build'] = listlen(data.get('build', []))
-        data['sg_len_install'] = listlen(data.get('install', []))
-        # data['sg_len_parse_funcs'] = listlen(data.get('_parse_functions', []))
+        # if data['pkgname'] == 'bash':
+        #     breakpoint()
+        data['sg_len_build'] = data['sg_len_install'] = 0
+        try:
+            data['sg_len_build'] = listlen(data['_parse_function_build']['length'])
+        except KeyError:
+            pass
+        try:
+            data['sg_len_install'] = listlen(data['_parse_function_install']['length'])
+        except KeyError:
+            pass
         data['sg_len_subpackages'] = listlen(data.get('subpackages', []))
         return data
 
@@ -42,11 +48,3 @@ class DebianPopContest(SQLModel, table=True):
     recent: int
     no_files: int
     maintainer: str
-
-# def setup():
-#     sqlite_file_name = "database.db"
-#     sqlite_url = f"sqlite:///{sqlite_file_name}"
-
-#     engine = create_engine(sqlite_url, echo=True)
-
-#     SQLModel.metadata.create_all(engine)
