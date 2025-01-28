@@ -39,6 +39,10 @@ extract2:
 	-$(RM) database.db
 	venv/bin/python3 -m main extract2
 
+test-extract2:
+	-$(RM) database.db
+	venv/bin/python3 -m main extract2 aports/main/bash
+
 table.html:
 	venv/bin/python3 -m main table > $@
 

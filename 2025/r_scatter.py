@@ -19,7 +19,7 @@ from lib import equery
 
 def query_data():
     sql = """
-    SELECT sg_len_install, sg_len_parse_funcs
+    SELECT sg_len_build, sg_len_install
     from sgalpinepackage
 """
     return equery(sql)

@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+import re
+import subprocess
 from sqlmodel import Session, create_engine, text
 
 DEBUG = 'DEBUG' in os.environ
@@ -46,4 +48,23 @@ def get_engine():
     sqlite_url = f"sqlite:///{sqlite_file_name}"
     engine = create_engine(sqlite_url, echo=DEBUG)
     return engine
+
+
+def git_checkout(branch):
+    # FIXME: "git sparse-checkout init"
+    checkout_cmd = ["git", "-C", "aports", "checkout", "--quiet", f"remotes/origin/{branch}"]
+    result = subprocess.run(checkout_cmd, capture_output=True, text=True)
+    if result.returncode != 0: # FIXME: more here
+        print(f"Failed to checkout branch {branch}: {result.stderr}", file=sys.stderr)
+
+
+def git_list_branches():
+    cmd = ["git", "-C", "aports", "branch", "-a"]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    releases = re.compile(r'remotes/origin/(\d+\.\d+-stable)').findall(result.stdout)
+    # FIXME:
+    if 1:
+        releases = [rel for rel in releases if rel.startswith('3.')]
+        return releases
+    return releases
 

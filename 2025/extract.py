@@ -7,6 +7,7 @@ from model import DebianPopContest, SGAlpinePackage
 import parse
 from lib import get_engine
 from sqlalchemy.exc import OperationalError
+from lib import git_checkout, git_list_branches
 
 
 def db_delete_all(engine):
@@ -30,6 +31,7 @@ def extract_apk_dir(topdir, release, session):
     info = SGAlpinePackage.annotate(info)
     package = SGAlpinePackage(alpine_release=release, **info)
     session.add(package)
+    return info
 
 
 def extract(paths, release, verbose=True):
@@ -42,11 +44,15 @@ def extract(paths, release, verbose=True):
 
     with Session(engine) as session:
         for num,topdir in enumerate(paths):
+            if num > 10:
+                break
             dirname = Path(topdir).name
             if (verbose and num % 10 == 1):
                 print(dirname, end=' ')
             try:
-                extract_apk_dir(topdir, release, session)
+                info = extract_apk_dir(topdir, release, session)
+                if verbose:
+                    print(info)
             except ValueError as e:
                 print(f"{dirname}: {e}")
                 continue
@@ -62,41 +68,41 @@ def extract(paths, release, verbose=True):
     #     count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
     #     print(f"Release: {release} -- Total packages: {count}")
 
-
-def git_checkout(branch):
-    checkout_cmd = ["git", "-C", "aports", "checkout", "--quiet", f"remotes/origin/{branch}"]
-    result = subprocess.run(checkout_cmd, capture_output=True, text=True)
-    if result.returncode != 0: # FIXME: more here
-        print(f"Failed to checkout branch {branch}: {result.stderr}", file=sys.stderr)
-
-
-def git_list_branches():
-    cmd = ["git", "-C", "aports", "branch", "-a"]
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    releases = re.compile(r'remotes/origin/(\d+\.\d+-stable)').findall(result.stdout)
-    # FIXME:
-    if 1:
-        releases = [rel for rel in releases if rel.startswith('3.')]
-        return releases
-    return releases
-
-
-def extract2():
+def extract2(paths):
     """
     import all Alpine packages from all branches/releases
+    
+    Paths given: testing mode
+    - import one release only
+    - import packages listed in paths
     """
     engine = get_engine()
     releases = git_list_branches()
-    print(f'Found {len(releases)} releases')
-    for release in releases:
-        print(f'{release}:')
-        git_checkout(release)
-        topdirs = [str(f) for f in Path('aports/main').iterdir() if f.is_dir()]
-        print(f'- {len(topdirs)} main directories')
-        extract(topdirs, release, verbose=False)
-        with Session(engine) as session:
-            count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
-        print(f'- {count} total packages')
+
+    if not paths:
+        print(f'Found {len(releases)} releases')
+        for release in releases:
+            print(f'{release}:')
+            git_checkout(release)
+            topdirs = [str(f) for f in Path('aports/main').iterdir() if f.is_dir()]
+            print(f'- {len(topdirs)} main directories')
+            extract(topdirs, release, verbose=False)
+            with Session(engine) as session:
+                count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
+            print(f'- {count} total packages')
+    else:
+        # paths given: testing mode, parse those repos only
+        # NOTE: release is random, not latest
+        for release in [releases[-1]]:
+            print(f'{release}:')
+            git_checkout(release)
+            topdirs = paths
+            print(f'- {len(topdirs)} main directories')
+            extract(topdirs, release, verbose=False)
+            with Session(engine) as session:
+                count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
+            print(f'- {count} total packages')
+
 
 
 def extract_popcon():

@@ -43,7 +43,7 @@ def cmd_table(paths):
     print(render.format_html_table())
 
 def cmd_extract2(paths):
-    print(extract.extract2())
+    print(extract.extract2(paths))
 
 
 def cmd_popcon(paths):
