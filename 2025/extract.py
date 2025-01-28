@@ -78,6 +78,7 @@ def extract2(paths):
     """
     engine = get_engine()
     releases = git_list_branches()
+    verbose = False
 
     if not paths:
         print(f'Found {len(releases)} releases')
@@ -86,7 +87,7 @@ def extract2(paths):
             git_checkout(release)
             topdirs = [str(f) for f in Path('aports/main').iterdir() if f.is_dir()]
             print(f'- {len(topdirs)} main directories')
-            extract(topdirs, release, verbose=False)
+            extract(topdirs, release)
             with Session(engine) as session:
                 count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
             print(f'- {count} total packages')
@@ -98,7 +99,7 @@ def extract2(paths):
             git_checkout(release)
             topdirs = paths
             print(f'- {len(topdirs)} main directories')
-            extract(topdirs, release, verbose=False)
+            extract(topdirs, release)
             with Session(engine) as session:
                 count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
             print(f'- {count} total packages')
