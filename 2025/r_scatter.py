@@ -5,21 +5,23 @@ import numpy as np
 # from packaging import 
 from lib import equery
 
-# CREATE TABLE sgalpinepackage (
-#         id INTEGER NOT NULL, 
-#         alpine_release VARCHAR NOT NULL, 
-#         pkgname VARCHAR NOT NULL, 
-#         pkgdesc VARCHAR NOT NULL, 
-#         pkgver VARCHAR NOT NULL, 
-#         pkgrel VARCHAR NOT NULL, 
-#         sg_complexity INTEGER,  -- XX: not used?
-#         sg_len_build INTEGER, 
-#         sg_len_install INTEGER, 
-#         sg_len_subpackages INTEGER
+
+# class SGAlpinePackage(SQLModel, table=True):
+#     id: int | None = Field(default=None, primary_key=True)
+#     alpine_release: str  # FIXME: rename -> sg_alpine_release
+#     pkgname: str
+#     pkgdesc: str
+#     pkgver: str
+#     pkgrel: str
+#     sg_complexity: int | None = None
+#     sg_len_build: int | None = None
+#     sg_len_install: int | None = None
+#     sg_len_subpackages: int | None = None
+#     sg_file_num_lines: int | None = None
 
 def query_data():
     sql = """
-    SELECT sg_len_build, sg_len_install
+    SELECT alpine_release, pkgname, pkgver, sg_file_num_lines
     from sgalpinepackage
 """
     return equery(sql)
@@ -28,15 +30,15 @@ def scatter():
     plt.style.use('_mpl-gallery')
 
     data = query_data()
-    pprint(data)
+    pprint(data[:10])
     data = np.array(data)
 
-    len_install_data = data[:, 0]
-    len_parse_funcs_data = data[:, 1]
+    data_alpine_release = data[:, 0]
+    data_alpine_release = [rel.replace('-stable', '') for rel in data_alpine_release]
+    data_file_num_lines = data[:, 3].astype(int)
 
-    if 1:
-        print(len_install_data)
-        print(len_parse_funcs_data)
+    print(data_alpine_release)
+    print(data_file_num_lines)
 
     if 0:
         # make the data
@@ -53,10 +55,10 @@ def scatter():
     # ax.scatter(x, y, s=sizes, c=colors, vmin=0, vmax=100)
     conf = dict(s=sizes, c=colors, vmin=0, vmax=100)
     conf = dict()
-    ax.scatter(x=len_install_data, y=len_parse_funcs_data, **conf)
+    ax.scatter(x=data_alpine_release, y=data_file_num_lines, **conf)
 
-    ax.set(xlim=(0, 8), xticks=np.arange(1, 8),
-        ylim=(0, 8), yticks=np.arange(1, 8))
+    # ax.set(xlim=(0, 8), xticks=np.arange(1, 8),
+    #     ylim=(0, 8), yticks=np.arange(1, 8))
 
     imgpath = __file__.replace('.py', '.png')
     plt.savefig(imgpath)

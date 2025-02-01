@@ -6,3 +6,4 @@ rectangle-packer
 Pillow
 matplotlib
 pytest-mock
+pdbpp
