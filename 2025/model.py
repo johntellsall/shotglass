@@ -13,6 +13,7 @@ class SGAlpinePackage(SQLModel, table=True):
     sg_len_build: int | None = None
     sg_len_install: int | None = None
     sg_len_subpackages: int | None = None
+    sg_file_num_lines: int | None = None
 
     # NOTE: move to 3rd library? vs parse or model
     @classmethod

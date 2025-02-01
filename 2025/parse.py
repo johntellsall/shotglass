@@ -9,7 +9,9 @@ def parse(lines, label=None):
     
     name_equals_pat = re.compile(r'(\w+)=(.*)$')
     function_pat = re.compile(r'(\w+)\(\)') # NOTE: maybe too strict
-    info = {'_parse_functions': []}
+    lines = list(lines)
+    info = {'_parse_functions': [],
+            'sg_file_num_lines': len(lines)}
     # NOTE: ignores comments in multiline strings, but close enough
     lines = (line for line in lines if not is_comment(line))
     parse_func_state = {}

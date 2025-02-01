@@ -39,6 +39,13 @@ def test_parse_functions():
     assert dict_subset(ref, info)
 
 
+def test_parse_other():
+    lines = open('test-data/bash.apkbuild')
+    info = parse.parse(lines)
+    ref = {'sg_file_num_lines': 162}
+    assert dict_subset(ref, info)
+
+
 @pytest.mark.xfail
 def test_list_quote():
     lines = open('test-data/list-quote.dat')
