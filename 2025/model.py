@@ -26,15 +26,20 @@ class SGAlpinePackage(SQLModel, table=True):
         #     breakpoint()
         data['sg_len_build'] = data['sg_len_install'] = 0
         try:
-            data['sg_len_build'] = listlen(data['_parse_function_build']['length'])
+            data['sg_len_build'] = data['_parse_function_build']['length']
         except KeyError:
             pass
         try:
-            data['sg_len_install'] = listlen(data['_parse_function_install']['length'])
+            data['sg_len_install'] = data['_parse_function_install']['length']
         except KeyError:
             pass
         data['sg_len_subpackages'] = listlen(data.get('subpackages', []))
+        print('sg_len: ', data['sg_len_build'], data['sg_len_install'], data['sg_len_subpackages'])
         return data
+
+#  '_parse_function_build': {'length': 17},
+#  '_parse_function_package': {'length': 5},
+#  '_parse_function_prepare': {'length': 12},
 
 # popcon ={'rank': 1, 'name': 'libacl1', 'inst': 138898, 'vote': 126117, 'old': 2, 'recent': 12764, 'no_files': 15,
 # 'maintainer': 'Guillem Jover'}

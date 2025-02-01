@@ -34,7 +34,7 @@ def extract_apk_dir(topdir, release, session):
     return info
 
 
-def extract(paths, release, verbose=True):
+def extract(paths, release, verbose=False):
     engine = get_engine()
 
     if 0:
@@ -88,9 +88,6 @@ def extract2(paths):
             topdirs = [str(f) for f in Path('aports/main').iterdir() if f.is_dir()]
             print(f'- {len(topdirs)} main directories')
             extract(topdirs, release)
-            with Session(engine) as session:
-                count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
-            print(f'- {count} total packages')
     else:
         # paths given: testing mode, parse those repos only
         # NOTE: release is random, not latest
@@ -100,9 +97,10 @@ def extract2(paths):
             topdirs = paths
             print(f'- {len(topdirs)} main directories')
             extract(topdirs, release)
-            with Session(engine) as session:
-                count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
-            print(f'- {count} total packages')
+
+    with Session(engine) as session:
+        count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
+    print(f'- {count} total packages')
 
 
 
