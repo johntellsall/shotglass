@@ -35,6 +35,10 @@ def extract_apk_dir(topdir, release, session):
 
 
 def extract(paths, release, verbose=False):
+    """
+    extract list of packages into database
+    - single version of Alpine in "release"
+    """
     engine = get_engine()
 
     if 0:
