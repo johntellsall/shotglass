@@ -1,5 +1,8 @@
 all:
 
+run:
+	python3 get_source.py
+	
 srcgrid:
 	python3 srcgrid.py '../SOURCE/dnsmasq'
 	imgcat --width=120 output.png
@@ -11,7 +14,7 @@ testx:  # Run tests, stop after first failure
 	python3  $<
 	imgcat --width=50 $(<:.py=.png)
 
-run:
+run-scatter:
 	python3 -m main scatter
 	imgcat --width=50 r_scatter.png
 
