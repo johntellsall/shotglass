@@ -126,11 +126,18 @@ def render(projdir):
             continue
         draw.text((rect.x, rect.y), label, fill='black', font=font)
 
-    image.save('output.png')
-    print(projdir)
-    pprint(calc_stats(proj_data))
-    print(f'size: {size}')
+    return image
+
+
+def main(projects):
+    for project in projects:
+        image = render(project)
+        name = Path(project).name
+        image.save(f'{name}.png')
+        # print(projdir)
+        # pprint(calc_stats(proj_data))
+        # print(f'size: {size}')
     
 
 if __name__ == '__main__':
-    render(sys.argv[1])
+    main(sys.argv[1:])

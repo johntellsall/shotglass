@@ -1,14 +1,21 @@
 all:
 
+run:
+	python3 assemble.py dnsmasq.png hello.png
+	
 get-debian-source:
 	python3 get_source.py -C ../SOURCE/ dnsmasq hello libc6 zlib1g adduser redis-server
 
-run:
+run-source:
 	python3 get_source.py -C ../SOURCE/ hello
 	ls -d ../SOURCE/hello*
 # python3 get_source.py hello
 
 # python3 srcgrid.py '../SOURCE/dnsmasq'
+
+srcgrid3:
+	python3 srcgrid.py '../SOURCE/dnsmasq' '../SOURCE/hello-2.10'
+	ls -1l *png
 
 srcgrid:
 	python3 srcgrid.py '../SOURCE/hello-2.10'
