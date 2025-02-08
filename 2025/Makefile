@@ -8,8 +8,14 @@ run:
 	ls -d ../SOURCE/hello*
 # python3 get_source.py hello
 
+# python3 srcgrid.py '../SOURCE/dnsmasq'
+
 srcgrid:
-	python3 srcgrid.py '../SOURCE/dnsmasq'
+	python3 srcgrid.py '../SOURCE/hello-2.10'
+	imgcat --width=120 output.png
+
+srcgrid2:
+	python3 srcgrid.py '../SOURCE/redis-7.0.15'
 	imgcat --width=120 output.png
 
 testx:  # Run tests, stop after first failure

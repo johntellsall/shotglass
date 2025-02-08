@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from math import sqrt
+from operator import is_
 from pathlib import Path
 from pprint import pprint
 import sys
@@ -33,7 +34,15 @@ def count_project(projdir):
     - filename will have project prefix removed
     Example: 'src/pattern.c': 386
     """
-    paths = list(git_list_files(projdir))
+    SUFFIXES = ['.c', '.py']
+    is_git = (Path(projdir) / '.git').is_dir()
+    if is_git:
+        paths = list(git_list_files(projdir))
+    else:
+        paths = []
+        for suffix in SUFFIXES:
+            paths.extend(Path(projdir).rglob(f'*{suffix}'))
+        paths = [str(path.relative_to(projdir)) for path in paths]
     count_dict = {path: count_lines(projdir, path) for path in paths}
     return count_dict
 
@@ -92,7 +101,9 @@ def calc_stats(data):
 
 
 def render(projdir):
+    assert Path(projdir).is_dir()
     proj_data = count_project(projdir)
+    assert len(proj_data) > 0
 
     rects = query_rect_sizes(proj_data)
     boxdict = {rect.name: rect for rect in rects}
@@ -111,7 +122,7 @@ def render(projdir):
         label = simplify(rect.name)
         (_, _, bbottom, bright) = font.getbbox(text=label)
         if bright > rect.width or bbottom > rect.height:
-            # print(f'- {label} does not fit in {rect.width}x{rect.height}')
+            print(f'- {label} does not fit in {rect.width}x{rect.height}')
             continue
         draw.text((rect.x, rect.y), label, fill='black', font=font)
 
