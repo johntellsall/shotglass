@@ -7,3 +7,4 @@ Pillow
 matplotlib
 pytest-mock
 pdbpp
+click

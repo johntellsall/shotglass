@@ -1,5 +1,11 @@
 # NOTES
 
+## Debian
+
+### download popularity contest results
+
+    curl -o by_vote https://popcon.debian.org/by_vote
+    
 ## Alpine
 
 estimate package size before installing (X: check)

@@ -1,8 +1,12 @@
 all:
 
+# get-debian-source:
+# 	-$(RM) -r dnsmasq-2.80/
+# 	apt-get source dnsmasq
+
 run:
-	-$(RM) -r hello-2.10/
-	python3 get_source.py
+	python3 get_source.py hello
+# python3 get_source.py -C ../SOURCE/ hello
 
 srcgrid:
 	python3 srcgrid.py '../SOURCE/dnsmasq'
