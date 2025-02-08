@@ -1,9 +1,9 @@
 all:
 
 srcgrid:
-	python3 srcgrid.py
-	imgcat output.png
-	
+	python3 srcgrid.py '../SOURCE/dnsmasq'
+	imgcat --width=120 output.png
+
 testx:  # Run tests, stop after first failure
 	pytest -sv --maxfail=1
 

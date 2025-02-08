@@ -85,15 +85,22 @@ def simplify(path):
     return path
 
 
+def calc_stats(data):
+    total_lines = sum(data.values())
+    total_files = len(data)
+    return {'total_lines': total_lines, 'total_files': total_files}
+
+
 def render(projdir):
     proj_data = count_project(projdir)
-    pprint(proj_data)
 
     rects = query_rect_sizes(proj_data)
     boxdict = {rect.name: rect for rect in rects}
 
     bbox = boxdict.pop('BOUNDING-BOX')
-    image = Image.new('RGB', (bbox.width, bbox.height), 'white')
+    scale = 1
+    size = (bbox.width * scale, bbox.height * scale)
+    image = Image.new('RGB', size, 'white')
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("../fonts/ariblk.ttf", 12)
 
@@ -104,12 +111,15 @@ def render(projdir):
         label = simplify(rect.name)
         (_, _, bbottom, bright) = font.getbbox(text=label)
         if bright > rect.width or bbottom > rect.height:
-            print(f'- {label} does not fit in {rect.width}x{rect.height}')
+            # print(f'- {label} does not fit in {rect.width}x{rect.height}')
             continue
         draw.text((rect.x, rect.y), label, fill='black', font=font)
 
     image.save('output.png')
+    print(projdir)
+    pprint(calc_stats(proj_data))
+    print(f'size: {size}')
     
 
 if __name__ == '__main__':
-    render('../SOURCE/dnsmasq')
+    render(sys.argv[1])
