@@ -1,11 +1,41 @@
 # NOTES
 
+## Misc
+
+* `hello` is 1.5x package size as `dnsmasq`!
+
+## Commands
+
+ls sort by size; default largest first
+
+    ls -sh1 --sort=size *orig.tar*
+
 ## Debian
 
 ### download popularity contest results
 
     curl -o by_vote https://popcon.debian.org/by_vote
-    
+
+### all packages mirrored?
+
+Salsa is the Debian GitLab instance. Ex: for package `hello`
+
+Note: extracted! Can browse individual files.
+
+    https://salsa.debian.org/sanvila/hello
+
+### packages point to their Git mirror!
+
+From `apt-get source adduser`:
+
+    NOTICE: 'adduser' packaging is maintained in the 'Git' version control system at:
+    https://salsa.debian.org/debian/adduser.git
+
+### DSC example
+
+    Vcs-Browser: https://salsa.debian.org/sanvila/hello
+    Vcs-Git: https://salsa.debian.org/sanvila/hello.git
+
 ## Alpine
 
 estimate package size before installing (X: check)

@@ -1,8 +1,7 @@
 all:
 
-# get-debian-source:
-# 	-$(RM) -r dnsmasq-2.80/
-# 	apt-get source dnsmasq
+get-debian-source:
+	python3 get_source.py -C ../SOURCE/ dnsmasq hello libc6 zlib1g adduser redis-server
 
 run:
 	python3 get_source.py -C ../SOURCE/ hello
