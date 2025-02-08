@@ -1,0 +1,5 @@
+aports
+venv
+dist
+*.png
+*.html

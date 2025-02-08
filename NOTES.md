@@ -1,3 +1,19 @@
+# NOTES
+
+## Alpine
+
+estimate package size before installing (X: check)
+
+    apk search -v --size <package_name>
+
+    apk info --size <package_name>
+
+## Git
+
+Checkout branch, put in worktree directory "beer", keep original Git repos
+
+    git worktree add beer 3.15-stable
+
 # running tests
 
 Flask, with tox, only Python 3.11:
