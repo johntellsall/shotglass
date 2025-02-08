@@ -1,8 +1,9 @@
 all:
 
 run:
+	-$(RM) -r hello-2.10/
 	python3 get_source.py
-	
+
 srcgrid:
 	python3 srcgrid.py '../SOURCE/dnsmasq'
 	imgcat --width=120 output.png
