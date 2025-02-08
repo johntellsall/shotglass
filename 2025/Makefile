@@ -5,8 +5,9 @@ all:
 # 	apt-get source dnsmasq
 
 run:
-	python3 get_source.py hello
-# python3 get_source.py -C ../SOURCE/ hello
+	python3 get_source.py -C ../SOURCE/ hello
+	ls -d ../SOURCE/hello*
+# python3 get_source.py hello
 
 srcgrid:
 	python3 srcgrid.py '../SOURCE/dnsmasq'
