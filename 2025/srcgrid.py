@@ -83,7 +83,7 @@ def roughpack(data):
         width, height = sizes[i]
         yield Rect(x, y, width, height, names[i])
 
-DULL_DIRS = ('contrib/', 'debian/', 'doc/', 'examples/', 'tests/')
+DULL_DIRS = ('contrib/', 'debian/', 'deps/', 'doc/', 'examples/', 'test/', 'tests/')
 
 def query_rect_sizes(proj_data):
     # ignore source under 100 lines

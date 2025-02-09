@@ -1,8 +1,10 @@
 all:
 
-run:
-	python3 assemble.py dnsmasq.png hello-2.10.png
+assemble-all:
+	python3 assemble.py *-[0-9]*.png
 	imgcat overview.png
+
+# run:
 # imgcat --width=120 overview.png
 
 

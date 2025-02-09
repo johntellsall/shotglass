@@ -67,7 +67,7 @@ def roughpack(data, max_width=None):
         yield Rect(x, y, width, height, names[i])
 
 
-def make_rects(paths):
+def make_rects(paths, max_width=None):
     sizes = {}
     
     for path in paths:
@@ -76,7 +76,7 @@ def make_rects(paths):
             width, height = img.size
         sizes[name] = (width, height)
 
-    rects = roughpack(sizes, max_width=600)
+    rects = roughpack(sizes, max_width=max_width)
     rects = {rect.name: rect for rect in rects}
     return rects
 
