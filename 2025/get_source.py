@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
+# 
 # get_source.py -- download Debian package source
 # FIXME: tarballs, not Git repos with history
 
+from pathlib import Path
 import re
 import subprocess
 import sys
@@ -10,7 +13,8 @@ import click
 
 # FIXME: not always correct: xz suffix?
 def parse_archive_path(output):
-    split_pat = re.compile(r'(?P<name>\S+)_(?P<version>.+?)\.orig\.tar\.gz')
+    # breakpoint()
+    split_pat = re.compile(r'(?P<name>\S+)_(?P<version>.+?)\.tar\.\S+')
     if m := split_pat.search(output):
         path = m.group().strip("'")
         name = m.group('name').strip("'")
@@ -49,13 +53,15 @@ def extract_source(archive, dest):
 
 @click.command()
 @click.argument('pkgnames', nargs=-1)
+@click.option('--extract', is_flag=True, help='Extract source code')
 @click.option('-C', '--directory', default='.', help='Directory to extract the source into')
-def main(pkgnames, directory):
+def main(extract, pkgnames, directory):
     for pkgname in pkgnames:
         print(pkgname)
         info = download_debian_source(pkgname, directory)
-        # if info:
-        #     extract_source(info['path'], directory)
+        if extract:
+            path = Path(directory) / info['path']
+            extract_source(str(path), directory)
         print(info)
 
 

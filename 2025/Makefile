@@ -7,7 +7,14 @@ run:
 
 
 get-debian-source:
-	python3 get_source.py -C ../SOURCE/ dnsmasq hello libc6 zlib1g adduser redis-server
+	python3 get_source.py --extract -C ../SOURCE/ \
+		dnsmasq hello libc6 zlib1g adduser redis-server
+
+top:
+	rg -v '(lib|#)' ../dist/by_vote | rg -v '(debian|debconf|dpkg)' | head
+
+source-sizes:
+	ls --sort=size -sh1 ../SOURCE/*orig*
 
 run-source:
 	python3 get_source.py -C ../SOURCE/ hello
