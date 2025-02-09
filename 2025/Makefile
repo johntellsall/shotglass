@@ -13,6 +13,7 @@ get-debian-source:
 top:
 	rg -v '(lib|#)' ../dist/by_vote | rg -v '(debian|debconf|dpkg)' | head
 
+# NOTE: not quite right
 source-sizes:
 	ls --sort=size -sh1 ../SOURCE/*orig*
 
@@ -22,6 +23,9 @@ run-source:
 # python3 get_source.py hello
 
 # python3 srcgrid.py '../SOURCE/dnsmasq'
+
+srcgrid-all:
+	python3 -m srcgrid $$(ls -1d ../SOURCE/*-*/)
 
 srcgrid3:
 	python3 srcgrid.py '../SOURCE/dnsmasq' '../SOURCE/hello-2.10'

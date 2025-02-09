@@ -25,7 +25,11 @@ def git_list_files(prefix):
 
 def count_lines(prefix, path):
     fullpath = Path(prefix) / path
-    return sum(1 for line in fullpath.open())
+    try:
+        return sum(1 for line in fullpath.open(encoding='utf-8'))
+    except UnicodeDecodeError:
+        print(f'{fullpath}: UnicodeDecodeError')
+        return 0
 
 def count_project(projdir):
     """
@@ -43,6 +47,7 @@ def count_project(projdir):
         for suffix in SUFFIXES:
             paths.extend(Path(projdir).rglob(f'*{suffix}'))
         paths = [str(path.relative_to(projdir)) for path in paths]
+    print(f'{projdir}: {len(paths)} source files')
     count_dict = {path: count_lines(projdir, path) for path in paths}
     return count_dict
 
@@ -103,7 +108,9 @@ def calc_stats(data):
 def render(projdir):
     assert Path(projdir).is_dir()
     proj_data = count_project(projdir)
-    assert len(proj_data) > 0
+    if not proj_data:
+        print(f'{projdir} has no source files')
+        return None
 
     rects = query_rect_sizes(proj_data)
     boxdict = {rect.name: rect for rect in rects}
@@ -132,6 +139,8 @@ def render(projdir):
 def main(projects):
     for project in projects:
         image = render(project)
+        if not image:
+            continue
         name = Path(project).name
         image.save(f'{name}.png')
         # print(projdir)
