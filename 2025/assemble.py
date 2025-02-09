@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from pathlib import Path
 import sys
 
@@ -34,19 +35,56 @@ from PIL import Image
 #     return image
 
 
-def main(paths):
-    projects = {}
+@dataclass
+class Rect:
+    x: int
+    y: int
+    width: int
+    height: int
+    name: str
+
+
+def roughpack(data, max_width=None):
+    """
+    Given a list of filenames and rectangle sizes, pack them into a new large rectangle
+    Returns a list of Rect objects, one for each rendered file
+    - also includes a special Rect object for the bounding box
+    - "position" is the lower-left corner of the rectangle
+    """
+    names = list(data.keys())
+    sizes = list(data.values())
+    positions = rpack.pack(sizes, max_width=max_width)
+
+    # calculate bounding box, store as special rect
+    bbox = rpack.bbox_size(sizes, positions)
+    yield Rect(0, 0, bbox[0], bbox[1], 'BOUNDING-BOX')
+
+    for i in range(len(names)):
+        x, y = positions[i]
+        width, height = sizes[i]
+        yield Rect(x, y, width, height, names[i])
+
+
+def make_rects(paths):
+    sizes = {}
     
     for path in paths:
         name = Path(path).name
         with Image.open(path) as img:
             width, height = img.size
-        info = dict(size=(width, height), name=name)
-        projects[name] = info
+        sizes[name] = (width, height)
 
-    sizes = [p['size'] for p in projects.values()]
-    positions = rpack.pack(sizes)
-    assert 0, positions
+    rects = roughpack(sizes, max_width=600)
+    rects = {rect.name: rect for rect in rects}
+    return rects
+
+
+def main(paths):
+    rects = make_rects(paths)
+    bbox = rects['BOUNDING-BOX']
+    aspect = bbox.width / bbox.height
+    print(f'Aspect ratio: {aspect:.2f}')
+    assert 0, rects
 
 if __name__=='__main__':
     main(sys.argv[1:])
