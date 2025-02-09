@@ -26,6 +26,7 @@ run-source:
 
 srcgrid-all:
 	python3 -m srcgrid $$(ls -1d ../SOURCE/*-*/)
+	echo DONE
 
 srcgrid3:
 	python3 srcgrid.py '../SOURCE/dnsmasq' '../SOURCE/hello-2.10'

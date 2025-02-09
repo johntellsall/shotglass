@@ -83,13 +83,16 @@ def roughpack(data):
         width, height = sizes[i]
         yield Rect(x, y, width, height, names[i])
 
+DULL_DIRS = ('contrib/', 'debian/', 'doc/', 'examples/', 'tests/')
 
 def query_rect_sizes(proj_data):
     # ignore source under 100 lines
     def is_interesting(name, lines):
-        return lines > 100 and not name.startswith('contrib/')
+        return lines > 100 and not name.startswith(DULL_DIRS)
+    print(f'query_rect_sizes: size={len(proj_data)}')
     proj_data = {k: v for k, v in proj_data.items() if is_interesting(k, v)}
     packed_rects = list(roughpack(proj_data))
+    print(f'query_rect_sizes: => {len(packed_rects)} rects')
     return packed_rects
 
 
@@ -112,6 +115,7 @@ def render(projdir):
         print(f'{projdir} has no source files')
         return None
 
+    projname = Path(projdir).name
     rects = query_rect_sizes(proj_data)
     boxdict = {rect.name: rect for rect in rects}
 
@@ -129,7 +133,7 @@ def render(projdir):
         label = simplify(rect.name)
         (_, _, bbottom, bright) = font.getbbox(text=label)
         if bright > rect.width or bbottom > rect.height:
-            print(f'- {label} does not fit in {rect.width}x{rect.height}')
+            print(f'{projname}: {label} does not fit in {rect.width}x{rect.height}')
             continue
         draw.text((rect.x, rect.y), label, fill='black', font=font)
 
