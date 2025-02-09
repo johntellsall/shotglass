@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 from pathlib import Path
+import re
 import sys
+from textwrap import fill
 
 import rpack
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 
 # def render(projdir):
@@ -79,12 +81,35 @@ def make_rects(paths):
     return rects
 
 
+def simplify(name):
+    """
+    strip version number and image suffix
+    """
+    pat = re.compile('[^-.]+')
+    if m := pat.match(name):
+        return m.group()
+    return name
+
+
 def main(paths):
     rects = make_rects(paths)
-    bbox = rects['BOUNDING-BOX']
+    bbox = rects.pop('BOUNDING-BOX')
     aspect = bbox.width / bbox.height
     print(f'Aspect ratio: {aspect:.2f}')
-    assert 0, rects
+
+    overview_img = Image.new('RGB', (bbox.width, bbox.height), 'gray')
+    draw = ImageDraw.Draw(overview_img)
+    font = ImageFont.truetype("../fonts/ariblk.ttf", 24)
+
+    for name, rect in rects.items():
+        rstyle = dict(outline='green', fill='white')
+        draw.rectangle([rect.x, rect.y, rect.x + rect.width, rect.y + rect.height], **rstyle)
+        label = simplify(name)
+        lstyle = dict(fill='black', font=font)
+        draw.text((rect.x, rect.y), label, **lstyle)
+    overview_img.save('overview.png')
+  
+    
 
 if __name__=='__main__':
     main(sys.argv[1:])
