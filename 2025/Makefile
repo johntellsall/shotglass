@@ -1,8 +1,8 @@
 all:
 
 run:
-	python3 assemble.py dnsmasq.png hello.png
-	
+	python3 assemble.py dnsmasq.png hello-2.10.png
+
 get-debian-source:
 	python3 get_source.py -C ../SOURCE/ dnsmasq hello libc6 zlib1g adduser redis-server
 
