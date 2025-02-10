@@ -12,7 +12,6 @@ import click
 from stats import parse_archive_path
 
 
-
 def download_debian_source(pkgname, directory):
     """
     download Debian package contents: original source, patches, support files
