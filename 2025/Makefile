@@ -26,7 +26,11 @@ run-source:
 
 # python3 srcgrid.py '../SOURCE/dnsmasq'
 
-srcgrid-all:
+# redis: 112 source files	140k lines
+stats:
+	find ../SOURCE/redis-7.0.15/ | rg '[cy]$$' /dev/stdin | rg -v '(tests|deps)/' | wc -l
+
+srcgrid-all:ls *
 	python3 -m srcgrid $$(ls -1d ../SOURCE/*-*/)
 	echo DONE
 
