@@ -9,24 +9,8 @@ import subprocess
 import sys
 
 import click
+from stats import parse_archive_path
 
-
-# FIXME: not always correct: xz suffix?
-def parse_archive_path(output):
-    # breakpoint()
-    split_pat = re.compile(r'(?P<name>\S+)_(?P<version>.+?)\.tar\.\S+')
-    if m := split_pat.search(output):
-        path = m.group().strip("'")
-        name = m.group('name').strip("'")
-        return dict(path=path, name=name, version=m.group('version'))
-    
-    # NOTE: lacks archive path
-    split_pat = re.compile(r'(?P<name>\S+)\s+(?P<version>\d+\.\d+).+\(tar\)')
-    if m := split_pat.search(output):
-        name = m.group('name').strip()
-        version = m.group('version').strip()
-        return dict(name=name, version=version)
-    return None
 
 
 def download_debian_source(pkgname, directory):

@@ -9,6 +9,7 @@ import sys
 import rpack
 import subprocess
 from PIL import Image, ImageDraw, ImageFont
+from stats import DULL_DIRS, simplify
 
 # # Create a bunch of rectangles (width, height)
 # >>> sizes = [(58, 206), (231, 176), (35, 113), (46, 109)]
@@ -90,8 +91,6 @@ def roughpack(data):
         width, height = sizes[i]
         yield Rect(x, y, width, height, names[i])
 
-DULL_DIRS = ('contrib/', 'debian/', 'deps/', 'doc/', 'examples/', 'test/', 'tests/')
-
 def query_rect_sizes(proj_data):
     # ignore source under 100 lines
     def is_interesting(name, lines):
@@ -101,12 +100,6 @@ def query_rect_sizes(proj_data):
     packed_rects = list(roughpack(proj_data))
     print(f'query_rect_sizes: => {len(packed_rects)} rects')
     return packed_rects
-
-
-def simplify(path):
-    path = path.replace('src/', '')
-    path = path.replace('.c', '') # FIXME:
-    return path
 
 
 def calc_stats(data):
