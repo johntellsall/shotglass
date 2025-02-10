@@ -95,24 +95,6 @@ def report_popcon():
         print(f'- {pkgname:22} {vote:6} {desc}')
 
 
-# def query_popular(engine):
-#     popular_ranked = equery('popular-packages.sql', engine)
-#     popular_names = set(name for name,_ in popular_ranked)
-#     return popular_names
-
-
-# def query_sqlfile(path,  engine=None):
-#     assert type(path) == str
-#     if engine is None:
-#         engine = get_engine()
-
-#     with open(path) as f:
-#         sql = f.read()
-
-#     with Session(engine) as session:
-#         return session.exec(text(sql)).all()
-
-
 def query_popcon2(engine, releases):
     data = equery('pop_over_time.sql', engine)
 
@@ -209,14 +191,3 @@ def query_popcon3():
 def report_popcon3():
     table, _grid = query_popcon3()
     return format_html_table(table)
-
-
-# def report_popcon4():
-#     data = equery('pop_over_time.sql')
-
-#     for num, (packagename, *cells, note) in enumerate(data):
-#         if note in ('INCOMPLETE', 'REMOVED'):
-#             continue
-#         if note in ('NEW',):
-#             continue
-#         print(num, packagename, note)

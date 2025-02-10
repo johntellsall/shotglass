@@ -61,7 +61,7 @@ run-scatter:
 format:
 	ruff check --select=E,W,F --fix --ignore E501 test_pack.py
 
-stats:
+stats-py-count:
 	wc -l *.py
 	
 lint:
