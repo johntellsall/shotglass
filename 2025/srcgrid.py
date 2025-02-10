@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from math import sqrt
 from operator import is_
+import os
 from pathlib import Path
+from posixpath import dirname
 from pprint import pprint
 import sys
 import rpack
@@ -31,7 +33,12 @@ def count_lines(prefix, path):
         print(f'{fullpath}: UnicodeDecodeError')
         return 0
 
-def count_project(projdir):
+def find_project_directories(projdir):
+    for dirpath, dirnames, _ in os.walk(projdir):
+        for dirname in dirnames:
+            yield f'{dirpath}/{dirname}'
+
+def count_project_files(projdir):
     """
     Scan files in project directory, count lines in each source file.
     Return: dict with filename as key and line count as value
@@ -110,7 +117,7 @@ def calc_stats(data):
 
 def render(projdir):
     assert Path(projdir).is_dir()
-    proj_data = count_project(projdir)
+    proj_data = count_project_files(projdir)
     if not proj_data:
         print(f'{projdir} has no source files')
         return None
@@ -126,6 +133,7 @@ def render(projdir):
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("../fonts/ariblk.ttf", 12)
 
+    nofit_count = 0
     for rect in rects:
         if rect.name == 'BOUNDING-BOX':
             continue
@@ -133,7 +141,9 @@ def render(projdir):
         label = simplify(rect.name)
         (_, _, bbottom, bright) = font.getbbox(text=label)
         if bright > rect.width or bbottom > rect.height:
-            print(f'{projname}: {label} does not fit in {rect.width}x{rect.height}')
+            if not nofit_count:
+                print(f'{projname}: {label} does not fit in {rect.width}x{rect.height}')
+            nofit_count += 1
             continue
         draw.text((rect.x, rect.y), label, fill='black', font=font)
 
@@ -142,12 +152,18 @@ def render(projdir):
 
 def main(projects):
     for project in projects:
+        print(project)
+
+        dir_count = len(list(find_project_directories(project)))
+        if dir_count > 50:
+            print(f'{project}: too many directories ({dir_count})')
+            continue
+
         image = render(project)
         if not image:
             continue
         name = Path(project).name
         image.save(f'{name}.png')
-        # print(projdir)
         # pprint(calc_stats(proj_data))
         # print(f'size: {size}')
     

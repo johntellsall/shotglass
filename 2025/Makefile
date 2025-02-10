@@ -16,8 +16,8 @@ top:
 	rg -v '(lib|#)' ../dist/by_vote | rg -v '(debian|debconf|dpkg)' | head
 
 # NOTE: not quite right
-source-sizes:
-	ls --sort=size -sh1 ../SOURCE/*orig*
+list-source-sizes:
+	ls --sort=size -sh1 ../SOURCE/*orig* | rg -v 'asc$$'
 
 run-source:
 	python3 get_source.py -C ../SOURCE/ hello

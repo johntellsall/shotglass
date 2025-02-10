@@ -1,13 +1,8 @@
-CREATE TABLE sgalpinepackage (
-        id INTEGER NOT NULL, 
-        alpine_release VARCHAR NOT NULL, 
-        pkgname VARCHAR NOT NULL, 
-        pkgdesc VARCHAR NOT NULL, 
-        pkgver VARCHAR NOT NULL, 
-        pkgrel VARCHAR NOT NULL, 
-        sg_complexity INTEGER, 
-        sg_len_install INTEGER, 
-        sg_len_parse_funcs INTEGER, 
-        sg_len_subpackages INTEGER, 
-        PRIMARY KEY (id)
-);
+# NOTES
+
+## IDEAS
+
+* a sea of squares isn't useful
+        * boxpack rectangles per directory
+                * boxpack squares per file
+                * scale up/down to fit directory box
