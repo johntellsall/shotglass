@@ -1,5 +1,19 @@
 # NOTES
 
+## GitLab / Debian
+
+* "repos graph"
+
+    https://salsa.debian.org/python-team/packages/matplotlib/-/network/master?ref_type=heads
+
+* Git tags
+
+    https://salsa.debian.org/python-team/packages/matplotlib/-/tags
+
+* repos stats (authors, commit history)
+
+    https://salsa.debian.org/python-team/packages/matplotlib/-/graphs/master/charts
+
 ## Misc
 
 * `hello` is 1.5x package size as `dnsmasq`!

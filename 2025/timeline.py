@@ -11,8 +11,10 @@ of Matplotlib. First, we'll pull the data from GitHub.
 """
 
 import json
+import sys # noqa
 import urllib.request
 from datetime import datetime
+from pprint import pprint # noqa
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -27,16 +29,24 @@ def get_package_releases(package_name):
 
     dates = []
     releases = []
-    for item in data:
-        if 'rc' not in item['tag_name'] and 'b' not in item['tag_name']:
-            dates.append(item['published_at'].split("T")[0])
-            releases.append(item['tag_name'].lstrip("v"))
+    try:
+        for item in data:
+            if 'rc' not in item['tag_name'] and 'b' not in item['tag_name']:
+                dates.append(item['published_at'].split("T")[0])
+                releases.append(item['tag_name'].lstrip("v"))
+    except IndexError as e:
+        print(f"Error: {e}")
     
     tag_names = [ item['tag_name'] for item in data]
     info = dict(tag_names=tag_names, dates=dates, releases=releases)
     return info
 
-pkg_info = get_package_releases('matplotlib/matplotlib')
+pkg_id = 'madler/zlib'
+pkg_name = 'Zlib'
+# pkg_info = get_package_releases('matplotlib/matplotlib')
+pkg_info = get_package_releases(pkg_id)
+# pprint(pkg_info) ; sys.exit(1) # noqa
+
 releases = pkg_info['releases']
 dates = pkg_info['dates']
 
@@ -75,7 +85,7 @@ levels = []
 macro_meso_releases = sorted({release[:2] for release in releases})
 for release in releases:
     macro_meso = release[:2]
-    micro = int(release[2])
+    micro = int(release[2]) if len(release) > 2 else 0
     h = 1 + 0.8 * (5 - micro)
     level = h if macro_meso_releases.index(macro_meso) % 2 == 0 else -h
     levels.append(level)
@@ -88,7 +98,7 @@ def is_feature(release):
 
 # The figure and the axes.
 fig, ax = plt.subplots(figsize=(8.8, 4), layout="constrained")
-ax.set(title="Matplotlib release dates")
+ax.set(title=f"{pkg_name} release dates")
 
 # The vertical stems.
 ax.vlines(dates, 0, levels,
