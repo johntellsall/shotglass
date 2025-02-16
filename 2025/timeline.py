@@ -11,6 +11,7 @@ of Matplotlib. First, we'll pull the data from GitHub.
 """
 
 import json
+import os
 import sys # noqa
 import urllib.request
 from datetime import datetime
@@ -21,11 +22,26 @@ import numpy as np
 import matplotlib.dates as mdates
 
 
+def get_package_data(package_name):
+    assert '/' in package_name, "Package name must be in the form 'owner/repo'"
+    _, repo = package_name.split('/')
+    data_path = f'{repo}.json'
+    if not os.path.exists(data_path):
+        url = f'https://api.github.com/repos/{package_name}/releases'
+        url += '?per_page=100'
+        data = json.loads(urllib.request.urlopen(url, timeout=1).read().decode())
+        with open(data_path, 'w') as f:
+            json.dump(data, f)
+
+    data = json.load(open(data_path))
+    if not data:
+        sys.exit(f"Error: No data found for {package_name}")
+    return data
+
 def get_package_releases(package_name):
-    # url = 'https://api.github.com/repos/matplotlib/matplotlib/releases'
-    url = f'https://api.github.com/repos/{package_name}/releases'
-    url += '?per_page=100'
-    data = json.loads(urllib.request.urlopen(url, timeout=1).read().decode())
+  
+    data = get_package_data(package_name)
+    pprint(data)
 
     dates = []
     releases = []
@@ -41,14 +57,15 @@ def get_package_releases(package_name):
     info = dict(tag_names=tag_names, dates=dates, releases=releases)
     return info
 
-pkg_id = 'madler/zlib'
-pkg_name = 'Zlib'
+# pkg_id = 'madler/zlib'pkg_name = 'Zlib'
+pkg_info = dict(id='postgres/postgres', name='PostgreSQL')
 # pkg_info = get_package_releases('matplotlib/matplotlib')
-pkg_info = get_package_releases(pkg_id)
+release_info = get_package_releases(pkg_info['id'])
+pprint(release_info)
 # pprint(pkg_info) ; sys.exit(1) # noqa
 
-releases = pkg_info['releases']
-dates = pkg_info['dates']
+releases = release_info['releases']
+dates = release_info['dates']
 
 
 
@@ -91,6 +108,7 @@ for release in releases:
     levels.append(level)
 
 
+# FIXME: this isn't right
 def is_feature(release):
     """Return whether a version (split into components) is a feature release."""
     return release[-1] == '0'
@@ -98,7 +116,7 @@ def is_feature(release):
 
 # The figure and the axes.
 fig, ax = plt.subplots(figsize=(8.8, 4), layout="constrained")
-ax.set(title=f"{pkg_name} release dates")
+ax.set(title=f"{pkg_info['name']} release dates")
 
 # The vertical stems.
 ax.vlines(dates, 0, levels,
@@ -113,13 +131,15 @@ ax.plot(micro_dates, np.zeros_like(micro_dates), "ko", mfc="white")
 ax.plot(meso_dates, np.zeros_like(meso_dates), "ko", mfc="tab:red")
 
 # Annotate the lines.
+line_style = dict(textcoords="offset points", bbox=dict(boxstyle='square', pad=0, lw=0, fc=(1, 1, 1, 0.7)))
 for date, level, release in zip(dates, levels, releases):
     version_str = '.'.join(release)
     ax.annotate(version_str, xy=(date, level),
-                xytext=(-3, np.sign(level)*3), textcoords="offset points",
+                xytext=(-3, np.sign(level)*3), 
                 verticalalignment="bottom" if level > 0 else "top",
                 weight="bold" if is_feature(release) else "normal",
-                bbox=dict(boxstyle='square', pad=0, lw=0, fc=(1, 1, 1, 0.7)))
+                **line_style
+                )
 
 ax.xaxis.set(major_locator=mdates.YearLocator(),
              major_formatter=mdates.DateFormatter("%Y"))
