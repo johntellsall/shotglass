@@ -1,5 +1,10 @@
 all:
 
+.PHONY: imgcat.png
+timeline.png: timeline.py Makefile
+	python3 timeline.py
+	imgcat-iterm2 --legacy $@
+
 assemble-all:
 	python3 assemble.py *-[0-9]*.png
 	imgcat overview.png
@@ -151,6 +156,9 @@ clone-alpine:
 setup:
 	test -d venv || python3 -m venv venv
 	venv/bin/pip install -r requirements.txt
+
+nuke-virtualenv:
+	$(RM) -r venv
 
 run-model:
 	venv/bin/python3 -m model
