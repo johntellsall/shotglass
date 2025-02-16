@@ -38,6 +38,7 @@ def get_package_data(package_name):
         sys.exit(f"Error: No data found for {package_name}")
     return data
 
+
 def get_package_releases(package_name):
   
     data = get_package_data(package_name)
@@ -58,7 +59,7 @@ def get_package_releases(package_name):
     return info
 
 # pkg_id = 'madler/zlib'pkg_name = 'Zlib'
-pkg_info = dict(id='postgres/postgres', name='PostgreSQL')
+pkg_info = dict(id='redis/redis', name='Redis')
 # pkg_info = get_package_releases('matplotlib/matplotlib')
 release_info = get_package_releases(pkg_info['id'])
 pprint(release_info)
