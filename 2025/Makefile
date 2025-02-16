@@ -2,6 +2,7 @@ all:
 
 .PHONY: imgcat.png
 timeline.png: timeline.py Makefile
+	ruff check timeline.py
 	python3 timeline.py
 	imgcat-iterm2 --legacy $@
 
