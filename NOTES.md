@@ -2,6 +2,19 @@
 
 ## GitLab / Debian
 
+* GraphQL is open!
+
+    https://salsa.debian.org/-/graphql-explorer
+
+    * examples
+        * query {currentUser {name}}
+
+        * query {
+  project(fullPath: "debian/adduser") {
+    name
+  }
+}
+
 * "repos graph"
 
     https://salsa.debian.org/python-team/packages/matplotlib/-/network/master?ref_type=heads
@@ -150,3 +163,43 @@ app/management/commands/words.py
 app/management/commands/funcsize.py
 app/management/commands/bokplot.py
 app/management/commands/draw.py
+
+
+## GraphQL Salsa Debian GitLab
+
+### list info about 5 projects
+
+query {
+  projects(first: 5) {
+    nodes {
+      id
+      name
+      description
+      webUrl
+      visibility
+      lastActivityAt
+      statistics {
+        repositorySize
+        storageSize
+      }
+     
+    }
+  }
+}
+
+### list releases
+
+XX: no results
+
+    query {
+  project(fullPath: "debian/adduser") {
+    releases(first: 5) {
+      nodes {
+        tagName
+        name
+        createdAt
+        releasedAt
+      }
+    }
+  }
+}

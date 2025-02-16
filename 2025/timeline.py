@@ -11,7 +11,7 @@ of Matplotlib. First, we'll pull the data from GitHub.
 """
 
 import json
-import os
+import os # noqa
 import sys # noqa
 import urllib.request
 from datetime import datetime
@@ -22,27 +22,35 @@ import numpy as np
 import matplotlib.dates as mdates
 
 
-def get_package_data(package_name):
+def github_get_package_data(package_name):
     assert '/' in package_name, "Package name must be in the form 'owner/repo'"
     _, repo = package_name.split('/')
     data_path = f'{repo}.json'
+    url = None
     if not os.path.exists(data_path):
         url = f'https://api.github.com/repos/{package_name}/releases'
         url += '?per_page=100'
         data = json.loads(urllib.request.urlopen(url, timeout=1).read().decode())
-        with open(data_path, 'w') as f:
-            json.dump(data, f)
+        if data:
+            with open(data_path, 'w') as f:
+                json.dump(data, f)
+    else:
+        data = json.load(open(data_path))
 
-    data = json.load(open(data_path))
     if not data:
-        sys.exit(f"Error: No data found for {package_name}")
+        sys.exit(f"Error: No data found for {package_name} -- {url}")
     return data
+
+
+get_package_data = github_get_package_data
 
 
 def get_package_releases(package_name):
   
     data = get_package_data(package_name)
-    pprint(data)
+    verbose = False
+    if verbose:
+        pprint(data)
 
     dates = []
     releases = []
@@ -59,7 +67,15 @@ def get_package_releases(package_name):
     return info
 
 # pkg_id = 'madler/zlib'pkg_name = 'Zlib'
-pkg_info = dict(id='redis/redis', name='Redis')
+# pkg_info = dict(id='redis/redis', name='Redis')
+# pkg_info = dict(id='alpinelinux/aports', name='Alpine Linux')
+# pkg_info = dict(id='sqlite/sqlite', name='Sqlite')
+# TODO: https://thekelleys.org.uk/gitweb/?p=dnsmasq.git;a=summary
+# pkg_info = dict(id='sanvila/sympy', name='Sympy') # Debian Salsa
+# pkg_info = dict(id='python/cpython', name='Python')
+pkg_info = dict(id='nodejs/node', name='Node.js')
+
+
 # pkg_info = get_package_releases('matplotlib/matplotlib')
 release_info = get_package_releases(pkg_info['id'])
 pprint(release_info)
@@ -82,6 +98,12 @@ dates = release_info['dates']
     #          '2017-05-10', '2017-05-02', '2017-01-17', '2016-09-09',
     #          '2016-07-03', '2016-01-10', '2015-10-29', '2015-02-16',
     #          '2014-10-26', '2014-10-18', '2014-08-26']
+
+large_mode = len(release_info['tag_names']) > 30
+if large_mode:
+    print(f"Large mode: {len(release_info['tag_names'])}")
+    releases = releases[:30]
+    dates = dates[:30]
 
 dates = [datetime.strptime(d, "%Y-%m-%d") for d in dates]  # Convert strs to dates.
 releases = [tuple(release.split('.')) for release in releases]  # Split by component.

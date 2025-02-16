@@ -1,5 +1,5 @@
 aports
 venv
 dist
-*.png
+# *.png
 *.html
