@@ -20,7 +20,7 @@ from pprint import pprint # noqa
 
 import matplotlib.pyplot as plt
 import numpy as np
-import click
+# import click
 import matplotlib.dates as mdates
 
 
@@ -69,7 +69,7 @@ def get_package_releases(package_url):
     github_pat = re.compile(r'github.com/(.+)')
     package_name = github_pat.search(package_url).group(1)
   
-    data = get_package_data(package_name)
+    data = query_github_releases(package_name)
     verbose = False
     if verbose:
         pprint(data)
@@ -90,7 +90,7 @@ def get_package_releases(package_url):
     return info
 
 # pkg_id = 'madler/zlib'pkg_name = 'Zlib'
-# pkg_info = dict(id='redis/redis', name='Redis')
+pkg_info = dict(id='redis/redis', name='Redis')
 # pkg_info = dict(id='alpinelinux/aports', name='Alpine Linux')
 # pkg_info = dict(id='sqlite/sqlite', name='Sqlite')
 # TODO: https://thekelleys.org.uk/gitweb/?p=dnsmasq.git;a=summary
@@ -101,7 +101,7 @@ def get_package_releases(package_url):
 # pkg_info = dict(id='hashicorp/terraform', name='Terraform')
 # pkg_info = dict(id='caddyserver/caddy', name='Caddy')
 # pkg_info = dict(url='https://github.com/kubernetes/kubernetes', name='Kubernetes')
-pkg_info = dict(url='https://github.com/numpy/numpy', name='Numpy')
+# pkg_info = dict(url='https://github.com/numpy/numpy', name='Numpy')
 
 
 def import_releases(args):
@@ -133,7 +133,7 @@ def plot():
         #          '2016-07-03', '2016-01-10', '2015-10-29', '2015-02-16',
         #          '2014-10-26', '2014-10-18', '2014-08-26']
 
-    large_mode = len(release_info['tag_names']) > 50
+    large_mode = len(release_info['tag_names']) > 50 # noqa
     if 0: # large_mode:
         print(f"Large mode: {len(release_info['tag_names'])}")
         releases = releases[:50]

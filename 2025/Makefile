@@ -5,8 +5,8 @@ t-import:
 
 .PHONY: imgcat.png
 timeline.png: timeline.py Makefile
-	ruff check timeline.py
-	python3 timeline.py
+	ruff check --output-format=concise timeline.py
+	python3 timeline.py import redis/redis
 	imgcat-iterm2 --legacy $@
 
 assemble-all:
@@ -39,7 +39,7 @@ run-source:
 stats:
 	find ../SOURCE/redis-7.0.15/ | rg '[cy]$$' /dev/stdin | rg -v '(tests|deps)/' | wc -l
 
-srcgrid-all:ls *
+srcgrid-all:
 	python3 -m srcgrid $$(ls -1d ../SOURCE/*-*/)
 	echo DONE
 
