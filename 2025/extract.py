@@ -3,7 +3,7 @@ import re
 import subprocess
 import sys
 from sqlmodel import select, delete, func, Session, SQLModel
-from model import DebianPopContest, SGAlpinePackage
+from model import DebianPopContest, SGAlpinePackage, SGGitHubRelease
 import parse
 from lib import get_engine
 from sqlalchemy.exc import OperationalError
@@ -126,3 +126,21 @@ def extract_popcon():
     with Session(engine) as session:
         count = session.scalar(select(func.count()).select_from(DebianPopContest))
     print(f"DebianPopContest packages: {count}")
+
+
+def import_github_releases(releases):
+    assert type(releases) is list
+    engine = get_engine()
+    SQLModel.metadata.create_all(engine)
+
+    with Session(engine) as session:
+        for num,release in enumerate(releases):
+            rel = SGGitHubRelease(**release)
+            session.add(rel)
+            if num == 0: # make bugs show early
+                session.commit()
+        session.commit()
+
+    with Session(engine) as session:
+        count = session.scalar(select(func.count()).select_from(SGGitHubRelease))
+    print(f"SGGitHubRelease count: {count}")

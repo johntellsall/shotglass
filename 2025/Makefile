@@ -1,5 +1,8 @@
 all:
 
+t-import:
+	python3 timeline.py import caddyserver/caddy
+
 .PHONY: imgcat.png
 timeline.png: timeline.py Makefile
 	ruff check timeline.py

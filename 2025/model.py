@@ -1,5 +1,12 @@
 from sqlmodel import Field, SQLModel
 
+
+class SGGitHubRelease(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    tag_name: str
+    published_at: str
+    gh_owner_repo: str
+
 # Shotglass-specific fields prefixed with "sg_"
 
 class SGAlpinePackage(SQLModel, table=True):
