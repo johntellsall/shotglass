@@ -64,10 +64,10 @@ def boring_tag_name(tag_name):
     return boring_pat.search(tag_name)
 
 
-def get_package_releases(package_url):
+def get_package_releases(package_name):
 
-    github_pat = re.compile(r'github.com/(.+)')
-    package_name = github_pat.search(package_url).group(1)
+    # github_pat = re.compile(r'github.com/(.+)')
+    # package_name = github_pat.search(package_url).group(1)
   
     data = query_github_releases(package_name)
     verbose = False
@@ -111,27 +111,18 @@ def import_releases(args):
         pprint(tags)
 
 
+def plot_release_interval(pkg_info):
+    pass
+
+
 def plot():
-    release_info = get_package_releases(pkg_info['url'])
+    pid = pkg_info['id']
+    # url = f'https://github.com/{pid}'
+    release_info = get_package_releases(pid)
     pprint(release_info)
 
     releases = release_info['releases']
     dates = release_info['dates']
-
-
-
-        # # In case the above fails, e.g. because of missing internet connection
-        # # use the following lists as fallback.
-        # releases = ['2.2.4', '3.0.3', '3.0.2', '3.0.1', '3.0.0', '2.2.3',
-        #             '2.2.2', '2.2.1', '2.2.0', '2.1.2', '2.1.1', '2.1.0',
-        #             '2.0.2', '2.0.1', '2.0.0', '1.5.3', '1.5.2', '1.5.1',
-        #             '1.5.0', '1.4.3', '1.4.2', '1.4.1', '1.4.0']
-        # dates = ['2019-02-26', '2019-02-26', '2018-11-10', '2018-11-10',
-        #          '2018-09-18', '2018-08-10', '2018-03-17', '2018-03-16',
-        #          '2018-03-06', '2018-01-18', '2017-12-10', '2017-10-07',
-        #          '2017-05-10', '2017-05-02', '2017-01-17', '2016-09-09',
-        #          '2016-07-03', '2016-01-10', '2015-10-29', '2015-02-16',
-        #          '2014-10-26', '2014-10-18', '2014-08-26']
 
     large_mode = len(release_info['tag_names']) > 50 # noqa
     if 0: # large_mode:
@@ -214,9 +205,14 @@ def plot():
 
 
 def main(args):
-    assert args[0] == 'import'
-    import_releases(args[1:])
-    # plot()
+    if args[0] == 'import':
+        import_releases(args[1:])
+    elif args[0] == 'plot':
+        plot()
+    elif args[0] == 'plot2':
+        plot_release_interval(pkg_info)
+    else:
+        sys.exit('usage: import|plot')
 
 
 if __name__ == "__main__":

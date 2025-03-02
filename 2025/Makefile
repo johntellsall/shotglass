@@ -3,11 +3,15 @@ all:
 t-import:
 	python3 timeline.py import caddyserver/caddy
 
-.PHONY: imgcat.png
 timeline.png: timeline.py Makefile
 	ruff check --output-format=concise timeline.py
-	python3 timeline.py import redis/redis
-	imgcat-iterm2 --legacy $@
+	python3 timeline.py plot
+	imgcat-iterm2 --legacy timeline.png
+
+plot2: timeline.py Makefile
+	ruff check --output-format=concise timeline.py
+	python3 timeline.py plot2
+	imgcat-iterm2 --legacy redis.png
 
 assemble-all:
 	python3 assemble.py *-[0-9]*.png
