@@ -31,3 +31,11 @@ distclean: clean
 # fastlint:
 # 	flake8 .
 # 	@echo DONE
+
+# blobless clone: full history, only HEAD has full files
+# git clone --filter=blob:none <url> creates a blobless clone. These clones download all reachable commits and trees while fetching blobs on-demand. These clones are best for developers and build environments that span multiple builds.
+# X: kernel.org doesn't obey filter
+# clone-linux: URL:=git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+clone-linux: URL:=https://github.com/torvalds/linux.git
+clone-linux:
+	git clone --filter=blob:none $(URL) ./SOURCE/linux
