@@ -33,3 +33,6 @@ from pathlib import Path
 imgpath = Path(__file__).with_suffix('.png')
 plt.savefig(imgpath)
 print(f'{imgpath}: saved')
+
+from matplotlib import image
+preview = image.imread(imgpath)
