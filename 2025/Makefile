@@ -1,5 +1,8 @@
 all:
 
+run:
+	python3 apie.py
+	
 proj-stats: proj_stats.py
 	python3 proj_stats.py ../SOURCE/linux
 	
