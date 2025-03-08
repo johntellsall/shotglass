@@ -1,13 +1,21 @@
 # apie.py # everyone loves pie
 # 
 
+import re
 import matplotlib.pyplot as plt
 import numpy as np
 
-from lib import equery1
+from lib import equery, equery1
 
-res = equery1('select count(*) from sgalpinepackage')
-assert 0, res
+res = equery('select pkgname from sgalpinepackage')
+packages = [row[0] for row in res]
+
+dull_pat = re.compile(r'(acf-|apache-mod-|aspell-|clang[0-9]|freeswitch-|font-|lua[0-9]|lua-|perl-|py3-|ruby-)')
+count_dull = len([pkg for pkg in packages if dull_pat.match(pkg)])
+info = {"total": len(packages),
+        'dull': count_dull,
+        'interesting': len(packages) - count_dull}
+assert 0, info
 
 fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
 
