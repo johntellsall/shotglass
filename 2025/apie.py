@@ -15,17 +15,21 @@ count_dull = len([pkg for pkg in packages if dull_pat.match(pkg)])
 info = {"total": len(packages),
         'dull': count_dull,
         'interesting': len(packages) - count_dull}
-assert 0, info
+# assert 0, info
 
 fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
 
-recipe = ["375 g flour",
-          "75 g sugar",
-          "250 g butter",
-          "300 g berries"]
+if 0:
+    recipe = ["375 g flour",
+            "75 g sugar",
+            "250 g butter",
+            "300 g berries"]
 
-data = [float(x.split()[0]) for x in recipe]
-ingredients = [x.split()[-1] for x in recipe]
+    data = [float(x.split()[0]) for x in recipe]
+    ingredients = [x.split()[-1] for x in recipe]
+else:
+    data = [info['dull'], info['interesting']]
+    ingredients = ['dull', 'interesting']
 
 
 def func(pct, allvals):
