@@ -1,5 +1,13 @@
+# apie.py # everyone loves pie
+# 
+
 import matplotlib.pyplot as plt
 import numpy as np
+
+from lib import equery1
+
+res = equery1('select count(*) from sgalpinepackage')
+assert 0, res
 
 fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
 
@@ -34,5 +42,17 @@ imgpath = Path(__file__).with_suffix('.png')
 plt.savefig(imgpath)
 print(f'{imgpath}: saved')
 
-from matplotlib import image
-preview = image.imread(imgpath)
+# from matplotlib import image
+# preview = image.imread(imgpath)
+
+# CREATE TABLE sgalpinepackage (
+#         id INTEGER NOT NULL, 
+#         alpine_release VARCHAR NOT NULL, 
+#         pkgname VARCHAR NOT NULL, 
+#         pkgdesc VARCHAR NOT NULL, 
+#         pkgver VARCHAR NOT NULL, 
+#         pkgrel VARCHAR NOT NULL, 
+#         sg_complexity INTEGER, 
+#         sg_len_install INTEGER, 
+#         sg_len_parse_funcs INTEGER, 
+#         sg_len_subpackages INTEGER, 

@@ -8,12 +8,11 @@ from sqlmodel import Session, create_engine, text
 DEBUG = 'DEBUG' in os.environ
 
 
-
 def equery(arg, engine=None):
     if engine is None:
         engine = get_engine()
 
-    if 'SELECT' in arg:
+    if 'SELECT' in arg or 'select' in arg:
         query = arg
     else:
         # get SQL from file
@@ -30,6 +29,11 @@ def equery(arg, engine=None):
 
     with Session(engine) as session:
         return session.exec(query).all()
+
+
+def equery1(*args, **kwargs):
+    res = equery(*args, **kwargs)
+    return res[0][0]
 
 
 def format_html_row(row):
