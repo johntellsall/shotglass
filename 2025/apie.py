@@ -19,35 +19,26 @@ info = {"total": len(packages),
 
 fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
 
-if 0:
-    recipe = ["375 g flour",
-            "75 g sugar",
-            "250 g butter",
-            "300 g berries"]
-
-    data = [float(x.split()[0]) for x in recipe]
-    ingredients = [x.split()[-1] for x in recipe]
-else:
-    data = [info['dull'], info['interesting']]
-    ingredients = ['dull', 'interesting']
+data = [info['dull'], info['interesting']]
+ingredients = ['dull', 'interesting']
 
 
-def func(pct, allvals):
+def wedge_label(pct, allvals):
     absolute = int(np.round(pct/100.*np.sum(allvals)))
     return f"{pct:.1f}%\n({absolute:d} g)"
 
 
-wedges, texts, autotexts = ax.pie(data, autopct=lambda pct: func(pct, data),
+wedges, texts, autotexts = ax.pie(data, autopct=lambda pct: wedge_label(pct, data),
                                   textprops=dict(color="w"))
 
 ax.legend(wedges, ingredients,
-          title="Ingredients",
+          title="Package Classes",
           loc="center left",
           bbox_to_anchor=(1, 0, 0.5, 1))
 
 plt.setp(autotexts, size=8, weight="bold")
 
-ax.set_title("Matplotlib bakery: A pie")
+ax.set_title("Alpine Packages")
 
 from pathlib import Path
 imgpath = Path(__file__).with_suffix('.png')

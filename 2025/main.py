@@ -32,6 +32,12 @@ def show_summary(paths):
 
 
 def cmd_import(paths):
+    """
+    import Alpine packages
+    - 'aports' directory)
+    - X: set env RELEASE, example RELEASE=3.19-stable python3 -m main import aports
+    """
+    # TODO: `git log -1` to get the release?
     extract.extract(paths, release=os.environ['RELEASE'])
                     
 

@@ -16,34 +16,39 @@ class SGAlpinePackage(SQLModel, table=True):
     pkgdesc: str
     pkgver: str
     pkgrel: str
-    sg_complexity: int | None = None
-    sg_len_build: int | None = None
-    sg_len_install: int | None = None
-    sg_len_subpackages: int | None = None
+    # sg_complexity: int | None = None
+    # sg_len_build: int | None = None
+    # sg_len_install: int | None = None
+    # sg_len_subpackages: int | None = None
     sg_file_num_lines: int | None = None
 
-    # NOTE: move to 3rd library? vs parse or model
+    # FIXME: why?
     @classmethod
     def annotate(cls, data):
-        data = data.copy()
-        def listlen(obj):
-            if type(obj) is list:
-                return len(obj)
-            return 1
-        # if data['pkgname'] == 'bash':
-        #     breakpoint()
-        data['sg_len_build'] = data['sg_len_install'] = 0
-        try:
-            data['sg_len_build'] = data['_parse_function_build']['length']
-        except KeyError:
-            pass
-        try:
-            data['sg_len_install'] = data['_parse_function_install']['length']
-        except KeyError:
-            pass
-        data['sg_len_subpackages'] = listlen(data.get('subpackages', []))
-        print('sg_len: ', data['sg_len_build'], data['sg_len_install'], data['sg_len_subpackages'])
         return data
+
+    # NOTE: move to 3rd library? vs parse or model
+    # @classmethod
+    # def annotate(cls, data):
+    #     data = data.copy()
+    #     def listlen(obj):
+    #         if type(obj) is list:
+    #             return len(obj)
+    #         return 1
+    #     # if data['pkgname'] == 'bash':
+    #     #     breakpoint()
+    #     data['sg_len_build'] = data['sg_len_install'] = 0
+    #     try:
+    #         data['sg_len_build'] = data['_parse_function_build']['length']
+    #     except KeyError:
+    #         pass
+    #     try:
+    #         data['sg_len_install'] = data['_parse_function_install']['length']
+    #     except KeyError:
+    #         pass
+    #     data['sg_len_subpackages'] = listlen(data.get('subpackages', []))
+    #     print('sg_len: ', data['sg_len_build'], data['sg_len_install'], data['sg_len_subpackages'])
+    #     return data
 
 #  '_parse_function_build': {'length': 17},
 #  '_parse_function_package': {'length': 5},

@@ -3,3 +3,5 @@ venv
 dist
 # *.png
 *.html
+*.png
+*.json

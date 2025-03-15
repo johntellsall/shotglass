@@ -57,10 +57,13 @@ def get_engine():
 
 def git_checkout(branch):
     # FIXME: "git sparse-checkout init"
+    # NOTE: "git reset --hard HEAD"?
     checkout_cmd = ["git", "-C", "aports", "checkout", "--quiet", f"remotes/origin/{branch}"]
-    result = subprocess.run(checkout_cmd, capture_output=True, text=True)
-    if result.returncode != 0: # FIXME: more here
-        print(f"Failed to checkout branch {branch}: {result.stderr}", file=sys.stderr)
+    _result = subprocess.run(checkout_cmd, capture_output=True, text=True, check=True)
+    # NOTE: abort if warning on stderr?
+    # if result.returncode != 0: # FIXME: more here
+    #     print(f"Failed to checkout branch {branch}: {result.stderr}", file=sys.stderr)
+    #     raise ValueError(f"Failed to checkout branch {branch}")
 
 
 def git_list_branches():
