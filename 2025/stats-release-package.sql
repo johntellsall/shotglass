@@ -7,8 +7,11 @@ select min(alpine_release), max(alpine_release) from sgalpinepackage;
 select 'Package Count (all releases)';
 select count(*) from sgalpinepackage;
 
-select 'All data';
-select alpine_release, pkgname from sgalpinepackage;
+select "Package Count (each relesae)";
+select alpine_release, count(*) from sgalpinepackage group by alpine_release order by 1;
+
+-- select 'All data';
+-- select alpine_release, pkgname from sgalpinepackage;
 
 -- CREATE TABLE sgalpinepackage (
 --         id INTEGER NOT NULL, 

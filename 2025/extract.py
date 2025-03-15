@@ -34,16 +34,12 @@ def extract_apk_dir(topdir, release, session):
     return info
 
 
-def extract(paths, release, verbose=False):
+def extract(paths, release, limit=False, verbose=False):
     """
     extract list of packages into database
     - single version of Alpine in "release"
     """
     engine = get_engine()
-    limit = False
-
-    if 0:
-        db_delete_all(engine) # FIXME:
 
     SQLModel.metadata.create_all(engine)
 
@@ -69,9 +65,6 @@ def extract(paths, release, verbose=False):
         if verbose:
             print()
 
-    # with Session(engine) as session:
-    #     count = session.scalar(select(func.count()).select_from(SGAlpinePackage))
-    #     print(f"Release: {release} -- Total packages: {count}")
 
 def extract2(paths):
     """
@@ -84,7 +77,6 @@ def extract2(paths):
     engine = get_engine()
     releases = git_list_branches()
     limit = True
-    verbose = False
 
     # NOTE: release is random, not latest
     if limit:
