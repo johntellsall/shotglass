@@ -85,24 +85,33 @@ def extract2(paths):
     """
     engine = get_engine()
     releases = git_list_branches()
+    limit = True
     verbose = False
 
+    # NOTE: release is random, not latest
+    if limit:
+        releases = releases[-3:]
+
+    print(f'Found {len(releases)} releases', end=' ')
+    if paths:
+        print(f', {len(paths)} paths')
+    else:
+        print()
+
     if not paths:
-        print(f'Found {len(releases)} releases')
         for release in releases:
             print(f'{release}:')
             git_checkout(release)
             topdirs = [str(f) for f in Path('aports/main').iterdir() if f.is_dir()]
-            print(f'- {len(topdirs)} main directories')
+            print(f'- {len(topdirs)} main directories [{release}]')
             extract(topdirs, release)
     else:
         # paths given: testing mode, parse those repos only
-        # NOTE: release is random, not latest
-        for release in [releases[-1]]:
+        for release in releases:
             print(f'{release}:')
             git_checkout(release)
             topdirs = paths
-            print(f'- {len(topdirs)} main directories')
+            print(f'- {len(topdirs)} main directories [{release}]')
             extract(topdirs, release)
 
     with Session(engine) as session:

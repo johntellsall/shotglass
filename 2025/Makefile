@@ -96,15 +96,15 @@ test-cov:
 	coverage run -m pytest *.py
 	coverage report -m
 
-extract2:
+extract2: ## Extract from many packages, many releases
 	-$(RM) database.db
 	venv/bin/python3 -m main extract2
 
-test-extract2:
+test-extract2:  ## Extract fast: two packages
 	-$(RM) database.db
 	venv/bin/python3 -m main extract2 aports/main/bash aports/main/perl
 	make summary.show
-	
+
 table.html:
 	venv/bin/python3 -m main table > $@
 
