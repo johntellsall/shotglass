@@ -99,6 +99,8 @@ test-cov:
 extract2: ## Extract from many packages, many releases
 	-$(RM) database.db
 	venv/bin/python3 -m main extract2
+	make summary.show
+
 
 test-extract2:  ## Extract fast: two packages
 	-$(RM) database.db

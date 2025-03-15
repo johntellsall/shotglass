@@ -43,6 +43,7 @@ def extract(paths, release, verbose=False):
     - single version of Alpine in "release"
     """
     engine = get_engine()
+    limit = False
 
     if 0:
         db_delete_all(engine) # FIXME:
@@ -51,7 +52,7 @@ def extract(paths, release, verbose=False):
 
     with Session(engine) as session:
         for num,topdir in enumerate(paths):
-            if num > 10:
+            if limit and num > 10:
                 break
             dirname = Path(topdir).name
             if (verbose and num % 10 == 1):
