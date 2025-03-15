@@ -4,7 +4,6 @@
 # FIXME: tarballs, not Git repos with history
 
 from pathlib import Path
-import re
 import subprocess
 import sys
 

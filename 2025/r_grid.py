@@ -1,5 +1,4 @@
 from collections import defaultdict
-from pprint import pprint
 import matplotlib.pyplot as plt
 import numpy as np
 from lib import equery

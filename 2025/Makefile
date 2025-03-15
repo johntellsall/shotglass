@@ -82,7 +82,10 @@ stats-py-count:
 lint:
 	ruff check --output-format=concise .
 
-fix-ruff:
+lint-diff:
+	ruff check --output-format=concise --diff .
+
+lint-fix:
 	ruff check --output-format=concise --fix .
 
 popcon2:

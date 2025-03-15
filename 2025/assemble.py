@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 import sys
-from textwrap import fill
 
 import rpack
 from PIL import Image, ImageDraw, ImageFont

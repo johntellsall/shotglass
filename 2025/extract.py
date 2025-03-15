@@ -1,6 +1,4 @@
 from pathlib import Path
-import subprocess
-import sys
 from sqlmodel import select, delete, func, Session, SQLModel
 from model import DebianPopContest, SGAlpinePackage, SGGitHubRelease
 import parse

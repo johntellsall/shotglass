@@ -5,7 +5,7 @@ import re
 import matplotlib.pyplot as plt
 import numpy as np
 
-from lib import equery, equery1
+from lib import equery
 
 res = equery('select pkgname from sgalpinepackage')
 packages = [row[0] for row in res]

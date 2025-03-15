@@ -1,4 +1,3 @@
-from pathlib import Path
 from sqlmodel import select, Session
 from model import SGAlpinePackage
 import parse
