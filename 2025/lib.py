@@ -7,6 +7,7 @@ from sqlmodel import Session, create_engine, text
 DEBUG = 'DEBUG' in os.environ
 
 
+# TODO: support "?" args
 def equery(arg, engine=None):
     if engine is None:
         engine = get_engine()

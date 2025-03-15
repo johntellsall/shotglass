@@ -16,9 +16,12 @@ def cmp_version(verstring):
 res = equery('select distinct(alpine_release) from sgalpinepackage')
 res = [row[0] for row in res]
 res.sort(key=cmp_version)
-assert 0, res
+latest_version = res[-1]
+print(f'latest version: {latest_version}')
 
-res = equery('select pkgname from sgalpinepackage')
+res = equery(
+f"select pkgname from sgalpinepackage where alpine_release = '{latest_version}'"
+)
 packages = [row[0] for row in res]
 
 dull_pat = re.compile(r'(acf-|apache-mod-|aspell-|clang[0-9]|freeswitch-|font-|lua[0-9]|lua-|perl-|py3-|ruby-)')
@@ -36,7 +39,7 @@ ingredients = ['dull', 'interesting']
 
 def wedge_label(pct, allvals):
     absolute = int(np.round(pct/100.*np.sum(allvals)))
-    return f"{pct:.1f}%\n({absolute:d} g)"
+    return f"{pct:.1f}%\n{absolute:d}"
 
 
 wedges, texts, autotexts = ax.pie(data, autopct=lambda pct: wedge_label(pct, data),
@@ -55,8 +58,6 @@ imgpath = Path(__file__).with_suffix('.png')
 plt.savefig(imgpath)
 print(f'{imgpath}: saved')
 
-# from matplotlib import image
-# preview = image.imread(imgpath)
 
 # CREATE TABLE sgalpinepackage (
 #         id INTEGER NOT NULL, 
