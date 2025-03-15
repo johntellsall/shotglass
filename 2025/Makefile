@@ -181,3 +181,8 @@ nuke-virtualenv:
 
 run-model:
 	venv/bin/python3 -m model
+
+# enable image preview
+# - URL like "http://localhost:8000/apie.png"
+start-preview-server:
+	venv/bin/python3 -m http.server --directory .

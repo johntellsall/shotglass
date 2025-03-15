@@ -4,8 +4,19 @@
 import re
 import matplotlib.pyplot as plt
 import numpy as np
+from distutils.version import StrictVersion
+from pathlib import Path
 
 from lib import equery
+
+def cmp_version(verstring):
+    verstring = verstring.split('-')[0]
+    return StrictVersion(verstring)
+
+res = equery('select distinct(alpine_release) from sgalpinepackage')
+res = [row[0] for row in res]
+res.sort(key=cmp_version)
+assert 0, res
 
 res = equery('select pkgname from sgalpinepackage')
 packages = [row[0] for row in res]
@@ -33,14 +44,13 @@ wedges, texts, autotexts = ax.pie(data, autopct=lambda pct: wedge_label(pct, dat
 
 ax.legend(wedges, ingredients,
           title="Package Classes",
-          loc="center left",
+          loc="center",
           bbox_to_anchor=(1, 0, 0.5, 1))
 
 plt.setp(autotexts, size=8, weight="bold")
 
 ax.set_title("Alpine Packages")
 
-from pathlib import Path
 imgpath = Path(__file__).with_suffix('.png')
 plt.savefig(imgpath)
 print(f'{imgpath}: saved')
