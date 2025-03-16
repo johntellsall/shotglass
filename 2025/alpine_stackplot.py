@@ -9,16 +9,10 @@ import lib
 
 
 plt.style.use('_mpl-gallery')
-
-releases = lib.equery_col('select distinct(alpine_release) from sgalpinepackage')
-releases.sort(key=lib.cmp_version)
-
-
-# res = equery(
-# f"select pkgname from sgalpinepackage where alpine_release = '{latest_version}'"
-# )
-# packages = [row[0] for row in res]
-
+def query_releases():
+       releases = lib.equery_col('select distinct(alpine_release) from sgalpinepackage')
+       releases.sort(key=lib.cmp_version)
+       return releases
 
 def count_fun_packages(packages):
        dull_pat = re.compile(r'(acf-|apache-mod-|aspell-|clang[0-9]|freeswitch-|font-|lua[0-9]|lua-|perl-|py3-|ruby-)')
@@ -28,14 +22,24 @@ def count_fun_packages(packages):
               'interesting': len(packages) - count_dull}
        return count
 
-release_stats = []
-for release in releases:
-       packages = lib.equery_col(
-              f"select pkgname from sgalpinepackage where alpine_release = '{release}'"
-       )
-       count = count_fun_packages(packages)
-       row = (release, count['interesting'], count['dull'])
-       release_stats.append(row)
+def query_package_stats():
+       release_stats = []
+       for release in releases:
+              packages = lib.equery_col(
+                     f"select pkgname from sgalpinepackage where alpine_release = '{release}'"
+              )
+              count = count_fun_packages(packages)
+              row = (release, count['interesting'], count['dull'])
+              release_stats.append(row)
+       return release_stats
+
+# res = equery(
+# f"select pkgname from sgalpinepackage where alpine_release = '{latest_version}'"
+# )
+# packages = [row[0] for row in res]
+
+releases = query_releases()
+release_stats = query_package_stats()
 
 x = releases
 dull = [row[1] for row in release_stats]
@@ -45,7 +49,7 @@ y = np.vstack([dull, interesting])
 # plot
 fig, ax = plt.subplots()
 
-ax.set_title("Alpine Fun/Dull Packages")
+ax.set_title("Alpine Fun/Dull Packages 1422")
 
 ax.stackplot(x, y)
 ax.legend(loc='upper right', labels=['dull', 'interesting'])
