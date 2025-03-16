@@ -7,7 +7,7 @@ import numpy as np
 from distutils.version import StrictVersion
 from pathlib import Path
 
-from lib import equery
+from lib import equery, savefig
 
 def cmp_version(verstring):
     verstring = verstring.split('-')[0]
@@ -54,9 +54,7 @@ plt.setp(autotexts, size=8, weight="bold")
 
 ax.set_title("Alpine Packages")
 
-imgpath = Path(__file__).with_suffix('.png')
-plt.savefig(imgpath)
-print(f'{imgpath}: saved')
+savefig(plt, __file__)
 
 
 # CREATE TABLE sgalpinepackage (

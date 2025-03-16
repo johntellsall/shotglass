@@ -1,3 +1,4 @@
+from distutils.version import StrictVersion
 import os
 from pathlib import Path
 import re
@@ -5,6 +6,11 @@ import subprocess
 from sqlmodel import Session, create_engine, text
 
 DEBUG = 'DEBUG' in os.environ
+
+
+def cmp_version(verstring):
+    verstring = verstring.split('-')[0]
+    return StrictVersion(verstring)
 
 
 # TODO: support "?" args
@@ -34,6 +40,11 @@ def equery(arg, engine=None):
 def equery1(*args, **kwargs):
     res = equery(*args, **kwargs)
     return res[0][0]
+
+def equery_col(*args, **kwargs):
+    "return first column of data"
+    res = equery(*args, **kwargs)
+    return [row[0] for row in res]
 
 
 def format_html_row(row):
@@ -76,3 +87,26 @@ def git_list_branches():
         return releases
     return releases
 
+
+def savefig(plt, myfile):
+    imgpath = Path(myfile).with_suffix('.png')
+    plt.savefig(imgpath)
+
+    pagepath = imgpath.with_suffix('.html')
+    title = Path(myfile).name
+    imagename = imgpath.name
+    with open(pagepath, 'w') as f:
+        f.write(PAGE.format(title=title, imagename=imagename))
+    return dict(imgpath=imgpath, pagepath=pagepath)
+
+PAGE = '''
+<html>
+<head>
+    <title>{title}</title>
+    <meta http-equiv="refresh" content="5" />
+</head>
+<body>
+    <img src="{imagename}">
+</body>
+</html>
+'''
