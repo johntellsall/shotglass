@@ -1,5 +1,6 @@
 from distutils.version import StrictVersion
 import os
+import random
 from pathlib import Path
 import re
 import subprocess
@@ -24,8 +25,8 @@ def equery(arg, engine=None):
         # get SQL from file
         query = Path(arg).read_text()
         # strip header
-        # FIXME: support lowercase
-        select_index = query.index("SELECT ")
+        # TODO: strip footer
+        select_index = query.upper().index("SELECT ")
         if select_index >= 0:
             query = query[select_index:]
         else:
@@ -95,6 +96,8 @@ def savefig(plt, myfile):
     pagepath = imgpath.with_suffix('.html')
     title = Path(myfile).name
     imagename = imgpath.name
+    # NOTE: add cache buster
+    imagename = f"{imagename}?{random.random()}"
     with open(pagepath, 'w') as f:
         f.write(PAGE.format(title=title, imagename=imagename))
     return dict(imgpath=imgpath, pagepath=pagepath)

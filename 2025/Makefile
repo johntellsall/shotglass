@@ -1,7 +1,7 @@
 all:
 
 run:
-	python3 apie.py
+	python3 alpine_stackplot.py
 	
 proj-stats: proj_stats.py
 	python3 proj_stats.py ../SOURCE/linux
