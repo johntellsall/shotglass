@@ -1,3 +1,6 @@
+# extract.py -- Extract/Transform/Load for Shotglass
+# - mostly Load
+
 from pathlib import Path
 from sqlmodel import select, delete, func, Session, SQLModel
 from model import DebianPopContest, SGAlpinePackage, SGGitHubRelease
@@ -66,7 +69,7 @@ def extract(paths, release, limit=False, verbose=False):
             print()
 
 
-def extract2(paths):
+def extract2(paths, limit=False):
     """
     import all Alpine packages from all branches/releases
     
@@ -76,11 +79,11 @@ def extract2(paths):
     """
     engine = get_engine()
     releases = git_list_branches()
-    limit = True
 
     # NOTE: release is random, not latest
     if limit:
         releases = releases[-3:]
+        print('extract2: Limiting to last 3 releases')
 
     print(f'Found {len(releases)} releases', end=' ')
     if paths:

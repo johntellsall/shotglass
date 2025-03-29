@@ -42,9 +42,6 @@ assemble-all:
 	python3 assemble.py *-[0-9]*.png
 	imgcat overview.png
 
-# run:
-# imgcat --width=120 overview.png
-
 
 top:
 	rg -v '(lib|#)' ../dist/by_vote | rg -v '(debian|debconf|dpkg)' | head
@@ -56,9 +53,6 @@ list-source-sizes:
 run-source:
 	python3 get_source.py -C ../SOURCE/ hello
 	ls -d ../SOURCE/hello*
-# python3 get_source.py hello
-
-# python3 srcgrid.py '../SOURCE/dnsmasq'
 
 # redis: 112 source files	140k lines
 stats:
