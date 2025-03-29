@@ -69,8 +69,7 @@ pkgnames = [info[1] for info in res]
 
 x = [item[2] for item in res]
 y = [get_size(package_size_dict, name) for name in pkgnames]
-assert 0, y
-# y = 4 + np.random.normal(0, 2, len(x))
+
 # size and color:
 sizes = np.random.uniform(15, 80, len(x))
 colors = np.random.uniform(15, 80, len(x))
@@ -81,8 +80,8 @@ fig, ax = plt.subplots()
 
 ax.scatter(x, y, s=sizes, c=colors, vmin=0, vmax=100)
 
-ax.set(xlim=(0, 100), xticks=np.arange(1, 8),
-       ylim=(0, 10), yticks=np.arange(1, 8))
+# ax.set(xlim=(0, 100), xticks=np.arange(1, 8),
+#        ylim=(0, 10), yticks=np.arange(1, 8))
 
 imgpath = __file__.replace('.py', '.png')
 plt.savefig(imgpath)
