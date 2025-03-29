@@ -91,7 +91,7 @@ x = [item[2] for item in res]
 y = [get_size(size_db, release=parse_release(item[0]), pkgname=item[1]) for item in res]
 
 # size and color:
-sizes = np.random.uniform(15, 80, len(x))
+# sizes = np.random.uniform(15, 80, len(x))
 
 # NOTE: janky: version 3.12 should be after 3.9
 colors = [float(parse_release(info[0])) for info in res]
@@ -102,7 +102,8 @@ if len(pkgnames) < 20:
 # plot
 fig, ax = plt.subplots()
 
-ax.scatter(x, y, s=sizes, c=colors, vmin=3.0, vmax=4.0)
+# ax.scatter(x, y, s=sizes, c=colors, vmin=3.7, vmax=4.0)
+ax.scatter(x, y, c=colors, vmin=3.7, vmax=4.0)
 
 # ax.set(xlim=(0, 100), xticks=np.arange(1, 8),
 #        ylim=(0, 10), yticks=np.arange(1, 8))
