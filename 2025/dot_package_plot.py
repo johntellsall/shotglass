@@ -85,10 +85,15 @@ def update_size_cache(releases):
 releases = set(parse_release(info[0]) for info in res)
 size_db = update_size_cache(releases)
 
-pkgnames = [info[1] for info in res]
+# pkgnames = [info[1] for info in res]
 
 x = [item[2] for item in res]
 y = [get_size(size_db, release=parse_release(item[0]), pkgname=item[1]) for item in res]
+
+def rel_edge(release):
+    edge_conf = {'3.9': 'black', None: 'none'}
+    return edge_conf.get(release, edge_conf[None])
+edges = [rel_edge(parse_release(info[0])) for info in res]
 
 # size and color:
 # sizes = np.random.uniform(15, 80, len(x))
@@ -96,14 +101,14 @@ y = [get_size(size_db, release=parse_release(item[0]), pkgname=item[1]) for item
 # NOTE: janky: version 3.12 should be after 3.9
 colors = [float(parse_release(info[0])) for info in res]
 
-if len(pkgnames) < 20:
-    pprint(dict(x=x, y=y, sizes=sizes, colors=colors))
+# if len(pkgnames) < 20:
+#     pprint(dict(x=x, y=y, colors=colors))
 
 # plot
 fig, ax = plt.subplots()
 
 # ax.scatter(x, y, s=sizes, c=colors, vmin=3.7, vmax=4.0)
-ax.scatter(x, y, c=colors, vmin=3.7, vmax=4.0)
+ax.scatter(x, y, c=colors, edgecolor=edges)
 
 # ax.set(xlim=(0, 100), xticks=np.arange(1, 8),
 #        ylim=(0, 10), yticks=np.arange(1, 8))
