@@ -1,3 +1,4 @@
+from collections import namedtuple
 from distutils.version import StrictVersion
 import os
 import random
@@ -12,6 +13,38 @@ DEBUG = 'DEBUG' in os.environ
 def cmp_version(verstring):
     verstring = verstring.split('-')[0]
     return StrictVersion(verstring)
+
+def dict_factory(cursor, row):
+    fields = [column[0] for column in cursor.description]
+    return {key: value for key, value in zip(fields, row)}
+
+def namedtuple_factory(cursor, row):
+    fields = [column[0] for column in cursor.description]
+    cls = namedtuple("Row", fields)
+    return cls._make(row)
+
+# TODO: support "?" args
+def OLDequery(arg, engine=None):
+    if engine is None:
+        engine = get_engine()
+
+    if 'SELECT' in arg or 'select' in arg:
+        query = arg
+    else:
+        # get SQL from file
+        query = Path(arg).read_text()
+        # strip header
+        # TODO: strip footer
+        select_index = query.upper().index("SELECT ")
+        if select_index >= 0:
+            query = query[select_index:]
+        else:
+            raise ValueError("No SELECT in query file")
+
+    query = text(query)
+
+    with Session(engine) as session:
+        return session.exec(query).all()
 
 
 # TODO: support "?" args
@@ -35,7 +68,12 @@ def equery(arg, engine=None):
     query = text(query)
 
     with Session(engine) as session:
-        return session.exec(query).all()
+        result = session.exec(query).all()
+    
+    # FIXME: use formal method
+    # if asdict:
+    #     return [row._asdict() for row in result]
+    return result
 
 
 def equery1(*args, **kwargs):

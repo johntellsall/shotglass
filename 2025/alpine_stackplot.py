@@ -57,6 +57,7 @@ def plot_simple():
 
 
 def query_common_packages():
+    "list packages that appear in all releases"
     return lib.equery_col('''
 select pkgname from sgalpinepackage
 group by pkgname
@@ -81,10 +82,9 @@ group by alpine_release;
     ax.set_title("Alpine Common Packages")
     ax.set_ylabel('Total Lines')
     ax.set_xlabel('Alpine Release')
-    
+
     page_path = lib.savefig(plt, 'a-common')
     print(f'{page_path} saved')
-
 
 
 if __name__=='__main__':
