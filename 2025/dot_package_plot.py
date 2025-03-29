@@ -11,13 +11,28 @@
 #    - https://dl-cdn.alpinelinux.org/alpine/
 
 from pprint import pprint
+import re
 import matplotlib.pyplot as plt
 import numpy as np
+import requests
 
 from lib import equery, savefig
 
 
+def query_package_sizes():
+    # "<a href="a52dec-dev-0.7.4-r7.apk">a52dec-dev-0.7.4-r7.apk</a>    20-Dec-2018 10:39     23K\r\n"
+    package_pat = re.compile(r'<a href="(?P<name>.*?)-(?P<version>.*?)-(?P<release>.*?).apk">.*?</a>\s+(?P<datestr>\S+ \S+)\s+(?P<size>\d+[A-Z]?)')
+    url = 'https://dl-cdn.alpinelinux.org/alpine/v3.9/main/x86_64/'
+    page = requests.get(url)
+    packages = package_pat.finditer(page.text)
+    package_dict = {m.group('name'): m.groupdict() for m in packages}
+    return package_dict
+    
+
+
 plt.style.use('_mpl-gallery')
+
+package_size_dict = query_package_sizes()
 
 res = equery('''
 select alpine_release, pkgname, sg_file_num_lines
@@ -25,9 +40,25 @@ select alpine_release, pkgname, sg_file_num_lines
              limit 10
 ''')
 
-x = [item[2] for item in res]
+def calc_size(size_str):
+    "handle suffixes like K, M, G"
+    multipliers = {'K':1024, 'M':1024**2, 'G':1024**3}
+    if mult := multipliers.get(size_str[-1]):
+        return int(size_str[:-1]) * mult
+    return int(size_str)
 
-y = 4 + np.random.normal(0, 2, len(x))
+def get_size(pkgname):
+    if info := package_size_dict.get(pkgname):
+        return calc_size(info['size'])
+    return 0
+
+pkgnames = [info[1] for info in res]
+
+x = [item[2] for item in res]
+y = [get_size(name) for name in pkgnames]
+# FIXME: convert size to int
+
+# y = 4 + np.random.normal(0, 2, len(x))
 # size and color:
 sizes = np.random.uniform(15, 80, len(x))
 colors = np.random.uniform(15, 80, len(x))
