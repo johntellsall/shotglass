@@ -10,6 +10,14 @@ select count(*) from sgalpinepackage;
 select "Package Count (each relesae)";
 select alpine_release, count(*) from sgalpinepackage group by alpine_release order by 1;
 
+select 'Min-Max of Apkbuild sizes';
+select min(sg_file_num_lines), max(sg_file_num_lines) from sgalpinepackage;
+
+select '- largest';
+select pkgname, sg_file_num_lines from sgalpinepackage
+where sg_file_num_lines > 500
+and pkgname not like '%$%';
+
 -- select 'All data';
 -- select alpine_release, pkgname from sgalpinepackage;
 

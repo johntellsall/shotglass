@@ -117,7 +117,7 @@ else:
 # ax.set(xlim=(0, 100), xticks=np.arange(1, 8),
 #        ylim=(0, 10), yticks=np.arange(1, 8))
 
-ax.set_xlabel('Package complexity')
+ax.set_xlabel('Apkbuild complexity')
 ax.set_ylabel('Package size')
 ax.set_title('Alpine packages over time')
 ax.legend()
