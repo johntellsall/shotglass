@@ -61,7 +61,7 @@ with shelve.open(shelf_filename) as shelf:
 res = equery('''
 select alpine_release, pkgname, sg_file_num_lines
              from sgalpinepackage
-             where alpine_release = '3.9-stable'
+             where substr(pkgname, 1, 1) between 'a' and 'm'
              limit 10
 ''')
 
@@ -72,13 +72,19 @@ y = [get_size(package_size_dict, name) for name in pkgnames]
 
 # size and color:
 sizes = np.random.uniform(15, 80, len(x))
-colors = np.random.uniform(15, 80, len(x))
-pprint(dict(x=x, y=y, sizes=sizes, colors=colors))
+def parse_version(verstring):
+    verstring = verstring.split('-')[0]
+    return float(verstring)
+# colors = np.random.uniform(15, 80, len(x))
+colors = [parse_version(info[0]) for info in res]
+
+if 1: # len(pkgnames) < 20:
+    pprint(dict(x=x, y=y, sizes=sizes, colors=colors))
 
 # plot
 fig, ax = plt.subplots()
 
-ax.scatter(x, y, s=sizes, c=colors, vmin=0, vmax=100)
+ax.scatter(x, y, s=sizes, c=colors, vmin=3.0, vmax=4.0)
 
 # ax.set(xlim=(0, 100), xticks=np.arange(1, 8),
 #        ylim=(0, 10), yticks=np.arange(1, 8))
