@@ -1,4 +1,23 @@
+IMGCAT := imgcat-iterm2 --legacy
+
 all:
+
+%.run: %.py
+	python3 $<
+
+# %.show: %.png
+# 	$(IMGCAT) --width 60% $<
+
+%.show: %.py
+	python3 $<
+	$(IMGCAT) --width 40% $(<:.py=.png)
+
+%.show: %.sql
+	sqlite3 database.db < $<
+	
+%.show4: %.sql
+	sqlite3 database.db < $< \
+	| pr --width=100 --omit-header -4
 
 run:
 	python3 alpine_stackplot.py
@@ -64,10 +83,6 @@ srcgrid2:
 testx:  # Run tests, stop after first failure
 	pytest -sv --maxfail=1
 
-%.show: %.py
-	python3  $<
-	imgcat --width=50 $(<:.py=.png)
-
 run-scatter:
 	python3 -m main scatter
 	imgcat --width=50 r_scatter.png
@@ -112,13 +127,6 @@ test-extract2:  ## Extract fast: two packages
 
 table.html:
 	venv/bin/python3 -m main table > $@
-
-%.show: %.sql
-	sqlite3 database.db < $<
-	
-%.show4: %.sql
-	sqlite3 database.db < $< \
-	| pr --width=100 --omit-header -4
 
 import-full:
 	-$(RM) database.db
