@@ -17,6 +17,7 @@ import numpy as np
 import requests
 
 from lib import equery, savefig
+import shelve
 
 
 def query_package_sizes():
@@ -46,7 +47,16 @@ def get_size(sizedb, pkgname):
 
 plt.style.use('_mpl-gallery')
 
-package_size_dict = query_package_sizes()
+shelf_filename = "package_size.shelve"
+
+with shelve.open(shelf_filename) as shelf:
+    if "package_size_dict" in shelf:
+        package_size_dict = shelf["package_size_dict"]
+    else:
+        print("Fetching package sizes...")
+        package_size_dict = query_package_sizes()
+        print("{} packages fetched".format(len(package_size_dict)))
+        shelf["package_size_dict"] = package_size_dict
 
 res = equery('''
 select alpine_release, pkgname, sg_file_num_lines
