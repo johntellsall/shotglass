@@ -1,4 +1,7 @@
 all:
+
+get-source:
+	git -C SOURCE clone https://github.com/sqlalchemy/sqlalchemy.git
 	
 setup:
 	python3 -m venv .venv

@@ -19,9 +19,9 @@ SETUP_SQL = [
         )""",
     """create table if not exists symbol (
         name, path, line_start, line_end, kind,
-        file_id int,
+        -- file_id int, -- FIXME: reconcile this
         project_id int,
-        foreign key (file_id) references file (id),
+        -- foreign key (file_id) references file (id),
         foreign key (project_id) references project (id)
         )""",
 ]

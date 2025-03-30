@@ -96,7 +96,8 @@ def db_add_files(con, path, project_id, release, only_interesting):
 
 class IterFixedFields:
     """
-    ensure dict-like items have all required fields
+    translate between Ctags verbose output and our modest table.
+    Ensure dict-like items have all required fields
     - ex: "end" is not always provided by Ctags
     """
 
@@ -118,9 +119,9 @@ class IterFixedFields:
 
 
 # TODO: how do we assoc release with symbol? Needed?
-def db_add_symbols(con, project_path, filehash, path):
+def db_add_symbols_from_hash(con, project_path, filehash, path):
     """
-    Parse symbols from file, add to database
+    Given a hash, extract file, parse symbols from file, add to database
     """
     if not path.endswith(".py"):  # TODO:
         click.echo(f"{path=}: unsupported language")
@@ -155,6 +156,38 @@ def db_add_symbols(con, project_path, filehash, path):
     con.executemany(insert_sym, IterFixedFields(items))
 
 
+def db_add_symbols_from_path(con, project_path, relpath):
+    """
+    Given a single file path, parse symbols from file, add to database
+    """
+    if not relpath.endswith(".py"):  # TODO:
+        click.echo(f"{relpath=}: unsupported language")
+        return
+
+    # don't warn if __init__ or __manifest__ files are empty
+    # - symbols always added, this just suppresses warning
+    def is_dull(path):
+        return path.endswith("__.py")
+
+    srcpath = Path(project_path) / relpath
+    # parse symbols from source file
+    items = list(run.run_ctags(srcpath))
+    if not items:
+        if not is_dull(relpath):
+            click.secho(f"- {relpath=}: no symbols")
+        return
+
+    # insert symbols into database
+    insert_sym = f"""
+    insert into symbol (
+        name, path, line_start, line_end, kind
+    ) values (
+        :name, '{relpath}', :line, :end, :kind
+    )
+    """
+    con.executemany(insert_sym, IterFixedFields(items))
+
+
 def do_add_symbols(con, project_path):
     """
     list files from database (one project only)
@@ -180,7 +213,10 @@ def do_add_symbols(con, project_path):
             batch = min(batch * 2, 50)
 
         # TODO: more work here
-        db_add_symbols(con, project_path, filehash=filehash, path=path)
+        if 0:
+            db_add_symbols(con, project_path, filehash=filehash, path=path)
+        else:
+            db_add_symbols_from_path(con, project_path, relpath=path)
     con.commit()
 
 

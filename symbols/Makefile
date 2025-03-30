@@ -21,9 +21,10 @@ demo-plot0:
 	python3 plot_sunburst3.py
 
 demo-plot-flask:
-	./main.py add-project --reset-db --all $(SAMPLE))
+	./main.py add-project --reset-db --all $(SAMPLE)
 	make summary-symbols.show
 	python3 plot_sunburst3.py
+
 
 build-sqla:
 	./main.py add-project --reset-db ../SOURCE/sqlalchemy
@@ -32,10 +33,10 @@ build-sqla:
 demo-plot:
 	python3 plot_sunburst3.py
 
-# NAME			#FILES	#PYTHON	LOC	DESCRIPTION
-# flask			246		80		17K		Python library		
+# NAME			#FILES	#PYTHON	LOC	DESCRIPTION					FILES-SYM		LOAD-gato
+# flask			246		80		17K		Python library			24	653			12 sec
 # zulip		 	6421	1468	282K	Python chat application
-# sqlalchemy	810		589		463K	Python library
+# sqlalchemy	810		589		463K	Python library			254 18K		    286 sec
 # odoo			36540	5425	682K	Python office suite
 
 stats-some:  ## show stats for few representative projects
@@ -45,7 +46,7 @@ stats-some:  ## show stats for few representative projects
 build-tiny:
 	./build.sh flask
 build-medium:
-	./build.sh zulip
+	./build.sh sqlalchemy
 build-huge:
 	./build.sh odoo
 
