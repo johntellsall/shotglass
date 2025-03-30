@@ -82,31 +82,38 @@ select alpine_release, pkgname, sg_file_num_lines
     'fast': '''
 select alpine_release, pkgname, sg_file_num_lines
     from sgalpinepackage
-    where substr(pkgname, 1, 1) between 'a' and 'g'
+    where substr(pkgname, 1, 1) between 'a' and 'd'
     limit 1000
 '''}
-res = equery(query_db['fast'])
+pkgdata_rows = equery(query_db['fast'])
 
+# Create a structured numpy array with columns: release, pkgname, numlines
+dtype = [('release', 'U10'), ('pkgname', 'U100'), ('numlines', 'i4')]
+pkgdata = np.array([(parse_release(info[0]), info[1], info[2]) for info in pkgdata_rows], dtype=dtype)
 
-releases = set(parse_release(info[0]) for info in res)
+releases = set(pkgdata['release'])
 releases = sorted(releases, key=Version)
+latest_rel = releases[-1]
 
 size_db = update_size_cache(releases)
 
-x = [item[2] for item in res]
-y = [get_size(size_db, release=parse_release(item[0]), pkgname=item[1]) for item in res]
-
 # NOTE: janky: version 3.12 should be after 3.9
-colors = [float(parse_release(info[0])) for info in res]
+colors = [float(parse_release(info[0])) for info in pkgdata_rows]
 
 
 # plot
 fig, ax = plt.subplots()
 
 for rel in releases:
-    rel_x = [x[i] for i in range(len(x)) if parse_release(res[i][0]) == rel]
-    rel_y = [y[i] for i in range(len(y)) if parse_release(res[i][0]) == rel]
-    ax.scatter(rel_x, rel_y, label=rel)
+    # rel_x = [x[i] for i in range(len(x)) if parse_release(pkgdata_rows[i][0]) == rel]
+    # rel_y = [y[i] for i in range(len(y)) if parse_release(pkgdata_rows[i][0]) == rel]
+    rel_x = pkgdata['numlines'][pkgdata['release'] == rel]
+    rel_y = [get_size(size_db, release=rel, pkgname=pkg) for pkg in pkgdata['pkgname'][pkgdata['release'] == rel]]
+    
+    style = dict(alpha=0.5)
+    if rel == latest_rel:
+        style = dict(edgecolor='black')
+    ax.scatter(rel_x, rel_y, label=rel, **style)
 
 
 ax.set_xlabel('Apkbuild complexity')
