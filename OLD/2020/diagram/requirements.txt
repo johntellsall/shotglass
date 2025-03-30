@@ -1,2 +1,0 @@
-# OBSOLETE: gitpython
-ipdb

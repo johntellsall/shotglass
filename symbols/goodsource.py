@@ -26,6 +26,8 @@ def sort_versions(mylist):
     try:
         mylist.sort(key=pv.parse)
     except pv.InvalidVersion as error:
+        if mylist == ['']:
+            raise ValueError("Empty version list")
         logging.warning("Invalid version -- switching to hacky sort: %s", error)
         mylist.sort(key=parse_hacky)
 

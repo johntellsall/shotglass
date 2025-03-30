@@ -153,9 +153,9 @@ run1:
 test:
 	pytest -sv
 
-get-debian-source:
+get-debian-source:  # download sample Debian source packages
 	python3 get_source.py --extract -C ../SOURCE/ \
-		dnsmasq hello libc6 zlib1g adduser redis-server
+		dnsmasq flask hello libc6 zlib1g adduser redis-server
 
 get-alpine:
 	git clone --depth=1 https://gitlab.alpinelinux.org/alpine/aports.git

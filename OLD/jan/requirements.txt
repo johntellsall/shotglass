@@ -1,7 +1,0 @@
-sqlite-utils
-click
-jupyter
-semver
-isort
-black[jupyter]
-pytest

@@ -196,6 +196,9 @@ def do_add_files(con, project_path, only_interesting=False):
 
     release_sql = f"select label from release where project_id={project_id}"
     releases = [label for (label,) in con.execute(release_sql)]
+    if releases == ['']:
+        click.secho(f"{project_name}: no releases, skipping project", fg="red")
+        return
     goodsource.sort_versions(releases)
 
     # FIXME: handle this better!
@@ -252,6 +255,7 @@ def raw_add_project(
 
     con = state.get_db(temporary=is_testing)
 
+    # FIXME: abort if raw directory w/o Git state
     db_add_project(con, project_path)
     con.commit()
 

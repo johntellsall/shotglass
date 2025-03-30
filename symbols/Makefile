@@ -1,8 +1,6 @@
-# export PYTHONASYNCIODEBUG=1
-# export PYTHONBREAKPOINT=ipdb.set_trace
-
+# SAMPLE := ../SOURCE/Flask-2.2.2
 SAMPLE := ../SOURCE/flask
-# PY_SOURCE := $(shell git ls-files './*.py')
+
 PY_SOURCE := $(shell ls -1 *.py)
 DBPATH := main.db
 
@@ -14,16 +12,16 @@ show-recent: ## run most recent SQL report
 	; make $${RECENT}
 
 demo:
-	./main.py add-project --reset-db ../SOURCE/flask
+	./main.py add-project --reset-db $(SAMPLE)
 	make demo.show
 
 demo-plot0:
-	./main.py add-project --reset-db ../SOURCE/flask
+	./main.py add-project --reset-db $(SAMPLE)
 	make summary-symbols.show
 	python3 plot_sunburst3.py
 
 demo-plot-flask:
-	./main.py add-project --reset-db --all ../SOURCE/flask
+	./main.py add-project --reset-db --all $(SAMPLE))
 	make summary-symbols.show
 	python3 plot_sunburst3.py
 

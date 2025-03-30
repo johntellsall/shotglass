@@ -2,6 +2,7 @@
 # FIXME: set slice width based on number of symbols
 
 from pathlib import Path
+import sys
 
 import pandas as pd
 import plotly.express as px
@@ -12,6 +13,8 @@ db = state.get_db()
 
 # TODO: get path from linked file
 paths_df = pd.read_sql_query("select distinct(path) from symbol", db)
+if paths_df.empty:
+    sys.exit("symbol: No paths found in database")
 
 # remove boring paths
 # FIXME: merge with goodsource.py?
