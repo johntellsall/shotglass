@@ -6,6 +6,8 @@ Shotglass: info about codebases over time
 
 import logging
 import pprint
+import time
+from itertools import batched # Python 3.12+
 from pathlib import Path, PurePath
 
 import click
@@ -178,6 +180,7 @@ def db_add_symbols_from_path(con, project_path, relpath):
         return
 
     # insert symbols into database
+    # FIXME: use db_insert_symbols
     insert_sym = f"""
     insert into symbol (
         name, path, line_start, line_end, kind
@@ -188,7 +191,47 @@ def db_add_symbols_from_path(con, project_path, relpath):
     con.executemany(insert_sym, IterFixedFields(items))
 
 
+def db_insert_symbols(con, project_id, relpath_symbols):
+    """
+    insert symbols into database
+    """
+    for relpath, items in relpath_symbols.items():
+        insert_sym = f"""
+        insert into symbol (
+            project_id, name, path, line_start, line_end, kind
+        ) values (
+            {project_id}, :name, '{relpath}', :line, :end, :kind
+        )
+        """
+        con.executemany(insert_sym, IterFixedFields(items))
+
+
+def query_project_source_paths(project_path):
+    project_path = Path(project_path)
+    return project_path.rglob("*.py") # FIXME:
+
+
+def query_project_symbols(project_path):
+    srcpaths = query_project_source_paths(project_path)
+    batch_size = 10
+
+    for batch in batched(query_project_source_paths(project_path), batch_size):
+        symbols = run.run_ctags(batch)
+        breakpoint()
+    return symbols
+
+
 def do_add_symbols(con, project_path):
+    project_id = db_get_project_id(con, project_path)
+    start_t = time.perf_counter()
+    symbols = query_project_symbols(project_path)
+    print(f"- query time: {time.perf_counter() - start_t:.2f} seconds")
+    db_insert_symbols(con, project_id, symbols)
+    con.commit()
+    print(f"Time taken: {time.perf_counter() - start_t:.2f} seconds")
+
+                  
+def OLD_do_add_symbols(con, project_path):
     """
     list files from database (one project only)
     - parse each file for symbols
@@ -303,11 +346,12 @@ def raw_add_project(
 
     con.commit()
 
+    # FIXME: needed?
     # per release -> add files to db
     do_add_files(con, project_path, only_interesting=only_interesting)
     con.commit()
 
-    # per file -> add symbols to db
+    # per project -> single release, add symbols to db
     do_add_symbols(con, project_path=project_path)
     con.commit()
 

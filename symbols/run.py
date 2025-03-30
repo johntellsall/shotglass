@@ -8,9 +8,11 @@ import subprocess
 CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()
 
 
-def run_ctags(path, verbose=False):
+def run_ctags(paths, verbose=False):
     "Ctags command output -- iter of dictionaries, one per symbol"
-    cmd = CTAGS_ARGS + [path]
+    if type(paths) == str:
+        paths = [paths]
+    cmd = CTAGS_ARGS + paths
     proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
     assert proc.returncode == 0
     if verbose:
