@@ -12,6 +12,8 @@
 
 from pprint import pprint
 import re
+from packaging.version import Version
+
 import matplotlib.pyplot as plt
 import numpy as np
 import requests
@@ -72,16 +74,23 @@ def update_size_cache(releases):
     return package_size_dict
 
 
-res = equery('''
+query_db = {
+    'full': '''
 select alpine_release, pkgname, sg_file_num_lines
-             from sgalpinepackage
-             -- where substr(pkgname, 1, 1) between 'a' and 'g'
-             -- limit 10
-''')
-
+    from sgalpinepackage
+''',
+    'fast': '''
+select alpine_release, pkgname, sg_file_num_lines
+    from sgalpinepackage
+    where substr(pkgname, 1, 1) between 'a' and 'g'
+    limit 1000
+'''}
+res = equery(query_db['fast'])
 
 
 releases = set(parse_release(info[0]) for info in res)
+releases = sorted(releases, key=Version)
+
 size_db = update_size_cache(releases)
 
 x = [item[2] for item in res]
