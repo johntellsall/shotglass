@@ -74,7 +74,13 @@ def update_size_cache(releases):
     return package_size_dict
 
 
-query_db = {
+CONFIG = {
+    'logscale': False,
+    'xmax': (0, 400),
+    'ymax': (0, 0.4e8),
+}
+
+QUERY_DB = {
     'full': '''
 select alpine_release, pkgname, sg_file_num_lines
     from sgalpinepackage
@@ -85,7 +91,8 @@ select alpine_release, pkgname, sg_file_num_lines
     where substr(pkgname, 1, 1) between 'a' and 'd'
     limit 1000
 '''}
-pkgdata_rows = equery(query_db['full'])
+
+pkgdata_rows = equery(QUERY_DB['full'])
 
 # Create a structured numpy array with columns: release, pkgname, numlines
 dtype = [('release', 'U10'), ('pkgname', 'U100'), ('numlines', 'i4')]
@@ -125,8 +132,13 @@ ax.set_ylabel('Package size')
 ax.set_title('Alpine packages over time')
 # ax.set_xlim(xmax=400)
 # ax.set_ylim(ymax=0.4e8)
-ax.set_xscale('log')
-ax.set_yscale('log')
+if CONFIG['logscale']:
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+else:
+    ax.set_xlim(CONFIG['xmax'])
+    ax.set_ylim(CONFIG['ymax'])
+
 ax.legend()
 ax.grid(True)
 
