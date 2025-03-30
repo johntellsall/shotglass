@@ -10,7 +10,8 @@ all:
 
 %.show: %.py
 	python3 $<
-	$(IMGCAT) --width 40% $(<:.py=.png)
+	$(IMGCAT) $(<:.py=.png)
+# $(IMGCAT) --width 40% $(<:.py=.png)
 
 %.show: %.sql
 	sqlite3 database.db < $<

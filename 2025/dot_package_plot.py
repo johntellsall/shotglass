@@ -85,7 +85,7 @@ select alpine_release, pkgname, sg_file_num_lines
     where substr(pkgname, 1, 1) between 'a' and 'd'
     limit 1000
 '''}
-pkgdata_rows = equery(query_db['fast'])
+pkgdata_rows = equery(query_db['full'])
 
 # Create a structured numpy array with columns: release, pkgname, numlines
 dtype = [('release', 'U10'), ('pkgname', 'U100'), ('numlines', 'i4')]
@@ -95,18 +95,22 @@ releases = set(pkgdata['release'])
 releases = sorted(releases, key=Version)
 latest_rel = releases[-1]
 
-size_db = update_size_cache(releases)
+# too many releases => simplify
+if len(releases) > 10:
+    temp_releases = [releases[0], releases[-1]]
+    keep = int(len(releases) / 8)
+    for i in range(1, len(releases) - 1, keep):
+        temp_releases.append(releases[i])
+    releases = sorted(temp_releases, key=Version)
+    print(f'Keeping {len(releases)} releases: {list(map(str, releases))}')
 
-# NOTE: janky: version 3.12 should be after 3.9
-colors = [float(parse_release(info[0])) for info in pkgdata_rows]
+size_db = update_size_cache(releases)
 
 
 # plot
 fig, ax = plt.subplots()
 
 for rel in releases:
-    # rel_x = [x[i] for i in range(len(x)) if parse_release(pkgdata_rows[i][0]) == rel]
-    # rel_y = [y[i] for i in range(len(y)) if parse_release(pkgdata_rows[i][0]) == rel]
     rel_x = pkgdata['numlines'][pkgdata['release'] == rel]
     rel_y = [get_size(size_db, release=rel, pkgname=pkg) for pkg in pkgdata['pkgname'][pkgdata['release'] == rel]]
     
