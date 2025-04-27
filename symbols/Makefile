@@ -1,5 +1,5 @@
-# SAMPLE := ../SOURCE/Flask-2.2.2
-SAMPLE := ../SOURCE/flask
+SAMPLE := ../SOURCE/Flask-2.2.2
+# SAMPLE := ../SOURCE/flask
 
 PY_SOURCE := $(shell ls -1 *.py)
 DBPATH := main.db
@@ -12,7 +12,7 @@ show-recent: ## run most recent SQL report
 	; make $${RECENT}
 
 demo:
-	./main.py add-project --reset-db $(SAMPLE)
+	uv run main.py add-project --reset-db $(SAMPLE)
 	make demo.show
 
 demo-plot0:
@@ -54,10 +54,10 @@ build-huge:
 	./build.sh odoo
 
 demo2b:
-	./main.py add-project --reset-db --all ../SOURCE/flask
+	uv run main.py add-project --reset-db --all ../SOURCE/flask
 	make summary
-	./main.py add-project --all ../SOURCE/pyramid
-	make summary
+# uv run main.py add-project --all ../SOURCE/pyramid
+# make summary
 
 summary: summary.csv
 
