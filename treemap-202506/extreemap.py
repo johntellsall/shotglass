@@ -45,7 +45,6 @@ squarify.plot(
    pad=True,
    ax=ax
 )
-# plt.show()
 
 # create a color palette
 cmap = load_cmap('Acadia')
@@ -70,7 +69,6 @@ squarify.plot(
    pad=True,
    ax=ax
 )
-# plt.show()
 
 # create a color palette
 cmap = load_cmap('Acadia')
@@ -116,7 +114,5 @@ if 0:
       ha='left'
    )
 
-# plt.show()
-# save the figure
 fig.savefig(PlotFile, bbox_inches='tight', dpi=300)
 print(f"Figure saved as {PlotFile}")
