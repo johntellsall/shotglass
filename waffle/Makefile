@@ -1,5 +1,7 @@
 all:
 
 run:
-	uv run main.py
+	uv run exwaffle.py
+	${IMGCAT} exwaffle.png
 	
+IMGCAT := imgcat-iterm2 --legacy 
