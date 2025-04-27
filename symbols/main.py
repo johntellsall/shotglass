@@ -50,7 +50,7 @@ def db_add_releases(con, project_obj):
     """
     tags = project_obj.get_tags()
     project_path = project_obj.path
-    if not tags:
+    if not tags: # XX or tasks == [""]:
         click.secho(f"{project_path}: no good tags, skipping project", fg="red")
         return
 
@@ -152,38 +152,6 @@ def do_add_symbols(con, project_path):
     db_insert_symbols(con, project_id, file_symbols)
     con.commit()
 
-                  
-def OLD_do_add_symbols(con, project_path):
-    """
-    list files from database (one project only)
-    - parse each file for symbols
-    - add symbols to database
-    """
-
-    # Per file: extract symbols
-    # TODO: restrict to interesting releases+files?
-    project_id = db_get_project_id(con, project_path)
-    project_name = Path(project_path).name
-
-    sql = f"select count(distinct release) from file where project_id={project_id}"
-    assert query1(con, sql=sql) == 1, "FIXME: handle multiple releases"
-
-    click.secho(f"{project_name}: adding symbols", fg="cyan")
-    sql = f"select path, hash, release from file where project_id={project_id}"
-    batch = 5
-
-    for num, (path, filehash, _release) in enumerate(con.execute(sql)):
-        if not num or (num + 1) % batch == 0:
-            click.secho(f"- {num+1:03d} {path=} {filehash=}")
-            batch = min(batch * 2, 50)
-
-        # TODO: more work here
-        if 0:
-            db_add_symbols(con, project_path, filehash=filehash, path=path)
-        else:
-            db_add_symbols_from_path(con, project_path, relpath=path)
-    con.commit()
-
 
 def do_add_files(con, project_path, only_interesting=False):
     """
@@ -197,15 +165,16 @@ def do_add_files(con, project_path, only_interesting=False):
 
     release_sql = f"select label from release where project_id={project_id}"
     releases = [label for (label,) in con.execute(release_sql)]
-    if releases == ['']:
-        click.secho(f"{project_name}: no releases, skipping project", fg="red")
-        return
+    # if releases == ['']:
+    #     click.secho(f"{project_name}: no releases, skipping project", fg="red")
+    #     return
     goodsource.sort_versions(releases)
 
     # FIXME: handle this better!
     if releases == [""]:
         logging.warning("%s: no release tags -- using HEAD", project_name)
         releases = ["HEAD"]
+    breakpoint()
 
     for label in releases:
         click.echo(f"{project_id=} release {label}")
@@ -265,7 +234,6 @@ def raw_add_project(
 
     # Git releases -> database; show count
     db_add_releases(con, proj_config)
-
     con.commit()
 
     # FIXME: needed?

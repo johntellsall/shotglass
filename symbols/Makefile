@@ -137,3 +137,6 @@ demo_ctags_support:
 
 clean:
 	-$(RM) -r venv
+
+main2:
+	uv run main2.py ../SOURCE/flask
