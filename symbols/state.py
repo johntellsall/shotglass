@@ -13,7 +13,8 @@ SETUP_SQL = [
         foreign key (project_id) references project (id)
         )""",
     """create table if not exists file (
-        id integer primary key, release, path, hash, size_bytes,
+        id integer primary key, release,
+        path, hash, num_lines, size_bytes,
         project_id,
         foreign key (project_id) references project (id)
         )""",
