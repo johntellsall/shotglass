@@ -1,4 +1,4 @@
-IMGCAT := imgcat-iterm2 --legacy
+IMGCAT := imgcat-iterm2 --legacy -W 100
 
 all:
 

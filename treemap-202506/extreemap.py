@@ -27,7 +27,7 @@ squarify.plot(
 )
 
 # display plot
-plt.show()
+# plt.show()
 
 # create a color palette
 cmap = load_cmap('Acadia')
@@ -45,7 +45,7 @@ squarify.plot(
    pad=True,
    ax=ax
 )
-plt.show()
+# plt.show()
 
 # create a color palette
 cmap = load_cmap('Acadia')
@@ -70,7 +70,7 @@ squarify.plot(
    pad=True,
    ax=ax
 )
-plt.show()
+# plt.show()
 
 # create a color palette
 cmap = load_cmap('Acadia')
