@@ -113,21 +113,20 @@ fmt:
 	isort .
 	black .
 
-# FIXME: use ruff
-# FIXME: skip venv!
-fastlint:
-	flake8 .
-	@echo DONE
+lint:
+	uv run ruff check .
+lint-some:
+	uv run ruff check --output-format=concise main2.py
 
 # lint -- find major errors with core files
 # lintv -- verbose: find any issues with any files
-PYLINT := pylint --rcfile=../pylintrc
-lint:
-	$(PYLINT) -E --ignore='test_*.py' $(PY_SOURCE)
-	@echo DONE
-lintv:
-	$(PYLINT) $(PY_SOURCE)
-	@echo DONE
+# PYLINT := pylint --rcfile=../pylintrc
+# lint-full:
+# 	$(PYLINT) -E --ignore='test_*.py' $(PY_SOURCE)
+# 	@echo DONE
+# lintv:
+# 	$(PYLINT) $(PY_SOURCE)
+# 	@echo DONE
 
 # show Ctags
 demo_ctags:

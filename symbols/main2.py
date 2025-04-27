@@ -1,7 +1,11 @@
 # main2.py -- import file info only
 from collections import defaultdict
 from pathlib import Path
+
+import click
+
 import state
+
 
 CONFIG = {
     "SourceTypes": {".py"} #  FIXME:
@@ -54,6 +58,8 @@ def calc_fileinfo(project_root, relpath):
     }
 
 
+@click.command()
+@click.argument("project_dirs", nargs=-1, type=click.Path(exists=True, file_okay=False, dir_okay=True))
 def main(project_dirs):
     db = state.get_db(temporary=True)
     db.execute('insert into project (id, name) values (1, "temp")')
@@ -65,6 +71,4 @@ def main(project_dirs):
     show_stats(db)
 
 if __name__ == "__main__":
-    import sys
-    project_dirs = sys.argv[1:]
-    main(project_dirs)
+    main()

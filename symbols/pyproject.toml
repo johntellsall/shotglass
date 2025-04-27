@@ -16,4 +16,5 @@ dependencies = [
     "pyright>=1.1.398",
     "pytest>=8.3.5",
     "pytest-cov>=6.0.0",
+    "ruff>=0.11.7",
 ]
