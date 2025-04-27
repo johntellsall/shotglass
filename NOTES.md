@@ -1,5 +1,51 @@
 # NOTES
 
+## Git
+
+Checkout branch, put in worktree directory "beer", keep original Git repos
+
+    git worktree add beer 3.15-stable
+
+### Find all hashes on a given tag
+
+To list all commit hashes reachable from a specific tag:
+
+    git rev-list <tag_name>
+
+Replace `<tag_name>` with the desired tag, e.g., `v1.0.0`.
+
+Example:
+
+    git rev-list v1.0.0
+
+### git info on tags and releases
+
+    git tag -n --format='%(refname) %(objecttype)'
+
+Example: Flask
+
+    refs/tags/1.1.0 commit
+    refs/tags/1.1.1 commit
+    refs/tags/1.1.2 commit
+    refs/tags/1.1.3 tag
+    refs/tags/1.1.4 tag
+    refs/tags/2.0.0 tag
+
+Can use `objectsize` to show rough amount of change... but of tag only? How can we show e.g. "huge code change here / small tweak there"?
+
+Most recent tags
+
+    git for-each-ref refs/tags --sort=-taggerdate --format='%(refname:short)' --count=3
+
+Exclude boring directories
+
+    git diff --stat 3.0.2..3.0.3 | grep -Ev '(.github|requirements|docs)/'
+
+MISC
+
+    git diff --stat 3.0.2..3.0.3
+
+
 ## GitLab / Debian
 
 * GraphQL is open!
@@ -71,11 +117,6 @@ estimate package size before installing (X: check)
 
     apk info --size <package_name>
 
-## Git
-
-Checkout branch, put in worktree directory "beer", keep original Git repos
-
-    git worktree add beer 3.15-stable
 
 # running tests
 
@@ -87,34 +128,6 @@ Pass args to Pytest:
 
     tox run -e py311 -- tests/test_basic.py
 
-
-
-# git info on tags and releases
-
-    git tag -n --format='%(refname) %(objecttype)'
-
-Example: Flask
-
-    refs/tags/1.1.0 commit
-    refs/tags/1.1.1 commit
-    refs/tags/1.1.2 commit
-    refs/tags/1.1.3 tag
-    refs/tags/1.1.4 tag
-    refs/tags/2.0.0 tag
-
-Can use `objectsize` to show rough amount of change... but of tag only? How can we show e.g. "huge code change here / small tweak there"?
-
-Most recent tags
-
-    git for-each-ref refs/tags --sort=-taggerdate --format='%(refname:short)' --count=3
-
-Exclude boring directories
-
-    git diff --stat 3.0.2..3.0.3 | grep -Ev '(.github|requirements|docs)/'
-
-MISC
-
-    git diff --stat 3.0.2..3.0.3
 
 
 

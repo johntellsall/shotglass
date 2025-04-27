@@ -29,7 +29,11 @@ SETUP_SQL = [
 
 def get_db(temporary=False):
     path = ":memory:" if temporary else "main.db"
-    params = {"isolation_level": None}  # autocommit
+    # FIXME:
+    if 1:
+        params = {} # default: manual commit
+    else:
+        params = {"isolation_level": None}  # autocommit
     con = sqlite3.connect(path, **params)  # pylint: disable=no-member
     con.row_factory = sqlite3.Row
     setup(con)

@@ -12,7 +12,7 @@ def run_ctags(paths, verbose=False):
     "Ctags command output -- iter of dictionaries, one per symbol"
     if type(paths) == str:
         paths = [paths]
-    cmd = CTAGS_ARGS + paths
+    cmd = CTAGS_ARGS + list(paths)
     proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
     assert proc.returncode == 0
     if verbose:

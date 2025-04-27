@@ -4,6 +4,7 @@
 Shotglass: info about codebases over time
 """
 
+from collections import defaultdict
 import logging
 import pprint
 import time
@@ -38,9 +39,9 @@ def db_add_project(con, project_path):
     """
     add single project record into database
     """
-    insert_project = "insert into project (name) values (:name)"
+    insert_project = "insert into project (name) values (?)"
     name = PurePath(project_path).name
-    con.execute(insert_project, [name])
+    con.execute(insert_project, (name,))
 
 
 def db_add_releases(con, project_obj):
@@ -96,104 +97,14 @@ def db_add_files(con, path, project_id, release, only_interesting):
 # 'roles': 'def', 'end': 655}
 
 
-class IterFixedFields:
-    """
-    translate between Ctags verbose output and our modest table.
-    Ensure dict-like items have all required fields
-    - ex: "end" is not always provided by Ctags
-    """
-
-    FIELDS = ("name", "path", "start", "end", "kind")
-
-    def __init__(self, items):
-        self.items = items
-        self.proto = dict.fromkeys(self.FIELDS)
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if not self.items:
-            raise StopIteration
-        item = self.proto.copy()
-        item.update(self.items.pop(0))
-        return item
-
-
-# TODO: how do we assoc release with symbol? Needed?
-def db_add_symbols_from_hash(con, project_path, filehash, path):
-    """
-    Given a hash, extract file, parse symbols from file, add to database
-    """
-    if not path.endswith(".py"):  # TODO:
-        click.echo(f"{path=}: unsupported language")
-        return
-
-    # don't warn if __init__ or __manifest__ files are empty
-    # - symbols always added, this just suppresses warning
-    def is_dull(path):
-        return path.endswith("__.py")
-
-    sql = "select id from file where hash=?"
-    file_id = query1(con, sql=sql, args=[filehash])
-
-    # copy file from Git to filesystem (uncompress if needed)
-    # FIXME: support other languages
-    run.run_blob(f"git -C {project_path} show {filehash} > .temp.py")
-
-    # parse symbols from source file
-    items = list(run.run_ctags(".temp.py"))
-    if not items:
-        if not is_dull(path):
-            click.secho(f"- {path=}: no symbols")
-        return
-
-    # insert symbols into database
-    insert_sym = f"""
-    insert into symbol (
-        name, path, line_start, line_end, kind, file_id
-    ) values (
-        :name, '{path}', :line, :end, :kind, {file_id})
-    """
-    con.executemany(insert_sym, IterFixedFields(items))
-
-
-def db_add_symbols_from_path(con, project_path, relpath):
-    """
-    Given a single file path, parse symbols from file, add to database
-    """
-    if not relpath.endswith(".py"):  # TODO:
-        click.echo(f"{relpath=}: unsupported language")
-        return
-
-    # don't warn if __init__ or __manifest__ files are empty
-    # - symbols always added, this just suppresses warning
-    def is_dull(path):
-        return path.endswith("__.py")
-
-    srcpath = Path(project_path) / relpath
-    # parse symbols from source file
-    items = list(run.run_ctags(srcpath))
-    if not items:
-        if not is_dull(relpath):
-            click.secho(f"- {relpath=}: no symbols")
-        return
-
-    # insert symbols into database
-    # FIXME: use db_insert_symbols
-    insert_sym = f"""
-    insert into symbol (
-        name, path, line_start, line_end, kind
-    ) values (
-        :name, '{relpath}', :line, :end, :kind
-    )
-    """
-    con.executemany(insert_sym, IterFixedFields(items))
-
 
 def db_insert_symbols(con, project_id, relpath_symbols):
     """
     insert symbols into database
+    - input: dictionary
+        - one key per source path
+        - key = relative to top of project directory
+        - value = list of symbols in that file
     """
     for relpath, items in relpath_symbols.items():
         insert_sym = f"""
@@ -203,7 +114,12 @@ def db_insert_symbols(con, project_id, relpath_symbols):
             {project_id}, :name, '{relpath}', :line, :end, :kind
         )
         """
-        con.executemany(insert_sym, IterFixedFields(items))
+        # print(f'{relpath} {len(items)}', end=' ')
+        # ensure each symbol has "end" field
+        for symbol in items:
+            symbol['end'] = symbol.get('end', symbol['line'])
+        con.executemany(insert_sym, items)
+        # print()
 
 
 def query_project_source_paths(project_path):
@@ -212,23 +128,29 @@ def query_project_source_paths(project_path):
 
 
 def query_project_symbols(project_path):
-    srcpaths = query_project_source_paths(project_path)
     batch_size = 10
 
+    tags = []
     for batch in batched(query_project_source_paths(project_path), batch_size):
-        symbols = run.run_ctags(batch)
-        breakpoint()
-    return symbols
+        tags.extend(run.run_ctags(batch))
+    
+    # translate back into project-relative paths
+    # assemble into dictionary of lists
+    # - key = relative path
+    # - value = list of symbols in that file
+    relpath_symbols = defaultdict(list)
+    for tag in tags:
+        fullpath = Path(tag["path"])
+        relpath = fullpath.relative_to(project_path)
+        relpath_symbols[relpath].append(tag)
+    return relpath_symbols
 
 
 def do_add_symbols(con, project_path):
     project_id = db_get_project_id(con, project_path)
-    start_t = time.perf_counter()
-    symbols = query_project_symbols(project_path)
-    print(f"- query time: {time.perf_counter() - start_t:.2f} seconds")
-    db_insert_symbols(con, project_id, symbols)
+    file_symbols = query_project_symbols(project_path)
+    db_insert_symbols(con, project_id, file_symbols)
     con.commit()
-    print(f"Time taken: {time.perf_counter() - start_t:.2f} seconds")
 
                   
 def OLD_do_add_symbols(con, project_path):

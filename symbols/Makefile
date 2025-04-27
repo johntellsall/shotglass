@@ -34,14 +34,17 @@ demo-plot:
 	python3 plot_sunburst3.py
 
 # NAME			#FILES	#PYTHON	LOC	DESCRIPTION					FILES-SYM		LOAD-gato
-# flask			246		80		17K		Python library			24	653			12 sec
-# zulip		 	6421	1468	282K	Python chat application
-# sqlalchemy	810		589		463K	Python library			254 18K		    286 sec
-# odoo			36540	5425	682K	Python office suite
+# flask			246		80		17K		Python library			24	2K			1 sec
+# zulip		 	6421	1468	282K	Python chat application	689 21K         5 sec
+# sqlalchemy	810		589		463K	Python library			254 53K		    6 sec
+# odoo			36540	5425	682K	Python office suite	    ? 69K           15 sec
 
 stats-some:  ## show stats for few representative projects
 	ls -1d ../SOURCE/{flask,sqlalchemy,zulip,odoo} \
 		| xargs -I {} ./stats.sh {}
+
+raw-build-tiny:
+	uv run ./main.py add-project --reset-db "../SOURCE/flask"
 
 build-tiny:
 	./build.sh flask
@@ -59,7 +62,8 @@ demo2b:
 summary: summary.csv
 
 pysummary:
-	./main.py summary
+	uv run ./main.py summary
+
 
 
 %.csv: %.sql

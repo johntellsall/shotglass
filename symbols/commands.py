@@ -1,6 +1,6 @@
 # commands.py
 
-from distutils.version import LooseVersion
+# FIXME: from distutils.version import LooseVersion
 
 import click
 
