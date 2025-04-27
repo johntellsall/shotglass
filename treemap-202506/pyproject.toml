@@ -1,10 +1,12 @@
 [project]
-name = "waffle"
+name = "treemap"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "matplotlib>=3.10.1",
-    "pywaffle>=1.1.1",
+    "pandas>=2.2.3",
+    "pypalettes>=0.1.5",
+    "squarify>=0.4.4",
 ]
