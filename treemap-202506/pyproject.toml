@@ -10,3 +10,8 @@ dependencies = [
     "pypalettes>=0.1.5",
     "squarify>=0.4.4",
 ]
+
+[dependency-groups]
+dev = [
+    "nbformat>=5.10.4",
+]
