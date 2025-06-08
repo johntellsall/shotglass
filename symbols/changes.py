@@ -60,15 +60,16 @@ def main(paths):
             key = (diff['path'], src_tag)
             path_rel_diff[key] = diff['diff']
 
+    sep = '-'
     print(f'Tags: {tags}')
     for path in sorted(final_paths):
-        print(f"{path}", end=' ')
+        print(f"{path:20}", end=' ')
         for tag in tags[:-1]:
             diff = path_rel_diff.get((path, tag))
             if diff:
-                print(diff, end=' ')
+                print(f'{diff:>4}', end=' ')
             else:
-                print('-', end=' ')
+                print(f'{sep:>4}', end=' ')
         print()
 
 
