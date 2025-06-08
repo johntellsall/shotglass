@@ -26,17 +26,20 @@ def git_diff_stat(proj, tag1, tag2, filepat):
     # Sample input: ' src/arp.c            |    8 +-'
     stat_pat = re.compile(r'''
                           (?P<path>\S+) 
-                          .+?
+                          [\s|]+ # whitespace or pipe
                           (?P<diff>\d+)
                           ''', re.VERBOSE)
     def parse(line):
+        if 'changed,' in line:
+            return None
         match = stat_pat.search(line)
         if match:
             return match.groupdict()
         return None
     lines = run.run(cmd)
     result = [parse(line) for line in lines]
-    breakpoint()
+    result = [item for item in result if item is not None]
+    return result
 
 
 def main(paths):
@@ -48,11 +51,28 @@ def main(paths):
     final_paths = git_ls_tree(proj, final_tag, 'src')
     
     tag_pairs = list(pairwise(tags))
+    path_rel_diff = {}
     for src_tag, dest_tag in tag_pairs:
-        print(f"Changes from {src_tag} to {dest_tag}")
+        # print(f"Changes from {src_tag} to {dest_tag}")
         result = git_diff_stat(proj, src_tag, dest_tag, 'src')
-        breakpoint()
-        print(result)
+        # diff[src_tag, dest_tag] = result
+        for diff in result:
+            key = (diff['path'], src_tag)
+            path_rel_diff[key] = diff['diff']
+
+    print(f'Tags: {tags}')
+    for path in sorted(final_paths):
+        print(f"{path}", end=' ')
+        for tag in tags[:-1]:
+            diff = path_rel_diff.get((path, tag))
+            if diff:
+                print(diff, end=' ')
+            else:
+                print('-', end=' ')
+        print()
+
+
+
    
 
 if __name__ == '__main__':
