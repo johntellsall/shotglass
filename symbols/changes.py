@@ -71,7 +71,7 @@ def main(paths):
             key = (diff['path'], src_tag)
             path_rel_diff[key] = diff['diff']
 
-    sep = '-'
+    SEP = '-'
     print(f'Tags: {tags}')
 
     # header: tags
@@ -90,22 +90,23 @@ def main(paths):
             year_month = ''.join(date.split('-')[:2])
             print(f'{year_month}', end=' ')
         else:
-            print(f'{sep:>6}', end=' ')
+            print(f'{SEP:>6}', end=' ')
     print()
 
-    for path in sorted(final_paths)[:10]:
+    limit = False
+    paths = sorted(final_paths)
+    if limit:
+        paths = paths[:10]
+    for path in paths:
         print(f"{path:20}", end=' ')
         for tag in tags[:-1]:
             diff = path_rel_diff.get((path, tag))
             if diff:
-                print(f'{diff:>4}', end=' ')
+                print(f'{diff:>6}', end=' ')
             else:
-                print(f'{sep:>4}', end=' ')
+                print(f'{SEP:>6}', end=' ')
         print()
 
-
-
-   
 
 if __name__ == '__main__':
     main(sys.argv[1:])
