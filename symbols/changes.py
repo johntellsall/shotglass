@@ -1,6 +1,7 @@
 # changes.py -- show file changes over time
 # - Dnsmasq, 20 samples over 90 releases
 
+from itertools import pairwise
 import re
 import sys
 import run
@@ -19,12 +20,13 @@ def git_ls_tree(proj, tag, filepat):
     cmd = f"git -C {proj} ls-tree -r --name-only '{tag}' {filepat}"
     return run.run(cmd)
 
+
 def git_diff_stat(proj, tag1, tag2, filepat):
     cmd = f"git -C {proj} diff --stat '{tag1}' '{tag2}' -- {filepat}"
     # Sample input: ' src/arp.c            |    8 +-'
     stat_pat = re.compile(r'''
                           (?P<path>\S+) 
-                          .+
+                          .+?
                           (?P<diff>\d+)
                           ''', re.VERBOSE)
     def parse(line):
@@ -33,8 +35,8 @@ def git_diff_stat(proj, tag1, tag2, filepat):
             return match.groupdict()
         return None
     lines = run.run(cmd)
-    temp = [parse(line) for line in lines]
-    assert 0, temp
+    result = [parse(line) for line in lines]
+    breakpoint()
 
 
 def main(paths):
@@ -45,9 +47,12 @@ def main(paths):
     final_tag = tags[-1]
     final_paths = git_ls_tree(proj, final_tag, 'src')
     
-    tag = tags[-2]
-    git_diff_stat(proj, tag, final_tag, 'src')
-
+    tag_pairs = list(pairwise(tags))
+    for src_tag, dest_tag in tag_pairs:
+        print(f"Changes from {src_tag} to {dest_tag}")
+        result = git_diff_stat(proj, src_tag, dest_tag, 'src')
+        breakpoint()
+        print(result)
    
 
 if __name__ == '__main__':
