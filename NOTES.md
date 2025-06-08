@@ -2,6 +2,12 @@
 
 ## Git
 
+Show files in specific tag
+
+    git ls-tree -r v2.0 src
+
+    OR: git ls-tree -r v2.0 --name-only src
+
 Checkout branch, put in worktree directory "beer", keep original Git repos
 
     git worktree add beer 3.15-stable

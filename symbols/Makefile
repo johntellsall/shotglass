@@ -7,6 +7,9 @@ DBPATH := main.db
 
 all:
 
+changes:
+	uv run changes.py ../SOURCE/dnsmasq
+	
 show-recent: ## run most recent SQL report
 	RECENT=$$(ls -1t *.sql | head -1 | sed -e 's/.sql/.show/') \
 	; make $${RECENT}
