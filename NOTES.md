@@ -2,7 +2,13 @@
 
 ## Git
 
-Show files in specific tag (porcelain, for scripting)
+### List all tags with dates
+
+    git tag --list --format='%(refname:short) %(taggerdate:short)' 
+
+X: unreliable for e.g. Dnsmasq
+
+## Show files in specific tag (porcelain, for scripting)
 
     git ls-tree -r v2.0 src
 
