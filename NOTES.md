@@ -2,7 +2,7 @@
 
 ## Git
 
-Show files in specific tag
+Show files in specific tag (porcelain, for scripting)
 
     git ls-tree -r v2.0 src
 
