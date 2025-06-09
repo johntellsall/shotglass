@@ -9,12 +9,13 @@ import run
 def is_tag_interesting(tag):
     return re.fullmatch('v[0-9.]+', tag) is not None
 
-def sample_tags(proj):
+def git_tag_list(proj):
     tags = run.git_tag_list(proj)
     tags = [tag for tag in tags if is_tag_interesting(tag)]
-    # Pick every tenth tag
-    sampled_tags = tags[::10] # FIXME:
-    return sampled_tags
+    return tags
+    # # Pick every tenth tag
+    # sampled_tags = tags[::10] # FIXME:
+    # return sampled_tags
 
 def git_ls_tree(proj, tag, filepat):
     cmd = f"git -C {proj} ls-tree -r --name-only '{tag}' {filepat}"
@@ -42,6 +43,15 @@ def git_diff_stat(proj, tag1, tag2, filepat):
     return result
 
 
+def count_lines(proj, tag, path):
+    """
+    count lines in file at given tag
+    """
+    cmd = f"git -C {proj} show '{tag}:{path}'"
+    lines = run.run(cmd)
+    return len(lines) 
+
+
 def git_tag_list_dates(proj):
     """
     get Git tags with dates
@@ -55,14 +65,24 @@ def git_tag_list_dates(proj):
 
 def main(paths):
     proj = paths[0]
-    tags = sample_tags(proj)
+    tags = git_tag_list(proj)
     print(tags)
 
     final_tag = tags[-1]
     final_paths = git_ls_tree(proj, final_tag, 'src')
 
+    path_linecount = {}
+    for path in final_paths:
+        path_linecount[path] = count_lines(proj, final_tag, path)
+
     tag_date = git_tag_list_dates(proj)
-    
+
+    # Dnsmasq: skip tags without dates
+    first_tag = tags[0]
+    good_index = tags.index('v2.60')
+    tags = [first_tag] + tags[good_index:]  
+
+    # FIXME: ensure "first version lines" case is handled
     tag_pairs = list(pairwise(tags))
     path_rel_diff = {}
     for src_tag, dest_tag in tag_pairs:
@@ -72,6 +92,11 @@ def main(paths):
             path_rel_diff[key] = diff['diff']
 
     SEP = '-'
+
+    limit_tags = True
+    if limit_tags:
+        tags = tags[-10:]
+
     print(f'Tags: {tags}')
 
     # header: tags
@@ -91,20 +116,31 @@ def main(paths):
             print(f'{year_month}', end=' ')
         else:
             print(f'{SEP:>6}', end=' ')
+
+    # header: line count
+    print(f'{"LOC":>6}', end=' ')
     print()
 
-    limit = False
+    limit = True
     paths = sorted(final_paths)
     if limit:
         paths = paths[:10]
     for path in paths:
+        # first col: file path
         print(f"{path:20}", end=' ')
+
+        # middle: releases with change count
         for tag in tags[:-1]:
             diff = path_rel_diff.get((path, tag))
             if diff:
                 print(f'{diff:>6}', end=' ')
             else:
                 print(f'{SEP:>6}', end=' ')
+
+        # last col: final version line count
+        linecount = path_linecount.get(path, 0)
+        print(f'{linecount:>6}', end=' ')
+
         print()
 
 

@@ -9,7 +9,7 @@ all:
 
 changes:
 	uv run changes.py ../SOURCE/dnsmasq
-	
+
 show-recent: ## run most recent SQL report
 	RECENT=$$(ls -1t *.sql | head -1 | sed -e 's/.sql/.show/') \
 	; make $${RECENT}
@@ -119,7 +119,7 @@ fmt:
 lint:
 	uv run ruff check .
 lint-some:
-	uv run ruff check --output-format=concise main2.py
+	uv run ruff check --output-format=concise changes.py
 
 # lint -- find major errors with core files
 # lintv -- verbose: find any issues with any files
