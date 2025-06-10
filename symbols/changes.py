@@ -3,6 +3,7 @@
 
 from itertools import pairwise
 import re
+import subprocess
 import sys
 import run
 
@@ -46,10 +47,18 @@ def git_diff_stat(proj, tag1, tag2, filepat):
 def count_lines(proj, tag, path):
     """
     count lines in file at given tag
+    - 0 = file empty
+    - None = file does not exist
     """
     cmd = f"git -C {proj} show '{tag}:{path}'"
-    lines = run.run(cmd)
-    return len(lines) 
+    try:
+        lines = run.run(cmd)
+        return len(lines) 
+    except subprocess.CalledProcessError as error:
+        if error.returncode == 128:
+            # file does not exist
+            return None
+        raise
 
 
 def git_tag_list_dates(proj):
@@ -62,6 +71,11 @@ def git_tag_list_dates(proj):
     tag_date = {tag:date for tag, date in (line.split() for line in lines)}
     return tag_date
 
+def val_or_sep(value):
+    return value if value is not None else '-'
+
+def lines_or_sep(value):
+    return f'{value}L' if value is not None else '-'
 
 def main(paths):
     proj = paths[0]
@@ -82,31 +96,52 @@ def main(paths):
     good_index = tags.index('v2.60')
     tags = [first_tag] + tags[good_index:]  
 
-    # FIXME: ensure "first version lines" case is handled
-    tag_pairs = list(pairwise(tags))
-    path_rel_diff = {}
-    for src_tag, dest_tag in tag_pairs:
-        result = git_diff_stat(proj, src_tag, dest_tag, 'src')
-        for diff in result:
-            key = (diff['path'], src_tag)
-            path_rel_diff[key] = diff['diff']
-
-    SEP = '-'
-
     limit_tags = True
     if limit_tags:
         tags = tags[-10:]
 
     print(f'Tags: {tags}')
 
+    # FIXME: ensure "first version lines" case is handled
+    # tag_pairs = list(pairwise(tags))
+    # path_rel_diff = {}
+    # for src_tag, dest_tag in tag_pairs:
+    #     result = git_diff_stat(proj, src_tag, dest_tag, 'src')
+    #     for diff in result:
+    #         key = (diff['path'], src_tag)
+    #         path_rel_diff[key] = diff['diff']
+
+    # change count:
+    # - first col is number of lines in first version
+    # - other col are number of changes
+    # - line change = *two* according to Git: one add, one remove
+    first_count = {}
+    for path in final_paths:
+        first_count[path] = count_lines(proj, first_tag, path)
+
+    if first_tag not in tags: # FIXME:
+        tags = [first_tag] + tags
+    tag_pairs = list(pairwise(tags))
+    path_rel_diff = {}
+    for src_tag, dest_tag in tag_pairs:
+        result = git_diff_stat(proj, src_tag, dest_tag, 'src')
+        for diff in result:
+            key = (diff['path'], dest_tag)
+            path_rel_diff[key] = diff['diff']
+
+    SEP = '-'
+
     # header: tags
     print(f"{"":20}", end=' ')
-    for tag in tags[:-1]:
+    for tag in tags:
         print(f'{tag:>6}', end=' ')
     print()
 
-    # header: dates
+    # header 2nd row: first version line count
     print(f"{"path":20}", end=' ')
+    print(f'{"LOC":>6}', end=' ')
+
+    # header 2nd row: dates
     for tag in tags[:-1]:
         date = tag_date.get(tag)
         if date == '2012-01-05': # NOTE: Dnsmasq special case
@@ -117,7 +152,7 @@ def main(paths):
         else:
             print(f'{SEP:>6}', end=' ')
 
-    # header: line count
+    # header 2nd row: final line count
     print(f'{"LOC":>6}', end=' ')
     print()
 
@@ -129,6 +164,10 @@ def main(paths):
         # first col: file path
         print(f"{path:20}", end=' ')
 
+        # next col: first version line count
+        first = first_count.get(path)
+        print(f'{lines_or_sep(first):>6}', end=' ')
+
         # middle: releases with change count
         for tag in tags[:-1]:
             diff = path_rel_diff.get((path, tag))
@@ -139,7 +178,7 @@ def main(paths):
 
         # last col: final version line count
         linecount = path_linecount.get(path, 0)
-        print(f'{linecount:>6}', end=' ')
+        print(f'{linecount:>6}L', end=' ')
 
         print()
 
