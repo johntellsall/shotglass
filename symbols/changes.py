@@ -156,7 +156,7 @@ def main(paths):
     print(f'{"LOC":>6}', end=' ')
     print()
 
-    limit = True
+    limit = False
     paths = sorted(final_paths)
     if limit:
         paths = paths[:10]
