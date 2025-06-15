@@ -1,15 +1,16 @@
 # changes.py -- show file changes over time
 # - Dnsmasq, 20 samples over 90 releases
 
-from itertools import pairwise
 import re
 import subprocess
 import sys
+from itertools import pairwise
+
 import run
 
 
 def is_tag_interesting(tag):
-    return re.fullmatch('v[0-9.]+', tag) is not None
+    return re.fullmatch("v[0-9.]+", tag) is not None
 
 
 def git_tag_list(proj):
@@ -30,7 +31,7 @@ def count_lines(proj, tag, path):
     cmd = f"git -C {proj} show '{tag}:{path}'"
     try:
         lines = run.run(cmd)
-        return len(lines) 
+        return len(lines)
     except subprocess.CalledProcessError as error:
         if error.returncode == 128:
             # file does not exist
@@ -45,14 +46,17 @@ def git_tag_list_dates(proj):
     cmd = f"git -C {proj} tag --list --format='%(refname:short) %(creatordate:short)'"
     # Sample input: 'v2.85 2023-10-01'
     lines = run.run(cmd)
-    tag_date = {tag:date for tag, date in (line.split() for line in lines)}
+    tag_date = {tag: date for tag, date in (line.split() for line in lines)}
     return tag_date
 
+
 def val_or_sep(value):
-    return value if value is not None else '-'
+    return value if value is not None else "-"
+
 
 def lines_or_sep(value):
-    return f'{value}L' if value is not None else '-'
+    return f"{value}L" if value is not None else "-"
+
 
 def main(paths):
     proj = paths[0]
@@ -60,7 +64,7 @@ def main(paths):
     print(tags)
 
     final_tag = tags[-1]
-    final_paths = run.git_ls_tree2(proj, final_tag, 'src')
+    final_paths = run.git_ls_tree2(proj, final_tag, "src")
 
     path_linecount = {}
     for path in final_paths:
@@ -70,14 +74,14 @@ def main(paths):
 
     # Dnsmasq: skip tags without dates
     first_tag = tags[0]
-    good_index = tags.index('v2.60')
-    tags = [first_tag] + tags[good_index:]  
+    good_index = tags.index("v2.60")
+    tags = [first_tag] + tags[good_index:]
 
     limit_tags = True
     if limit_tags:
         tags = tags[-10:]
 
-    print(f'Tags: {tags}')
+    print(f"Tags: {tags}")
 
     # FIXME: ensure "first version lines" case is handled
     # tag_pairs = list(pairwise(tags))
@@ -96,41 +100,41 @@ def main(paths):
     for path in final_paths:
         first_count[path] = count_lines(proj, first_tag, path)
 
-    if first_tag not in tags: # FIXME:
+    if first_tag not in tags:  # FIXME:
         tags = [first_tag] + tags
     tag_pairs = list(pairwise(tags))
     path_rel_diff = {}
     for src_tag, dest_tag in tag_pairs:
-        result = run.git_diff_stat(proj, src_tag, dest_tag, 'src')
+        result = run.git_diff_stat(proj, src_tag, dest_tag, "src")
         for diff in result:
-            key = (diff['path'], dest_tag)
-            path_rel_diff[key] = diff['diff']
+            key = (diff["path"], dest_tag)
+            path_rel_diff[key] = diff["diff"]
 
-    SEP = '-'
+    SEP = "-"
 
     # header: tags
-    print(f"{"":20}", end=' ')
+    print(f"{"":20}", end=" ")
     for tag in tags:
-        print(f'{tag:>6}', end=' ')
+        print(f"{tag:>6}", end=" ")
     print()
 
     # header 2nd row: first version line count
-    print(f"{"path":20}", end=' ')
-    print(f'{"LOC":>6}', end=' ')
+    print(f"{"path":20}", end=" ")
+    print(f'{"LOC":>6}', end=" ")
 
     # header 2nd row: dates
     for tag in tags[:-1]:
         date = tag_date.get(tag)
-        if date == '2012-01-05': # NOTE: Dnsmasq special case
+        if date == "2012-01-05":  # NOTE: Dnsmasq special case
             date = None
         if date:
-            year_month = ''.join(date.split('-')[:2])
-            print(f'{year_month}', end=' ')
+            year_month = "".join(date.split("-")[:2])
+            print(f"{year_month}", end=" ")
         else:
-            print(f'{SEP:>6}', end=' ')
+            print(f"{SEP:>6}", end=" ")
 
     # header 2nd row: final line count
-    print(f'{"LOC":>6}', end=' ')
+    print(f'{"LOC":>6}', end=" ")
     print()
 
     limit = False
@@ -139,26 +143,26 @@ def main(paths):
         paths = paths[:10]
     for path in paths:
         # first col: file path
-        print(f"{path:20}", end=' ')
+        print(f"{path:20}", end=" ")
 
         # next col: first version line count
         first = first_count.get(path)
-        print(f'{lines_or_sep(first):>6}', end=' ')
+        print(f"{lines_or_sep(first):>6}", end=" ")
 
         # middle: releases with change count
         for tag in tags[:-1]:
             diff = path_rel_diff.get((path, tag))
             if diff:
-                print(f'{diff:>6}', end=' ')
+                print(f"{diff:>6}", end=" ")
             else:
-                print(f'{SEP:>6}', end=' ')
+                print(f"{SEP:>6}", end=" ")
 
         # last col: final version line count
         linecount = path_linecount.get(path, 0)
-        print(f'{linecount:>6}L', end=' ')
+        print(f"{linecount:>6}L", end=" ")
 
         print()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(sys.argv[1:])

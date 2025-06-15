@@ -19,27 +19,27 @@ show-recent: ## run most recent SQL report
 	RECENT=$$(ls -1t *.sql | head -1 | sed -e 's/.sql/.show/') \
 	; make $${RECENT}
 
-demo:
-	uv run main.py add-project --reset-db $(SAMPLE)
-	make demo.show
+# demo:
+# 	uv run main.py add-project --reset-db $(SAMPLE)
+# 	make demo.show
 
-demo-plot0:
-	./main.py add-project --reset-db $(SAMPLE)
-	make summary-symbols.show
-	python3 plot_sunburst3.py
+# demo-plot0:
+# 	./main.py add-project --reset-db $(SAMPLE)
+# 	make summary-symbols.show
+# 	python3 plot_sunburst3.py
 
-demo-plot-flask:
-	./main.py add-project --reset-db --all $(SAMPLE)
-	make summary-symbols.show
-	python3 plot_sunburst3.py
+# demo-plot-flask:
+# 	./main.py add-project --reset-db --all $(SAMPLE)
+# 	make summary-symbols.show
+# 	python3 plot_sunburst3.py
 
 
-build-sqla:
-	./main.py add-project --reset-db ../SOURCE/sqlalchemy
-	make summary-symbols.show
+# build-sqla:
+# 	./main.py add-project --reset-db ../SOURCE/sqlalchemy
+# 	make summary-symbols.show
 
-demo-plot:
-	python3 plot_sunburst3.py
+# demo-plot:
+# 	python3 plot_sunburst3.py
 
 # NAME			#FILES	#PYTHON	LOC	DESCRIPTION					FILES-SYM		LOAD-gato
 # flask			246		80		17K		Python library			24	2K			1 sec
@@ -47,30 +47,26 @@ demo-plot:
 # sqlalchemy	810		589		463K	Python library			254 53K		    6 sec
 # odoo			36540	5425	682K	Python office suite	    ? 69K           15 sec
 
-stats-some:  ## show stats for few representative projects
-	ls -1d ../SOURCE/{flask,sqlalchemy,zulip,odoo} \
-		| xargs -I {} ./stats.sh {}
+# raw-build-tiny:
+# 	uv run ./main.py add-project --reset-db "../SOURCE/flask"
 
-raw-build-tiny:
-	uv run ./main.py add-project --reset-db "../SOURCE/flask"
+# build-tiny:
+# 	./build.sh flask
+# build-medium:
+# 	./build.sh sqlalchemy
+# build-huge:
+# 	./build.sh odoo
 
-build-tiny:
-	./build.sh flask
-build-medium:
-	./build.sh sqlalchemy
-build-huge:
-	./build.sh odoo
-
-demo2b:
-	uv run main.py add-project --reset-db --all ../SOURCE/flask
-	make summary
+# demo2b:
+# 	uv run main.py add-project --reset-db --all ../SOURCE/flask
+# 	make summary
 # uv run main.py add-project --all ../SOURCE/pyramid
 # make summary
 
-summary: summary.csv
+# summary: summary.csv
 
-pysummary:
-	uv run ./main.py summary
+# pysummary:
+# 	uv run ./main.py summary
 
 
 
@@ -82,7 +78,7 @@ pysummary:
 
 # TODO: skip sample_code and test_*.py
 coverage:
-	pytest --cov
+	uv run pytest --cov
 
 # sniff -- find stinky code that shouldn't make a PR
 sniff:
@@ -92,12 +88,8 @@ pre-commit: fmt fastlint
 
 pre-push: sniff check-types
 
-check-types:
-	pyright
-
-# FIXME:
-run:
-	./main.py ls-tags $(SAMPLE)
+# check-types:
+# 	pyright
 
 
 # "make test" runs all tests
@@ -109,15 +101,9 @@ testk:
 test-all:
 	TEST_ALL=1 $(PYTEST)
 	
-setup:
-	test -d venv || python3 -m venv venv
-	venv/bin/pip install wheel
-	venv/bin/pip install -r requirements.txt
-	@echo DONE
-
 fmt:
-	isort .
-	black .
+	uv run isort .
+	uv run black .
 
 lint:
 	uv run ruff check .
@@ -140,8 +126,5 @@ demo_ctags:
 demo_ctags_support:
 	ctags --list-roles | grep -Ew '^(C|Python)'
 
-clean:
-	-$(RM) -r venv
-
-main2:
-	uv run main2.py ../SOURCE/flask
+# main2:
+# 	uv run main2.py ../SOURCE/flask

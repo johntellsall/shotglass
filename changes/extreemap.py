@@ -2,10 +2,10 @@ import squarify
 
 # these values define the coordinate system for the returned rectangles
 # the values will range from x to x + width and y to y + height
-x = 0.
-y = 0.
-width = 700.
-height = 433.
+x = 0.0
+y = 0.0
+width = 700.0
+height = 433.0
 
 values = [500, 433, 78, 25, 25, 7]
 
