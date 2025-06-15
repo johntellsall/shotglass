@@ -2,6 +2,7 @@
 "run commands, especially Ctags"
 
 import json
+import re
 import subprocess
 
 # Universal Ctags
@@ -57,3 +58,29 @@ def git_ls_tree(project_path, release):
 def git_tag_list(project_path):
     "list Git tags (~ releases)"
     return run(f"git -C {project_path} tag --list")
+
+
+def git_ls_tree2(proj, tag, filepat):
+    cmd = f"git -C {proj} ls-tree -r --name-only '{tag}' {filepat}"
+    return run(cmd)
+
+
+def git_diff_stat(proj, tag1, tag2, filepat):
+    cmd = f"git -C {proj} diff --stat '{tag1}' '{tag2}' -- {filepat}"
+    # Sample input: ' src/arp.c            |    8 +-'
+    stat_pat = re.compile(r'''
+                          (?P<path>\S+) 
+                          [\s|]+ # whitespace or pipe
+                          (?P<diff>\d+)
+                          ''', re.VERBOSE)
+    def parse(line):
+        if 'changed,' in line:
+            return None
+        match = stat_pat.search(line)
+        if match:
+            return match.groupdict()
+        return None
+    lines = run(cmd)
+    result = [parse(line) for line in lines]
+    result = [item for item in result if item is not None]
+    return result

@@ -39,6 +39,7 @@ def test_main_interesting():
     assert interesting_count < full_count
 
 
+@pytest.mark.xfail(reason="Result may change if source files change")
 def test_main_add_project():
     con = main.raw_add_project(
         "../SOURCE/flask", is_testing=True, only_interesting=True

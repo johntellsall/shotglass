@@ -3,10 +3,10 @@ all:
 # Odoo -- releases from branches, not tags
 
 get-source:
-	git -C SOURCE clone --depth=1 https://github.com/odoo/odoo.git
-	git -C SOURCE clone https://github.com/zulip/zulip.git
 	git -C SOURCE clone https://github.com/pallets/flask.git
-	git -C SOURCE clone https://github.com/sqlalchemy/sqlalchemy.git
+# git -C SOURCE clone --depth=1 https://github.com/odoo/odoo.git
+# git -C SOURCE clone https://github.com/zulip/zulip.git
+# git -C SOURCE clone https://github.com/sqlalchemy/sqlalchemy.git
 
 setup:
 	python3 -m venv .venv

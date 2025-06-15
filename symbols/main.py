@@ -174,7 +174,6 @@ def do_add_files(con, project_path, only_interesting=False):
     if releases == [""]:
         logging.warning("%s: no release tags -- using HEAD", project_name)
         releases = ["HEAD"]
-    breakpoint()
 
     for label in releases:
         click.echo(f"{project_id=} release {label}")
@@ -227,8 +226,6 @@ def raw_add_project(
         db_reset()
 
     con = state.get_db(temporary=is_testing)
-
-    breakpoint()
     db_add_project(con, project_path)
     con.commit()
 
