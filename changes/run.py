@@ -89,3 +89,20 @@ def git_diff_stat(proj, tag1, tag2, filepat):
     result = [parse(line) for line in lines]
     result = [item for item in result if item is not None]
     return result
+
+
+def git_count_lines(proj, tag, path):
+    """
+    count lines in file at given tag
+    - 0 = file empty
+    - None = file does not exist
+    """
+    cmd = f"git -C {proj} show '{tag}:{path}'"
+    try:
+        lines = run(cmd)
+        return len(lines)
+    except subprocess.CalledProcessError as error:
+        if error.returncode == 128:
+            # file does not exist
+            return None
+        raise

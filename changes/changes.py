@@ -5,6 +5,7 @@ import re
 import subprocess
 import sys
 from itertools import pairwise
+from pathlib import Path
 
 import run
 import state
@@ -21,23 +22,6 @@ def git_tag_list(proj):
     # # Pick every tenth tag
     # sampled_tags = tags[::10] # FIXME:
     # return sampled_tags
-
-
-def count_lines(proj, tag, path):
-    """
-    count lines in file at given tag
-    - 0 = file empty
-    - None = file does not exist
-    """
-    cmd = f"git -C {proj} show '{tag}:{path}'"
-    try:
-        lines = run.run(cmd)
-        return len(lines)
-    except subprocess.CalledProcessError as error:
-        if error.returncode == 128:
-            # file does not exist
-            return None
-        raise
 
 
 def git_tag_list_dates(proj):
@@ -69,7 +53,7 @@ def OLD_main(paths):
 
     path_linecount = {}
     for path in final_paths:
-        path_linecount[path] = count_lines(proj, final_tag, path)
+        path_linecount[path] = run.git_count_lines(proj, final_tag, path)
 
     tag_date = git_tag_list_dates(proj)
 
@@ -111,22 +95,37 @@ def OLD_main(paths):
             key = (diff["path"], dest_tag)
             path_rel_diff[key] = diff["diff"]
 
+
 def main(paths):
     db = state.get_db(temporary=True)
     state.setup(db)
 
     proj = paths[0]
+
+    project_name = Path(proj).name
+    try:
+        db.execute("INSERT INTO project (name) VALUES (?)", (project_name,))
+    except sqlite3.IntegrityError:
+        pass
+    project_id = state.query1(db, "SELECT id FROM project WHERE name = ?", args=(project_name,))
+
     tags = git_tag_list(proj)
     print(tags)
 
     final_tag = tags[-1]
     final_paths = run.git_ls_tree2(proj, final_tag, "src")
 
-    path_linecount = {}
-    for path in final_paths:
-        path_linecount[path] = count_lines(proj, final_tag, path)
+    data = [
+        (project_id, final_tag, path, run.git_count_lines(proj, final_tag, path))
+        for path in final_paths
+    ]
+    db.executemany(
+        "INSERT INTO file (project_id, tag, path, num_lines) VALUES (?, ?, ?, ?)",
+        data
+    )
+    print(state.query1(db, "select sum(num_lines) from file"))
+    assert 0
 
-    breakpoint()
 
     tag_date = git_tag_list_dates(proj)
 
