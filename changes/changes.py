@@ -7,6 +7,7 @@ import sys
 from itertools import pairwise
 
 import run
+import state
 
 
 def is_tag_interesting(tag):
@@ -58,7 +59,7 @@ def lines_or_sep(value):
     return f"{value}L" if value is not None else "-"
 
 
-def main(paths):
+def OLD_main(paths):
     proj = paths[0]
     tags = git_tag_list(proj)
     print(tags)
@@ -69,6 +70,63 @@ def main(paths):
     path_linecount = {}
     for path in final_paths:
         path_linecount[path] = count_lines(proj, final_tag, path)
+
+    tag_date = git_tag_list_dates(proj)
+
+    # Dnsmasq: skip tags without dates
+    first_tag = tags[0]
+    good_index = tags.index("v2.60")
+    tags = [first_tag] + tags[good_index:]
+
+    limit_tags = True
+    if limit_tags:
+        tags = tags[-10:]
+
+    print(f"Tags: {tags}")
+
+    # FIXME: ensure "first version lines" case is handled
+    # tag_pairs = list(pairwise(tags))
+    # path_rel_diff = {}
+    # for src_tag, dest_tag in tag_pairs:
+    #     result = git_diff_stat(proj, src_tag, dest_tag, 'src')
+    #     for diff in result:
+    #         key = (diff['path'], src_tag)
+    #         path_rel_diff[key] = diff['diff']
+
+    # change count:
+    # - first col is number of lines in first version
+    # - other col are number of changes
+    # - line change = *two* according to Git: one add, one remove
+    first_count = {}
+    for path in final_paths:
+        first_count[path] = count_lines(proj, first_tag, path)
+
+    if first_tag not in tags:  # FIXME:
+        tags = [first_tag] + tags
+    tag_pairs = list(pairwise(tags))
+    path_rel_diff = {}
+    for src_tag, dest_tag in tag_pairs:
+        result = run.git_diff_stat(proj, src_tag, dest_tag, "src")
+        for diff in result:
+            key = (diff["path"], dest_tag)
+            path_rel_diff[key] = diff["diff"]
+
+def main(paths):
+    db = state.get_db(temporary=True)
+    state.setup(db)
+
+    proj = paths[0]
+    tags = git_tag_list(proj)
+    print(tags)
+
+    final_tag = tags[-1]
+    final_paths = run.git_ls_tree2(proj, final_tag, "src")
+
+    path_linecount = {}
+    for path in final_paths:
+        path_linecount[path] = count_lines(proj, final_tag, path)
+
+    breakpoint()
 
     tag_date = git_tag_list_dates(proj)
 
