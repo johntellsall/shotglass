@@ -18,7 +18,7 @@ CTAGS_KEYS = {
 
 
 def test_run_ctags():
-    res = list(run.run_ctags(path="sample_code/sample.py"))
+    res = list(run.run_ctags(paths=["sample_code/sample.py"]))
     assert set(res[0]) == CTAGS_KEYS
 
 
@@ -47,7 +47,7 @@ def test_run_ctags():
 #   'scopeKind': 'function',
 #   'signature': '()'},
 def test_run_ctags_detail():
-    res = list(run.run_ctags(path="sample_code/sample.py"))
+    res = list(run.run_ctags(paths=["sample_code/sample.py"]))
     res = res[0]
     assert res == {
         "_type": "tag",

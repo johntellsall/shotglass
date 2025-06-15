@@ -3,10 +3,15 @@ SAMPLE := ../SOURCE/Flask-2.2.2
 
 PY_SOURCE := $(shell ls -1 *.py)
 DBPATH := main.db
+PYTEST := uv run pytest -vv --showlocals
+# --tb=long
 
 
 all:
 
+extreemap:
+	uv run extreemap.py
+	
 changes:
 	uv run changes.py ../SOURCE/dnsmasq
 
@@ -94,8 +99,6 @@ check-types:
 run:
 	./main.py ls-tags $(SAMPLE)
 
-PYTEST := venv/bin/pytest -vv --showlocals
-# --tb=long
 
 # "make test" runs all tests
 # "KEYWORD=foo make testk " runs only tests matching "foo"

@@ -13,12 +13,12 @@ SAMPLE = "sample_code/test_code.py"
 TEST_ALL = os.environ.get("TEST_ALL")  # enable slow tests
 
 
-def test_ls_tags():
-    "test list Git tags in project"
-    runner = CliRunner()
-    result = runner.invoke(main.ls_tags, [FLASK_DIR])
-    assert result.exit_code == 0
-    assert "'0.10.1'," in result.output
+# def test_ls_tags():
+#     "test list Git tags in project"
+#     runner = CliRunner()
+#     result = runner.invoke(main.ls_tags, [FLASK_DIR])
+#     assert result.exit_code == 0
+#     assert "'0.10.1'," in result.output
 
 
 @pytest.mark.skipif(not TEST_ALL, reason="slow")

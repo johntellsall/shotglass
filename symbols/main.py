@@ -220,12 +220,15 @@ def summary():
 def raw_add_project(
     project_path, reset_db=False, is_testing=False, only_interesting=True
 ):
+    path = Path(project_path)
+    if not (path.is_dir() and (path / ".git").is_dir()):
+        raise ValueError(f"{project_path} is not a Git repository")
     if reset_db:
         db_reset()
 
     con = state.get_db(temporary=is_testing)
 
-    # FIXME: abort if raw directory w/o Git state
+    breakpoint()
     db_add_project(con, project_path)
     con.commit()
 
