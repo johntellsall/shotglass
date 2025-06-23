@@ -39,8 +39,11 @@ def query1(con, sql=None, table=None, args=None):
     assert sql or table
     if table:
         sql = f"select count(*) from {table}"
-    res = list(con.execute(sql, args or []))
-    return res[0][0]
+    try:
+        res = list(con.execute(sql, args or []))
+        return res[0][0]
+    except IndexError:
+        return None
 
 
 def queryall(con, sql):

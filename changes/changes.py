@@ -123,8 +123,23 @@ def main(paths):
         "INSERT INTO file (project_id, tag, path, num_lines) VALUES (?, ?, ?, ?)",
         data
     )
-    print(state.query1(db, "select sum(num_lines) from file"))
-    assert 0
+    print('final lines:', state.query1(db, "select sum(num_lines) from file"))
+
+    first_tag = tags[0]
+    first_paths = run.git_ls_tree2(proj, first_tag, "src")
+    
+    retired = set(first_paths) - set(final_paths)
+    print(f"Retired paths: {retired}")
+
+    data = [
+        (project_id, first_tag, path, run.git_count_lines(proj, first_tag, path))
+        for path in first_paths
+    ]
+    db.executemany(
+        "INSERT INTO file (project_id, tag, path, num_lines) VALUES (?, ?, ?, ?)",
+        data
+    )
+    print('first lines:', state.query1(db, "select sum(num_lines) from file where tag = ?", args=(first_tag,)))
 
 
     tag_date = git_tag_list_dates(proj)
@@ -140,22 +155,10 @@ def main(paths):
 
     print(f"Tags: {tags}")
 
-    # FIXME: ensure "first version lines" case is handled
-    # tag_pairs = list(pairwise(tags))
-    # path_rel_diff = {}
-    # for src_tag, dest_tag in tag_pairs:
-    #     result = git_diff_stat(proj, src_tag, dest_tag, 'src')
-    #     for diff in result:
-    #         key = (diff['path'], src_tag)
-    #         path_rel_diff[key] = diff['diff']
-
     # change count:
     # - first col is number of lines in first version
     # - other col are number of changes
-    # - line change = *two* according to Git: one add, one remove
-    first_count = {}
-    for path in final_paths:
-        first_count[path] = count_lines(proj, first_tag, path)
+    # - line edit = *two* changes according to Git: one add, one remove
 
     if first_tag not in tags:  # FIXME:
         tags = [first_tag] + tags
@@ -198,12 +201,13 @@ def main(paths):
     paths = sorted(final_paths)
     if limit:
         paths = paths[:10]
+        
     for path in paths:
         # first col: file path
         print(f"{path:20}", end=" ")
 
         # next col: first version line count
-        first = first_count.get(path)
+        first = state.query1(db, "SELECT num_lines FROM file WHERE project_id = ? AND tag = ? AND path = ?", args=(project_id, first_tag, path))
         print(f"{lines_or_sep(first):>6}", end=" ")
 
         # middle: releases with change count
@@ -215,8 +219,8 @@ def main(paths):
                 print(f"{SEP:>6}", end=" ")
 
         # last col: final version line count
-        linecount = path_linecount.get(path, 0)
-        print(f"{linecount:>6}L", end=" ")
+        last = state.query1(db, "SELECT num_lines FROM file WHERE project_id = ? AND tag = ? AND path = ?", args=(project_id, final_tag, path))
+        print(f"{lines_or_sep(last):>6}", end=" ")
 
         print()
 
