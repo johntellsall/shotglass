@@ -22,6 +22,18 @@ def show(imgpath):
 def is_interesting(sourcepath):
     return sourcepath.endswith(('.py', '.c'))
 
+def do_resize(img, rect, scale):
+    """
+    Resize the rendered image to fit inside the rectangle, maintaining aspect ratio
+    """
+    img_w, img_h = img.size
+    width, height = rect
+    rect_w, rect_h = int(width), int(height)
+    scale_factor = min(rect_w / img_w, rect_h / img_h, scale)
+    new_size = (max(1, int(img_w * scale_factor)), max(1, int(img_h * scale_factor)))
+    resized_img = img.resize(new_size, Image.NEAREST)
+    return resized_img
+
 @click.command()
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
 def main(files):
@@ -52,14 +64,7 @@ def main(files):
         shape = [rect['x'], rect['y'], rect['x'] + rect['dx'], rect['y'] + rect['dy']]
         draw.rectangle(shape, outline="black", fill="lightblue")
 
-        # Resize the rendered image to fit inside the rectangle, maintaining aspect ratio
-        img_w, img_h = img.size
-        rect_w, rect_h = int(rect['dx']), int(rect['dy'])
-        scale_factor = min(rect_w / img_w, rect_h / img_h, scale)
-        print(scale_factor)
-        new_size = (max(1, int(img_w * scale_factor)), max(1, int(img_h * scale_factor)))
-        img = img.resize(new_size, Image.LANCZOS)
-
+        img = do_resize(img, (rect['dx'], rect['dy']), scale)
         image.paste(img, (int(rect['x']), int(rect['y'])))
         
     with tempfile.NamedTemporaryFile(suffix=".png", delete=True) as tmp:
