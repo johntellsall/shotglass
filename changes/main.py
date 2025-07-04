@@ -27,6 +27,7 @@ def is_interesting(sourcepath):
 def main(files):
     """Print contents of each file passed as argument."""
     width, height = 800, 600
+    scale = 3
 
     files = [file for file in files if is_interesting(file)]
     symfiles = [parse_path(file_) for file_ in files]
@@ -50,6 +51,16 @@ def main(files):
         # Draw the rectangle on the image
         shape = [rect['x'], rect['y'], rect['x'] + rect['dx'], rect['y'] + rect['dy']]
         draw.rectangle(shape, outline="black", fill="lightblue")
+
+        # Resize the rendered image to fit inside the rectangle, maintaining aspect ratio
+        img_w, img_h = img.size
+        rect_w, rect_h = int(rect['dx']), int(rect['dy'])
+        scale_factor = min(rect_w / img_w, rect_h / img_h, scale)
+        print(scale_factor)
+        new_size = (max(1, int(img_w * scale_factor)), max(1, int(img_h * scale_factor)))
+        img = img.resize(new_size, Image.LANCZOS)
+
+        image.paste(img, (int(rect['x']), int(rect['y'])))
         
     with tempfile.NamedTemporaryFile(suffix=".png", delete=True) as tmp:
         image.save(tmp.name)
