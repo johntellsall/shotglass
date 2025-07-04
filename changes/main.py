@@ -2,7 +2,7 @@ from symbols import parse_path
 
 import click
 import squarify
-from PIL import Image
+from PIL import Image, ImageDraw
 import math
 import subprocess
 import tempfile
@@ -36,7 +36,24 @@ def main(files):
     sizes = [s.num_lines for s in symfiles]
     sizes = squarify.normalize_sizes(sizes, width, height)
     rects = squarify.padded_squarify(sizes, 0, 0, width, height)
-    print(rects)
+    
+    image = Image.new("RGB", (width, height), color="gray")
+    draw = ImageDraw.Draw(image)
+
+    for i, symfile in enumerate(symfiles):
+        rect = rects[i]
+        img = render(symfile)
+        if img is None:
+            print(f"Skipping {symfile.path} due to insufficient lines.")
+            continue
+        
+        # Draw the rectangle on the image
+        shape = [rect['x'], rect['y'], rect['x'] + rect['dx'], rect['y'] + rect['dy']]
+        draw.rectangle(shape, outline="black", fill="lightblue")
+        
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=True) as tmp:
+        image.save(tmp.name)
+        show(tmp.name)
 
 
 
