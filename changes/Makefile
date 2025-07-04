@@ -1,5 +1,4 @@
-SAMPLE := ../SOURCE/Flask-2.2.2
-# SAMPLE := ../SOURCE/flask
+SAMPLE := ../SOURCE/flask
 
 PY_SOURCE := $(shell ls -1 *.py)
 DBPATH := main.db
@@ -11,6 +10,8 @@ all:
 
 render:
 	uv run main.py sample_code/sample.py
+render-full:
+	uv run main.py $$(find $(SAMPLE))
 
 extreemap:
 	uv run extreemap.py
