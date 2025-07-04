@@ -9,6 +9,9 @@ PYTEST := uv run pytest -vv --showlocals
 
 all:
 
+render:
+	uv run main.py sample_code/sample.py
+
 extreemap:
 	uv run extreemap.py
 	
