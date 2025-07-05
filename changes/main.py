@@ -1,3 +1,4 @@
+from pathlib import Path
 from symbols import parse_path
 
 import click
@@ -34,6 +35,30 @@ def do_resize(img, rect, scale):
     resized_img = img.resize(new_size, Image.NEAREST)
     return resized_img
 
+
+def label_files(symfiles, draw, rects):
+    font_lg = ImageFont.load_default(size=24)
+    font_sm = ImageFont.load_default(size=16)
+
+    # label the larger files
+    for i, symfile in enumerate(symfiles):
+        if symfile.num_lines < 100:
+            continue
+        rect = rects[i]
+        path = Path(symfile.path)
+        label = path.name
+        font = font_lg
+        label_width = draw.textlength(label, font=font)
+        if label_width > rect['dx'] - 10:
+            print(f'{label} is too wide for rectangle {rect}')
+            font = font_sm
+            label_width = draw.textlength(label, font=font)
+            if label_width > rect['dx'] - 10:
+                print(f'{label} small too wide, skipping')
+                continue
+        draw.text((rect['x'] + 5, rect['y'] + 5), label, fill="black", font=font)
+
+
 @click.command()
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
 def main(files):
@@ -67,31 +92,12 @@ def main(files):
         img = do_resize(img, (rect['dx'], rect['dy']), scale)
         image.paste(img, (int(rect['x']), int(rect['y'])))
 
-    font = ImageFont.load_default(size=24)
-
-    # label the larger files
-    for i, symfile in enumerate(symfiles):
-        if symfile.num_lines < 100:
-            continue
-        rect = rects[i]
-        label = f"{symfile.path}"
-        draw.text((rect['x'] + 5, rect['y'] + 5), label, fill="black", font=font)
+    label_files(symfiles, draw, rects)
 
     with tempfile.NamedTemporaryFile(suffix=".png", delete=True) as tmp:
         image.save(tmp.name)
         show(tmp.name)
 
-
-
-    # for file_path in files:
-    #     symbols = parse_path(file_path)
-    #     img = render(symbols)
-    #     if img is None:
-    #         continue
-    #     with tempfile.NamedTemporaryFile(suffix=".png", delete=True) as tmp:
-    #         img.save(tmp.name)
-    #         print(f'{symbols.path}: {symbols.num_lines} lines, {len(symbols.symbols)} symbols, size={img.size}')
-    #         show(tmp.name)
 
 if __name__ == '__main__':
     main()
