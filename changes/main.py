@@ -2,7 +2,7 @@ from symbols import parse_path
 
 import click
 import squarify
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 import math
 import subprocess
 import tempfile
@@ -54,19 +54,29 @@ def main(files):
     draw = ImageDraw.Draw(image)
 
     for i, symfile in enumerate(symfiles):
-        rect = rects[i]
         img = render(symfile)
         if img is None:
             print(f"Skipping {symfile.path} due to insufficient lines.")
             continue
         
-        # Draw the rectangle on the image
+        # Draw a rectangle on the image
+        rect = rects[i]
         shape = [rect['x'], rect['y'], rect['x'] + rect['dx'], rect['y'] + rect['dy']]
         draw.rectangle(shape, outline="black", fill="lightblue")
 
         img = do_resize(img, (rect['dx'], rect['dy']), scale)
         image.paste(img, (int(rect['x']), int(rect['y'])))
-        
+
+    font = ImageFont.load_default(size=24)
+
+    # label the larger files
+    for i, symfile in enumerate(symfiles):
+        if symfile.num_lines < 100:
+            continue
+        rect = rects[i]
+        label = f"{symfile.path}"
+        draw.text((rect['x'] + 5, rect['y'] + 5), label, fill="black", font=font)
+
     with tempfile.NamedTemporaryFile(suffix=".png", delete=True) as tmp:
         image.save(tmp.name)
         show(tmp.name)
