@@ -9,6 +9,7 @@ import subprocess
 CTAGS_ARGS = "ctags --output-format=json --fields=*-P -o -".split()
 
 
+# FIXME: support chdir
 def run_ctags(paths, verbose=False):
     "Ctags command output -- iter of dictionaries, one per symbol"
     if type(paths) == str:
