@@ -1,8 +1,14 @@
 all:
 
+# get-source: fetch directly from Debian
+# FIXME: simplify: depth=1?
+get-source:
+	echo git clone -C SOURCE https://salsa.debian.org/debian/dnsmasq.git
+	git -C SOURCE clone --depth=1 https://salsa.debian.org/debian/hello.git
+
 # Odoo -- releases from branches, not tags
 
-get-source:
+get-source-orig:
 	git -C SOURCE clone https://github.com/pallets/flask.git
 # git -C SOURCE clone --depth=1 https://github.com/odoo/odoo.git
 # git -C SOURCE clone https://github.com/zulip/zulip.git
