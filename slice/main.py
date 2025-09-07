@@ -1,5 +1,8 @@
+import run
+
 def main():
-    print("Hello from slice!")
+    paths = run.git_ls_files('../SOURCE/hello', 'HEAD', '**/*.c')
+    assert 0, paths
 
 
 if __name__ == "__main__":

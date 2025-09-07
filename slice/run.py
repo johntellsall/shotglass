@@ -60,8 +60,8 @@ def git_tag_list(project_path):
     return run(f"git -C {project_path} tag --list")
 
 
-def git_ls_tree2(proj, tag, filepat):
-    cmd = f"git -C {proj} ls-tree -r --name-only '{tag}' {filepat}"
+def git_ls_files(proj, tag, filepat):
+    cmd = f"git -C {proj} ls-files '{tag}' -- '{filepat}'"
     return run(cmd)
 
 
