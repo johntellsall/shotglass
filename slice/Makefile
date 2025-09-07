@@ -1,4 +1,4 @@
 all:
 
 run:
-	uv run main.py ../SOURCE/hello
+	uv run main.py ../SOURCE/dnsmasq

@@ -1,15 +1,25 @@
 from pathlib import Path
+import sys
 import run
 
-def main():
-    rel_paths = run.git_ls_files('../SOURCE/hello', 'HEAD', '**/*.c')
-    print(f'hello: {len(rel_paths)} source files')
 
-    base = Path('../SOURCE/hello')
+def proj_list_paths(projtop):
+    base = Path(projtop)
+    rel_paths = run.git_ls_files(projtop, 'HEAD', '**/*.c')
+
     paths = [base / relpath for relpath in rel_paths]
-    symbols = list(run.run_ctags(paths, verbose=True))
-    print(f'hello: {len(symbols)} symbols')
+    return paths
+
+
+def main(proj_list):
+    for projtop in proj_list:
+        name = Path(projtop).stem
+        paths = proj_list_paths(projtop)
+        print(f'{name}: {len(paths)} source files')
+
+        symbols = list(run.run_ctags(paths))
+        print(f'{name}: {len(symbols)} symbols')
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
