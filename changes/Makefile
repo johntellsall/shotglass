@@ -8,10 +8,13 @@ PYTEST := uv run pytest -vv --showlocals
 
 all:
 
-render:
-	uv run main.py sample_code/sample.py
-render-full:
-	uv run main.py $$(find $(SAMPLE))
+lines:
+	uv run lines.py $(SAMPLE)/tests/test_basic.py
+	
+square:
+	uv run file_square.py sample_code/sample.py
+square-full:
+	uv run file_square.py $$(find $(SAMPLE))
 
 extreemap:
 	uv run extreemap.py
