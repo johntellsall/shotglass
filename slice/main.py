@@ -60,7 +60,9 @@ def main(proj_list):
         for spath in sym_paths:
             print(f'** {spath}')
             blame = list(run_git_blame(projtop, [spath]))
-            print('{line_num} {author} {summary}'.format(**blame[0]))
+            for bitem in blame:
+                print(spath, end='')
+                print(':{line_num} {author} {summary}'.format(**bitem))
             # fields = ('author', 'line_num', 'summary')
 
 if __name__ == "__main__":
