@@ -1,5 +1,8 @@
 all:
 
+test:
+	uv run pytest -sv
+	
 run:
 	uv run main.py ../SOURCE/dnsmasq
 drun:
