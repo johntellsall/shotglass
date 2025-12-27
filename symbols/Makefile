@@ -9,6 +9,8 @@ PYTEST := uv run pytest -vv --showlocals
 
 all:
 
+pfs:
+	uv run plot_func_size.py
 list:
 	wc -l *.md
 	wc -l $$(git ls-files '*.py' | rg -v 'test_') \
@@ -27,6 +29,10 @@ show-recent: ## run most recent SQL report
 demo:
 	uv run main.py add-project --reset-db $(SAMPLE)
 	make demo.show
+
+demo-symbols:
+	uv run main.py add-project --reset-db $(SAMPLE)
+	make list-symbols.show
 
 demo-plot0:
 	./main.py add-project --reset-db $(SAMPLE)
@@ -76,7 +82,6 @@ summary: summary.csv
 
 pysummary:
 	uv run ./main.py summary
-
 
 
 %.csv: %.sql

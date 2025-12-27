@@ -7,9 +7,7 @@
 --         )""",
 --     """create table if not exists symbol (
 --         name, path, line_start, line_end, kind,
---         file_id int,
 --         project_id int,
---         foreign key (file_id) references file (id),
 --         foreign key (project_id) references project (id)
 --         )""",
 
@@ -27,3 +25,11 @@ select count(*) from symbol as symbol_count;
 select s.*, s.line_end - s.line_start + 1 as line_count
 from symbol s
 where s.name = 'route';
+
+-- Largest symbols by line count
+select s.name,
+    (s.line_end - s.line_start + 1) as line_count,
+    s.path
+from symbol s
+order by line_count desc, s.name
+limit 10;
