@@ -11,6 +11,7 @@ all:
 
 pfs:
 	uv run plot_func_size.py
+	
 list:
 	wc -l *.md
 	wc -l $$(git ls-files '*.py' | rg -v 'test_') \

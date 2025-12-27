@@ -6,6 +6,10 @@ get-source:
 	git -C SOURCE clone https://salsa.debian.org/debian/dnsmasq.git
 	echo git -C SOURCE clone --depth=1 https://salsa.debian.org/debian/hello.git
 
+get-source-flask:
+	git -C SOURCE clone https://salsa.debian.org/python-team/packages/flask.git
+	git -C SOURCE/flask tag -l 'debian/*' | wc -l
+
 # Odoo -- releases from branches, not tags
 
 get-source-orig:

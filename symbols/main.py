@@ -49,6 +49,7 @@ def db_add_releases(con, project_obj):
     for project, insert interesting (Git) tags/releases into db
     """
     tags = project_obj.get_tags()
+    breakpoint()
     project_path = project_obj.path
     if not tags: # XX or tasks == [""]:
         click.secho(f"{project_path}: no good tags, skipping project", fg="red")

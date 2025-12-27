@@ -82,6 +82,7 @@ def filter_good_paths(items, only_interesting=True):
 # TODO: make flexible
 class GoodTagFilter:
     GOOD_PATS = {
+        "debian": r'^debian/.+',
         "major_minor": r"^[0-9]+\.[0-9]+$",
         "numbers": r"^[0-9.]+$",  # exclude "2.0.0rc1"
     }
