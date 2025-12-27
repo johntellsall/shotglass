@@ -49,7 +49,6 @@ def db_add_releases(con, project_obj):
     for project, insert interesting (Git) tags/releases into db
     """
     tags = project_obj.get_tags()
-    breakpoint()
     project_path = project_obj.path
     if not tags: # XX or tasks == [""]:
         click.secho(f"{project_path}: no good tags, skipping project", fg="red")
@@ -155,7 +154,7 @@ def do_add_symbols(con, project_path):
 
 def do_add_files(con, project_path, only_interesting=False):
     """
-    for each project's releases, add those files into database
+    for each project's release, add those files into database
     """
     # Per project-release: add release files -> database
     project_id = db_get_project_id(con, project_path)
@@ -217,7 +216,8 @@ def summary():
 
 
 def raw_add_project(
-    project_path, reset_db=False, is_testing=False, only_interesting=True
+    project_path, reset_db=False, is_testing=False, only_interesting=True,
+    project_filter=None,
 ):
     path = Path(project_path)
     if not (path.is_dir() and (path / ".git").is_dir()):
@@ -229,11 +229,13 @@ def raw_add_project(
     db_add_project(con, project_path)
     con.commit()
 
-    proj_config = goodsource.GoodTagFilter(project_path)
-    proj_config.set_good_pat("latest")
+    if project_filter is None:
+        # default: only fetch latest tagged release
+        project_filter = goodsource.GoodTagFilter(project_path)
+        project_filter.set_good_pat("latest")
 
     # Git releases -> database; show count
-    db_add_releases(con, proj_config)
+    db_add_releases(con, project_filter)
     con.commit()
 
     # FIXME: needed?
