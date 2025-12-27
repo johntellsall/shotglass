@@ -24,7 +24,6 @@ select count(*) from symbol as symbol_count;
 -- DEFINITION of "route"
 -- moved in 6/2023 to src/flask/sansio/scaffold.py NOTE: HEAD only!
 -- 2.3.3 = src/flask/scaffold.py
-select f.path, s.line_start, s.name
-from symbol s, file f 
-where s.file_id = f.id
-and s.name='route';
+select s.*, s.line_end - s.line_start + 1 as line_count
+from symbol s
+where s.name = 'route';

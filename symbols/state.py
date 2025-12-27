@@ -18,11 +18,12 @@ SETUP_SQL = [
         project_id,
         foreign key (project_id) references project (id)
         )""",
+    # SYMBOL:
+    # - no file_id; path is more convenient
+    # - "path" = file_path
     """create table if not exists symbol (
         name, path, line_start, line_end, kind,
-        -- file_id int, -- FIXME: reconcile this
         project_id int,
-        -- foreign key (file_id) references file (id),
         foreign key (project_id) references project (id)
         )""",
 ]

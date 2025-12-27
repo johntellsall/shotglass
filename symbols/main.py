@@ -75,6 +75,7 @@ def db_get_project_id(con, path):
 def db_add_files(con, path, project_id, release, only_interesting):
     """
     for project and release/tag, add interesting files into db
+    - no file ID
     """
     all_items = list(run.git_ls_tree(path, release=release))
     items = list(
@@ -114,12 +115,10 @@ def db_insert_symbols(con, project_id, relpath_symbols):
             {project_id}, :name, '{relpath}', :line, :end, :kind
         )
         """
-        # print(f'{relpath} {len(items)}', end=' ')
         # ensure each symbol has "end" field
         for symbol in items:
             symbol['end'] = symbol.get('end', symbol['line'])
         con.executemany(insert_sym, items)
-        # print()
 
 
 def query_project_source_paths(project_path):

@@ -1,5 +1,5 @@
-SAMPLE := ../SOURCE/Flask-2.2.2
-# SAMPLE := ../SOURCE/flask
+# SAMPLE := ../SOURCE/Flask-2.2.2
+SAMPLE := ../SOURCE/flask
 
 PY_SOURCE := $(shell ls -1 *.py)
 DBPATH := main.db
@@ -8,6 +8,11 @@ PYTEST := uv run pytest -vv --showlocals
 
 
 all:
+
+list:
+	wc -l *.md
+	wc -l $$(git ls-files '*.py' | rg -v 'test_') \
+	| pr -3t
 
 extreemap:
 	uv run extreemap.py
@@ -103,7 +108,7 @@ run:
 # "make test" runs all tests
 # "KEYWORD=foo make testk " runs only tests matching "foo"
 test:
-	$(PYTEST)
+	$(PYTEST) -sv
 testk:
 	$(PYTEST) -k $(KEYWORD)
 test-all:
@@ -145,3 +150,6 @@ clean:
 
 main2:
 	uv run main2.py ../SOURCE/flask
+
+main3:
+	uv run main3.py
