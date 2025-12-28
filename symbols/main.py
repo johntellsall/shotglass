@@ -96,7 +96,6 @@ def db_add_files(con, path, project_id, release): # NOTE: , only_interesting):
     if not items:
         click.secho(f"{path}: {release=}: no files")
         return
-
     insert_file = (
         "insert into file (project_id, release, path, hash, size_bytes)"
         f" values ({project_id}, '{release}', :path, :hash, :size_bytes)"
@@ -169,7 +168,6 @@ def do_add_files(con, project_path, only_interesting=False):
     """
     for each project's release, add those files into database
     """
-    breakpoint()
     # Per project-release: add release files -> database
     project_id = db_get_project_id(con, project_path)
     project_name = Path(project_path).name
@@ -238,8 +236,13 @@ def raw_add_project(
     path = Path(project_path)
     if not (path.is_dir() and (path / ".git").is_dir()):
         raise ValueError(f"{project_path} is not a Git repository")
+    
+    
     if reset_db:
         db_reset()
+        con = state.get_db(temporary=is_testing)
+        state.setup(con)
+        con.commit()
 
     con = state.get_db(temporary=is_testing)
     db_add_project(con, project_path)

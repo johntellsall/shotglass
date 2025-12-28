@@ -15,7 +15,15 @@
 .mode tabs
 .headers on
 
+-- list all user tables and views
+-- select name, type, sql
+-- from sqlite_master
+-- where type in ('table','view')
+--     and name not like 'sqlite_%'
+-- order by name;
+
 -- COUNT
+select count(*) from release as release_count;
 select count(*) from file as file_count;
 select count(*) from symbol as symbol_count;
 

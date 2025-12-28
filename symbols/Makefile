@@ -1,8 +1,8 @@
 # # SAMPLE := ../SOURCE/Flask-2.2.2
 SAMPLE := ../SOURCE/flask
+DBPATH := main.db
 
 # PY_SOURCE := $(shell ls -1 *.py)
-# DBPATH := main.db
 # PYTEST := uv run pytest -vv --showlocals
 # # --tb=long
 
@@ -29,6 +29,7 @@ all:
 
 demo:
 	uv run main.py add-project --reset-db $(SAMPLE)
+	echo '.tables' | sqlite3 -echo ./main.db
 	make demo.show
 
 # demo-symbols:
