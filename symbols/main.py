@@ -4,8 +4,8 @@
 # Shotglass: info about codebases over time
 # """
 
+import logging
 from collections import defaultdict
-# import logging
 # import pprint
 # import time
 from itertools import batched
@@ -19,7 +19,8 @@ import run
 import state
 from state import query1
 
-# logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
+
+logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
 
 # # :::::::::::::::::::: APP-CENTRIC FUNCTIONS
@@ -56,15 +57,22 @@ def OLD_db_add_releases(con, project_obj):
 
     project_id = db_get_project_id(con, project_path)
     insert_release = f"""
-    insert into release (label, project_id)
-    values (:label, {project_id}
+        insert into release (label, project_id)
+        values (:label, {project_id}
     )"""
     items = [{"label": tag} for tag in tags]
     con.executemany(insert_release, items)
 
 
 def db_add_releases(con, project_obj):
-    tags = ['upstream/3.1.2'] # FIXME:
+    """
+    for project, insert interesting (Git) tags/releases into db
+    """
+    if False:
+        tags = ['upstream/3.1.2'] # FIXME:
+    else:
+        # list Git tags
+        tags = project_obj.get_tags()
 
     project_id = db_get_project_id(con, project_obj.path)
     insert_release = f"""
@@ -103,11 +111,10 @@ def db_add_files(con, path, project_id, release): # NOTE: , only_interesting):
     con.executemany(insert_file, items)
 
 
-# # CTAGS
-# # {'_type': 'tag', 'name': 'Flask', 'path': '.temp.py', 'access': 'public',
-# # 'inherits': 'object', 'language': 'Python', 'line': 173, 'kind': 'class',
-# # 'roles': 'def', 'end': 655}
-
+# CTAGS
+# {'_type': 'tag', 'name': 'Flask', 'path': '.temp.py', 'access': 'public',
+# 'inherits': 'object', 'language': 'Python', 'line': 173, 'kind': 'class',
+# 'roles': 'def', 'end': 655}
 
 
 def db_insert_symbols(con, project_id, relpath_symbols):
@@ -120,11 +127,11 @@ def db_insert_symbols(con, project_id, relpath_symbols):
     """
     for relpath, items in relpath_symbols.items():
         insert_sym = f"""
-        insert into symbol (
-            project_id, name, path, line_start, line_end, kind
-        ) values (
-            {project_id}, :name, '{relpath}', :line, :end, :kind
-        )
+            insert into symbol (
+                project_id, name, path, line_start, line_end, kind
+            ) values (
+                {project_id}, :name, '{relpath}', :line, :end, :kind
+            )
         """
         # ensure each symbol has "end" field
         for symbol in items:
@@ -156,6 +163,7 @@ def query_project_symbols(project_path):
     return relpath_symbols
 
 
+# NOTE: doesn't handle releases
 def do_add_symbols(con, project_path):
     project_id = db_get_project_id(con, project_path)
     file_symbols = query_project_symbols(project_path)
@@ -230,13 +238,10 @@ def cli():
 def raw_add_project(
     project_path, reset_db=False, is_testing=False, 
     project_filter=None,
-    #     only_interesting=True,
-
 ):
     path = Path(project_path)
     if not (path.is_dir() and (path / ".git").is_dir()):
         raise ValueError(f"{project_path} is not a Git repository")
-    
     
     if reset_db:
         db_reset()
@@ -263,7 +268,7 @@ def raw_add_project(
     con.commit()
 
     # per project -> single release, add symbols to db
-    do_add_symbols(con, project_path=project_path)
+    do_add_symbols(con, project_path)
     con.commit()
 
     if is_testing:
@@ -273,13 +278,17 @@ def raw_add_project(
 
 
 @cli.command()
-@click.option("--all", is_flag=True)
+# @click.option("--all", is_flag=True)
 @click.option("--reset-db", is_flag=True)
 @click.argument("project_path")
 def add_project(project_path, all=False, reset_db=False):
-    only_interesting = not all
+    # only_interesting = not all
+    project_filter = goodsource.GoodTagFilter(project_path)
+    project_filter.set_good_pat('debian')
     return raw_add_project(
-        project_path, reset_db=reset_db, 
+        project_path,
+        reset_db=reset_db,
+        project_filter=project_filter,
         # only_interesting=only_interesting
     )
 

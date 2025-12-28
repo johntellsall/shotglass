@@ -10,40 +10,40 @@ import state
 
 
 # TODO: remove?
-def cmd_list_git():
-    """
-    list project Releases, and stats for each release
-    TODO: make generic (now Flask only)
-    """
-    path = "../SOURCE/flask"  # TODO:
-    click.echo(f"List Tags {path}")
-    tags = goodsource.get_good_tags(path)
-    tags.sort(key=LooseVersion)
+# def cmd_list_git():
+#     """
+#     list project Releases, and stats for each release
+#     TODO: make generic (now Flask only)
+#     """
+#     path = "../SOURCE/flask"  # TODO:
+#     click.echo(f"List Tags {path}")
+#     tags = goodsource.get_good_tags(path)
+#     tags.sort(key=LooseVersion)
 
-    hashes = set()
-    # for each release
-    for tag in tags:
-        click.secho(f"release: {tag}", fg="black", bg="yellow")
-        all_items = list(run.git_ls_tree(path, release=tag))
-        click.secho(f"= {len(all_items)} total files", fg="yellow")
+#     hashes = set()
+#     # for each release
+#     for tag in tags:
+#         click.secho(f"release: {tag}", fg="black", bg="yellow")
+#         all_items = list(run.git_ls_tree(path, release=tag))
+#         click.secho(f"= {len(all_items)} total files", fg="yellow")
 
-        items = list(goodsource.filter_good_paths(all_items))
-        click.secho(f"= {len(items)} source files", fg="yellow")
+#         items = list(goodsource.filter_good_paths(all_items))
+#         click.secho(f"= {len(items)} source files", fg="yellow")
 
-        changed_items = []
-        for item in items:
-            filehash = item["hash"]
-            if filehash in hashes:
-                continue
-            hashes.add(filehash)
-            changed_items.append(item)
+#         changed_items = []
+#         for item in items:
+#             filehash = item["hash"]
+#             if filehash in hashes:
+#                 continue
+#             hashes.add(filehash)
+#             changed_items.append(item)
 
-        # show count of files changed in this release
-        click.secho(f"+/- {len(changed_items)} changed source", fg="yellow")
+#         # show count of files changed in this release
+#         click.secho(f"+/- {len(changed_items)} changed source", fg="yellow")
 
-        # .. and the files
-        for item in changed_items:
-            click.secho(f"- {item['path']}")
+#         # .. and the files
+#         for item in changed_items:
+#             click.secho(f"- {item['path']}")
 
 
 def cmd_summary():

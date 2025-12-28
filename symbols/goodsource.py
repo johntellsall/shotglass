@@ -92,6 +92,7 @@ class GoodTagFilter:
         self.good_pat = None
 
     def set_good_pat(self, pat):
+        "set pattern for filtering tags"
         if pat.startswith("^"):
             self.good_pat = pat  # regex
         elif pat in (None, "latest"):
@@ -99,20 +100,20 @@ class GoodTagFilter:
         else:
             self.good_pat = self.GOOD_PATS[pat]
 
-    def _get_tags_latest(self, raw_tags):
-        tags = list(raw_tags)
-        return tags[-1:]
-
     def get_tags(self):
         raw_tags = git_tag_list(self.path)
-        if self.good_pat == "latest":
-            return self._get_tags_latest(raw_tags)
-        elif self.good_pat is None:
-            return list(raw_tags)
-
-        is_good_tag = re.compile(self.good_pat).match
-        tags = list(filter(is_good_tag, raw_tags))
-        return tags
+        match self.good_pat:
+            case "latest":
+                tags = list(raw_tags)
+                return tags[-1:]
+            case None: # all tags
+                return list(raw_tags)
+            case _:
+                raise NotImplementedError
+                # XX check this
+                is_good_tag = re.compile(self.good_pat).match
+                tags = list(filter(is_good_tag, raw_tags))
+                return tags
 
 
 def get_good_tags(path):
