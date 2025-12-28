@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
-#
-"""
-Shotglass: info about codebases over time
-"""
+# #
+# """
+# Shotglass: info about codebases over time
+# """
 
 from collections import defaultdict
-import logging
-import pprint
-import time
-from itertools import batched # Python 3.12+
+# import logging
+# import pprint
+# import time
+from itertools import batched
 from pathlib import Path, PurePath
 
 import click
 
-import commands
+# import commands
 import goodsource
 import run
 import state
 from state import query1
 
-logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
+# logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
 
 
-# :::::::::::::::::::: APP-CENTRIC FUNCTIONS
+# # :::::::::::::::::::: APP-CENTRIC FUNCTIONS
 
 
 def db_reset():
@@ -44,7 +44,7 @@ def db_add_project(con, project_path):
     con.execute(insert_project, (name,))
 
 
-def db_add_releases(con, project_obj):
+def OLD_db_add_releases(con, project_obj):
     """
     for project, insert interesting (Git) tags/releases into db
     """
@@ -63,6 +63,18 @@ def db_add_releases(con, project_obj):
     con.executemany(insert_release, items)
 
 
+def db_add_releases(con, project_obj):
+    tags = ['upstream/3.1.2'] # FIXME:
+
+    project_id = db_get_project_id(con, project_obj.path)
+    insert_release = f"""
+        insert into release (label, project_id)
+        values (:label, {project_id}
+    )"""
+    items = [{"label": tag} for tag in tags]
+    con.executemany(insert_release, items)
+
+
 def db_get_project_id(con, path):
     "helper: fetch project's int ID"
     name = PurePath(path).name
@@ -71,15 +83,15 @@ def db_get_project_id(con, path):
     return query1(con, sql=sql)
 
 
-# TODO: add via *hash* not path
-def db_add_files(con, path, project_id, release, only_interesting):
+# TODO: pass config
+def db_add_files(con, path, project_id, release): # NOTE: , only_interesting):
     """
     for project and release/tag, add interesting files into db
     - no file ID
     """
     all_items = list(run.git_ls_tree(path, release=release))
     items = list(
-        goodsource.filter_good_paths(all_items, only_interesting=only_interesting)
+        goodsource.filter_good_paths(all_items) # NOTE: , only_interesting=only_interesting)
     )
     if not items:
         click.secho(f"{path}: {release=}: no files")
@@ -92,10 +104,10 @@ def db_add_files(con, path, project_id, release, only_interesting):
     con.executemany(insert_file, items)
 
 
-# CTAGS
-# {'_type': 'tag', 'name': 'Flask', 'path': '.temp.py', 'access': 'public',
-# 'inherits': 'object', 'language': 'Python', 'line': 173, 'kind': 'class',
-# 'roles': 'def', 'end': 655}
+# # CTAGS
+# # {'_type': 'tag', 'name': 'Flask', 'path': '.temp.py', 'access': 'public',
+# # 'inherits': 'object', 'language': 'Python', 'line': 173, 'kind': 'class',
+# # 'roles': 'def', 'end': 655}
 
 
 
@@ -152,10 +164,12 @@ def do_add_symbols(con, project_path):
     con.commit()
 
 
+# FIXME: pass config
 def do_add_files(con, project_path, only_interesting=False):
     """
     for each project's release, add those files into database
     """
+    breakpoint()
     # Per project-release: add release files -> database
     project_id = db_get_project_id(con, project_path)
     project_name = Path(project_path).name
@@ -181,7 +195,7 @@ def do_add_files(con, project_path, only_interesting=False):
             project_id=project_id,
             path=project_path,
             release=label,
-            only_interesting=only_interesting,
+            # NOTE: only_interesting=only_interesting,
         )
     con.commit()
 
@@ -197,7 +211,7 @@ def do_add_files(con, project_path, only_interesting=False):
         click.secho(f"rel {label}: num files: {result[0][0]}")
 
 
-# :::::::::::::::::::: COMMANDS
+# # :::::::::::::::::::: COMMANDS
 
 
 @click.group()
@@ -205,19 +219,21 @@ def cli():
     pass
 
 
-@cli.command()
-def list_git():
-    commands.cmd_list_git()
+# @cli.command()
+# def list_git():
+#     commands.cmd_list_git()
 
 
-@cli.command()
-def summary():
-    commands.cmd_summary()
+# @cli.command()
+# def summary():
+#     commands.cmd_summary()
 
 
 def raw_add_project(
-    project_path, reset_db=False, is_testing=False, only_interesting=True,
+    project_path, reset_db=False, is_testing=False, 
     project_filter=None,
+    #     only_interesting=True,
+
 ):
     path = Path(project_path)
     if not (path.is_dir() and (path / ".git").is_dir()):
@@ -240,7 +256,7 @@ def raw_add_project(
 
     # FIXME: needed?
     # per release -> add files to db
-    do_add_files(con, project_path, only_interesting=only_interesting)
+    do_add_files(con, project_path) # , only_interesting=only_interesting)
     con.commit()
 
     # per project -> single release, add symbols to db
@@ -260,39 +276,40 @@ def raw_add_project(
 def add_project(project_path, all=False, reset_db=False):
     only_interesting = not all
     return raw_add_project(
-        project_path, reset_db=reset_db, only_interesting=only_interesting
+        project_path, reset_db=reset_db, 
+        # only_interesting=only_interesting
     )
 
 
-@cli.command()
-@click.argument("path")
-def ls_tags(path):
-    """
-    list tags in Git repos
-    """
-    click.echo(f"List Tags {path}")
-    tags = run.git_tag_list(path)
-    pprint.pprint(tags)
+# @cli.command()
+# @click.argument("path")
+# def ls_tags(path):
+#     """
+#     list tags in Git repos
+#     """
+#     click.echo(f"List Tags {path}")
+#     tags = run.git_tag_list(path)
+#     pprint.pprint(tags)
 
 
-@cli.command()
-@click.argument("path")
-def ctags(path):
-    """
-    show symbols of single source file (from Ctags)
-    """
-    click.echo(f"Ctags {path}")
-    symbols = list(run.run_ctags(path))
-    pprint.pprint(symbols)
+# @cli.command()
+# @click.argument("path")
+# def ctags(path):
+#     """
+#     show symbols of single source file (from Ctags)
+#     """
+#     click.echo(f"Ctags {path}")
+#     symbols = list(run.run_ctags(path))
+#     pprint.pprint(symbols)
 
 
-@cli.command()
-@click.argument("path")
-def count_defs(path):
-    "print rough count of Python functions in project"
-    cmd = f"cd {path} ; git ls-files '*.py' | xargs grep -w def | wc -l"
-    count = int(run.run_blob(cmd))
-    click.echo(f"{path}: def {count=}")
+# @cli.command()
+# @click.argument("path")
+# def count_defs(path):
+#     "print rough count of Python functions in project"
+#     cmd = f"cd {path} ; git ls-files '*.py' | xargs grep -w def | wc -l"
+#     count = int(run.run_blob(cmd))
+#     click.echo(f"{path}: def {count=}")
 
 
 if __name__ == "__main__":
