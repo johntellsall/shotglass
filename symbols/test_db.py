@@ -19,7 +19,7 @@ def test_release(test_con):
     assert releases[0]["label"] == "upstream/3.1.2"
 
 
-def test_file(test_con):
+def test_path(test_con):
     file_rows = queryall(test_con, sql='select * from file')
     files = [dict(row) for row in file_rows]
     assert len(files) >= 1
@@ -53,3 +53,9 @@ def test_file(test_con):
 #     # Assertions
 #     assert result == {"mock_key": "mock_response"}
 #     requests.get.assert_called_once_with("https://fakeurl.com") # Verify call details
+    # file_rows = queryall(con, sql='select * from file where path = "src/flask/app.py"')
+    # item = dict(file_rows[0])
+    # print('FILE:', item)
+    # symbol_rows = queryall(con, sql='select * from symbol where path = "src/flask/app.py"')
+    # item = dict(symbol_rows[0])
+    # print('SYMBOL:', item)
