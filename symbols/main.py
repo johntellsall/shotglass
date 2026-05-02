@@ -17,7 +17,7 @@ import click
 import goodsource
 import run
 import state
-from state import query1
+from state import queryall, query1
 
 
 logging.basicConfig(format="%(asctime)-15s %(message)s", level=logging.INFO)
@@ -91,22 +91,21 @@ def db_get_project_id(con, path):
     return query1(con, sql=sql)
 
 
-# TODO: pass config
-def db_add_files(con, path, project_id, release): # NOTE: , only_interesting):
+def db_add_files(con, path, release, release_id):
     """
-    for project and release/tag, add interesting files into db
+    for project and release/tag, add files into db
     - no file ID
     """
     all_items = list(run.git_ls_tree(path, release=release))
     items = list(
-        goodsource.filter_good_paths(all_items) # NOTE: , only_interesting=only_interesting)
+        goodsource.filter_good_paths(all_items)
     )
     if not items:
         click.secho(f"{path}: {release=}: no files")
         return
     insert_file = (
-        "insert into file (project_id, release, path, hash, size_bytes)"
-        f" values ({project_id}, '{release}', :path, :hash, :size_bytes)"
+        "insert into file (release_id, path, hash, size_bytes)"
+        f" values ({release_id}, :path, :hash, :size_bytes)"
     )
     con.executemany(insert_file, items)
 
@@ -117,7 +116,7 @@ def db_add_files(con, path, project_id, release): # NOTE: , only_interesting):
 # 'roles': 'def', 'end': 655}
 
 
-def db_insert_symbols(con, project_id, relpath_symbols):
+def db_insert_symbols(con, release_id, relpath_symbols):
     """
     insert symbols into database
     - input: dictionary
@@ -128,9 +127,9 @@ def db_insert_symbols(con, project_id, relpath_symbols):
     for relpath, items in relpath_symbols.items():
         insert_sym = f"""
             insert into symbol (
-                project_id, name, path, line_start, line_end, kind
+                release_id, name, path, line_start, line_end, kind
             ) values (
-                {project_id}, :name, '{relpath}', :line, :end, :kind
+                {release_id}, :name, '{relpath}', :line, :end, :kind
             )
         """
         # ensure each symbol has "end" field
@@ -163,6 +162,26 @@ def query_project_symbols(project_path):
     return relpath_symbols
 
 
+def db_add_release(con, project_id, release):
+    insert_release = f"""
+        insert into release (label, project_id)
+        values (:label, :project_id
+    )"""
+    con.execute(insert_release, {"label": release, "project_id": project_id})
+
+
+def db_get_release_id(con, project_id, release):
+    sql = f"""
+        select id from release
+        where project_id=:project_id and label=:release
+    """
+    return query1(con, sql=sql, params={"project_id": project_id, "release": release})
+
+# ::::::::::::::::::::::::::::
+
+
+
+
 # NOTE: doesn't handle releases
 def do_add_symbols(con, project_path):
     project_id = db_get_project_id(con, project_path)
@@ -172,7 +191,7 @@ def do_add_symbols(con, project_path):
 
 
 # FIXME: pass config
-def do_add_files(con, project_path, only_interesting=False):
+def do_add_files(con, project_path):
     """
     for each project's release, add those files into database
     """
@@ -195,6 +214,13 @@ def do_add_files(con, project_path, only_interesting=False):
         releases = ["HEAD"]
 
     for label in releases:
+        db_add_release(con, project_id, label)
+
+    releases = queryall(con, f"select release_id, label from release where project_id={project_id}")
+
+    breakpoint()
+
+    for release_id, label in releases:
         click.echo(f"{project_id=} release {label}")
         db_add_files(
             con,
@@ -224,15 +250,6 @@ def do_add_files(con, project_path, only_interesting=False):
 def cli():
     pass
 
-
-# @cli.command()
-# def list_git():
-#     commands.cmd_list_git()
-
-
-# @cli.command()
-# def summary():
-#     commands.cmd_summary()
 
 
 def raw_add_project(
@@ -264,12 +281,13 @@ def raw_add_project(
 
     # FIXME: needed?
     # per release -> add files to db
-    do_add_files(con, project_path) # , only_interesting=only_interesting)
-    con.commit()
+    # do_add_files(con, project_path)
+    # con.commit()
 
-    # per project -> single release, add symbols to db
-    do_add_symbols(con, project_path)
-    con.commit()
+    if 0: # FIXME: not yet
+        # per project -> single release, add symbols to db
+        do_add_symbols(con, project_path)
+        con.commit()
 
     if is_testing:
         return con
@@ -289,37 +307,6 @@ def add_project(project_path, all=False, reset_db=False):
         reset_db=reset_db,
         project_filter=project_filter,
     )
-
-
-# @cli.command()
-# @click.argument("path")
-# def ls_tags(path):
-#     """
-#     list tags in Git repos
-#     """
-#     click.echo(f"List Tags {path}")
-#     tags = run.git_tag_list(path)
-#     pprint.pprint(tags)
-
-
-# @cli.command()
-# @click.argument("path")
-# def ctags(path):
-#     """
-#     show symbols of single source file (from Ctags)
-#     """
-#     click.echo(f"Ctags {path}")
-#     symbols = list(run.run_ctags(path))
-#     pprint.pprint(symbols)
-
-
-# @cli.command()
-# @click.argument("path")
-# def count_defs(path):
-#     "print rough count of Python functions in project"
-#     cmd = f"cd {path} ; git ls-files '*.py' | xargs grep -w def | wc -l"
-#     count = int(run.run_blob(cmd))
-#     click.echo(f"{path}: def {count=}")
 
 
 if __name__ == "__main__":

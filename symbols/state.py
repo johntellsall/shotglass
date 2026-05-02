@@ -17,7 +17,7 @@ SETUP_SQL = [
     # FILE: part of a Release
     # - simple stats
     """create table if not exists file (
-        id integer primary key, release,
+        id integer primary key, 
         path, hash, num_lines, size_bytes,
         release_id,
         foreign key (release_id) references release (id)
