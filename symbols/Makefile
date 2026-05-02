@@ -9,13 +9,19 @@ DBPATH := main.db
 
 all:
 
+lint:
+	uv run ruff check --output-format=concise
+
+fix-lint:
+	uv run ruff check --fix
+
 # pfs:
 # 	uv run plot_func_size.py
 	
-# list:
-# 	wc -l *.md
-# 	wc -l $$(git ls-files '*.py' | rg -v 'test_') \
-# 	| pr -3t
+list:
+	wc -l *.md
+	wc -l $$(git ls-files '*.py' | rg -v 'test_') \
+	| pr -3t
 
 # extreemap:
 # 	uv run extreemap.py

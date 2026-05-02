@@ -5,6 +5,8 @@ import sqlite3
 
 SETUP_SQL = [
     "PRAGMA foreign_keys = ON",
+    # PROJECT: like "flask"
+    # RELEASE: a specific version of a Project
     """create table if not exists project (
         id integer primary key, name
         )""",
@@ -12,19 +14,21 @@ SETUP_SQL = [
         label, project_id,
         foreign key (project_id) references project (id)
         )""",
+    # FILE: part of a Release
+    # - simple stats
     """create table if not exists file (
         id integer primary key, release,
         path, hash, num_lines, size_bytes,
-        project_id,
-        foreign key (project_id) references project (id)
+        release_id,
+        foreign key (release_id) references release (id)
         )""",
     # SYMBOL:
-    # - no file_id; path is more convenient
-    # - "path" = file_path
+    # - also part of a Release
+    # - no file_id; release+path is more convenient
     """create table if not exists symbol (
         name, path, line_start, line_end, kind,
-        project_id int,
-        foreign key (project_id) references project (id)
+        release_id int,
+        foreign key (release_id) references release (id)
         )""",
 ]
 
