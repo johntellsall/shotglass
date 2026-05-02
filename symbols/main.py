@@ -45,25 +45,6 @@ def db_add_project(con, project_path):
     con.execute(insert_project, (name,))
 
 
-def OLD_db_add_releases(con, project_obj):
-    """
-    for project, insert interesting (Git) tags/releases into db
-    """
-    tags = project_obj.get_tags()
-    project_path = project_obj.path
-    if not tags: # XX or tasks == [""]:
-        click.secho(f"{project_path}: no good tags, skipping project", fg="red")
-        return
-
-    project_id = db_get_project_id(con, project_path)
-    insert_release = f"""
-        insert into release (label, project_id)
-        values (:label, {project_id}
-    )"""
-    items = [{"label": tag} for tag in tags]
-    con.executemany(insert_release, items)
-
-
 def db_add_releases(con, project_obj):
     """
     for project, insert interesting (Git) tags/releases into db
@@ -216,31 +197,28 @@ def do_add_files(con, project_path):
     for label in releases:
         db_add_release(con, project_id, label)
 
-    releases = queryall(con, f"select release_id, label from release where project_id={project_id}")
+    releases = queryall(con, f"select id, label from release where project_id={project_id}")
 
-    breakpoint()
-
-    for release_id, label in releases:
-        click.echo(f"{project_id=} release {label}")
+    for rel in releases:
+        click.echo(f"{project_id=} release {rel['label']}")
         db_add_files(
             con,
-            project_id=project_id,
+            release_id=rel['id'],
             path=project_path,
-            release=label,
-            # NOTE: only_interesting=only_interesting,
+            release=rel['label'],
         )
     con.commit()
 
     # Per project-release: show count of files
     click.secho(f"{project_name}: files per release", fg="yellow")
 
-    for label in releases:
-        sql = (
+    for rel in releases:
+        num_files = query1(
+            con,
             "select count(*) from file where "
-            f"project_id={project_id} and release = ?"
+            f"release_id={rel['id']}"
         )
-        result = list(con.execute(sql, [label]))
-        click.secho(f"rel {label}: num files: {result[0][0]}")
+        click.secho(f"rel {rel['label']}: num files: {num_files}")
 
 
 # # :::::::::::::::::::: COMMANDS
@@ -279,10 +257,9 @@ def raw_add_project(
     db_add_releases(con, project_filter)
     con.commit()
 
-    # FIXME: needed?
     # per release -> add files to db
-    # do_add_files(con, project_path)
-    # con.commit()
+    do_add_files(con, project_path)
+    con.commit()
 
     if 0: # FIXME: not yet
         # per project -> single release, add symbols to db

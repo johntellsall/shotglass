@@ -11,6 +11,7 @@ SETUP_SQL = [
         id integer primary key, name
         )""",
     """create table if not exists release (
+        id integer primary key,
         label, project_id,
         foreign key (project_id) references project (id)
         )""",
