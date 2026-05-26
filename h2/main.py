@@ -56,6 +56,7 @@ def git_get_file(project_path, release, file_path) -> list[str]:
 class GitRepo:
     def __init__(self, path):
         self.path = path
+        self.name = Path(path).name
 
     def ls_tree(self, release):
         return git_ls_tree(self.path, release)
@@ -68,8 +69,13 @@ class GitRepo:
     
 
 def import_project(db, repo, release):
-    query(db, f'insert into project (name) values ("{release}")')
-    project_id = query1(db, f'select id from project where name = "{release}"')
+    """
+    - project record (name)
+    - file records (project_id, release, path, num_bytes)
+    """
+    query(db, f'insert into project (name) values ("{repo.name}")')
+    db.commit()
+    project_id = query1(db, f'select id from project where name = "{repo.name}"')
 
     def is_interesting(path):
         suffix = Path(path).suffix
@@ -86,23 +92,31 @@ def import_project(db, repo, release):
     db.commit()
 
 
-def main():
-    db = dbsetup()
-    repo = GitRepo('../SOURCE/dnsmasq')
-    release = 'HEAD'
-
-    import_project(db, repo, release)
-
-    count = query1(db, 'select count(*) from file')
-    print(f"Found {count} files in release {release}")
-
-    path_id_map = query(db, 'select path, id from file')
+def project_mod_numlines(repo, db, project_id, release):
+    path_id_map = query(db, f'select path, id from file where project_id = {project_id} and release = "{release}"')
     path_id_map = dict(path_id_map)
     
     for path, path_id in path_id_map.items():
         lines = git_get_file(repo.path, release, path)
         num_lines = len(lines)
         query(db, f'update file set num_lines = {num_lines} where id = {path_id}')
+    db.commit()
+
+
+def main():
+    db = dbsetup()
+    repo = GitRepo('../SOURCE/dnsmasq')
+    proj_name = repo.name
+    release = 'HEAD'
+
+    import_project(db, repo, release)
+
+    count = query1(db, 'select count(*) from file')
+    size = query1(db, 'select sum(num_bytes) from file')
+    print(f"Found {count} files in release {release}, total size {size} bytes")
+
+    project_id = query1(db, f'select id from project where name = "{proj_name}"')
+    project_mod_numlines(repo, db, project_id, release)
 
     total = query1(db, 'select sum(num_lines) from file')
     print(f"Total lines of code in release {release}: {total}")
