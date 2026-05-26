@@ -36,7 +36,7 @@ list:
 demo:
 	uv run main.py add-project --reset-db $(SAMPLE)
 	echo '.tables' | sqlite3 -echo ./main.db
-	make summary.show
+	@echo make summary.show
 
 # demo-symbols:
 # 	uv run main.py add-project --reset-db $(SAMPLE)

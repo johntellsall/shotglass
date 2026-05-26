@@ -151,12 +151,12 @@ def db_add_release(con, project_id, release):
     con.execute(insert_release, {"label": release, "project_id": project_id})
 
 
-def db_get_release_id(con, project_id, release):
+def db_get_release_id(con, project_id, label):
     sql = f"""
         select id from release
-        where project_id=:project_id and label=:release
+        where project_id=:project_id and label=:label
     """
-    return query1(con, sql=sql, params={"project_id": project_id, "release": release})
+    return query1(con, sql=sql, params={"project_id": project_id, "label": label})
 
 # ::::::::::::::::::::::::::::
 
@@ -190,16 +190,16 @@ def do_add_files(con, project_path):
     goodsource.sort_versions(releases)
 
     # FIXME: handle this better!
-    if releases == [""]:
-        logging.warning("%s: no release tags -- using HEAD", project_name)
-        releases = ["HEAD"]
+    # if releases == [""]:
+    #     logging.warning("%s: no release tags -- using HEAD", project_name)
+    #     releases = ["HEAD"]
 
     for label in releases:
         db_add_release(con, project_id, label)
 
     releases = queryall(con, f"select id, label from release where project_id={project_id}")
-
     for rel in releases:
+        print(dict(rel))
         click.echo(f"{project_id=} release {rel['label']}")
         db_add_files(
             con,
@@ -245,6 +245,7 @@ def raw_add_project(
         con.commit()
 
     con = state.get_db(temporary=is_testing)
+
     db_add_project(con, project_path)
     con.commit()
 
