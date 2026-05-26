@@ -61,13 +61,9 @@ class GitRepo:
     #     return git_ls_files(self.path, tag, filepat)
     
 
-def main():
-    db = dbsetup()
-    repo = GitRepo('../SOURCE/dnsmasq')
-    release = 'HEAD'
-
-    query(db, 'insert into project (name) values ("dnsmasq")')
-    project_id = query1(db, 'select id from project where name = "dnsmasq"')
+def import_project(db, repo, release):
+    query(db, f'insert into project (name) values ("{release}")')
+    project_id = query1(db, f'select id from project where name = "{release}"')
 
     def is_interesting(path):
         suffix = Path(path).suffix
@@ -82,6 +78,14 @@ def main():
     )
     db.executemany(sql, rows)
     db.commit()
+
+
+def main():
+    db = dbsetup()
+    repo = GitRepo('../SOURCE/dnsmasq')
+    release = 'HEAD'
+
+    import_project(db, repo, release)
 
     count = query1(db, 'select count(*) from file')
     print(f"Found {count} files in release {release}")
