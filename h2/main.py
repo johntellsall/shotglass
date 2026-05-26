@@ -1,4 +1,7 @@
+from pathlib import Path
 import subprocess
+
+from model import dbsetup, query, query1
 
 
 def run_blob(cmd):
@@ -59,7 +62,23 @@ class GitRepo:
     
 
 def main():
-    print("Hello from h2!")
+    db = dbsetup()
+    repo = GitRepo('../SOURCE/dnsmasq')
+
+    query(db, 'insert into project (name) values ("dnsmasq")')
+    project_id = query1(db, 'select id from project where name = "dnsmasq"')
+
+    def is_interesting(path):
+        suffix = Path(path).suffix
+        return suffix in {'.c', '.h', '.go', '.py'}
+
+    tree = repo.ls_tree("HEAD")
+    items = [item for item in tree if is_interesting(item['path'])]
+    rows = [(item['path'], item['size_bytes']) for item in items]
+    sql = ('insert into file'
+           ' (project_id, release, path, num_bytes)'
+           ' values (1, "HEAD", ?, ?)'
+    )
 
 
 if __name__ == "__main__":

@@ -9,3 +9,12 @@ def test_ls_tree():
 
     assert len(items) > 0
     assert items[0].keys() == {"hash", "path", "size_bytes"}
+
+
+def test_tag_list():
+    repo = main.GitRepo(SOURCE)
+    tags = list(repo.tag_list())
+    breakpoint()
+
+    assert len(tags) > 0
+    assert tags[0].startswith("v")
