@@ -64,6 +64,7 @@ class GitRepo:
 def main():
     db = dbsetup()
     repo = GitRepo('../SOURCE/dnsmasq')
+    release = 'HEAD'
 
     query(db, 'insert into project (name) values ("dnsmasq")')
     project_id = query1(db, 'select id from project where name = "dnsmasq"')
@@ -72,13 +73,18 @@ def main():
         suffix = Path(path).suffix
         return suffix in {'.c', '.h', '.go', '.py'}
 
-    tree = repo.ls_tree("HEAD")
+    tree = repo.ls_tree(release)
     items = [item for item in tree if is_interesting(item['path'])]
     rows = [(item['path'], item['size_bytes']) for item in items]
     sql = ('insert into file'
            ' (project_id, release, path, num_bytes)'
-           ' values (1, "HEAD", ?, ?)'
+           f' values ({project_id}, "{release}", ?, ?)'
     )
+    db.executemany(sql, rows)
+    db.commit()
+
+    count = query1(db, 'select count(*) from file')
+    print(f"Found {count} files in release {release}")
 
 
 if __name__ == "__main__":
