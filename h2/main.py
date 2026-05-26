@@ -42,6 +42,12 @@ def git_tag_list(project_path):
     return run(f"git -C {project_path} tag --list")
 
 
+def git_get_file(project_path, release, file_path) -> list[str]:
+    "get contents of a file in a given release -- lines"
+    cmd = f"git -C {project_path} show '{release}:{file_path}'"
+    return run(cmd)
+
+
 # def git_ls_files(proj, tag, filepat):
 #     cmd = f"git -C {proj} ls-files '{tag}' -- '{filepat}'"
 #     return run(cmd)
@@ -90,6 +96,20 @@ def main():
     count = query1(db, 'select count(*) from file')
     print(f"Found {count} files in release {release}")
 
+    path_id_map = query(db, 'select path, id from file')
+    path_id_map = dict(path_id_map)
+    
+    for path, path_id in path_id_map.items():
+        lines = git_get_file(repo.path, release, path)
+        num_lines = len(lines)
+        query(db, f'update file set num_lines = {num_lines} where id = {path_id}')
 
+    total = query1(db, 'select sum(num_lines) from file')
+    print(f"Total lines of code in release {release}: {total}")
+
+    min_lines, max_lines = query(db, 'select min(num_lines), max(num_lines) from file')[0]
+    print(f"Min lines: {min_lines}, Max lines: {max_lines}")
+
+    
 if __name__ == "__main__":
     main()
