@@ -39,9 +39,9 @@ def git_tag_list(project_path):
     return run(f"git -C {project_path} tag --list")
 
 
-def git_ls_files(proj, tag, filepat):
-    cmd = f"git -C {proj} ls-files '{tag}' -- '{filepat}'"
-    return run(cmd)
+# def git_ls_files(proj, tag, filepat):
+#     cmd = f"git -C {proj} ls-files '{tag}' -- '{filepat}'"
+#     return run(cmd)
 
 
 class GitRepo:
@@ -54,10 +54,10 @@ class GitRepo:
     def tag_list(self):
         return git_tag_list(self.path)
 
-    def ls_files(self, tag, filepat):
-        return git_ls_files(self.path, tag, filepat)
+    # def ls_files(self, tag, filepat):
+    #     return git_ls_files(self.path, tag, filepat)
     
-    
+
 def main():
     print("Hello from h2!")
 
