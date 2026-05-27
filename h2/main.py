@@ -94,7 +94,7 @@ class GitRepo:
         return git_tag_list(self.path)
 
 
-def import_project(db, repo, release):
+def import_project(db, repo):
     """
     - project record (name)
     - file records (project_id, release, path, num_bytes)
@@ -102,7 +102,10 @@ def import_project(db, repo, release):
     query(db, f'insert into project (name) values ("{repo.name}")')
     db.commit()
     project_id = query1(db, f'select id from project where name = "{repo.name}"')
+    return project_id
 
+
+def import_release(db, repo, project_id, release):
     def is_interesting(path):
         suffix = Path(path).suffix
         return suffix in {'.c', '.h', '.go', '.py'}
@@ -161,25 +164,36 @@ def main():
     proj_name = repo.name
     release = 'HEAD'
 
-    import_project(db, repo, release)
+    project_id = import_project(db, repo)
 
-    count = query1(db, 'select count(*) from file')
-    size = query1(db, 'select sum(num_bytes) from file')
-    print(f"Found {count} files in release {release}, total size {size} bytes")
+    tags = repo.tag_list()
+    def is_interesting(tag):
+        return tag.lstrip('v').replace('.', '').isdigit()
+    releases = [tag for tag in tags if is_interesting(tag)]
 
-    project_id = query1(db, f'select id from project where name = "{proj_name}"')
-    project_mod_numlines(repo, db, project_id, release)
+    releases = releases[-2:]
 
-    total = query1(db, 'select sum(num_lines) from file')
-    print(f"Total lines of code in release {release}: {total}")
+    for release in releases:
+        print(f"=== {proj_name} {release} ===")
+        import_release(db, repo, project_id, release)
 
-    min_lines, max_lines = query(db, 'select min(num_lines), max(num_lines) from file')[0]
-    print(f"Min lines: {min_lines}, Max lines: {max_lines}")
+        count = query1(db, f'select count(*) from file where project_id = {project_id} and release = "{release}"')
+        size = query1(db, f'select sum(num_bytes) from file where project_id = {project_id} and release = "{release}"')
+        print(f"Found {count} files in release {release}, total size {size} bytes")
 
-    project_add_symbols(repo, db, project_id, release)
+        project_id = query1(db, f'select id from project where name = "{proj_name}"')
+        project_mod_numlines(repo, db, project_id, release)
 
-    total = query1(db, 'select count(*) from symbol')
-    print(f"Total symbols in release {release}: {total}")
+        total = query1(db, f'select sum(num_lines) from file where project_id = {project_id} and release = "{release}"')
+        print(f"Total lines of code in release {release}: {total}")
+
+        min_lines, max_lines = query(db, f'select min(num_lines), max(num_lines) from file where project_id = {project_id} and release = "{release}"')[0]
+        print(f"Min lines: {min_lines}, Max lines: {max_lines}")
+
+        project_add_symbols(repo, db, project_id, release)
+
+        total = query1(db, 'select count(*) from symbol')
+        print(f"Total symbols: {total}")
 
     
 if __name__ == "__main__":
